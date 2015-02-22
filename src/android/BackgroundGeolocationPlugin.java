@@ -1,4 +1,4 @@
-package com.tenforwardconsulting.cordova.bgloc;
+package com.transistorsoft.cordova.bggeo;
 
 import org.apache.cordova.CallbackContext;
 import org.apache.cordova.CordovaPlugin;
@@ -31,7 +31,7 @@ import android.media.AudioManager;
 import android.media.ToneGenerator;
 
 public class BackgroundGeolocationPlugin extends CordovaPlugin implements LocationListener, GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener {
-    private static final String TAG = "BackgroundGeoLocation";
+    private static final String TAG = "BackgroundGeolocation";
 
     public static final String ACTION_START = "start";
     public static final String ACTION_STOP = "stop";
@@ -88,7 +88,7 @@ public class BackgroundGeolocationPlugin extends CordovaPlugin implements Locati
         }
         
         // This is the IntentService we'll provide to google-play API.
-        locationUpdateService = PendingIntent.getService(activity, 0, new Intent(activity, LocationService.class), PendingIntent.FLAG_UPDATE_CURRENT);
+        locationUpdateService = PendingIntent.getService(activity, 0, new Intent(activity, BackgroundGeolocationService.class), PendingIntent.FLAG_UPDATE_CURRENT);
         
         // Register for events fired by our IntentService "LocationService"
         EventBus.getDefault().register(this);

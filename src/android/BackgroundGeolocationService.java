@@ -1,4 +1,4 @@
-package com.tenforwardconsulting.cordova.bgloc;
+package com.transistorsoft.cordova.bggeo;
 
 import de.greenrobot.event.EventBus;
 
@@ -15,7 +15,7 @@ public class BackgroundGeolocationService extends IntentService {
 
 	private static final String TAG = "BackgroundGeolocationService";
 	
-	public LocationService() {
+	public BackgroundGeolocationService() {
 		super("com.transistorsoft.cordova.bggeo.BackgroundGeolocationService");
 	}
 
@@ -45,7 +45,7 @@ public class BackgroundGeolocationService extends IntentService {
 					break;
 			}
 			
-			boolean isPushPluginActive = BackgroundGpsPlugin.isActive();
+			boolean isPushPluginActive = BackgroundGeolocationPlugin.isActive();
 			if (isMoving && !isPushPluginActive) {
 				forceMainActivityReload();
 		    }
@@ -54,7 +54,7 @@ public class BackgroundGeolocationService extends IntentService {
 			final Location location = intent.getParcelableExtra(FusedLocationProviderApi.KEY_LOCATION_CHANGED);
 			if (location != null) {
 				Log.i(TAG, "Location received: " + location.toString());
-				boolean isPushPluginActive = BackgroundGpsPlugin.isActive();
+				boolean isPushPluginActive = BackgroundGeolocationPlugin.isActive();
 				if (!isPushPluginActive) {
 					forceMainActivityReload();
 			    }
