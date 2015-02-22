@@ -1,8 +1,3 @@
-Paid Version
-==============================
-
-A new [Paid Version](http://christocracy.github.io/cordova-background-geolocation/) is available implementing the latest Android GeoLocation and ActivityRecognition APIs for much-improved battery performance.
-
 BackgroundGeoLocation
 ==============================
 
