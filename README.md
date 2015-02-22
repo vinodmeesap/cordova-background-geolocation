@@ -20,7 +20,7 @@ The plugin creates the object `window.plugins.backgroundGeoLocation` with the me
 
 ```
 
-   cordova plugin add https://github.com/christocracy/cordova-plugin-background-geolocation.git
+   cordova plugin add https://github.com/christocracy/cordova-background-geolocation.git
 ```
 
 A full example could be:
@@ -69,22 +69,14 @@ A full example could be:
 
     // BackgroundGeoLocation is highly configurable.
     bgGeo.configure(callbackFn, failureFn, {
-        url: 'http://only.for.android.com/update_location.json', // <-- Android ONLY:  your server url to send locations to
-        params: {
-            auth_token: 'user_secret_auth_token',    //  <-- Android ONLY:  HTTP POST params sent to your server when persisting locations.
-            foo: 'bar'                              //  <-- Android ONLY:  HTTP POST params sent to your server when persisting locations.
-        },
-        headers: {                                   // <-- Android ONLY:  Optional HTTP headers sent to your configured #url when persisting locations
-            "X-Foo": "BAR"
-        },
-        desiredAccuracy: 10,
-        stationaryRadius: 20,
-        distanceFilter: 30,
-        notificationTitle: 'Background tracking', // <-- android only, customize the title of the notification
-        notificationText: 'ENABLED', // <-- android only, customize the text of the notification
-        activityType: 'AutomotiveNavigation',
-        debug: true, // <-- enable this hear sounds for background-geolocation life-cycle.
-        stopOnTerminate: false // <-- enable this to clear background location settings when the app terminates
+        desiredAccuracy: 0,                         // <-- 0:  highest power, highest accuracy; 1000:  lowest power, lowest accuracy.
+        stationaryRadius: 50,
+        distanceFilter: 50,                         // <-- minimum distance between location events
+        activityType: 'AutomotiveNavigation',       // <-- [ios]
+        locationUpdateInterval: 30000,              // <-- [android] minimum time between location updates, used in conjunction with #distanceFilter
+        activityRecognitionInterval: 10000,         // <-- [android] sampling-rate activity-recognition system for movement/stationary detection
+        debug: true,                                // <-- enable this hear sounds, see notifications during life-cycle events.
+        stopOnTerminate: false                      // <-- enable this to clear background location settings when the app terminates
     });
 
     // Turn ON the background-geolocation system.  The user will be tracked whenever they suspend the app.
@@ -103,10 +95,15 @@ NOTE: The plugin includes `org.apache.cordova.geolocation` as a dependency.  You
 This plugin hosts a SampleApp in ```example/SampleApp``` folder.  This SampleApp contains no plugins so you must first start by adding this plugin
 
 ```
-$ cd example/SampleApp
-$ cordova plugin add https://github.com/christocracy/cordova-plugin-background-geolocation.git
+$ git clone git@github.com:christocracy/cordova-background-geolocation.git
+$ mkdir tmp
+$ cp -R cordova-background-geolocation/example/SampleApp tmp
+$ cd tmp/SampleApp
+$ cordova plugin add git@github.com:christocracy/cordova-background-geolocation.git
 $ cordova platform add ios
+$ cordova platform add android
 $ cordova build ios
+$ cordova build android
 
 ```
 
