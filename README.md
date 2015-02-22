@@ -115,37 +115,24 @@ If you're using XCode, boot the SampleApp in the iOS Simulator and enable ```Deb
 
 ## Behaviour
 
-The plugin has features allowing you to control the behaviour of background-tracking, striking a balance between accuracy and battery-usage.  In stationary-mode, the plugin attempts to descrease its power usage and accuracy by setting up a circular stationary-region of configurable #stationaryRadius.  iOS has a nice system  [Significant Changes API](https://developer.apple.com/library/ios/documentation/CoreLocation/Reference/CLLocationManager_Class/CLLocationManager/CLLocationManager.html#//apple_ref/occ/instm/CLLocationManager/startMonitoringSignificantLocationChanges), which allows the os to suspend your app until a cell-tower change is detected (typically 2-3 city-block change) Android uses [LocationManager#addProximityAlert](http://developer.android.com/reference/android/location/LocationManager.html). Windows Phone does not have such a API.
+The plugin has features allowing you to control the behaviour of background-tracking, striking a balance between accuracy and battery-usage.  In stationary-mode, the plugin attempts to descrease its power usage and accuracy by setting up a circular stationary-region of configurable #stationaryRadius.  iOS has a nice system  [Significant Changes API](https://developer.apple.com/library/ios/documentation/CoreLocation/Reference/CLLocationManager_Class/CLLocationManager/CLLocationManager.html#//apple_ref/occ/instm/CLLocationManager/startMonitoringSignificantLocationChanges), which allows the os to suspend your app until a cell-tower change is detected (typically 2-3 city-block change) Android uses the Google Play Services APIs [FusedLocationProvider API](https://developer.android.com/reference/com/google/android/gms/location/FusedLocationProviderApi.html) as well as the [ActivityRecognition API](https://developer.android.com/reference/com/google/android/gms/location/ActivityRecognitionApi.html) (for movement/stationary detection). Windows Phone does not have such a API.
 
-When the plugin detects your user has moved beyond his stationary-region, it engages the native platform's geolocation system for aggressive monitoring according to the configured `#desiredAccuracy`, `#distanceFilter` and `#locationTimeout`.  The plugin attempts to intelligently scale `#distanceFilter` based upon the current reported speed.  Each time `#distanceFilter` is determined to have changed by 5m/s, it recalculates it by squaring the speed rounded-to-nearest-five and adding #distanceFilter (I arbitrarily came up with that formula.  Better ideas?).
+The plugin will execute your configured ```callback``` provided to the ```#configure(callback, config)``` method. You must manually POST the received ```GeoLocation``` to your server using standard XHR, as well as manually cache a recieved location into ```localStorage``` if no network connection is available.
 
-  `(round(speed, 5))^2 + distanceFilter`
+The function ```changePace(isMoving, success, failure)``` is provided to force the plugin to enter "moving" or "stationary" state.
 
 ## iOS
 
-On iOS the plugin will execute your configured ```callbackFn```. You may manually POST the received ```GeoLocation``` to your server using standard XHR. iOS ignores the @config params ```url```, ```params``` and ```headers```. The plugin uses iOS Significant Changes API, and starts triggering ```callbackFn``` only when a cell-tower switch is detected (i.e. the device exits stationary radius). The function ```changePace(isMoving, success, failure)``` is provided to force the plugin to enter "moving" or "stationary" state.
+The plugin uses iOS Significant Changes API, and starts triggering your configured ```callback``` only when a cell-tower switch is detected (i.e. the device exits stationary radius). 
 
+When the plugin detects the device has moved beyond its configured #stationaryRadius, it engages the native platform's geolocation system for aggressive monitoring according to the configured `#desiredAccuracy`, `#distanceFilter`.  The plugin attempts to intelligently scale `#distanceFilter` based upon the current reported speed.  Each time `#distanceFilter` is determined to have changed by 5m/s, it recalculates it by squaring the speed rounded-to-nearest-five and adding #distanceFilter (I arbitrarily came up with that formula.  Better ideas?).
+
+  `(round(speed, 5))^2 + distanceFilter`
 
 ### Android
 
-Android **WILL NOT** execute your configured ```callbackFn```.  The plugin manages sync-ing GeoLocations to your server automatically, using the configured ```url```, ```params``` and ```headers```.  Since the Android plugin must run as an autonomous Background Service, disconnected from your the main Android Activity (your foreground application), the background-geolocation plugin will continue to run, even if the foreground Activity is killed due to memory constraints.  This is why the Android plugin cannot execute the Javascript ```callbackFn```, since your app is not guaranteed to keep running -- syncing locations to the server must be handled by the plugin.
+Using the [ActivityRecognition API](https://developer.android.com/reference/com/google/android/gms/location/ActivityRecognitionApi.html) provided by [Google Play Services](https://developer.android.com/google/play-services/index.html), Android will constantly monitor [the nature](https://developer.android.com/reference/com/google/android/gms/location/DetectedActivity.html) of the device's movement at a sampling-rate configured by ```#activityRecognitionRate```.  When the plugin sees a DetectedActivity of [STILL](https://developer.android.com/reference/com/google/android/gms/location/DetectedActivity.html), location-updates will be halted -- when it sees ```IN_VEHICLE, ON_BICYCLE, ON_FOOT, RUNNING, WALKING```, location-updates will be initiated.
 
-The Android plugin sends an HTTP POST to your configured ```url``` with ```Content-Type: application/json```.  The JSON location-data is encoded into the Request Body.  PHP people have [trouble with this](https://github.com/christocracy/cordova-plugin-background-geolocation/issues/50).  In PHP, find the raw JSON body with:
-
-```$data = file_get_contents('php://input');```.
-
-```
-{
-    "location": {
-        "latitude": "<data>",
-        "longitude": "<data>",
-        "speed": "<data>",
-        "bearing" "<data>",
-        "altitude": "<data>",
-        "recorded_at": "<data>"
-    }
-}
-```
 
 ### WP8
 
@@ -217,25 +204,21 @@ Enable this in order to force a stop() when the application terminated (e.g. on 
 
 ### Android Config
 
-#####`@param {String} url`
+#####`@param {Integer millis} locationUpdateInterval`
 
-The url which the Android plugin will persist background geolocation to
+Set the desired interval for active location updates, in milliseconds.
 
-#####`@param {Object} params`
+The location client will actively try to obtain location updates for your application at this interval, so it has a direct influence on the amount of power used by your application. Choose your interval wisely.
 
-Optional HTTP params POSTed to your server when persisting locations (eg:  auth_token)
+This interval is inexact. You may not receive updates at all (if no location sources are available), or you may receive them slower than requested. You may also receive them faster than requested (if other applications are requesting location at a faster interval). 
 
-#####`@param {Object} headers`
+Applications with only the coarse location permission may have their interval silently throttled.
 
-Optional HTTP headers POSTed to your server when persisting locations
+An interval of 0 is allowed, but not recommended, since location updates may be extremely fast on future implementations.
 
-#####`@param {String} notificationText/Title`
+#####`@param {Integer millis} activityRecognitionInterval`
 
-On Android devices it is required to have a notification in the drawer because it's a "foreground service".  This gives it high priority, decreasing probability of OS killing it.  To customize the title and text of the notification, set these options.
-
-#####`@param {Integer} locationTimeout
-
-The minimum time interval between location updates, in seconds.  See [Android docs](http://developer.android.com/reference/android/location/LocationManager.html#requestLocationUpdates(long,%20float,%20android.location.Criteria,%20android.app.PendingIntent)) for more information.
+the desired time between activity detections. Larger values will result in fewer activity detections while improving battery life. A value of 0 will result in activity detections at the fastest possible rate.
 
 ### iOS Config
 
@@ -245,9 +228,15 @@ Presumably, this affects ios GPS algorithm.  See [Apple docs](https://developer.
 
 ### WP8 Config
 
-#####`{String} desiredAccuracy`
+#####`{Integer [0, 10, 100, 1000]} desiredAccuracy`
 
-In Windows Phone, the underlying GeoLocator you can choose to use 'DesiredAccuracy' or 'DesiredAccuracyInMeters'. Since this plugins default configuration accepts meters, the default desiredAccuracy is mapped to the Windows Phone DesiredAccuracyInMeters leaving the DesiredAccuracy enum empty. For more info see the [MS docs](http://msdn.microsoft.com/en-us/library/windows/apps/windows.devices.geolocation.geolocator.desiredaccuracyinmeters) for more information.
+Specify the desired-accuracy of the geolocation system with 1 of 4 values, ```0, 10, 100, 1000``` where ```0``` means HIGHEST POWER, HIGHEST ACCURACY and ```1000``` means LOWEST POWER, LOWEST ACCURACY
+
+- [Android](https://developer.android.com/reference/com/google/android/gms/location/LocationRequest.html#PRIORITY_BALANCED_POWER_ACCURACY)
+- [iOS](https://developer.apple.com/library/ios/documentation/CoreLocation/Reference/CLLocationManager_Class/index.html#//apple_ref/occ/instp/CLLocationManager/desiredAccuracy) 
+
+###### Windows Phone
+The underlying GeoLocator you can choose to use 'DesiredAccuracy' or 'DesiredAccuracyInMeters'. Since this plugins default configuration accepts meters, the default desiredAccuracy is mapped to the Windows Phone DesiredAccuracyInMeters leaving the DesiredAccuracy enum empty. For more info see the [MS docs](http://msdn.microsoft.com/en-us/library/windows/apps/windows.devices.geolocation.geolocator.desiredaccuracyinmeters) for more information.
 
 ## Licence ##
 
