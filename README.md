@@ -16,7 +16,7 @@ The plugin creates the object `window.plugins.backgroundGeoLocation` with the me
 
   `stop(success, fail)`.
 
-  `changePace(true) // engages aggressive monitoring immediately
+  `changePace(true) // engages aggressive monitoring immediately`
 
 ## Installing the plugin ##
 
