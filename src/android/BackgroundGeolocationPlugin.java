@@ -92,10 +92,6 @@ public class BackgroundGeolocationPlugin extends CordovaPlugin implements Locati
         
         // Register for events fired by our IntentService "LocationService"
         EventBus.getDefault().register(this);
-        
-        if (isDebugging) {
-            toneGenerator = new ToneGenerator(AudioManager.STREAM_NOTIFICATION, 100);
-        }
     }
 
     public boolean execute(String action, JSONArray data, CallbackContext callbackContext) {
@@ -131,6 +127,10 @@ public class BackgroundGeolocationPlugin extends CordovaPlugin implements Locati
                 activityRecognitionInterval = config.getInt("activityRecognitionInterval");
                 isDebugging                = config.getBoolean("debug");
                 stopOnTerminate            = config.getBoolean("stopOnTerminate");
+                
+                if (isDebugging) {
+                    toneGenerator = new ToneGenerator(AudioManager.STREAM_NOTIFICATION, 100);
+                }
                 
                 this.callback = callbackContext;
             } catch (JSONException e) {
@@ -188,7 +188,7 @@ public class BackgroundGeolocationPlugin extends CordovaPlugin implements Locati
     }
     
     private void setPace(Boolean moving) {
-        if (isMoving) {
+        if (moving) {
             LocationRequest request = LocationRequest.create()
                 .setPriority(translateDesiredAccuracy(desiredAccuracy))
                 .setInterval(this.locationUpdateInterval)
