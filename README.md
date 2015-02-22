@@ -237,7 +237,7 @@ The underlying GeoLocator you can choose to use 'DesiredAccuracy' or 'DesiredAcc
 
 The MIT License
 
-Copyright (c) 2013 Chris Scott and Brian Samson
+Copyright (c) 2013 Chris Scott, [Transistor Software](http://transistorsoft.com)
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
