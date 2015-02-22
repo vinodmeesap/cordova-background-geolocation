@@ -142,8 +142,6 @@ Use the following config-parameters with the #configure method:
 
 #####`@param {Integer} desiredAccuracy [0, 10, 100, 1000] in meters`
 
-#####`{Integer [0, 10, 100, 1000]} desiredAccuracy`
-
 Specify the desired-accuracy of the geolocation system with 1 of 4 values, ```0, 10, 100, 1000``` where ```0``` means HIGHEST POWER, HIGHEST ACCURACY and ```1000``` means LOWEST POWER, LOWEST ACCURACY
 
 - [Android](https://developer.android.com/reference/com/google/android/gms/location/LocationRequest.html#PRIORITY_BALANCED_POWER_ACCURACY)
