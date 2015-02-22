@@ -25,7 +25,8 @@ The plugin creates the object `window.plugins.backgroundGeoLocation` with the me
    cordova plugin add https://github.com/christocracy/cordova-background-geolocation.git
 ```
 
-A full example could be:
+## Example
+
 ```
     //
     //
