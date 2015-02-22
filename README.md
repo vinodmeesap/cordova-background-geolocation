@@ -1,7 +1,7 @@
 BackgroundGeoLocation
 ==============================
 
-Cross-platform background geolocation for Cordova / PhoneGap with battery-saving "circular region monitoring" and "stop detection".
+Cross-platform background geolocation for Cordova with battery-saving "circular region monitoring" and "stop detection".
 
 Follows the [Cordova Plugin spec](https://github.com/apache/cordova-plugman/blob/master/plugin_spec.md), so that it works with [Plugman](https://github.com/apache/cordova-plugman).
 
@@ -15,6 +15,8 @@ The plugin creates the object `window.plugins.backgroundGeoLocation` with the me
   `start(success, fail)`
 
   `stop(success, fail)`.
+
+  `changePace(true) // engages aggressive monitoring immediately  (eg "begin workout" for a jogging app) `
 
 ## Installing the plugin ##
 
