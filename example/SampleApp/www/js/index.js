@@ -142,6 +142,8 @@ var app = {
         * This would be your own callback for Ajax-requests after POSTing background geolocation to your server.
         */
         var yourAjaxCallback = function(response) {
+            // NB:  It's important to inform BackgroundGeolocation when your callback is complete so it can terminate the native background-process which is currently running your callback.
+            // If you fail to execute #finish, the OS might kill your app for leaving a background-process running.
             bgGeo.finish();
         };
 
@@ -181,19 +183,14 @@ var app = {
 
         // BackgroundGeoLocation is highly configurable.
         bgGeo.configure(callbackFn, failureFn, {
-            url: 'http://only.for.android.com/update_location.json', // <-- Android ONLY:  your server url to send locations to
-            params: {
-                auth_token: 'user_secret_auth_token',    //  <-- Android ONLY:  HTTP POST params sent to your server when persisting locations.
-                foo: 'bar'                              //  <-- Android ONLY:  HTTP POST params sent to your server when persisting locations.
-            },
-            desiredAccuracy: 0,
+            desiredAccuracy: 0,                         // <-- 0:  highest power, highest accuracy; 1000:  lowest power, lowest accuracy.
             stationaryRadius: 50,
-            distanceFilter: 50,
-            notificationTitle: 'Background tracking', // <-- android only, customize the title of the notification
-            notificationText: 'ENABLED', // <-- android only, customize the text of the notification
-            activityType: 'AutomotiveNavigation',
-            debug: true, // <-- enable this hear sounds for background-geolocation life-cycle.
-            stopOnTerminate: false // <-- enable this to clear background location settings when the app terminates
+            distanceFilter: 50,                         // <-- minimum distance between location events
+            activityType: 'AutomotiveNavigation',       // <-- [ios]
+            locationUpdateInterval: 30000,              // <-- [android] minimum time between location updates, used in conjunction with #distanceFilter
+            activityRecognitionInterval: 10000,         // <-- [android] sampling-rate activity-recognition system for movement/stationary detection
+            debug: true,                                // <-- enable this hear sounds, see notifications during life-cycle events.
+            stopOnTerminate: false                      // <-- enable this to clear background location settings when the app terminates
         });
         
         // Turn ON the background-geolocation system.  The user will be tracked whenever they suspend the app.
