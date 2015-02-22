@@ -52,7 +52,7 @@ public class BackgroundGeolocationPlugin extends CordovaPlugin implements Locati
     
     // Android-only config
     private Integer locationUpdateInterval      = 60000;
-    private Integer activityDetectionInterval   = 60000;
+    private Integer activityRecognitionInterval   = 60000;
     
     
     private CallbackContext callback;
@@ -124,13 +124,13 @@ public class BackgroundGeolocationPlugin extends CordovaPlugin implements Locati
                 JSONObject config = data.getJSONObject(0);
                 Log.i(TAG, "- configure: " + config.toString());
                 
-                this.stationaryRadius           = config.getInt("stationaryRadius");
-                this.distanceFilter             = (float) config.getInt("distanceFilter");
-                this.desiredAccuracy            = config.getInt("desiredAccuracy");
-                this.locationUpdateInterval     = config.getInt("locationUpdateInterval");
-                this.activityDetectionInterval  = config.getInt("activityDetectionInterval");
-                this.isDebugging                = config.getBoolean("debug");
-                this.stopOnTerminate            = config.getBoolean("stopOnTerminate");
+                stationaryRadius           = config.getInt("stationaryRadius");
+                distanceFilter             = (float) config.getInt("distanceFilter");
+                desiredAccuracy            = config.getInt("desiredAccuracy");
+                locationUpdateInterval     = config.getInt("locationUpdateInterval");
+                activityRecognitionInterval = config.getInt("activityRecognitionInterval");
+                isDebugging                = config.getBoolean("debug");
+                stopOnTerminate            = config.getBoolean("stopOnTerminate");
                 
                 this.callback = callbackContext;
             } catch (JSONException e) {
@@ -274,7 +274,7 @@ public class BackgroundGeolocationPlugin extends CordovaPlugin implements Locati
     }
     
     private void requestActivityUpdates() {
-        ActivityRecognition.ActivityRecognitionApi.requestActivityUpdates(googleApiClient, activityDetectionInterval, locationUpdateService);
+        ActivityRecognition.ActivityRecognitionApi.requestActivityUpdates(googleApiClient, activityRecognitionInterval, locationUpdateService);
     }
     
     private void removeActivityUpdates() {

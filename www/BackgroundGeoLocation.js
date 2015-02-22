@@ -14,11 +14,10 @@ module.exports = {
 
         config.stationaryRadius     = (config.stationaryRadius >= 0) ? config.stationaryRadius : 50;    // meters
         config.distanceFilter       = (config.distanceFilter >= 0)  ? config.distanceFilter : 500;       // meters
-        config.locationTimeout      = (config.locationTimeout >= 0) ? config.locationTimeout : 60;      // seconds
+        config.locationUpdateInterval = (config.locationUpdateInterval >= 0) ? config.locationUpdateInterval : 60000;      // ms
+        config.activityRecognitionInterval = (config.activityRecognitionInterval >= 0) ? config.activityRecognitionInterval : 60000;      // ms
         config.desiredAccuracy      = (config.desiredAccuracy >= 0) ? config.desiredAccuracy : 100;     // meters
         config.debug                = config.debug || false;
-        config.notificationTitle    = config.notificationTitle || "Background tracking";
-        config.notificationText     = config.notificationText || "ENABLED";
         config.activityType         = config.activityType || "OTHER";
         config.stopOnTerminate      = config.stopOnTerminate || false;
 
