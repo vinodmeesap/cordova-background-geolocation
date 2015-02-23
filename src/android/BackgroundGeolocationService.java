@@ -35,6 +35,7 @@ public class BackgroundGeolocationService extends IntentService {
 				case DetectedActivity.IN_VEHICLE:
 				case DetectedActivity.ON_BICYCLE:
 				case DetectedActivity.ON_FOOT:
+				case DetectedActivity.RUNNING:
 					isMoving = true;
 					break;
 				case DetectedActivity.STILL:
