@@ -35,6 +35,7 @@ public class BackgroundGeolocationPlugin extends CordovaPlugin implements Locati
 
     public static final String ACTION_START = "start";
     public static final String ACTION_STOP = "stop";
+    public static final String ACTION_ON_PACE_CHANGE = "onPaceChange";
     public static final String ACTION_CONFIGURE = "configure";
     public static final String ACTION_SET_CONFIG = "setConfig";
 
@@ -94,7 +95,7 @@ public class BackgroundGeolocationPlugin extends CordovaPlugin implements Locati
         EventBus.getDefault().register(this);
     }
 
-    public boolean execute(String action, JSONArray data, CallbackContext callbackContext) {
+    public boolean execute(String action, JSONArray data, CallbackContext callbackContext) throws JSONException {
         Log.d(TAG, "execute / action : " + action);
 
         Boolean result = false;
@@ -135,6 +136,16 @@ public class BackgroundGeolocationPlugin extends CordovaPlugin implements Locati
                 this.callback = callbackContext;
             } catch (JSONException e) {
                 callbackContext.error("Configuration error " + e.getMessage());
+            }
+        } else if (ACTION_ON_PACE_CHANGE.equalsIgnoreCase(action)) {
+            if (!isEnabled) {
+                Log.w(TAG, "- Cannot change pace while in #stop mode");
+                result = false;
+                callbackContext.error("Cannot #changePace while in #stop mode");
+            } else {
+                result = true;
+                isMoving = data.getBoolean(0);
+                callbackContext.success();
             }
         } else if (ACTION_SET_CONFIG.equalsIgnoreCase(action)) {
             result = true;
@@ -188,7 +199,9 @@ public class BackgroundGeolocationPlugin extends CordovaPlugin implements Locati
     }
     
     private void setPace(Boolean moving) {
-        if (moving) {
+        Log.i(TAG, "- setPace: " + moving);
+        isMoving = moving;
+        if (moving && isEnabled) {
             LocationRequest request = LocationRequest.create()
                 .setPriority(translateDesiredAccuracy(desiredAccuracy))
                 .setInterval(this.locationUpdateInterval)
