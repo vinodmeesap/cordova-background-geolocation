@@ -27,8 +27,7 @@
         <source-file src="src/android/libs/eventbus-2.4.0.jar" target-dir="libs" />
         <source-file src="src/android/BackgroundGeolocationPlugin.java" target-dir="src/com/transistorsoft/cordova/bggeo" />
         <source-file src="src/android/BackgroundGeolocationService.java" target-dir="src/com/transistorsoft/cordova/bggeo" />
-        <source-file src="src/android/notification.png" target-dir="res/drawable" />
-
+        
         <config-file target="AndroidManifest.xml" parent="/manifest/application">
             <service android:name="com.transistorsoft.cordova.bggeo.BackgroundGeolocationService" />
         </config-file>
