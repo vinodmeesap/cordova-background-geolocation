@@ -38,7 +38,8 @@ public class BackgroundGeolocationPlugin extends CordovaPlugin implements Locati
     public static final String ACTION_ON_PACE_CHANGE = "onPaceChange";
     public static final String ACTION_CONFIGURE = "configure";
     public static final String ACTION_SET_CONFIG = "setConfig";
-
+    public static final String ACTION_ON_STATIONARY = "addStationaryRegionListener";
+    
     private PendingIntent locationUpdateService;
 
     private Boolean isEnabled       = false;
@@ -46,18 +47,21 @@ public class BackgroundGeolocationPlugin extends CordovaPlugin implements Locati
     
     // Common config
     private Integer desiredAccuracy     = 10;
-    private Integer stationaryRadius    = 50;
     private Float distanceFilter        = (float) 50;
     private Boolean isDebugging         = false;
     private Boolean stopOnTerminate     = false;
     
     // Android-only config
-    private Integer locationUpdateInterval      = 60000;
-    private Integer activityRecognitionInterval   = 60000;
+    private Integer locationUpdateInterval          = 60000;
+    private Integer activityRecognitionInterval     = 60000;
     
-    
+    // Geolocation callback
     private CallbackContext callback;
-
+    
+    // Called when DetectedActivity is STILL
+    private CallbackContext stationaryCallback;
+    private Location stationaryLocation;
+    
     private GoogleApiClient googleApiClient;    
     private DetectedActivity currentActivity;
     
@@ -65,9 +69,7 @@ public class BackgroundGeolocationPlugin extends CordovaPlugin implements Locati
     private ToneGenerator toneGenerator;
     
     @Override
-    protected void pluginInitialize() {
-        Log.d("BUS","registering");
-        
+    protected void pluginInitialize() {        
         gWebView = this.webView;
         
         Activity activity = this.cordova.getActivity();
@@ -103,7 +105,6 @@ public class BackgroundGeolocationPlugin extends CordovaPlugin implements Locati
         if (ACTION_START.equalsIgnoreCase(action) && !isEnabled) {
             result      = true;
             isEnabled   = true;
-            isMoving    = false;
             
             requestActivityUpdates();
 
@@ -116,26 +117,13 @@ public class BackgroundGeolocationPlugin extends CordovaPlugin implements Locati
             removeActivityUpdates();
             callbackContext.success();
         } else if (ACTION_CONFIGURE.equalsIgnoreCase(action)) {
-            result = true;
-            try {
-                JSONObject config = data.getJSONObject(0);
-                Log.i(TAG, "- configure: " + config.toString());
-                
-                stationaryRadius           = config.getInt("stationaryRadius");
-                distanceFilter             = (float) config.getInt("distanceFilter");
-                desiredAccuracy            = config.getInt("desiredAccuracy");
-                locationUpdateInterval     = config.getInt("locationUpdateInterval");
-                activityRecognitionInterval = config.getInt("activityRecognitionInterval");
-                isDebugging                = config.getBoolean("debug");
-                stopOnTerminate            = config.getBoolean("stopOnTerminate");
-                
+            result = applyConfig(data);
+            if (result) {
                 if (isDebugging) {
                     toneGenerator = new ToneGenerator(AudioManager.STREAM_NOTIFICATION, 100);
                 }
-                
-                this.callback = callbackContext;
-            } catch (JSONException e) {
-                callbackContext.error("Configuration error " + e.getMessage());
+            } else {
+                callbackContext.error("- Configuration error!");
             }
         } else if (ACTION_ON_PACE_CHANGE.equalsIgnoreCase(action)) {
             if (!isEnabled) {
@@ -148,14 +136,48 @@ public class BackgroundGeolocationPlugin extends CordovaPlugin implements Locati
                 callbackContext.success();
             }
         } else if (ACTION_SET_CONFIG.equalsIgnoreCase(action)) {
-            result = true;
+            result = applyConfig(data);
             // TODO reconfigure Service
-            callbackContext.success();
+            if (result) {
+                callbackContext.success();
+            } else {
+                callbackContext.error("- Configuration error!");
+            }
+        } else if (ACTION_ON_STATIONARY.equalsIgnoreCase(action)) {
+            result = true;
+            this.stationaryCallback = callbackContext;  
         }
 
         return result;
     }
-    
+    private boolean applyConfig(JSONArray data) {
+        try {
+            JSONObject config = data.getJSONObject(0);
+            Log.i(TAG, "- configure: " + config.toString());
+            
+            if (config.has("distanceFilter")) {
+                distanceFilter = (float) config.getInt("distanceFilter");
+            }
+            if (config.has("desiredAccuracy")) {
+                desiredAccuracy = config.getInt("desiredAccuracy");
+            }
+            if (config.has("locationUpdateInterval")) {
+                locationUpdateInterval = config.getInt("locationUpdateInterval");
+            }
+            if (config.has("activityRecognitionInterval")) {
+                activityRecognitionInterval = config.getInt("activityRecognitionInterval");
+            }
+            if (config.has("debug")) {
+                isDebugging = config.getBoolean("debug");
+            }
+            if (config.has("stopOnTerminate")) {
+                stopOnTerminate = config.getBoolean("stopOnTerminate");
+            }
+            return true;
+        } catch (JSONException e) {
+            return false;
+        }
+    }
     /**
      * Translates a number representing desired accuracy of GeoLocation system from set [0, 10, 100, 1000].
      * 0:  most aggressive, most accurate, worst battery drain
@@ -200,8 +222,15 @@ public class BackgroundGeolocationPlugin extends CordovaPlugin implements Locati
     
     private void setPace(Boolean moving) {
         Log.i(TAG, "- setPace: " + moving);
+        boolean wasMoving = isMoving;
         isMoving = moving;
         if (moving && isEnabled) {
+            if (!wasMoving) {
+                startTone("doodly_doo");
+            }
+            stationaryLocation = null;
+            
+            // Here's where the FusedLocationProvider is controlled.
             LocationRequest request = LocationRequest.create()
                 .setPriority(translateDesiredAccuracy(desiredAccuracy))
                 .setInterval(this.locationUpdateInterval)
@@ -211,21 +240,34 @@ public class BackgroundGeolocationPlugin extends CordovaPlugin implements Locati
             requestLocationUpdates(request);
         } else {
             removeLocationUpdates();
+            if (stationaryLocation == null) {
+                startTone("long_beep");
+                
+                // Re-set our stationaryLocation
+                stationaryLocation = LocationServices.FusedLocationApi.getLastLocation(googleApiClient);
+                
+                // Inform Javascript of our stationaryLocation
+                fireStationaryListener();
+            }
         }
     }
     
     public void onEventMainThread(DetectedActivity probableActivity) {
         currentActivity = probableActivity;
-        
-        Boolean wasMoving = isMoving;
+
+        boolean wasMoving = isMoving;
+        boolean nowMoving = false;
+       
         switch (probableActivity.getType()) {
             case DetectedActivity.IN_VEHICLE:
             case DetectedActivity.ON_BICYCLE:
             case DetectedActivity.ON_FOOT:
-                isMoving = true;
+            case DetectedActivity.RUNNING:
+            case DetectedActivity.WALKING:
+                nowMoving = true;
                 break;
             case DetectedActivity.STILL:
-                isMoving = false;
+                nowMoving = false;
                 break;
             case DetectedActivity.UNKNOWN:
                 break;
@@ -233,38 +275,73 @@ public class BackgroundGeolocationPlugin extends CordovaPlugin implements Locati
                 break;
         }
         
-        if (!wasMoving && isMoving) {
-            startTone("doodly_doo");
-            setPace(isMoving);
-        } else if (wasMoving && !isMoving) {
-            startTone("long_beep");
-            setPace(isMoving);
+        boolean startedMoving   = !wasMoving && nowMoving;
+        boolean justStopped     = wasMoving && !nowMoving;
+        boolean initialState    = !nowMoving && (stationaryLocation == null);
+        
+        if ( startedMoving || justStopped || initialState ) {
+            setPace(nowMoving);
         }
-
+        
         String probableActivityName = getActivityName(probableActivity.getType());
         Log.w(TAG, "- DetectedActivity: " + probableActivityName + ", confidence: " + probableActivity.getConfidence());
     }
-    
+        
     public void onEventMainThread(Location location) {
         Log.i(TAG, "BUS Rx:" + location.toString());
         startTone("beep");
-        try {
-            JSONObject loc = new JSONObject();
-            loc.put("latitude", location.getLatitude());
-            loc.put("longitude", location.getLongitude());
-            loc.put("accuracy", location.getAccuracy());
-            loc.put("speed", location.getSpeed());
-            loc.put("bearing", location.getBearing());
-            loc.put("altitude", location.getAltitude());
-            loc.put("timestamp", location.getTime());
-            
-            PluginResult result = new PluginResult(PluginResult.Status.OK, loc);
+
+        PluginResult result = new PluginResult(PluginResult.Status.OK, locationToJson(location));
+        result.setKeepCallback(true);
+        runInBackground(callback, result);
+    }
+    
+    /**
+     * Execute onStationary javascript callback when device is determined to have just stopped
+     */
+    private void fireStationaryListener() {
+        Log.i(TAG, "- fire stationary listener");
+        if ( (stationaryCallback != null)  && (stationaryLocation != null) ) {
+            final PluginResult result = new PluginResult(PluginResult.Status.OK, locationToJson(stationaryLocation));
             result.setKeepCallback(true);
-            if(callback != null){
-                callback.sendPluginResult(result);    
-            }
+            runInBackground(stationaryCallback, result);
+        }
+    }
+    
+    /**
+     * Convert a Location instance to JSONObject
+     * @param Location
+     * @return JSONObject
+     */
+    private JSONObject locationToJson(Location l) {
+        try {
+            JSONObject data = new JSONObject();
+            data.put("latitude", l.getLatitude());
+            data.put("longitude", l.getLongitude());
+            data.put("accuracy", l.getAccuracy());
+            data.put("speed", l.getSpeed());
+            data.put("bearing", l.getBearing());
+            data.put("altitude", l.getAltitude());
+            data.put("timestamp", l.getTime());
+            return data;
         } catch (JSONException e) {
             Log.e(TAG, "could not parse location");
+            return null;
+        }
+    }
+    
+    /**
+     * Run a javascript callback in Background
+     * @param cb
+     * @param result
+     */
+    private void runInBackground(final CallbackContext cb, final PluginResult result) {
+        if(cb != null){
+            cordova.getThreadPool().execute(new Runnable() {
+                public void run() {
+                    cb.sendPluginResult(result);
+                }
+            });
         }
     }
     
@@ -276,6 +353,10 @@ public class BackgroundGeolocationPlugin extends CordovaPlugin implements Locati
                 return "on_bicycle";
             case DetectedActivity.ON_FOOT:
                 return "on_foot";
+            case DetectedActivity.RUNNING:
+                return "running";
+            case DetectedActivity.WALKING:
+                return "walking";
             case DetectedActivity.STILL:
                 return "still";
             case DetectedActivity.UNKNOWN:
@@ -301,8 +382,6 @@ public class BackgroundGeolocationPlugin extends CordovaPlugin implements Locati
     private void removeLocationUpdates() {
         LocationServices.FusedLocationApi.removeLocationUpdates(googleApiClient, locationUpdateService);
     }
-    
-    
     
     /**
      * Plays debug sound
@@ -357,6 +436,10 @@ public class BackgroundGeolocationPlugin extends CordovaPlugin implements Locati
      * Checks to see if it should turn off
      */
     public void onDestroy() {
+        Log.i(TAG, "- onDestroy");
+        Log.i(TAG, "  stopOnTerminate: " + stopOnTerminate);
+        Log.i(TAG, "  isEnabled: " + isEnabled);
+        
         if(isEnabled && stopOnTerminate || !isEnabled) {
             removeActivityUpdates();
             removeLocationUpdates();

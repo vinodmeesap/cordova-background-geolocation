@@ -1,3 +1,11 @@
+/**
+* cordova-background-geolocation
+* Copyright (c) 2015, Transistor Software (9224-2932 Quebec Inc)
+* All rights reserved.
+* sales@transistorsoft.com
+* http://transistorsoft.com
+* @see LICENSE
+*/
 var ENV = (function() {
     
     var localStorage = window.localStorage;
@@ -133,7 +141,7 @@ var app = {
         * This callback will be executed every time a geolocation is recorded in the background.
         */
         var callbackFn = function(location) {
-            console.log('[js] BackgroundGeoLocation callback:  ' + location.latitude + ',' + location.longitude);
+            console.log('[js] BackgroundGeoLocation callback:  ' + JSON.stringify(location));
             
             // Update our current-position marker.
             app.setCurrentLocation(location);
@@ -148,6 +156,7 @@ var app = {
 
         // Only ios emits this stationary event
         bgGeo.onStationary(function(location) {
+            console.log('[js] BackgroundGeoLocation onStationary ' + JSON.stringify(location));
             if (!app.stationaryRadius) {
                 app.stationaryRadius = new google.maps.Circle({
                     fillColor: '#cc0000',
@@ -165,14 +174,14 @@ var app = {
 
         // BackgroundGeoLocation is highly configurable.
         bgGeo.configure(callbackFn, failureFn, {
-            desiredAccuracy: 0,                         // <-- 0:  highest power, highest accuracy; 1000:  lowest power, lowest accuracy.
+            desiredAccuracy: 0,
             stationaryRadius: 50,
-            distanceFilter: 50,                         // <-- minimum distance between location events
-            activityType: 'AutomotiveNavigation',       // <-- [ios]
-            locationUpdateInterval: 30000,              // <-- [android] minimum time between location updates, used in conjunction with #distanceFilter
-            activityRecognitionInterval: 10000,         // <-- [android] sampling-rate activity-recognition system for movement/stationary detection
-            debug: true,                                // <-- enable this hear sounds, see notifications during life-cycle events.
-            stopOnTerminate: false                      // <-- enable this to clear background location settings when the app terminates
+            distanceFilter: 30,
+            locationUpdateInterval: 30000,
+            activityRecognitionInterval: 10000,
+            activityType: 'AutomotiveNavigation',
+            debug: true, // <-- enable this hear sounds for background-geolocation life-cycle.
+            stopOnTerminate: false // <-- enable this to clear background location settings when the app terminates
         });
         
         // Turn ON the background-geolocation system.  The user will be tracked whenever they suspend the app.

@@ -1,3 +1,11 @@
+/**
+* cordova-background-geolocation
+* Copyright (c) 2015, Transistor Software (9224-2932 Quebec Inc)
+* All rights reserved.
+* sales@transistorsoft.com
+* http://transistorsoft.com
+* @see LICENSE
+*/
 var exec = require("cordova/exec");
 module.exports = {
     /**
