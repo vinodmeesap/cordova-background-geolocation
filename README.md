@@ -148,19 +148,47 @@ Keep in mind that it is **not** possible to use ```start()``` at the ```pause```
 Configures the plugin's parameters (@see following ##Config## section for accepted ```config``` params.  The ```locationCallback``` will be executed each time a new Geolocation is recorded.
 
 #####`start(successFn, failureFn)`
-Initiate background geolocation tracking.
+
+Enable background geolocation tracking.
+
+```
+bgGeo.start()
+```
 
 #####`stop(successFn, failureFn)`
-Stop background geolocation from tracking.
+
+Disable background geolocation tracking.
+
+```
+bgGeo.stop();
+```
 
 #####`changePace(enabled, successFn, failureFn)`
 Initiate or cancel immediate background tracking.  When set to ```true```, the plugin will begin aggressively tracking the devices Geolocation, bypassing stationary monitoring.  If you were making a "Jogging" application, this would be your [Start Workout] button to immediately begin GPS tracking.  Send ```false``` to disable aggressive GPS monitoring and return to stationary-monitoring mode.
 
+```
+bgGeo.changePace(true);  // <-- Aggressive GPS monitoring immediately engaged.
+bgGeo.changePace(false); // <-- Disable aggressive GPS monitoring.  Engages stationary-mode.
+```
+
 #####`setConfig(successFn, failureFn, config)`
 Reconfigure plugin's configuration (@see followign ##Config## section for accepted ```config``` params.
 
+```
+bgGeo.setConfig(function(){}, function(){}, {
+    desiredAccuracy: 10,
+    distanceFilter: 100
+});
+```
+
 #####`onStationary(callbackFn, failureFn)`
 Your ```callbackFn``` will be executed each time the device has entered stationary-monitoring mode.  The ```callbackFn``` will be provided with a ```Geolocation``` object as the 1st param, with the usual params (```latitude, longitude, accuracy, speed, bearing, altitude```).
+
+```
+bgGeo.onStationary(function(location) {
+    console.log('- Device is stopped: ', location.latitude, location.longitude);
+});
+```
 
 ## Config
 
