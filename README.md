@@ -11,12 +11,17 @@ This plugin leverages Cordova/PhoneGap's [require/define functionality used for 
 The plugin creates the object `window.plugins.backgroundGeoLocation` with the methods
 
   `configure(success, fail, option)`,
-
+	
+  `setConfig(success, fail, config) // reconfigure`,
+  
   `start(success, fail)`
 
   `stop(success, fail)`.
 
   `changePace(true) // engages aggressive monitoring immediately`
+  
+  `onStationary(callback, fail)`
+  
 
 ## Installing the plugin ##
 
