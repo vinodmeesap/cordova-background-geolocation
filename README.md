@@ -152,6 +152,16 @@ Keep in mind that it is **not** possible to use ```start()``` at the ```pause```
 
 Configures the plugin's parameters (@see following [Config](https://github.com/christocracy/cordova-background-geolocation/blob/edge/README.md#config) section for accepted ```config``` params.  The ```locationCallback``` will be executed each time a new Geolocation is recorded.
 
+#####`setConfig(successFn, failureFn, config)`
+Reconfigure plugin's configuration (@see followign ##Config## section for accepted ```config``` params.  **NOTE** The plugin will continue to send recorded Geolocation to the ```locationCallback``` you provided to ```configure``` method -- use this method only to change configuration params (eg: ```distanceFilter```, ```stationaryRadius```, etc).
+
+```
+bgGeo.setConfig(function(){}, function(){}, {
+    desiredAccuracy: 10,
+    distanceFilter: 100
+});
+```
+
 #####`start(successFn, failureFn)`
 
 Enable background geolocation tracking.
@@ -174,16 +184,6 @@ Initiate or cancel immediate background tracking.  When set to ```true```, the p
 ```
 bgGeo.changePace(true);  // <-- Aggressive GPS monitoring immediately engaged.
 bgGeo.changePace(false); // <-- Disable aggressive GPS monitoring.  Engages stationary-mode.
-```
-
-#####`setConfig(successFn, failureFn, config)`
-Reconfigure plugin's configuration (@see followign ##Config## section for accepted ```config``` params.
-
-```
-bgGeo.setConfig(function(){}, function(){}, {
-    desiredAccuracy: 10,
-    distanceFilter: 100
-});
 ```
 
 #####`onStationary(callbackFn, failureFn)`
