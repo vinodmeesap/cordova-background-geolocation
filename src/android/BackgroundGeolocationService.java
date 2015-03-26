@@ -21,6 +21,9 @@ public class BackgroundGeolocationService extends IntentService {
 
 	@Override
 	protected void onHandleIntent(Intent intent) {
+		// Determine whether the fore-ground Activity is running.  If it's not, we'll reboot it.
+		boolean isPluginActive = BackgroundGeolocationPlugin.isActive();
+		
 		if (ActivityRecognitionResult.hasResult(intent)) {
 			ActivityRecognitionResult result = ActivityRecognitionResult.extractResult(intent);
 			DetectedActivity probableActivity = result.getMostProbableActivity();
@@ -35,6 +38,7 @@ public class BackgroundGeolocationService extends IntentService {
 				case DetectedActivity.IN_VEHICLE:
 				case DetectedActivity.ON_BICYCLE:
 				case DetectedActivity.ON_FOOT:
+				case DetectedActivity.WALKING:
 				case DetectedActivity.RUNNING:
 					isMoving = true;
 					break;
@@ -46,17 +50,20 @@ public class BackgroundGeolocationService extends IntentService {
 					break;
 			}
 			
-			boolean isPushPluginActive = BackgroundGeolocationPlugin.isActive();
-			if (isMoving && !isPushPluginActive) {
+			// Force main-activity reload (if not running) if we're detected to be moving.
+			if (isMoving && !isPluginActive) {
 				forceMainActivityReload();
 		    }
+			
+			// Post activity to the bus.
 			EventBus.getDefault().post(probableActivity);
 		} else {
 			final Location location = intent.getParcelableExtra(FusedLocationProviderApi.KEY_LOCATION_CHANGED);
 			if (location != null) {
 				Log.i(TAG, "Location received: " + location.toString());
-				boolean isPushPluginActive = BackgroundGeolocationPlugin.isActive();
-				if (!isPushPluginActive) {
+				
+				// Force main-activity reload when a location comes in.
+				if (!isPluginActive) {
 					forceMainActivityReload();
 			    }
 				EventBus.getDefault().post(location);	
@@ -64,26 +71,34 @@ public class BackgroundGeolocationService extends IntentService {
 		}
 	}
 	
+	/**
+	 * This method has no other purpose than formatting the Activity for log-messages 
+	 */
 	private String getActivityName(int activityType) {
-		switch (activityType) {
-			case DetectedActivity.IN_VEHICLE:
-				return "in_vehicle";
-			case DetectedActivity.ON_BICYCLE:
-				return "on_bicycle";
-			case DetectedActivity.ON_FOOT:
-				return "on_foot";
-			case DetectedActivity.STILL:
-				return "still";
-			case DetectedActivity.UNKNOWN:
-				return "unknown";
-			case DetectedActivity.TILTING:
-				return "tilting";
-		}
-		return "unknown";
-	}
+        switch (activityType) {
+            case DetectedActivity.IN_VEHICLE:
+                return "in_vehicle";
+            case DetectedActivity.ON_BICYCLE:
+                return "on_bicycle";
+            case DetectedActivity.ON_FOOT:
+                return "on_foot";
+            case DetectedActivity.RUNNING:
+            	return "running";
+            case DetectedActivity.WALKING:
+            	return "walking";
+            case DetectedActivity.STILL:
+                return "still";
+            case DetectedActivity.UNKNOWN:
+                return "unknown";
+            case DetectedActivity.TILTING:
+                return "tilting";
+        }
+        return "unknown";
+    }
 	
 	/**
-	 * Forces the main activity to re-launch if it's unloaded.
+	 * Forces the main activity to re-launch if it's unloaded.  This is how we're able to rely upon Javascript
+	 * running always, since we for the app to boot.
 	 */
 	private void forceMainActivityReload() {
 		Log.w(TAG, "- Forcing main-activity reload");
