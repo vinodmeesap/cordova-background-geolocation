@@ -145,7 +145,7 @@ Keep in mind that it is **not** possible to use ```start()``` at the ```pause```
 
 #####`configure(locationCallback, failureCallback, config)`
 
-Configures the plugin's parameters (@see following ##Config## section for accepted ```config``` params.  The ```locationCallback``` will be executed each time a new Geolocation is recorded.
+Configures the plugin's parameters (@see following [Config](https://github.com/christocracy/cordova-background-geolocation/blob/edge/README.md#config) section for accepted ```config``` params.  The ```locationCallback``` will be executed each time a new Geolocation is recorded.
 
 #####`start(successFn, failureFn)`
 
