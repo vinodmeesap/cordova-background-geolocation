@@ -293,15 +293,13 @@ Presumably, this affects ios GPS algorithm.  See [Apple docs](https://developer.
 The underlying GeoLocator you can choose to use 'DesiredAccuracy' or 'DesiredAccuracyInMeters'. Since this plugins default configuration accepts meters, the default desiredAccuracy is mapped to the Windows Phone DesiredAccuracyInMeters leaving the DesiredAccuracy enum empty. For more info see the [MS docs](http://msdn.microsoft.com/en-us/library/windows/apps/windows.devices.geolocation.geolocator.desiredaccuracyinmeters) for more information.
 
 ## Licence ##
-
+```
 cordova-background-geolocation
 Copyright (c) 2015, Transistor Software (9224-2932 Quebec Inc)
 All rights reserved.
 sales@transistorsoft.com
 http://transistorsoft.com
-
-Cordova Background Geolocation - Terms and conditions
-=======================================================================
+```
 
 1. Preamble:  This Agreement governs the relationship between YOU OR THE ORGANIZATION ON WHOSE BEHALF YOU ARE ENTERING INTO THIS AGREEMENT (hereinafter: Licensee) and Transistor Software, a LICENSOR AFFILIATION whose principal place of business is Montreal, Quebec, Canada (Hereinafter: Licensor). This Agreement sets the terms, rights, restrictions and obligations on using [{software}] (hereinafter: The Software) created and owned by Licensor, as detailed herein
 
