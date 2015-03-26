@@ -141,28 +141,28 @@ Using the [ActivityRecognition API](https://developer.android.com/reference/com/
 WP8 uses ```callbackFn``` the way iOS do. On WP8, however, the plugin does not support the Stationary location and does not implement ```getStationaryLocation()``` and ```onPaceChange()```.
 Keep in mind that it is **not** possible to use ```start()``` at the ```pause``` event of Cordova/PhoneGap. WP8 suspend your app immediately and ```start()``` will not be executed. So make sure you fire ```start()``` before the app is closed/minimized.
 
-### Methods
+## Methods
 
-####`configure(locationCallback, failureCallback, config)`
+#####`configure(locationCallback, failureCallback, config)`
 
 Configures the plugin's parameters (@see following ##Config## section for accepted ```config``` params.  The ```locationCallback``` will be executed each time a new Geolocation is recorded.
 
-####`start(successFn, failureFn)`
+#####`start(successFn, failureFn)`
 Initiate background geolocation tracking.
 
-####`stop(successFn, failureFn)`
+#####`stop(successFn, failureFn)`
 Stop background geolocation from tracking.
 
-####`changePace(enabled, successFn, failureFn)`
+#####`changePace(enabled, successFn, failureFn)`
 Initiate or cancel immediate background tracking.  When set to ```true```, the plugin will begin aggressively tracking the devices Geolocation, bypassing stationary monitoring.  If you were making a "Jogging" application, this would be your [Start Workout] button to immediately begin GPS tracking.  Send ```false``` to disable aggressive GPS monitoring and return to stationary-monitoring mode.
 
-####`setConfig(successFn, failureFn, config)`
+#####`setConfig(successFn, failureFn, config)`
 Reconfigure plugin's configuration (@see followign ##Config## section for accepted ```config``` params.
 
-####`onStationary(callbackFn, failureFn)`
+#####`onStationary(callbackFn, failureFn)`
 Your ```callbackFn``` will be executed each time the device has entered stationary-monitoring mode.  The ```callbackFn``` will be provided with a ```Geolocation``` object as the 1st param, with the usual params (```latitude, longitude, accuracy, speed, bearing, altitude```).
 
-### Config
+## Config
 
 Use the following config-parameters with the #configure method:
 
