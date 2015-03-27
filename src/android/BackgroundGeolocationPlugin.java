@@ -56,7 +56,7 @@ public class BackgroundGeolocationPlugin extends CordovaPlugin implements Locati
     private Integer activityRecognitionInterval     = 60000;
     
     // Geolocation callback
-    private CallbackContext callback;
+    private CallbackContext locationCallback;
     
     // Called when DetectedActivity is STILL
     private CallbackContext stationaryCallback;
@@ -119,6 +119,7 @@ public class BackgroundGeolocationPlugin extends CordovaPlugin implements Locati
         } else if (ACTION_CONFIGURE.equalsIgnoreCase(action)) {
             result = applyConfig(data);
             if (result) {
+                this.locationCallback = callbackContext;
                 if (isDebugging) {
                     toneGenerator = new ToneGenerator(AudioManager.STREAM_NOTIFICATION, 100);
                 }
@@ -253,6 +254,9 @@ public class BackgroundGeolocationPlugin extends CordovaPlugin implements Locati
     }
     
     public void onEventMainThread(DetectedActivity probableActivity) {
+        String probableActivityName = getActivityName(probableActivity.getType());
+        Log.w(TAG, "- DetectedActivity: " + probableActivityName + ", confidence: " + probableActivity.getConfidence());
+        
         currentActivity = probableActivity;
 
         boolean wasMoving = isMoving;
@@ -270,9 +274,9 @@ public class BackgroundGeolocationPlugin extends CordovaPlugin implements Locati
                 nowMoving = false;
                 break;
             case DetectedActivity.UNKNOWN:
-                break;
             case DetectedActivity.TILTING:
-                break;
+                // We don't let these ActivityType affect movement/stationary state.
+                return;
         }
         
         boolean startedMoving   = !wasMoving && nowMoving;
@@ -282,9 +286,6 @@ public class BackgroundGeolocationPlugin extends CordovaPlugin implements Locati
         if ( startedMoving || justStopped || initialState ) {
             setPace(nowMoving);
         }
-        
-        String probableActivityName = getActivityName(probableActivity.getType());
-        Log.w(TAG, "- DetectedActivity: " + probableActivityName + ", confidence: " + probableActivity.getConfidence());
     }
         
     public void onEventMainThread(Location location) {
@@ -293,7 +294,7 @@ public class BackgroundGeolocationPlugin extends CordovaPlugin implements Locati
 
         PluginResult result = new PluginResult(PluginResult.Status.OK, locationToJson(location));
         result.setKeepCallback(true);
-        runInBackground(callback, result);
+        runInBackground(locationCallback, result);
     }
     
     /**
