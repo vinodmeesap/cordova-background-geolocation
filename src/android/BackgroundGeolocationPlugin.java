@@ -275,7 +275,7 @@ public class BackgroundGeolocationPlugin extends CordovaPlugin implements Locati
                 break;
             case DetectedActivity.UNKNOWN:
             case DetectedActivity.TILTING:
-                // We don't let these ActivityType affect movement/stationary state.
+                nowMoving = isMoving;
                 return;
         }
         
