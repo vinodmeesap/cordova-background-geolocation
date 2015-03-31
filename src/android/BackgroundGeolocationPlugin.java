@@ -1,5 +1,6 @@
 package com.transistorsoft.cordova.bggeo;
 
+import java.util.concurrent.TimeUnit;
 import org.apache.cordova.CallbackContext;
 import org.apache.cordova.CordovaPlugin;
 import org.apache.cordova.CordovaWebView;
@@ -14,6 +15,7 @@ import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GooglePlayServicesUtil;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.location.ActivityRecognition;
+import com.google.android.gms.location.ActivityRecognitionResult;
 import com.google.android.gms.location.DetectedActivity;
 import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationServices;
@@ -50,10 +52,17 @@ public class BackgroundGeolocationPlugin extends CordovaPlugin implements Locati
     private Float distanceFilter        = (float) 50;
     private Boolean isDebugging         = false;
     private Boolean stopOnTerminate     = false;
-    
+
     // Android-only config
     private Integer locationUpdateInterval          = 60000;
     private Integer activityRecognitionInterval     = 60000;
+    /**
+    * @config {Integer} stopTimeout The time to wait after ARS STILL to turn of GPS
+    */
+    private long stopTimeout                     = 0;
+    
+    // The elapsed millis when the ARS detected STILL
+    private long stoppedAt                          = 0;
     
     // Geolocation callback
     private CallbackContext locationCallback;
@@ -61,7 +70,7 @@ public class BackgroundGeolocationPlugin extends CordovaPlugin implements Locati
     // Called when DetectedActivity is STILL
     private CallbackContext stationaryCallback;
     private Location stationaryLocation;
-    
+   
     private GoogleApiClient googleApiClient;    
     private DetectedActivity currentActivity;
     
@@ -168,6 +177,9 @@ public class BackgroundGeolocationPlugin extends CordovaPlugin implements Locati
             if (config.has("activityRecognitionInterval")) {
                 activityRecognitionInterval = config.getInt("activityRecognitionInterval");
             }
+            if (config.has("stopTimeout")) {
+                stopTimeout = config.getLong("stopTimeout");
+            }
             if (config.has("debug")) {
                 isDebugging = config.getBoolean("debug");
             }
@@ -253,16 +265,15 @@ public class BackgroundGeolocationPlugin extends CordovaPlugin implements Locati
         }
     }
     
-    public void onEventMainThread(DetectedActivity probableActivity) {
-        String probableActivityName = getActivityName(probableActivity.getType());
-        Log.w(TAG, "- DetectedActivity: " + probableActivityName + ", confidence: " + probableActivity.getConfidence());
+    public void onEventMainThread(ActivityRecognitionResult result) {
+        currentActivity = result.getMostProbableActivity();
+        String probableActivityName = getActivityName(currentActivity.getType());
+        Log.w(TAG, "- DetectedActivity: " + probableActivityName + ", confidence: " + currentActivity.getConfidence());
         
-        currentActivity = probableActivity;
-
         boolean wasMoving = isMoving;
         boolean nowMoving = false;
        
-        switch (probableActivity.getType()) {
+        switch (currentActivity.getType()) {
             case DetectedActivity.IN_VEHICLE:
             case DetectedActivity.ON_BICYCLE:
             case DetectedActivity.ON_FOOT:
@@ -283,6 +294,24 @@ public class BackgroundGeolocationPlugin extends CordovaPlugin implements Locati
         boolean justStopped     = wasMoving && !nowMoving;
         boolean initialState    = !nowMoving && (stationaryLocation == null);
         
+        // If we're using a stopTimeout, record the current activity's timestamp.
+        if (justStopped && stopTimeout > 0 && stoppedAt == 0) {
+            stoppedAt = result.getElapsedRealtimeMillis();
+            return;
+        }
+        
+        // If we're using a stopTimeout, compare the current activity's timestamp with the 1st recorded STILL event.
+        if (!nowMoving && stoppedAt > 0) {
+            long elapsedMillis = result.getElapsedRealtimeMillis() - stoppedAt;
+            long elapsedMinutes = TimeUnit.MILLISECONDS.toMinutes(elapsedMillis);
+            Log.i(TAG, "- Waiting for stopTimeout (" + stopTimeout + " min): elapsed min: " + elapsedMinutes);
+            if (elapsedMinutes == stopTimeout) {
+                justStopped = true;
+            } else {
+                return;
+            }
+        }
+        stoppedAt = 0;
         if ( startedMoving || justStopped || initialState ) {
             setPace(nowMoving);
         }
