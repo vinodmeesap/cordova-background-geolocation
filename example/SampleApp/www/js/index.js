@@ -179,6 +179,7 @@ var app = {
             distanceFilter: 30,
             locationUpdateInterval: 30000,
             activityRecognitionInterval: 10000,
+            stopTimeout: 0, // <-- Minutes to wait before turning off GPS after stop-detection.
             activityType: 'AutomotiveNavigation',
             debug: true, // <-- enable this hear sounds for background-geolocation life-cycle.
             stopOnTerminate: false // <-- enable this to clear background location settings when the app terminates

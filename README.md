@@ -279,6 +279,10 @@ An interval of 0 is allowed, but not recommended, since location updates may be 
 
 the desired time between activity detections. Larger values will result in fewer activity detections while improving battery life. A value of 0 will result in activity detections at the fastest possible rate.
 
+#####`@param {Integer minutes} stopTimeout`
+
+The number of miutes to wait before turning off the GPS after the ActivityRecognition System (ARS) detects the device is ```STILL``` (defaults to 0, no timeout).  If you don't set a value, the plugin is eager to turn off the GPS ASAP.  An example use-case for this configuration is to delay GPS OFF while in a car waiting at a traffic light.
+
 ### iOS Config
 
 #####`@param {String} activityType [AutomotiveNavigation, OtherNavigation, Fitness, Other]`

@@ -56,7 +56,7 @@ public class BackgroundGeolocationService extends IntentService {
 		    }
 			
 			// Post activity to the bus.
-			EventBus.getDefault().post(probableActivity);
+			EventBus.getDefault().post(result);
 		} else {
 			final Location location = intent.getParcelableExtra(FusedLocationProviderApi.KEY_LOCATION_CHANGED);
 			if (location != null) {
