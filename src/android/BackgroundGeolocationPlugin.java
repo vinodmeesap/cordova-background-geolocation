@@ -114,8 +114,10 @@ public class BackgroundGeolocationPlugin extends CordovaPlugin implements Locati
         if (ACTION_START.equalsIgnoreCase(action) && !isEnabled) {
             result      = true;
             isEnabled   = true;
-            
-            requestActivityUpdates();
+
+            if (googleApiClient.isConnected()) {
+                requestActivityUpdates();
+            }
 
         } else if (ACTION_STOP.equalsIgnoreCase(action)) {
             result      = true;
@@ -447,12 +449,16 @@ public class BackgroundGeolocationPlugin extends CordovaPlugin implements Locati
     
     public void onConnectionFailed(ConnectionResult arg0) {
         // TODO Auto-generated method stub
+        Log.i(TAG, "- onConnectionFailed");
         
     }
     
     public void onConnected(Bundle arg0) {
         // TODO Auto-generated method stub
         Log.i(TAG, "- onConnected");
+        if (isEnabled) {
+            requestActivityUpdates();
+        }
     }
 
 
