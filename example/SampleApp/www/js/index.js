@@ -1,11 +1,21 @@
-/**
-* cordova-background-geolocation
-* Copyright (c) 2015, Transistor Software (9224-2932 Quebec Inc)
-* All rights reserved.
-* sales@transistorsoft.com
-* http://transistorsoft.com
-* @see LICENSE
-*/
+/*
+ * Licensed to the Apache Software Foundation (ASF) under one
+ * or more contributor license agreements.  See the NOTICE file
+ * distributed with this work for additional information
+ * regarding copyright ownership.  The ASF licenses this file
+ * to you under the Apache License, Version 2.0 (the
+ * "License"); you may not use this file except in compliance
+ * with the License.  You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ * KIND, either express or implied.  See the License for the
+ * specific language governing permissions and limitations
+ * under the License.
+ */
 var ENV = (function() {
     
     var localStorage = window.localStorage;
@@ -132,8 +142,6 @@ var app = {
         * This would be your own callback for Ajax-requests after POSTing background geolocation to your server.
         */
         var yourAjaxCallback = function(response) {
-            // NB:  It's important to inform BackgroundGeolocation when your callback is complete so it can terminate the native background-process which is currently running your callback.
-            // If you fail to execute #finish, the OS might kill your app for leaving a background-process running.
             bgGeo.finish();
         };
 
@@ -176,10 +184,15 @@ var app = {
         bgGeo.configure(callbackFn, failureFn, {
             desiredAccuracy: 0,
             stationaryRadius: 50,
-            distanceFilter: 30,
-            locationUpdateInterval: 30000,
+            distanceFilter: 50,
+            locationUpdateInterval: 5000,
             activityRecognitionInterval: 10000,
-            stopTimeout: 0, // <-- Minutes to wait before turning off GPS after stop-detection.
+            stopTimeout: 1,
+            url: 'http://posttestserver.com/post.php?dir=cordova-background-geolocation',
+            headers: {
+                "X-FOO": "bar"
+            },
+            forceReload: false,
             activityType: 'AutomotiveNavigation',
             debug: true, // <-- enable this hear sounds for background-geolocation life-cycle.
             stopOnTerminate: false // <-- enable this to clear background location settings when the app terminates
