@@ -30,7 +30,9 @@
         
         <config-file target="AndroidManifest.xml" parent="/manifest/application">
             <service android:name="com.transistorsoft.cordova.bggeo.BackgroundGeolocationService" />
-
+            <service android:name="com.transistorsoft.cordova.bggeo.LocationService" />
+            <service android:name="com.transistorsoft.cordova.bggeo.ActivityRecognitionService" />
+            
             <!-- autorun on boot receiver -->
             <receiver android:name="com.transistorsoft.cordova.bggeo.BootReceiver" android:enabled="true" android:exported="false">
                 <intent-filter>
