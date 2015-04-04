@@ -491,7 +491,7 @@ public class BackgroundGeolocationService extends Service implements GoogleApiCl
         removeActivityUpdates();
         removeLocationUpdates();
         stopSelf();
-        wakeLock.release();
+        //wakeLock.release();
     }
     
     /**
