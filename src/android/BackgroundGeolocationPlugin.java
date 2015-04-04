@@ -41,6 +41,9 @@ public class BackgroundGeolocationPlugin extends CordovaPlugin {
     
     private Location stationaryLocation;
         
+    public static boolean isActive() {
+        return gWebView != null;
+    }
     
     @Override
     protected void pluginInitialize() {        
@@ -52,19 +55,20 @@ public class BackgroundGeolocationPlugin extends CordovaPlugin {
 
     public boolean execute(String action, JSONArray data, CallbackContext callbackContext) throws JSONException {
         Log.d(TAG, "execute / action : " + action);
-
-        Boolean result = false;
         
+        Activity activity   = this.cordova.getActivity();
+        Boolean result      = false;
+
         if (ACTION_START.equalsIgnoreCase(action) && !isEnabled) {
             result      = true;
             isEnabled   = true;
             if (!BackgroundGeolocationService.isInstanceCreated()) {
-                this.cordova.getActivity().startService(backgroundServiceIntent);
+                activity.startService(backgroundServiceIntent);
             }
         } else if (ACTION_STOP.equalsIgnoreCase(action)) {
             result      = true;
             isEnabled = false;
-            this.cordova.getActivity().stopService(backgroundServiceIntent);
+            activity.stopService(backgroundServiceIntent);
             callbackContext.success();
         } else if (ACTION_CONFIGURE.equalsIgnoreCase(action)) {
             result = applyConfig(data);
@@ -83,11 +87,11 @@ public class BackgroundGeolocationPlugin extends CordovaPlugin {
                 callbackContext.success();
             }
         } else if (ACTION_SET_CONFIG.equalsIgnoreCase(action)) {
-            this.cordova.getActivity().stopService(backgroundServiceIntent);
+            activity.stopService(backgroundServiceIntent);
             result = applyConfig(data);
             // TODO reconfigure Service
             if (result) {
-                this.cordova.getActivity().stopService(backgroundServiceIntent);
+                activity.stopService(backgroundServiceIntent);
                 callbackContext.success();
             } else {
                 callbackContext.error("- Configuration error!");
@@ -96,9 +100,9 @@ public class BackgroundGeolocationPlugin extends CordovaPlugin {
             result = true;
             this.stationaryCallback = callbackContext;  
         }
-
         return result;
     }
+    
     private boolean applyConfig(JSONArray data) {
         // This is the IntentService we'll provide to google-play API.
         Activity activity = this.cordova.getActivity();
@@ -149,10 +153,6 @@ public class BackgroundGeolocationPlugin extends CordovaPlugin {
         }
     }    
 
-    public static boolean isActive() {
-        return gWebView != null;
-    }
-    
     public void onPause(boolean multitasking) {
         Log.i(TAG, "- onPause");
         if (isEnabled) {
@@ -165,27 +165,23 @@ public class BackgroundGeolocationPlugin extends CordovaPlugin {
             //removeLocationUpdates();
         }
     }
-        
-    public void onEventMainThread(Location location) {
-        if (location instanceof StationaryLocation) {
-            stationaryLocation = location;
-            fireStationaryListener();
-        } else {
-            PluginResult result = new PluginResult(PluginResult.Status.OK, BackgroundGeolocationService.locationToJson(location));
-            result.setKeepCallback(true);
-            runInBackground(locationCallback, result);
-        }
-    }
     
     /**
-     * Execute onStationary javascript callback when device is determined to have just stopped
+     * EventBus listener
+     * @param {Location} location
      */
-    private void fireStationaryListener() {
-        Log.i(TAG, "- fire stationary listener");
-        if ( (stationaryCallback != null)  && (stationaryLocation != null) ) {
-            final PluginResult result = new PluginResult(PluginResult.Status.OK, BackgroundGeolocationService.locationToJson(stationaryLocation));
+    public void onEventMainThread(Location location) {
+        PluginResult result = new PluginResult(PluginResult.Status.OK, BackgroundGeolocationService.locationToJson(location));
+        result.setKeepCallback(true);
+        
+        if (location instanceof StationaryLocation) {
+            stationaryLocation = location;
+            if (stationaryCallback != null) {
+                runInBackground(stationaryCallback, result);
+            }
+        } else {
             result.setKeepCallback(true);
-            runInBackground(stationaryCallback, result);
+            runInBackground(locationCallback, result);
         }
     }
     

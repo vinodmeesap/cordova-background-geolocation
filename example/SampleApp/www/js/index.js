@@ -182,6 +182,9 @@ var app = {
             headers: {
                 "X-FOO": "bar"
             },
+            params: {
+                "auth_token": "bar"
+            },
             forceReload: false,
             activityType: 'AutomotiveNavigation',
             debug: true, // <-- enable this hear sounds for background-geolocation life-cycle.
