@@ -172,23 +172,28 @@ var app = {
 
         // BackgroundGeoLocation is highly configurable.
         bgGeo.configure(callbackFn, failureFn, {
+            debug: true, // <-- enable this hear sounds for background-geolocation life-cycle.
             desiredAccuracy: 0,
             stationaryRadius: 50,
             distanceFilter: 50,
             locationUpdateInterval: 5000,
             activityRecognitionInterval: 10000,
             stopTimeout: 1,
-            url: 'http://posttestserver.com/post.php?dir=cordova-background-geolocation',
+            forceReload: true,     // <-- If the user closes the app **while location-tracking is started** , reboot app (WARNING: possibly distruptive to user) 
+            activityType: 'AutomotiveNavigation',
+            stopOnTerminate: false // <-- Allow the background-service to run headless when user closes the app.
+            /**
+            * HTTP Feature:  set an url to allow the native background service to POST locations to your server
+            *
+            ,url: 'http://posttestserver.com/post.php?dir=cordova-background-geolocation',
             headers: {
                 "X-FOO": "bar"
             },
             params: {
-                "auth_token": "bar"
-            },
-            forceReload: false,
-            activityType: 'AutomotiveNavigation',
-            debug: true, // <-- enable this hear sounds for background-geolocation life-cycle.
-            stopOnTerminate: false // <-- enable this to clear background location settings when the app terminates
+                "auth_token": "maybe_your_server_authenticates_via_token_YES?"
+            }
+            *
+            */
         });
         
         // Turn ON the background-geolocation system.  The user will be tracked whenever they suspend the app.

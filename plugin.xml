@@ -30,7 +30,7 @@
         <source-file src="src/android/ActivityRecognitionService.java" target-dir="src/com/transistorsoft/cordova/bggeo" />
         <source-file src="src/android/LocationService.java" target-dir="src/com/transistorsoft/cordova/bggeo" />
         
-        <!--
+        <!-- For SQLite persistence NOT YET IMPLEMENTED
         <source-file src="src/android/data/LocationDAO.java" target-dir="src/com/tenforwardconsulting/cordova/bgloc/data" />
         <source-file src="src/android/data/sqlite/LocationOpenHelper.java" target-dir="src/com/tenforwardconsulting/cordova/bgloc/data/sqlite" />
         <source-file src="src/android/data/sqlite/SQLiteLocationDAO.java" target-dir="src/com/tenforwardconsulting/cordova/bgloc/data/sqlite" />

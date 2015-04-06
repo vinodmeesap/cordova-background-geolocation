@@ -35,8 +35,6 @@ import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.IBinder;
-import android.os.PowerManager;
-import android.os.PowerManager.WakeLock;
 import android.util.Log;
 
 public class BackgroundGeolocationService extends Service implements GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener {
@@ -49,7 +47,6 @@ public class BackgroundGeolocationService extends Service implements GoogleApiCl
     }
     
     private GoogleApiClient googleApiClient;
-    private WakeLock wakeLock;
     private ToneGenerator toneGenerator;
     
     private PendingIntent activityRecognitionPI;
@@ -109,6 +106,8 @@ public class BackgroundGeolocationService extends Service implements GoogleApiCl
     // Flags
     private Boolean isEnabled           = false;
     private Boolean isMoving            = false;
+    private Boolean isPaused            = true;
+    
     private long stoppedAt              = 0;
     
     private Location stationaryLocation;
@@ -116,7 +115,6 @@ public class BackgroundGeolocationService extends Service implements GoogleApiCl
     
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
-        Log.i(TAG, "- Start BackgroundGeolocationService");
         instance = this;
         
         EventBus.getDefault().register(this);
@@ -127,10 +125,10 @@ public class BackgroundGeolocationService extends Service implements GoogleApiCl
         distanceFilter              = intent.getFloatExtra("distanceFilter", 50);
         desiredAccuracy             = intent.getIntExtra("desiredAccuracy", 10);
         locationUpdateInterval      = intent.getIntExtra("locationUpdateInterval", 30000);
-        activityRecognitionInterval = intent.getIntExtra("activityRecognitionInterval", 10000);
+        activityRecognitionInterval = intent.getIntExtra("activityRecognitionInterval", 60000);
         stopTimeout                 = intent.getLongExtra("stopTimeout", 0);
         forceReload                 = intent.getBooleanExtra("forceReload", false);
-
+        
         // HTTP Configuration
         url = intent.getStringExtra("url");
         try {
@@ -143,6 +141,17 @@ public class BackgroundGeolocationService extends Service implements GoogleApiCl
         } catch (JSONException e) {
             e.printStackTrace();
         }
+        
+        Log.i(TAG, "----------------------------------------");
+        Log.i(TAG, "- Start BackgroundGeolocationService");
+        Log.i(TAG, "  debug: " + isDebugging);
+        Log.i(TAG, "  distanceFilter: " + distanceFilter);
+        Log.i(TAG, "  desiredAccuracy: " + desiredAccuracy);
+        Log.i(TAG, "  locationUpdateInterval: " + locationUpdateInterval);
+        Log.i(TAG, "  activityRecognitionInterval: " + activityRecognitionInterval);
+        Log.i(TAG, "  stopTimeout: " + stopTimeout);
+        Log.i(TAG, "  forceReload: " + forceReload);
+        Log.i(TAG, "----------------------------------------");
         
         // For debug sounds, turn on ToneGenerator.
         if (isDebugging) {
@@ -171,12 +180,6 @@ public class BackgroundGeolocationService extends Service implements GoogleApiCl
         } else {
             Log.e(TAG,  "- GooglePlayServices unavailable");
         }
-        
-        /*
-        PowerManager pm = (PowerManager) getSystemService(Context.POWER_SERVICE);
-        wakeLock        = pm.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, TAG);
-        wakeLock.acquire();
-        */
         
         return Service.START_REDELIVER_INTENT;
     }
@@ -209,13 +212,36 @@ public class BackgroundGeolocationService extends Service implements GoogleApiCl
     }
     
     /**
+     * EventBus listener
+     * Fired from Plugin
+     * @param {PausedEvent} event
+     */
+    public void onEventMainThread(PausedEvent event) {
+    	isPaused = event.isPaused;
+    	if (isPaused) {
+    		setPace(isMoving);
+    	} else {
+    		removeLocationUpdates();
+    	}
+    }
+    
+    /**
+     * EventBus listener
+     * Fired from Plugin
+     * @param {PaceChangeEvent} event
+     */
+    public void onEventMainThread(PaceChangeEvent event) {
+    	setPace(event.isMoving);
+    }
+    
+    /**
      * EventBus listener for ARS
      * @param {ActivityRecognitionResult} result
      */
     public void onEventMainThread(ActivityRecognitionResult result) {
         currentActivity = result.getMostProbableActivity();
         String probableActivityName = getActivityName(currentActivity.getType());
-        Log.w(TAG, "- DetectedActivity: " + probableActivityName + ", confidence: " + currentActivity.getConfidence());
+        Log.i(TAG, "- Activity received: " + probableActivityName + ", confidence: " + currentActivity.getConfidence());
         
         boolean wasMoving = isMoving;
         boolean nowMoving = false;
@@ -304,7 +330,7 @@ public class BackgroundGeolocationService extends Service implements GoogleApiCl
                 startTone("long_beep");
                 // set our stationaryLocation
                 stationaryLocation = LocationServices.FusedLocationApi.getLastLocation(googleApiClient);
-                EventBus.getDefault().post(new BackgroundGeolocationService.StationaryLocation(stationaryLocation));
+                EventBus.getDefault().post(new StationaryLocation(stationaryLocation));
             }
         }
     }
@@ -436,6 +462,7 @@ public class BackgroundGeolocationService extends Service implements GoogleApiCl
     }
     
     private void requestLocationUpdates() {
+    	if (!isPaused || !isEnabled) { return; }	// <-- Don't engage GPS when app is in foreground
         LocationServices.FusedLocationApi.requestLocationUpdates(googleApiClient, locationRequest, locationUpdatePI);
     }
     
@@ -478,9 +505,7 @@ public class BackgroundGeolocationService extends Service implements GoogleApiCl
     
     @Override
     public void onDestroy() {
-        Log.w(TAG, "--------------------------------------");
         Log.w(TAG, "- Destroy service");
-        Log.w(TAG, "--------------------------------------");
         
         cleanUp();
         super.onDestroy();
@@ -490,8 +515,7 @@ public class BackgroundGeolocationService extends Service implements GoogleApiCl
         EventBus.getDefault().unregister(this);
         removeActivityUpdates();
         removeLocationUpdates();
-        stopSelf();
-        //wakeLock.release();
+        googleApiClient.disconnect();
     }
     
     /**
@@ -516,6 +540,20 @@ public class BackgroundGeolocationService extends Service implements GoogleApiCl
         }
     }
     
+    public static class PausedEvent {
+    	public boolean isPaused;
+    	public PausedEvent(boolean paused) {
+    		isPaused = paused;
+    	}
+    }
+    
+	public static class PaceChangeEvent {
+		public boolean isMoving;
+		public PaceChangeEvent(boolean moving) {
+	        isMoving = moving;
+	    }
+	}
+
     class StationaryLocation extends Location {
 
         public StationaryLocation(Location l) {
@@ -543,5 +581,4 @@ public class BackgroundGeolocationService extends Service implements GoogleApiCl
             Log.d(TAG, "PostLocationTask#onPostExecture");
         }
     }
-    
 }

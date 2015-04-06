@@ -24,7 +24,7 @@ public class ActivityRecognitionService extends IntentService {
             ActivityRecognitionResult result = ActivityRecognitionResult.extractResult(intent);
             DetectedActivity probableActivity = result.getMostProbableActivity();
             
-            Log.i(TAG, "Activity detected:" + getActivityName(probableActivity.getType()) + ", confidence:" + probableActivity.getConfidence());
+            Log.w(TAG, "Activity detected:" + getActivityName(probableActivity.getType()) + ", confidence:" + probableActivity.getConfidence());
             if (probableActivity.getConfidence() < 80) {
                 return;
             }

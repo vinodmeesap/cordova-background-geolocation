@@ -8,6 +8,8 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 import org.json.JSONException;
 
+import com.transistorsoft.cordova.bggeo.BackgroundGeolocationService.PaceChangeEvent;
+import com.transistorsoft.cordova.bggeo.BackgroundGeolocationService.PausedEvent;
 import com.transistorsoft.cordova.bggeo.BackgroundGeolocationService.StationaryLocation;
 
 import de.greenrobot.event.EventBus;
@@ -38,8 +40,6 @@ public class BackgroundGeolocationPlugin extends CordovaPlugin {
     private CallbackContext locationCallback;
     // Called when DetectedActivity is STILL
     private CallbackContext stationaryCallback;
-    
-    private Location stationaryLocation;
         
     public static boolean isActive() {
         return gWebView != null;
@@ -79,10 +79,13 @@ public class BackgroundGeolocationPlugin extends CordovaPlugin {
             }
         } else if (ACTION_ON_PACE_CHANGE.equalsIgnoreCase(action)) {
             if (!isEnabled) {
-                Log.w(TAG, "- Cannot change pace while in #stop mode");
+                Log.w(TAG, "- Cannot change pace while disabled");
                 result = false;
-                callbackContext.error("Cannot #changePace while in #stop mode");
-            } else {
+                callbackContext.error("Cannot #changePace while disabled");
+            } else { 
+                PaceChangeEvent event = new PaceChangeEvent(data.getBoolean(0));
+                EventBus.getDefault().post(event);
+
                 result = true;
                 callbackContext.success();
             }
@@ -157,12 +160,13 @@ public class BackgroundGeolocationPlugin extends CordovaPlugin {
         Log.i(TAG, "- onPause");
         if (isEnabled) {
             //setPace(isMoving);
+            EventBus.getDefault().post(new PausedEvent(true));
         }
     }
     public void onResume(boolean multitasking) {
         Log.i(TAG, "- onResume");
         if (isEnabled) {
-            //removeLocationUpdates();
+            EventBus.getDefault().post(new PausedEvent(false));
         }
     }
     
@@ -175,7 +179,6 @@ public class BackgroundGeolocationPlugin extends CordovaPlugin {
         result.setKeepCallback(true);
         
         if (location instanceof StationaryLocation) {
-            stationaryLocation = location;
             if (stationaryCallback != null) {
                 runInBackground(stationaryCallback, result);
             }
