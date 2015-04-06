@@ -27,10 +27,20 @@
         <source-file src="src/android/libs/eventbus-2.4.0.jar" target-dir="libs" />
         <source-file src="src/android/BackgroundGeolocationPlugin.java" target-dir="src/com/transistorsoft/cordova/bggeo" />
         <source-file src="src/android/BackgroundGeolocationService.java" target-dir="src/com/transistorsoft/cordova/bggeo" />
+        <source-file src="src/android/ActivityRecognitionService.java" target-dir="src/com/transistorsoft/cordova/bggeo" />
+        <source-file src="src/android/LocationService.java" target-dir="src/com/transistorsoft/cordova/bggeo" />
         
+        <!-- For SQLite persistence NOT YET IMPLEMENTED
+        <source-file src="src/android/data/LocationDAO.java" target-dir="src/com/tenforwardconsulting/cordova/bgloc/data" />
+        <source-file src="src/android/data/sqlite/LocationOpenHelper.java" target-dir="src/com/tenforwardconsulting/cordova/bgloc/data/sqlite" />
+        <source-file src="src/android/data/sqlite/SQLiteLocationDAO.java" target-dir="src/com/tenforwardconsulting/cordova/bgloc/data/sqlite" />
+        -->
+
         <config-file target="AndroidManifest.xml" parent="/manifest/application">
             <service android:name="com.transistorsoft.cordova.bggeo.BackgroundGeolocationService" />
-
+            <service android:name="com.transistorsoft.cordova.bggeo.LocationService" />
+            <service android:name="com.transistorsoft.cordova.bggeo.ActivityRecognitionService" />
+            
             <!-- autorun on boot receiver -->
             <receiver android:name="com.transistorsoft.cordova.bggeo.BootReceiver" android:enabled="true" android:exported="false">
                 <intent-filter>

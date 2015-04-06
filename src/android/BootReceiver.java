@@ -51,7 +51,7 @@ public class BootReceiver extends BroadcastReceiver implements GoogleApiClient.C
         }
         
         // This is the IntentService we'll provide to google-play API.
-        locationUpdateService = PendingIntent.getService(context, 0, new Intent(context, BackgroundGeolocationService.class), PendingIntent.FLAG_UPDATE_CURRENT);
+        locationUpdateService = PendingIntent.getService(context, 0, new Intent(context, LocationService.class), PendingIntent.FLAG_UPDATE_CURRENT);
     }
     
     private void requestActivityUpdates() {
