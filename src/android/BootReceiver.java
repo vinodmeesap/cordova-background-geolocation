@@ -17,14 +17,14 @@ public class BootReceiver extends BroadcastReceiver {
 	 * Background Geolocation Configuration params.
 	 * If you're auto-running the service on BOOT, you need to manually configure the params here since the foreground app will not have been booted.
 	 */
-	private float 	distanceFilter 				= 50;
-	private Integer desiredAccuracy 			= 0;
-	private Integer locationUpdateInterval 		= 5000;
-	private Integer activityRecognitionInterval = 10000;
-	private long 	stopTimeout 				= 0;
+	private float 	distanceFilter 					= 50;
+	private Integer desiredAccuracy 				= 0;
+	private Integer locationUpdateInterval 				= 5000;
+	private Integer activityRecognitionInterval 			= 10000;
+	private long 	stopTimeout 					= 0;
 	private boolean debug 						= true;
-	private boolean stopOnTerminate 			= false;
-	private boolean forceReload 				= false;
+	private boolean stopOnTerminate 				= false;
+	private boolean forceReload 					= false;
 	private String 	url 						= "http://posttestserver.com/post.php?dir=cordova-background-geolocation";
 	private String 	params 						= "{'foo':'bar'}";
 	private String 	headers 					= "{'X-FOO':'BAR'}";
