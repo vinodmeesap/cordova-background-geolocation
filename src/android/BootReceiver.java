@@ -1,79 +1,55 @@
 package com.transistorsoft.cordova.bggeo;
 
-import com.google.android.gms.common.ConnectionResult;
-import com.google.android.gms.common.GooglePlayServicesUtil;
-import com.google.android.gms.common.api.GoogleApiClient;
-import com.google.android.gms.location.ActivityRecognition;
-
-import android.app.PendingIntent;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
-import android.os.Bundle;
 import android.util.Log;
-
 /**
- * This boot receiver is meant to handle the case where device is first booted after power up.  This will initiate
- * Google Play's ActivityRecognition API, whose events will be sent to BackgroundGeolocationService as usual.
- * @author chris
+ * This boot receiver is meant to handle the case where device is first booted after power up.  
+ * This boot the headless BackgroundGeolocationService as configured by this class.
+ * @author chris scott
  *
  */
-public class BootReceiver extends BroadcastReceiver implements GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener {   
+public class BootReceiver extends BroadcastReceiver {   
 	private static final String TAG = "BackgroundGeolocation";
 	
-	private GoogleApiClient googleApiClient;
-	private PendingIntent locationUpdateService;
-	
+	/**
+	 * Background Geolocation Configuration params.
+	 * If you're auto-running the service on BOOT, you need to manually configure the params here since the foreground app will not have been booted.
+	 */
+	private float 	distanceFilter 				= 50;
+	private Integer desiredAccuracy 			= 0;
+	private Integer locationUpdateInterval 		= 5000;
 	private Integer activityRecognitionInterval = 10000;
-	
-	private PendingResult pendingResult;
+	private long 	stopTimeout 				= 0;
+	private boolean debug 						= true;
+	private boolean stopOnTerminate 			= false;
+	private boolean forceReload 				= false;
+	private String 	url 						= "http://posttestserver.com/post.php?dir=cordova-background-geolocation";
+	private String 	params 						= "{'foo':'bar'}";
+	private String 	headers 					= "{'X-FOO':'BAR'}";
 	
     @Override
     public void onReceive(Context context, Intent intent) {
-    	Log.i(TAG, "- BootReceiver auto-running ActivityRecognition system");
+    	Log.i(TAG, "- BootReceiver booting service");
     	
-    	// GoogleApiClient connection is asynchronous process.  @see #onConnected
-    	pendingResult = goAsync();
+    	Intent backgroundServiceIntent = new Intent(context, BackgroundGeolocationService.class);
     	
-    	// Connect to google-play services.
-        if (ConnectionResult.SUCCESS == GooglePlayServicesUtil.isGooglePlayServicesAvailable(context)) {
-            Log.i(TAG, "- Connecting to GooglePlayServices...");
-            
-            googleApiClient = new GoogleApiClient.Builder(context)
-                .addApi(ActivityRecognition.API)
-                .addConnectionCallbacks(this)
-                .addOnConnectionFailedListener(this)
-                .build();
-
-            googleApiClient.connect();
-        } else {
-            Log.e(TAG,  "- GooglePlayServices unavailable");
-        }
+    	// Configure background geolocation service params.
+        backgroundServiceIntent.putExtra("distanceFilter", distanceFilter);
+        backgroundServiceIntent.putExtra("desiredAccuracy", desiredAccuracy);
+        backgroundServiceIntent.putExtra("locationUpdateInterval", locationUpdateInterval);
+        backgroundServiceIntent.putExtra("activityRecognitionInterval", activityRecognitionInterval);
+        backgroundServiceIntent.putExtra("stopTimeout", stopTimeout);
+        backgroundServiceIntent.putExtra("debug", debug);
+        backgroundServiceIntent.putExtra("stopOnTerminate", stopOnTerminate);
+        backgroundServiceIntent.putExtra("forceReload", forceReload);
+        backgroundServiceIntent.putExtra("url", url);
+        backgroundServiceIntent.putExtra("params", params);        
+        backgroundServiceIntent.putExtra("headers", headers);
         
-        // This is the IntentService we'll provide to google-play API.
-        locationUpdateService = PendingIntent.getService(context, 0, new Intent(context, LocationService.class), PendingIntent.FLAG_UPDATE_CURRENT);
+        // Start the service.
+        context.startService(backgroundServiceIntent);
+    	
     }
-    
-    private void requestActivityUpdates() {
-        ActivityRecognition.ActivityRecognitionApi.requestActivityUpdates(googleApiClient, activityRecognitionInterval, locationUpdateService);
-    }
-    
-	@Override
-	public void onConnectionFailed(ConnectionResult arg0) {
-		// TODO Auto-generated method stub
-		pendingResult.finish();
-		
-	}
-
-	@Override
-	public void onConnected(Bundle arg0) {
-		requestActivityUpdates();
-		pendingResult.finish();
-	}
-
-	@Override
-	public void onConnectionSuspended(int arg0) {
-		// TODO Auto-generated method stub
-		pendingResult.finish();
-	}
 }

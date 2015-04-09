@@ -15,6 +15,7 @@ import com.transistorsoft.cordova.bggeo.BackgroundGeolocationService.StationaryL
 import de.greenrobot.event.EventBus;
 import android.app.Activity;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.location.Location;
 import android.util.Log;
 
@@ -48,7 +49,7 @@ public class BackgroundGeolocationPlugin extends CordovaPlugin {
     @Override
     protected void pluginInitialize() {        
         gWebView = this.webView;
-
+        
         // Register for events fired by our IntentService "LocationService"
         EventBus.getDefault().register(this);
     }
