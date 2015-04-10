@@ -508,8 +508,8 @@ public class BackgroundGeolocationService extends Service implements GoogleApiCl
         // Configure LocationRequest
         locationRequest = LocationRequest.create()
             .setPriority(translateDesiredAccuracy(desiredAccuracy))
-            .setInterval(this.getLocationUpdateInterval())
-            .setFastestInterval(this.getFastestLocationUpdateInterval())
+            .setInterval(getLocationUpdateInterval())
+            .setFastestInterval(getFastestLocationUpdateInterval())
             .setSmallestDisplacement(distanceFilter);
         
         LocationServices.FusedLocationApi.requestLocationUpdates(googleApiClient, locationRequest, locationUpdatePI);
