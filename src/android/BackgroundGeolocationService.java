@@ -35,6 +35,7 @@ import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.IBinder;
+import android.provider.Settings.Secure;
 import android.util.Log;
 
 public class BackgroundGeolocationService extends Service implements GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener {
@@ -101,7 +102,7 @@ public class BackgroundGeolocationService extends Service implements GoogleApiCl
     /**
      * @config {JSONObject} headers For sending location to your server
      */
-    private JSONObject headers          = null;
+    private JSONObject headers          = new JSONObject();
     
     // Flags
     private Boolean isEnabled           = false;
@@ -150,6 +151,7 @@ public class BackgroundGeolocationService extends Service implements GoogleApiCl
         Log.i(TAG, "  locationUpdateInterval: " + locationUpdateInterval);
         Log.i(TAG, "  activityRecognitionInterval: " + activityRecognitionInterval);
         Log.i(TAG, "  stopTimeout: " + stopTimeout);
+        Log.i(TAG, "  stopOnTerminate: " + stopOnTerminate);
         Log.i(TAG, "  forceReload: " + forceReload);
         Log.i(TAG, "----------------------------------------");
         
@@ -158,13 +160,6 @@ public class BackgroundGeolocationService extends Service implements GoogleApiCl
             toneGenerator = new ToneGenerator(AudioManager.STREAM_NOTIFICATION, 100);
         }
 
-        // Configure FusedLocationProvider
-        locationRequest = LocationRequest.create()
-            .setPriority(translateDesiredAccuracy(desiredAccuracy))
-            .setInterval(this.locationUpdateInterval)
-            .setFastestInterval(30000)
-            .setSmallestDisplacement(distanceFilter);
-        
         // Connect to google-play services.
         if (ConnectionResult.SUCCESS == GooglePlayServicesUtil.isGooglePlayServicesAvailable(this)) {
             Log.i(TAG, "- Connecting to GooglePlayServices...");
@@ -199,6 +194,13 @@ public class BackgroundGeolocationService extends Service implements GoogleApiCl
     public void onConnected(Bundle arg0) {
         Log.i(TAG, "- GooglePlayServices connected");
         
+        // Configure FusedLocationProvider
+        locationRequest = LocationRequest.create()
+            .setPriority(translateDesiredAccuracy(desiredAccuracy))
+            .setInterval(this.locationUpdateInterval)
+            .setFastestInterval(30000)
+            .setSmallestDisplacement(distanceFilter);
+            
         Intent arsIntent = new Intent(this, ActivityRecognitionService.class);
         activityRecognitionPI = PendingIntent.getService(this, 0, arsIntent, PendingIntent.FLAG_UPDATE_CURRENT);
         
@@ -217,12 +219,12 @@ public class BackgroundGeolocationService extends Service implements GoogleApiCl
      * @param {PausedEvent} event
      */
     public void onEventMainThread(PausedEvent event) {
-    	isPaused = event.isPaused;
-    	if (isPaused) {
-    		setPace(isMoving);
-    	} else {
-    		removeLocationUpdates();
-    	}
+        isPaused = event.isPaused;
+        if (isPaused) {
+            setPace(isMoving);
+        } else {
+            removeLocationUpdates();
+        }
     }
     
     /**
@@ -231,7 +233,7 @@ public class BackgroundGeolocationService extends Service implements GoogleApiCl
      * @param {PaceChangeEvent} event
      */
     public void onEventMainThread(PaceChangeEvent event) {
-    	setPace(event.isMoving);
+        setPace(event.isMoving);
     }
     
     /**
@@ -242,6 +244,12 @@ public class BackgroundGeolocationService extends Service implements GoogleApiCl
         currentActivity = result.getMostProbableActivity();
         String probableActivityName = getActivityName(currentActivity.getType());
         Log.i(TAG, "- Activity received: " + probableActivityName + ", confidence: " + currentActivity.getConfidence());
+        
+        // If configured to stop when user closes app, kill this service.
+        if (!BackgroundGeolocationPlugin.isActive() && stopOnTerminate) {
+            stopSelf();
+            return;
+        }
         
         boolean wasMoving = isMoving;
         boolean nowMoving = false;
@@ -408,7 +416,15 @@ public class BackgroundGeolocationService extends Service implements GoogleApiCl
             JSONObject data = locationToJson(location);
             
             params.put("location", data);
-
+            
+            // Append android UUID to params so that server can map the UUID to some user in your database on server.
+            // If you've configured the plugin to execute on BOOT, there's no way to append your user's auth-token to the params
+            // since this BackgroundGeolocationService will be running in "headless" mode.
+            //
+            // It's up to you to register this UUID with your system.  You can fetch this UUID using the
+            // Cordova Device plugin org.apache.cordova.device http://plugins.cordova.io/#/package/org.apache.cordova.device
+            params.put("android_id", Secure.getString(this.getContentResolver(), Secure.ANDROID_ID)); 
+            
             Log.i(TAG, "data: " + params.toString());
 
             StringEntity se = new StringEntity(params.toString());
@@ -462,7 +478,7 @@ public class BackgroundGeolocationService extends Service implements GoogleApiCl
     }
     
     private void requestLocationUpdates() {
-    	if (!isPaused || !isEnabled) { return; }	// <-- Don't engage GPS when app is in foreground
+        if (!isPaused || !isEnabled) { return; }    // <-- Don't engage GPS when app is in foreground
         LocationServices.FusedLocationApi.requestLocationUpdates(googleApiClient, locationRequest, locationUpdatePI);
     }
     
@@ -541,18 +557,18 @@ public class BackgroundGeolocationService extends Service implements GoogleApiCl
     }
     
     public static class PausedEvent {
-    	public boolean isPaused;
-    	public PausedEvent(boolean paused) {
-    		isPaused = paused;
-    	}
+        public boolean isPaused;
+        public PausedEvent(boolean paused) {
+            isPaused = paused;
+        }
     }
     
-	public static class PaceChangeEvent {
-		public boolean isMoving;
-		public PaceChangeEvent(boolean moving) {
-	        isMoving = moving;
-	    }
-	}
+    public static class PaceChangeEvent {
+        public boolean isMoving;
+        public PaceChangeEvent(boolean moving) {
+            isMoving = moving;
+        }
+    }
 
     class StationaryLocation extends Location {
 
