@@ -78,6 +78,10 @@ public class BackgroundGeolocationService extends Service implements GoogleApiCl
      */
     private Integer locationUpdateInterval          = 60000;
     /**
+     * @config {Integer} fastestLocationUpdateInterval (ms)
+     */
+    private Integer fastestLocationUpdateInterval   = 30000;
+    /**
      * @config {Integer{ activityRecognitionInterval (ms)
      */
     private Integer activityRecognitionInterval     = 60000;
@@ -193,14 +197,7 @@ public class BackgroundGeolocationService extends Service implements GoogleApiCl
     @Override
     public void onConnected(Bundle arg0) {
         Log.i(TAG, "- GooglePlayServices connected");
-        
-        // Configure FusedLocationProvider
-        locationRequest = LocationRequest.create()
-            .setPriority(translateDesiredAccuracy(desiredAccuracy))
-            .setInterval(this.locationUpdateInterval)
-            .setFastestInterval(30000)
-            .setSmallestDisplacement(distanceFilter);
-            
+                    
         Intent arsIntent = new Intent(this, ActivityRecognitionService.class);
         activityRecognitionPI = PendingIntent.getService(this, 0, arsIntent, PendingIntent.FLAG_UPDATE_CURRENT);
         
@@ -367,6 +364,34 @@ public class BackgroundGeolocationService extends Service implements GoogleApiCl
         return accuracy;
     }
     
+    private Integer getLocationUpdateInterval() {
+        // TODO Can add intelligence here based upon currentActivity.
+        return locationUpdateInterval;
+    }
+    
+    private Integer getFastestLocationUpdateInterval() {
+        /* TODO Add intelligent calculation of fastestLocationUpdateInterval based upon currentActivity here
+         * switch (currentActivity.getType()) {
+            case DetectedActivity.IN_VEHICLE:
+                fastestLocationUpdateInterval = 30000;
+                break;
+            case DetectedActivity.ON_BICYCLE:
+                fastestLocationUpdateInterval = 30000;
+                break;
+            case DetectedActivity.ON_FOOT:
+                fastestLocationUpdateInterval = 30000;
+                break;
+            case DetectedActivity.RUNNING:
+                fastestLocationUpdateInterval = 30000;
+                break;
+            case DetectedActivity.WALKING:
+                fastestLocationUpdateInterval = 30000; 
+                break;
+        }
+        */
+        return fastestLocationUpdateInterval;
+    }
+    
     private String getActivityName(int activityType) {
         switch (activityType) {
             case DetectedActivity.IN_VEHICLE:
@@ -479,6 +504,14 @@ public class BackgroundGeolocationService extends Service implements GoogleApiCl
     
     private void requestLocationUpdates() {
         if (!isPaused || !isEnabled) { return; }    // <-- Don't engage GPS when app is in foreground
+        
+        // Configure LocationRequest
+        locationRequest = LocationRequest.create()
+            .setPriority(translateDesiredAccuracy(desiredAccuracy))
+            .setInterval(this.getLocationUpdateInterval())
+            .setFastestInterval(this.getFastestLocationUpdateInterval())
+            .setSmallestDisplacement(distanceFilter);
+        
         LocationServices.FusedLocationApi.requestLocationUpdates(googleApiClient, locationRequest, locationUpdatePI);
     }
     
