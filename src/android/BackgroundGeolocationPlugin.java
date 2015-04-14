@@ -15,7 +15,6 @@ import com.transistorsoft.cordova.bggeo.BackgroundGeolocationService.StationaryL
 import de.greenrobot.event.EventBus;
 import android.app.Activity;
 import android.content.Intent;
-import android.content.IntentFilter;
 import android.location.Location;
 import android.util.Log;
 
@@ -50,6 +49,8 @@ public class BackgroundGeolocationPlugin extends CordovaPlugin {
     protected void pluginInitialize() {        
         gWebView = this.webView;
         
+        backgroundServiceIntent = new Intent(this.cordova.getActivity(), BackgroundGeolocationService.class);
+
         // Register for events fired by our IntentService "LocationService"
         EventBus.getDefault().register(this);
     }
@@ -108,11 +109,6 @@ public class BackgroundGeolocationPlugin extends CordovaPlugin {
     }
     
     private boolean applyConfig(JSONArray data) {
-        // This is the IntentService we'll provide to google-play API.
-        Activity activity = this.cordova.getActivity();
-
-        backgroundServiceIntent = new Intent(activity, BackgroundGeolocationService.class);
-        
         try {
             JSONObject config = data.getJSONObject(0);
             Log.i(TAG, "- configure: " + config.toString());
