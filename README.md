@@ -258,8 +258,7 @@ Compare now background-geolocation in the scope of a city.  In this image, the l
 ![distanceFilter at city scale](/distance-filter-city.png "distanceFilter at city scale")
 
 #####`@param {Boolean} stopOnTerminate`
-Enable this in order to force a stop() when the application terminated (e.g. on iOS, double-tap home button, swipe away the app)
-
+Enable this in order to force a stop() when the application terminated (e.g. on iOS, double-tap home button, swipe away the app).  On Android, ```stopOnTerminate: false``` will cause the plugin to operate as a headless background-service (in this case, you should configure an #url in order for the background-service to send the location to your server)
 
 ### Android Config
 
@@ -282,6 +281,37 @@ the desired time between activity detections. Larger values will result in fewer
 #####`@param {Integer minutes} stopTimeout`
 
 The number of miutes to wait before turning off the GPS after the ActivityRecognition System (ARS) detects the device is ```STILL``` (defaults to 0, no timeout).  If you don't set a value, the plugin is eager to turn off the GPS ASAP.  An example use-case for this configuration is to delay GPS OFF while in a car waiting at a traffic light.
+
+#####`@param {Boolean} forceReload`
+
+If the user closes the application while the background-tracking has been started,  location-tracking will continue on if ```stopOnTerminate: false```.  You may choose to force the foreground application to reload (since this is where your Javascript runs) by setting ```foreceReload: true```.  This will guarantee that locations are always sent to your Javascript callback (**WARNING** possibly disruptive to user).
+
+### HTTP Feature
+The Android plugin can run as a "headless" background service, sending the user's location to your server even after then close the application (by configuring ```stopOnTerminate: false```).
+
+#####`@param {String} url'
+
+By configuring an ```#url```, the  plugin will always attempt to send the location to that server.
+
+#####`@param {Object} params'
+
+Optional HTTP params sent along in HTTP request to above ```#url```.
+
+#####`@param {Object} headers'
+
+Optional HTTP params sent along in HTTP request to above ```#url```.
+
+### Autorun on Boot Feature
+
+The Android background-service can be configured to autorun whenever the device is booted.  In ```plugin.xml```, you must first un-comment the Android permission ```android.permission.RECEIVE_BOOT_COMPLETED```
+
+```
+<!-- Autorun your app on device BOOT.  UNCOMMENT TO ENABLE AUTO-BOOT -->
+<!-- <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" /> -->
+```
+
+Next, since the plugin will have no access to your presumably logged-in user at boot-time (eg authentication_token, password, etc), you must manually configure the plugin's parameters within the Java file [src/android/BootReceiver.java](https://github.com/christocracy/cordova-background-geolocation/blob/edge/src/android/BootReceiver.java).  Since the plugin will be running in "headless" mode at boot-time (ie: no foreground application, thus no javascript)  you should configure an ```#url``` so the plugin can automatically POST location to your server.  Since the plugin has no access to any user-identifying information, the Android plugin will send along the device's UUID in the HTTP request params as ```#android_id```.  It's up to you to map this Android UUID to a user on your server.  You may fetch the device UUID using standard cordova plugin [org.apache.cordova.device](http://plugins.cordova.io/#/package/org.apache.cordova.device).
+
 
 ### iOS Config
 
