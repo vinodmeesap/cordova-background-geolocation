@@ -289,15 +289,15 @@ If the user closes the application while the background-tracking has been starte
 #### HTTP Feature
 The Android plugin can run as a "headless" background service, sending the user's location to your server even after then close the application (by configuring ```stopOnTerminate: false```).
 
-#####`@param {String} url'
+#####`@param {String} url`
 
-By configuring an ```#url```, the  plugin will always attempt to send the location to that server.
+By configuring an ```#url```, the  plugin will always attempt to HTTP POST the location to your server.
 
-#####`@param {Object} params'
+#####`@param {Object} params`
 
 Optional HTTP params sent along in HTTP request to above ```#url```.
 
-#####`@param {Object} headers'
+#####`@param {Object} headers`
 
 Optional HTTP params sent along in HTTP request to above ```#url```.
 
@@ -311,7 +311,6 @@ The Android background-service can be configured to autorun whenever the device 
 ```
 
 Next, since the plugin will have no access to your presumably logged-in user at boot-time (eg authentication_token, password, etc), you must manually configure the plugin's parameters within the Java file [src/android/BootReceiver.java](https://github.com/christocracy/cordova-background-geolocation/blob/edge/src/android/BootReceiver.java).  Since the plugin will be running in "headless" mode at boot-time (ie: no foreground application, thus no javascript)  you should configure an ```#url``` so the plugin can automatically POST location to your server.  Since the plugin has no access to any user-identifying information, the Android plugin will send along the device's UUID in the HTTP request params as ```#android_id```.  It's up to you to map this Android UUID to a user on your server.  You may fetch the device UUID using standard cordova plugin [org.apache.cordova.device](http://plugins.cordova.io/#/package/org.apache.cordova.device).
-
 
 ### iOS Config
 
