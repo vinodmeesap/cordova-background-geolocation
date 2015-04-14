@@ -33,6 +33,7 @@ public class BackgroundGeolocationPlugin extends CordovaPlugin {
     
     private Boolean isEnabled           = false;
     private Boolean stopOnTerminate     = false;
+    private Boolean isMoving            = false;
     
     private Intent backgroundServiceIntent;
     
@@ -113,6 +114,7 @@ public class BackgroundGeolocationPlugin extends CordovaPlugin {
             JSONObject config = data.getJSONObject(0);
             Log.i(TAG, "- configure: " + config.toString());
             
+            backgroundServiceIntent.putExtra("isMoving", isMoving);
             if (config.has("distanceFilter")) {
                 backgroundServiceIntent.putExtra("distanceFilter", (float) config.getInt("distanceFilter"));
             }
@@ -156,7 +158,6 @@ public class BackgroundGeolocationPlugin extends CordovaPlugin {
     public void onPause(boolean multitasking) {
         Log.i(TAG, "- onPause");
         if (isEnabled) {
-            //setPace(isMoving);
             EventBus.getDefault().post(new PausedEvent(true));
         }
     }
@@ -176,10 +177,12 @@ public class BackgroundGeolocationPlugin extends CordovaPlugin {
         result.setKeepCallback(true);
         
         if (location instanceof StationaryLocation) {
+            isMoving = false;
             if (stationaryCallback != null) {
                 runInBackground(stationaryCallback, result);
             }
         } else {
+            isMoving = true;
             result.setKeepCallback(true);
             runInBackground(locationCallback, result);
         }

@@ -133,6 +133,7 @@ public class BackgroundGeolocationService extends Service implements GoogleApiCl
         activityRecognitionInterval = intent.getIntExtra("activityRecognitionInterval", 60000);
         stopTimeout                 = intent.getLongExtra("stopTimeout", 0);
         forceReload                 = intent.getBooleanExtra("forceReload", false);
+        isMoving                    = intent.getBooleanExtra("isMoving", false);
         
         // HTTP Configuration
         url = intent.getStringExtra("url");
@@ -157,6 +158,7 @@ public class BackgroundGeolocationService extends Service implements GoogleApiCl
         Log.i(TAG, "  stopTimeout: " + stopTimeout);
         Log.i(TAG, "  stopOnTerminate: " + stopOnTerminate);
         Log.i(TAG, "  forceReload: " + forceReload);
+        Log.i(TAG, "  isMoving: " + isMoving);
         Log.i(TAG, "----------------------------------------");
         
         // For debug sounds, turn on ToneGenerator.
@@ -203,7 +205,9 @@ public class BackgroundGeolocationService extends Service implements GoogleApiCl
         
         Intent locationIntent = new Intent(this, LocationService.class);
         locationUpdatePI = PendingIntent.getService(this, 0, locationIntent, PendingIntent.FLAG_UPDATE_CURRENT);
-         
+        
+        setPace(isMoving);
+        
         // Start monitoring ARS
         if (googleApiClient.isConnected()) {
             requestActivityUpdates();
