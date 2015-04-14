@@ -95,7 +95,7 @@ public class BackgroundGeolocationPlugin extends CordovaPlugin {
             result = applyConfig(data);
             // TODO reconfigure Service
             if (result) {
-                activity.stopService(backgroundServiceIntent);
+                activity.startService(backgroundServiceIntent);
                 callbackContext.success();
             } else {
                 callbackContext.error("- Configuration error!");
