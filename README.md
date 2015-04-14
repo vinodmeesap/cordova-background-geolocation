@@ -286,7 +286,7 @@ The number of miutes to wait before turning off the GPS after the ActivityRecogn
 
 If the user closes the application while the background-tracking has been started,  location-tracking will continue on if ```stopOnTerminate: false```.  You may choose to force the foreground application to reload (since this is where your Javascript runs) by setting ```foreceReload: true```.  This will guarantee that locations are always sent to your Javascript callback (**WARNING** possibly disruptive to user).
 
-### HTTP Feature
+#### HTTP Feature
 The Android plugin can run as a "headless" background service, sending the user's location to your server even after then close the application (by configuring ```stopOnTerminate: false```).
 
 #####`@param {String} url'
@@ -301,7 +301,7 @@ Optional HTTP params sent along in HTTP request to above ```#url```.
 
 Optional HTTP params sent along in HTTP request to above ```#url```.
 
-### Autorun on Boot Feature
+#### Autorun on Boot Feature
 
 The Android background-service can be configured to autorun whenever the device is booted.  In ```plugin.xml```, you must first un-comment the Android permission ```android.permission.RECEIVE_BOOT_COMPLETED```
 
