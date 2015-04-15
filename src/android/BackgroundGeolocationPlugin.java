@@ -8,358 +8,212 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 import org.json.JSONException;
 
+import com.transistorsoft.cordova.bggeo.BackgroundGeolocationService.PaceChangeEvent;
+import com.transistorsoft.cordova.bggeo.BackgroundGeolocationService.PausedEvent;
+import com.transistorsoft.cordova.bggeo.BackgroundGeolocationService.StationaryLocation;
+
 import de.greenrobot.event.EventBus;
-
-import com.google.android.gms.common.ConnectionResult;
-import com.google.android.gms.common.GooglePlayServicesUtil;
-import com.google.android.gms.common.api.GoogleApiClient;
-import com.google.android.gms.location.ActivityRecognition;
-import com.google.android.gms.location.DetectedActivity;
-import com.google.android.gms.location.LocationRequest;
-import com.google.android.gms.location.LocationServices;
-
-import com.google.android.gms.location.LocationListener;
-
 import android.app.Activity;
-import android.app.PendingIntent;
 import android.content.Intent;
 import android.location.Location;
-import android.os.Bundle;
 import android.util.Log;
 
-import android.media.AudioManager;
-import android.media.ToneGenerator;
-
-public class BackgroundGeolocationPlugin extends CordovaPlugin implements LocationListener, GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener {
+public class BackgroundGeolocationPlugin extends CordovaPlugin {
     private static final String TAG = "BackgroundGeolocation";
-
+    private static CordovaWebView gWebView;
+    public static Boolean forceReload = false;
+    
     public static final String ACTION_START = "start";
     public static final String ACTION_STOP = "stop";
     public static final String ACTION_ON_PACE_CHANGE = "onPaceChange";
     public static final String ACTION_CONFIGURE = "configure";
     public static final String ACTION_SET_CONFIG = "setConfig";
-
-    private PendingIntent locationUpdateService;
-
-    private Boolean isEnabled       = false;
-    private Boolean isMoving        = false;
+    public static final String ACTION_ON_STATIONARY = "addStationaryRegionListener";
     
-    // Common config
-    private Integer desiredAccuracy     = 10;
-    private Integer stationaryRadius    = 50;
-    private Float distanceFilter        = (float) 50;
-    private Boolean isDebugging         = false;
+    
+    private Boolean isEnabled           = false;
     private Boolean stopOnTerminate     = false;
+    private Boolean isMoving            = false;
     
-    // Android-only config
-    private Integer locationUpdateInterval      = 60000;
-    private Integer activityRecognitionInterval   = 60000;
+    private Intent backgroundServiceIntent;
     
-    
-    private CallbackContext callback;
-
-    private GoogleApiClient googleApiClient;    
-    private DetectedActivity currentActivity;
-    
-    private static CordovaWebView gWebView;    
-    private ToneGenerator toneGenerator;
+    // Geolocation callback
+    private CallbackContext locationCallback;
+    // Called when DetectedActivity is STILL
+    private CallbackContext stationaryCallback;
+        
+    public static boolean isActive() {
+        return gWebView != null;
+    }
     
     @Override
-    protected void pluginInitialize() {
-        Log.d("BUS","registering");
-        
+    protected void pluginInitialize() {        
         gWebView = this.webView;
         
-        Activity activity = this.cordova.getActivity();
-        
-        // Connect to google-play services.
-        if (ConnectionResult.SUCCESS == GooglePlayServicesUtil.isGooglePlayServicesAvailable(activity)) {
-            Log.i(TAG, "- Connecting to GooglePlayServices...");
-            
-            googleApiClient = new GoogleApiClient.Builder(activity)
-                .addApi(LocationServices.API)
-                .addApi(ActivityRecognition.API)
-                .addConnectionCallbacks(this)
-                .addOnConnectionFailedListener(this)
-                .build();
+        backgroundServiceIntent = new Intent(this.cordova.getActivity(), BackgroundGeolocationService.class);
 
-            googleApiClient.connect();
-        } else {
-            Log.e(TAG,  "- GooglePlayServices unavailable");
-        }
-        
-        // This is the IntentService we'll provide to google-play API.
-        locationUpdateService = PendingIntent.getService(activity, 0, new Intent(activity, BackgroundGeolocationService.class), PendingIntent.FLAG_UPDATE_CURRENT);
-        
         // Register for events fired by our IntentService "LocationService"
         EventBus.getDefault().register(this);
     }
 
     public boolean execute(String action, JSONArray data, CallbackContext callbackContext) throws JSONException {
         Log.d(TAG, "execute / action : " + action);
-
-        Boolean result = false;
         
+        Activity activity   = this.cordova.getActivity();
+        Boolean result      = false;
+
         if (ACTION_START.equalsIgnoreCase(action) && !isEnabled) {
             result      = true;
             isEnabled   = true;
-            isMoving    = false;
-            
-            requestActivityUpdates();
-
+            if (!BackgroundGeolocationService.isInstanceCreated()) {
+                activity.startService(backgroundServiceIntent);
+            }
         } else if (ACTION_STOP.equalsIgnoreCase(action)) {
             result      = true;
-            isEnabled   = false;
-            isMoving    = false;
-            
-            removeLocationUpdates();
-            removeActivityUpdates();
+            isEnabled = false;
+            activity.stopService(backgroundServiceIntent);
             callbackContext.success();
         } else if (ACTION_CONFIGURE.equalsIgnoreCase(action)) {
-            result = true;
-            try {
-                JSONObject config = data.getJSONObject(0);
-                Log.i(TAG, "- configure: " + config.toString());
-                
-                stationaryRadius           = config.getInt("stationaryRadius");
-                distanceFilter             = (float) config.getInt("distanceFilter");
-                desiredAccuracy            = config.getInt("desiredAccuracy");
-                locationUpdateInterval     = config.getInt("locationUpdateInterval");
-                activityRecognitionInterval = config.getInt("activityRecognitionInterval");
-                isDebugging                = config.getBoolean("debug");
-                stopOnTerminate            = config.getBoolean("stopOnTerminate");
-                
-                if (isDebugging) {
-                    toneGenerator = new ToneGenerator(AudioManager.STREAM_NOTIFICATION, 100);
-                }
-                
-                this.callback = callbackContext;
-            } catch (JSONException e) {
-                callbackContext.error("Configuration error " + e.getMessage());
+            result = applyConfig(data);
+            if (result) {
+                this.locationCallback = callbackContext;
+            } else {
+                callbackContext.error("- Configuration error!");
             }
         } else if (ACTION_ON_PACE_CHANGE.equalsIgnoreCase(action)) {
             if (!isEnabled) {
-                Log.w(TAG, "- Cannot change pace while in #stop mode");
+                Log.w(TAG, "- Cannot change pace while disabled");
                 result = false;
-                callbackContext.error("Cannot #changePace while in #stop mode");
-            } else {
+                callbackContext.error("Cannot #changePace while disabled");
+            } else { 
+                PaceChangeEvent event = new PaceChangeEvent(data.getBoolean(0));
+                EventBus.getDefault().post(event);
+
                 result = true;
-                isMoving = data.getBoolean(0);
                 callbackContext.success();
             }
         } else if (ACTION_SET_CONFIG.equalsIgnoreCase(action)) {
-            result = true;
+            activity.stopService(backgroundServiceIntent);
+            result = applyConfig(data);
             // TODO reconfigure Service
-            callbackContext.success();
+            if (result) {
+                activity.startService(backgroundServiceIntent);
+                callbackContext.success();
+            } else {
+                callbackContext.error("- Configuration error!");
+            }
+        } else if (ACTION_ON_STATIONARY.equalsIgnoreCase(action)) {
+            result = true;
+            this.stationaryCallback = callbackContext;  
         }
-
         return result;
     }
     
-    /**
-     * Translates a number representing desired accuracy of GeoLocation system from set [0, 10, 100, 1000].
-     * 0:  most aggressive, most accurate, worst battery drain
-     * 1000:  least aggressive, least accurate, best for battery.
-     */
-    private Integer translateDesiredAccuracy(Integer accuracy) {
-        switch (accuracy) {
-            case 1000:
-                accuracy = LocationRequest.PRIORITY_NO_POWER;
-                break;
-            case 100:
-                accuracy = LocationRequest.PRIORITY_LOW_POWER;
-                break;
-            case 10:
-                accuracy = LocationRequest.PRIORITY_BALANCED_POWER_ACCURACY;
-                break;
-            case 0:
-                accuracy = LocationRequest.PRIORITY_HIGH_ACCURACY;
-                break;
-            default:
-                accuracy = LocationRequest.PRIORITY_BALANCED_POWER_ACCURACY;
+    private boolean applyConfig(JSONArray data) {
+        try {
+            JSONObject config = data.getJSONObject(0);
+            Log.i(TAG, "- configure: " + config.toString());
+            
+            backgroundServiceIntent.putExtra("isMoving", isMoving);
+            if (config.has("distanceFilter")) {
+                backgroundServiceIntent.putExtra("distanceFilter", (float) config.getInt("distanceFilter"));
+            }
+            if (config.has("desiredAccuracy")) {
+                backgroundServiceIntent.putExtra("desiredAccuracy", config.getInt("desiredAccuracy"));
+            }
+            if (config.has("locationUpdateInterval")) {
+                backgroundServiceIntent.putExtra("locationUpdateInterval", config.getInt("locationUpdateInterval"));
+            }
+            if (config.has("activityRecognitionInterval")) {
+                backgroundServiceIntent.putExtra("activityRecognitionInterval", config.getInt("activityRecognitionInterval"));
+            }
+            if (config.has("stopTimeout")) {
+                backgroundServiceIntent.putExtra("stopTimeout", config.getLong("stopTimeout"));
+            }
+            if (config.has("debug")) {
+                backgroundServiceIntent.putExtra("debug", config.getBoolean("debug"));
+            }
+            if (config.has("stopOnTerminate")) {
+                stopOnTerminate = config.getBoolean("stopOnTerminate");
+                backgroundServiceIntent.putExtra("stopOnTerminate", config.getBoolean("stopOnTerminate"));
+            }
+            if (config.has("forceReload")) {
+                backgroundServiceIntent.putExtra("forceReload", config.getBoolean("forceReload"));
+            }
+            if (config.has("url")) {
+                backgroundServiceIntent.putExtra("url", config.getString("url"));
+            }
+            if (config.has("params")) {
+                backgroundServiceIntent.putExtra("params", config.getString("params"));
+            }
+            if (config.has("headers")) {
+                backgroundServiceIntent.putExtra("headers", config.getString("headers"));
+            }
+            return true;
+        } catch (JSONException e) {
+            return false;
         }
-        return accuracy;
-    }
-     
-    public static boolean isActive() {
-        return gWebView != null;
-    }
-    
+    }    
+
     public void onPause(boolean multitasking) {
         Log.i(TAG, "- onPause");
         if (isEnabled) {
-            setPace(isMoving);
+            EventBus.getDefault().post(new PausedEvent(true));
         }
     }
     public void onResume(boolean multitasking) {
         Log.i(TAG, "- onResume");
         if (isEnabled) {
-            removeLocationUpdates();
+            EventBus.getDefault().post(new PausedEvent(false));
         }
     }
-    
-    private void setPace(Boolean moving) {
-        Log.i(TAG, "- setPace: " + moving);
-        isMoving = moving;
-        if (moving && isEnabled) {
-            LocationRequest request = LocationRequest.create()
-                .setPriority(translateDesiredAccuracy(desiredAccuracy))
-                .setInterval(this.locationUpdateInterval)
-                .setFastestInterval(30000)
-                .setSmallestDisplacement(distanceFilter);
-            
-            requestLocationUpdates(request);
-        } else {
-            removeLocationUpdates();
-        }
-    }
-    
-    public void onEventMainThread(DetectedActivity probableActivity) {
-        currentActivity = probableActivity;
-        
-        Boolean wasMoving = isMoving;
-        switch (probableActivity.getType()) {
-            case DetectedActivity.IN_VEHICLE:
-            case DetectedActivity.ON_BICYCLE:
-            case DetectedActivity.ON_FOOT:
-                isMoving = true;
-                break;
-            case DetectedActivity.STILL:
-                isMoving = false;
-                break;
-            case DetectedActivity.UNKNOWN:
-                break;
-            case DetectedActivity.TILTING:
-                break;
-        }
-        
-        if (!wasMoving && isMoving) {
-            startTone("doodly_doo");
-            setPace(isMoving);
-        } else if (wasMoving && !isMoving) {
-            startTone("long_beep");
-            setPace(isMoving);
-        }
-
-        String probableActivityName = getActivityName(probableActivity.getType());
-        Log.w(TAG, "- DetectedActivity: " + probableActivityName + ", confidence: " + probableActivity.getConfidence());
-    }
-    
-    public void onEventMainThread(Location location) {
-        Log.i(TAG, "BUS Rx:" + location.toString());
-        startTone("beep");
-        try {
-            JSONObject loc = new JSONObject();
-            loc.put("latitude", location.getLatitude());
-            loc.put("longitude", location.getLongitude());
-            loc.put("accuracy", location.getAccuracy());
-            loc.put("speed", location.getSpeed());
-            loc.put("bearing", location.getBearing());
-            loc.put("altitude", location.getAltitude());
-            loc.put("timestamp", location.getTime());
-            
-            PluginResult result = new PluginResult(PluginResult.Status.OK, loc);
-            result.setKeepCallback(true);
-            if(callback != null){
-                callback.sendPluginResult(result);    
-            }
-        } catch (JSONException e) {
-            Log.e(TAG, "could not parse location");
-        }
-    }
-    
-    private String getActivityName(int activityType) {
-        switch (activityType) {
-            case DetectedActivity.IN_VEHICLE:
-                return "in_vehicle";
-            case DetectedActivity.ON_BICYCLE:
-                return "on_bicycle";
-            case DetectedActivity.ON_FOOT:
-                return "on_foot";
-            case DetectedActivity.STILL:
-                return "still";
-            case DetectedActivity.UNKNOWN:
-                return "unknown";
-            case DetectedActivity.TILTING:
-                return "tilting";
-        }
-        return "unknown";
-    }
-    
-    private void requestActivityUpdates() {
-        ActivityRecognition.ActivityRecognitionApi.requestActivityUpdates(googleApiClient, activityRecognitionInterval, locationUpdateService);
-    }
-    
-    private void removeActivityUpdates() {
-        ActivityRecognition.ActivityRecognitionApi.removeActivityUpdates(googleApiClient, locationUpdateService);
-    }
-    
-    private void requestLocationUpdates(LocationRequest request) {
-        LocationServices.FusedLocationApi.requestLocationUpdates(googleApiClient, request, locationUpdateService);
-    }
-    
-    private void removeLocationUpdates() {
-        LocationServices.FusedLocationApi.removeLocationUpdates(googleApiClient, locationUpdateService);
-    }
-    
-    
     
     /**
-     * Plays debug sound
-     * @param name
+     * EventBus listener
+     * @param {Location} location
      */
-    private void startTone(String name) {
-        int tone = 0;
-        int duration = 1000;
-
-        if (name.equals("beep")) {
-            tone = ToneGenerator.TONE_PROP_BEEP;
-        } else if (name.equals("beep_beep_beep")) {
-            tone = ToneGenerator.TONE_CDMA_CONFIRM;
-        } else if (name.equals("long_beep")) {
-            tone = ToneGenerator.TONE_CDMA_ABBR_ALERT;
-        } else if (name.equals("doodly_doo")) {
-            tone = ToneGenerator.TONE_CDMA_ALERT_NETWORK_LITE;
-        } else if (name.equals("chirp_chirp_chirp")) {
-            tone = ToneGenerator.TONE_CDMA_ALERT_CALL_GUARD;
-        } else if (name.equals("dialtone")) {
-            tone = ToneGenerator.TONE_SUP_RINGTONE;
-        }
-        if (isDebugging) {
-            toneGenerator.startTone(tone, duration);
+    public void onEventMainThread(Location location) {
+        PluginResult result = new PluginResult(PluginResult.Status.OK, BackgroundGeolocationService.locationToJson(location));
+        result.setKeepCallback(true);
+        
+        if (location instanceof StationaryLocation) {
+            isMoving = false;
+            if (stationaryCallback != null) {
+                runInBackground(stationaryCallback, result);
+            }
+        } else {
+            isMoving = true;
+            result.setKeepCallback(true);
+            runInBackground(locationCallback, result);
         }
     }
     
-    @Override
-    public void onLocationChanged(Location arg0) {
-        // TODO Auto-generated method stub
-        
+    /**
+     * Run a javascript callback in Background
+     * @param cb
+     * @param result
+     */
+    private void runInBackground(final CallbackContext cb, final PluginResult result) {
+        if(cb != null){
+            cordova.getThreadPool().execute(new Runnable() {
+                public void run() {
+                    cb.sendPluginResult(result);
+                }
+            });
+        }
     }
     
-    public void onConnectionFailed(ConnectionResult arg0) {
-        // TODO Auto-generated method stub
-        
-    }
-    
-    public void onConnected(Bundle arg0) {
-        // TODO Auto-generated method stub
-        Log.i(TAG, "- onConnected");
-    }
-
-
-    public void onConnectionSuspended(int arg0) {
-        // TODO Auto-generated method stub
-        
-    }
-
     /**
      * Override method in CordovaPlugin.
      * Checks to see if it should turn off
      */
     public void onDestroy() {
-        if(isEnabled && stopOnTerminate || !isEnabled) {
-            removeActivityUpdates();
-            removeLocationUpdates();
+        Log.i(TAG, "- onDestroy");
+        Log.i(TAG, "  stopOnTerminate: " + stopOnTerminate);
+        Log.i(TAG, "  isEnabled: " + isEnabled);
+        
+        if(isEnabled && stopOnTerminate) {
+            this.cordova.getActivity().stopService(backgroundServiceIntent);
         }
     }    
 }

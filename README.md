@@ -11,12 +11,17 @@ This plugin leverages Cordova/PhoneGap's [require/define functionality used for 
 The plugin creates the object `window.plugins.backgroundGeoLocation` with the methods
 
   `configure(success, fail, option)`,
-
+	
+  `setConfig(success, fail, config) // reconfigure`,
+  
   `start(success, fail)`
 
   `stop(success, fail)`.
 
   `changePace(true) // engages aggressive monitoring immediately`
+  
+  `onStationary(callback, fail)`
+  
 
 ## Installing the plugin ##
 
@@ -141,7 +146,56 @@ Using the [ActivityRecognition API](https://developer.android.com/reference/com/
 WP8 uses ```callbackFn``` the way iOS do. On WP8, however, the plugin does not support the Stationary location and does not implement ```getStationaryLocation()``` and ```onPaceChange()```.
 Keep in mind that it is **not** possible to use ```start()``` at the ```pause``` event of Cordova/PhoneGap. WP8 suspend your app immediately and ```start()``` will not be executed. So make sure you fire ```start()``` before the app is closed/minimized.
 
-### Config
+## Methods
+
+#####`configure(locationCallback, failureCallback, config)`
+
+Configures the plugin's parameters (@see following [Config](https://github.com/christocracy/cordova-background-geolocation/blob/edge/README.md#config) section for accepted ```config``` params.  The ```locationCallback``` will be executed each time a new Geolocation is recorded.
+
+#####`setConfig(successFn, failureFn, config)`
+Reconfigure plugin's configuration (@see followign ##Config## section for accepted ```config``` params.  **NOTE** The plugin will continue to send recorded Geolocation to the ```locationCallback``` you provided to ```configure``` method -- use this method only to change configuration params (eg: ```distanceFilter```, ```stationaryRadius```, etc).
+
+```
+bgGeo.setConfig(function(){}, function(){}, {
+    desiredAccuracy: 10,
+    distanceFilter: 100
+});
+```
+
+#####`start(successFn, failureFn)`
+
+Enable background geolocation tracking.
+
+```
+bgGeo.start()
+```
+
+#####`stop(successFn, failureFn)`
+
+Disable background geolocation tracking.
+
+```
+bgGeo.stop();
+```
+
+#####`changePace(enabled, successFn, failureFn)`
+Initiate or cancel immediate background tracking.  When set to ```true```, the plugin will begin aggressively tracking the devices Geolocation, bypassing stationary monitoring.  If you were making a "Jogging" application, this would be your [Start Workout] button to immediately begin GPS tracking.  Send ```false``` to disable aggressive GPS monitoring and return to stationary-monitoring mode.
+
+```
+bgGeo.changePace(true);  // <-- Aggressive GPS monitoring immediately engaged.
+bgGeo.changePace(false); // <-- Disable aggressive GPS monitoring.  Engages stationary-mode.
+```
+
+#####`onStationary(callbackFn, failureFn)`
+Your ```callbackFn``` will be executed each time the device has entered stationary-monitoring mode.  The ```callbackFn``` will be provided with a ```Geolocation``` object as the 1st param, with the usual params (```latitude, longitude, accuracy, speed, bearing, altitude```).
+
+```
+bgGeo.onStationary(function(location) {
+    console.log('- Device is stopped: ', location.latitude, location.longitude);
+});
+```
+
+## Config
 
 Use the following config-parameters with the #configure method:
 
@@ -204,8 +258,7 @@ Compare now background-geolocation in the scope of a city.  In this image, the l
 ![distanceFilter at city scale](/distance-filter-city.png "distanceFilter at city scale")
 
 #####`@param {Boolean} stopOnTerminate`
-Enable this in order to force a stop() when the application terminated (e.g. on iOS, double-tap home button, swipe away the app)
-
+Enable this in order to force a stop() when the application terminated (e.g. on iOS, double-tap home button, swipe away the app).  On Android, ```stopOnTerminate: false``` will cause the plugin to operate as a headless background-service (in this case, you should configure an #url in order for the background-service to send the location to your server)
 
 ### Android Config
 
@@ -225,6 +278,40 @@ An interval of 0 is allowed, but not recommended, since location updates may be 
 
 the desired time between activity detections. Larger values will result in fewer activity detections while improving battery life. A value of 0 will result in activity detections at the fastest possible rate.
 
+#####`@param {Integer minutes} stopTimeout`
+
+The number of miutes to wait before turning off the GPS after the ActivityRecognition System (ARS) detects the device is ```STILL``` (defaults to 0, no timeout).  If you don't set a value, the plugin is eager to turn off the GPS ASAP.  An example use-case for this configuration is to delay GPS OFF while in a car waiting at a traffic light.
+
+#####`@param {Boolean} forceReload`
+
+If the user closes the application while the background-tracking has been started,  location-tracking will continue on if ```stopOnTerminate: false```.  You may choose to force the foreground application to reload (since this is where your Javascript runs) by setting ```foreceReload: true```.  This will guarantee that locations are always sent to your Javascript callback (**WARNING** possibly disruptive to user).
+
+#### HTTP Feature
+The Android plugin can run as a "headless" background service, sending the user's location to your server even after the user close the application (by configuring ```stopOnTerminate: false```).
+
+#####`@param {String} url`
+
+By configuring an ```#url```, the  plugin will always attempt to HTTP POST the location to your server.
+
+#####`@param {Object} params`
+
+Optional HTTP params sent along in HTTP request to above ```#url```.
+
+#####`@param {Object} headers`
+
+Optional HTTP params sent along in HTTP request to above ```#url```.
+
+#### Autorun on Boot Feature
+
+The Android background-service can be configured to autorun whenever the device is booted.  In ```plugin.xml```, you must first un-comment the Android permission ```android.permission.RECEIVE_BOOT_COMPLETED```
+
+```
+<!-- Autorun your app on device BOOT.  UNCOMMENT TO ENABLE AUTO-BOOT -->
+<!-- <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" /> -->
+```
+
+Next, since the plugin will have no access to your presumably logged-in user at boot-time (eg authentication_token, password, etc), you must manually configure the plugin's parameters within the Java file [src/android/BootReceiver.java](https://github.com/christocracy/cordova-background-geolocation/blob/edge/src/android/BootReceiver.java).  Since the plugin will be running in "headless" mode at boot-time (ie: no foreground application, thus no javascript)  you should configure an ```#url``` so the plugin can automatically POST location to your server.  Since the plugin has no access to any user-identifying information, the Android plugin will send along the device's UUID in the HTTP request params as ```#android_id```.  It's up to you to map this Android UUID to a user on your server (at login time, for example).  You may fetch the device UUID using standard cordova plugin [org.apache.cordova.device](http://plugins.cordova.io/#/package/org.apache.cordova.device).
+
 ### iOS Config
 
 #####`@param {String} activityType [AutomotiveNavigation, OtherNavigation, Fitness, Other]`
@@ -239,25 +326,74 @@ Presumably, this affects ios GPS algorithm.  See [Apple docs](https://developer.
 The underlying GeoLocator you can choose to use 'DesiredAccuracy' or 'DesiredAccuracyInMeters'. Since this plugins default configuration accepts meters, the default desiredAccuracy is mapped to the Windows Phone DesiredAccuracyInMeters leaving the DesiredAccuracy enum empty. For more info see the [MS docs](http://msdn.microsoft.com/en-us/library/windows/apps/windows.devices.geolocation.geolocator.desiredaccuracyinmeters) for more information.
 
 ## Licence ##
+```
+cordova-background-geolocation
+Copyright (c) 2015, Transistor Software (9224-2932 Quebec Inc)
+All rights reserved.
+sales@transistorsoft.com
+http://transistorsoft.com
+```
 
-The MIT License
+1. Preamble:  This Agreement governs the relationship between YOU OR THE ORGANIZATION ON WHOSE BEHALF YOU ARE ENTERING INTO THIS AGREEMENT (hereinafter: Licensee) and Transistor Software, a LICENSOR AFFILIATION whose principal place of business is Montreal, Quebec, Canada (Hereinafter: Licensor). This Agreement sets the terms, rights, restrictions and obligations on using [{software}] (hereinafter: The Software) created and owned by Licensor, as detailed herein
 
-Copyright (c) 2013 Chris Scott, [Transistor Software](http://transistorsoft.com)
+2. License Grant: Licensor hereby grants Licensee a Personal, Non-assignable &amp; non-transferable, Commercial, Royalty free, Including the rights to create but not distribute derivative works, Non-exclusive license, all with accordance with the terms set forth and other legal restrictions set forth in 3rd party software used while running Software.
 
-Permission is hereby granted, free of charge, to any person obtaining a copy
-of this software and associated documentation files (the "Software"), to deal
-in the Software without restriction, including without limitation the rights
-to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-copies of the Software, and to permit persons to whom the Software is
-furnished to do so, subject to the following conditions:
+	2.1 Limited: Licensee may use Software for the purpose of:
+		- Running Software on Licensee's Website[s] and Server[s];
+		- Allowing 3rd Parties to run Software on Licensee's Website[s] and Server[s];
+		- Publishing Software&rsquo;s output to Licensee and 3rd Parties;
+		- Distribute verbatim copies of Software's output (including compiled binaries);
+		- Modify Software to suit Licensee&rsquo;s needs and specifications.
 
-The above copyright notice and this permission notice shall be included in
-all copies or substantial portions of the Software.
+	2.2 Binary Restricted: Licensee may sublicense Software as a part of a larger work containing more than Software, distributed solely in Object or Binary form under a personal, non-sublicensable, limited license. Such redistribution shall be limited to unlimited codebases.</li><li>
 
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
-THE SOFTWARE.
+	2.3 Non Assignable &amp; Non-Transferable: Licensee may not assign or transfer his rights and duties under this license.
+
+	2.4 Commercial, Royalty Free: Licensee may use Software for any purpose, including paid-services, without any royalties
+
+	2.5 Including the Right to Create Derivative Works: </strong>Licensee may create derivative works based on Software, including amending Software&rsquo;s source code, modifying it, integrating it into a larger work or removing portions of Software, as long as no distribution of the derivative works is made.
+
+3. Term & Termination:  The Term of this license shall be until terminated. Licensor may terminate this Agreement, including Licensee's license in the case where Licensee : 
+
+	3.1 became insolvent or otherwise entered into any liquidation process; or
+
+	3.2 exported The Software to any jurisdiction where licensor may not enforce his rights under this agreements in; or
+
+	3.3 Licensee was in breach of any of this license's terms and conditions and such breach was not cured, immediately upon notification; or
+
+	3.4 Licensee in breach of any of the terms of clause 2 to this license; or
+
+	3.5 Licensee otherwise entered into any arrangement which caused Licensor to be unable to enforce his rights under this License.
+
+4. Payment: In consideration of the License granted under clause 2, Licensee shall pay Licensor a FEE, via Credit-Card, PayPal or any other mean which Licensor may deem adequate. Failure to perform payment shall construe as material breach of this Agreement.
+
+5. Upgrades, Updates and Fixes: Licensor may provide Licensee, from time to time, with Upgrades,  Updates or Fixes, as detailed herein and according to his sole discretion. Licensee hereby warrants to keep The Software up-to-date and install all relevant updates and fixes, and may, at his sole discretion, purchase upgrades, according to the rates set by Licensor. Licensor shall provide any update or Fix free of charge; however, nothing in this Agreement shall require Licensor to provide Updates or Fixes.
+
+	5.1 Upgrades: for the purpose of this license, an Upgrade  shall be a material amendment in The Software, which contains new features   and or major performance improvements and shall be marked as a new version number. For example, should Licensee purchase The Software under   version 1.X.X, an upgrade shall commence under number 2.0.0.
+
+	5.2 Updates: for the purpose of this license, an update shall be a minor amendment   in The Software, which may contain new features or minor improvements and   shall be marked as a new sub-version number. For example, should   Licensee purchase The Software under version 1.1.X, an upgrade shall   commence under number 1.2.0.
+
+	5.3 Fix: for the purpose of this license, a fix shall be a minor amendment in   The Software, intended to remove bugs or alter minor features which impair   the The Software's functionality. A fix shall be marked as a new   sub-sub-version number. For example, should Licensee purchase Software   under version 1.1.1, an upgrade shall commence under number 1.1.2.
+
+6. Support: Software is provided under an AS-IS basis and without any support, updates or maintenance. Nothing in this Agreement shall require Licensor to provide Licensee with support or fixes to any bug, failure, mis-performance or other defect in The Software.
+
+	6.1 Bug Notification: Licensee may provide Licensor of details regarding any bug, defect or   failure in The Software promptly and with no delay from such event;  Licensee  shall comply with Licensor's request for information regarding  bugs,  defects or failures and furnish him with information,  screenshots and  try to reproduce such bugs, defects or failures.
+
+	6.2 Feature Request: Licensee may request additional features in Software, provided, however, that (i) Licensee shall waive any claim or right in such feature should feature be developed by Licensor; (ii) Licensee shall be prohibited from developing the feature, or disclose such feature   request, or feature, to any 3rd party directly competing with Licensor or any 3rd party which may be, following the development of such feature, in direct competition with Licensor; (iii) Licensee warrants that feature does not infringe any 3rd party patent, trademark, trade-secret or any other intellectual property right; and (iv) Licensee developed, envisioned or created the feature solely by himself.
+
+7. Liability: To the extent permitted under Law, The Software is provided under an   AS-IS basis. Licensor shall never, and without any limit, be liable for   any damage, cost, expense or any other payment incurred by Licensee as a   result of Software&rsquo;s actions, failure, bugs and/or any other  interaction  between The Software &nbsp;and Licensee&rsquo;s end-equipment, computers,  other  software or any 3rd party, end-equipment, computer or  services. Moreover, Licensor shall never be liable for any defect in  source code  written by Licensee when relying on The Software or using The Software&rsquo;s source  code.
+
+8. Warranty: 
+
+	8.1 Intellectual Property:  Licensor   hereby warrants that The Software does not violate or infringe any 3rd   party claims in regards to intellectual property, patents and/or   trademarks and that to the best of its knowledge no legal action has   been taken against it for any infringement or violation of any 3rd party   intellectual property rights.
+
+	8.2 No-Warranty: The Software is provided without any warranty; Licensor hereby disclaims   any warranty that The Software shall be error free, without defects or code   which may cause damage to Licensee&rsquo;s computers or to Licensee, and  that  Software shall be functional. Licensee shall be solely liable to  any  damage, defect or loss incurred as a result of operating software  and  undertake the risks contained in running The Software on License&rsquo;s  Server[s]  and Website[s].
+
+	8.3 Prior Inspection:  Licensee hereby states that he inspected The Software thoroughly and found   it satisfactory and adequate to his needs, that it does not interfere   with his regular operation and that it does meet the standards and  scope  of his computer systems and architecture. Licensee found that  The Software  interacts with his development, website and server environment  and that  it does not infringe any of End User License Agreement of any  software  Licensee may use in performing his services. Licensee hereby  waives any  claims regarding The Software's incompatibility, performance,  results and  features, and warrants that he inspected the The Software.</p>
+
+9. No Refunds:  Licensee warrants that he inspected The Software according to clause 7(c)   and that it is adequate to his needs. Accordingly, as The Software is   intangible goods, Licensee shall not be, ever, entitled to any refund,   rebate, compensation or restitution for any reason whatsoever, even if   The Software contains material flaws.
+
+10. Indemnification:  Licensee hereby warrants to hold Licensor harmless and indemnify Licensor for any lawsuit brought against it in regards to Licensee&rsquo;s use   of The Software in means that violate, breach or otherwise circumvent this   license, Licensor's intellectual property rights or Licensor's title  in  The Software. Licensor shall promptly notify Licensee in case of such  legal  action and request Licensee's consent prior to any settlement in relation to such lawsuit or claim.
+
+11. Governing Law, Jurisdiction:  Licensee hereby agrees not to initiate class-action lawsuits against Licensor in relation to this license and to compensate Licensor for any legal fees, cost or attorney fees should any claim brought by Licensee against Licensor be denied, in part or in full.
+

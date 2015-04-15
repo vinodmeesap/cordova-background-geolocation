@@ -1,3 +1,11 @@
+/**
+* cordova-background-geolocation
+* Copyright (c) 2015, Transistor Software (9224-2932 Quebec Inc)
+* All rights reserved.
+* sales@transistorsoft.com
+* http://transistorsoft.com
+* @see LICENSE
+*/
 var ENV = (function() {
     
     var localStorage = window.localStorage;
@@ -124,8 +132,6 @@ var app = {
         * This would be your own callback for Ajax-requests after POSTing background geolocation to your server.
         */
         var yourAjaxCallback = function(response) {
-            // NB:  It's important to inform BackgroundGeolocation when your callback is complete so it can terminate the native background-process which is currently running your callback.
-            // If you fail to execute #finish, the OS might kill your app for leaving a background-process running.
             bgGeo.finish();
         };
 
@@ -133,7 +139,7 @@ var app = {
         * This callback will be executed every time a geolocation is recorded in the background.
         */
         var callbackFn = function(location) {
-            console.log('[js] BackgroundGeoLocation callback:  ' + location.latitude + ',' + location.longitude);
+            console.log('[js] BackgroundGeoLocation callback:  ' + JSON.stringify(location));
             
             // Update our current-position marker.
             app.setCurrentLocation(location);
@@ -148,6 +154,7 @@ var app = {
 
         // Only ios emits this stationary event
         bgGeo.onStationary(function(location) {
+            console.log('[js] BackgroundGeoLocation onStationary ' + JSON.stringify(location));
             if (!app.stationaryRadius) {
                 app.stationaryRadius = new google.maps.Circle({
                     fillColor: '#cc0000',
@@ -165,14 +172,28 @@ var app = {
 
         // BackgroundGeoLocation is highly configurable.
         bgGeo.configure(callbackFn, failureFn, {
-            desiredAccuracy: 0,                         // <-- 0:  highest power, highest accuracy; 1000:  lowest power, lowest accuracy.
+            debug: true, // <-- enable this hear sounds for background-geolocation life-cycle.
+            desiredAccuracy: 0,
             stationaryRadius: 50,
-            distanceFilter: 50,                         // <-- minimum distance between location events
-            activityType: 'AutomotiveNavigation',       // <-- [ios]
-            locationUpdateInterval: 30000,              // <-- [android] minimum time between location updates, used in conjunction with #distanceFilter
-            activityRecognitionInterval: 10000,         // <-- [android] sampling-rate activity-recognition system for movement/stationary detection
-            debug: true,                                // <-- enable this hear sounds, see notifications during life-cycle events.
-            stopOnTerminate: false                      // <-- enable this to clear background location settings when the app terminates
+            distanceFilter: 50,
+            locationUpdateInterval: 5000,
+            activityRecognitionInterval: 10000,
+            stopTimeout: 0,
+            forceReload: true,      // <-- If the user closes the app **while location-tracking is started** , reboot app (WARNING: possibly distruptive to user) 
+            stopOnTerminate: false, // <-- Allow the background-service to run headless when user closes the app.
+            activityType: 'AutomotiveNavigation'
+            /**
+            * HTTP Feature:  set an url to allow the native background service to POST locations to your server
+            *
+            ,url: 'http://posttestserver.com/post.php?dir=cordova-background-geolocation',
+            headers: {
+                "X-FOO": "bar"
+            },
+            params: {
+                "auth_token": "maybe_your_server_authenticates_via_token_YES?"
+            }
+            *
+            */
         });
         
         // Turn ON the background-geolocation system.  The user will be tracked whenever they suspend the app.
