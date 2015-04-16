@@ -294,6 +294,21 @@ Set to ```true``` to start the background-service whenever the device boots.  Un
 The Android plugin can run as a "headless" background service, sending the user's location to your server even after the user close the application (by configuring ```stopOnTerminate: false```).  The plugin's HTTP request will arrive at your server as follows:
 
 ```
+bgGeo.configure(callbackFn, failureFn, {
+    .
+    .
+    .
+    url: 'http://posttestserver.com/post.php?dir=cordova-background-geolocation',
+    headers: {
+        "X-FOO": "bar"
+    },
+    params: {
+        "auth_token": "maybe_your_server_authenticates_via_token_YES?"
+    }
+});
+
+...
+
 Headers (Some may be inserted by server)
 
 REQUEST_URI = /post.php?dir=cordova-background-geolocation
