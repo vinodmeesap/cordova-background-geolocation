@@ -15,6 +15,7 @@ import com.transistorsoft.cordova.bggeo.BackgroundGeolocationService.StationaryL
 import de.greenrobot.event.EventBus;
 import android.app.Activity;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.location.Location;
 import android.util.Log;
 
@@ -93,11 +94,9 @@ public class BackgroundGeolocationPlugin extends CordovaPlugin {
                 callbackContext.success();
             }
         } else if (ACTION_SET_CONFIG.equalsIgnoreCase(action)) {
-            activity.stopService(backgroundServiceIntent);
             result = applyConfig(data);
             // TODO reconfigure Service
             if (result) {
-                activity.startService(backgroundServiceIntent);
                 callbackContext.success();
             } else {
                 callbackContext.error("- Configuration error!");
@@ -110,47 +109,65 @@ public class BackgroundGeolocationPlugin extends CordovaPlugin {
     }
     
     private boolean applyConfig(JSONArray data) {
+        Activity activity = this.cordova.getActivity();
+        
         try {
             JSONObject config = data.getJSONObject(0);
             Log.i(TAG, "- configure: " + config.toString());
             
-            backgroundServiceIntent.putExtra("isMoving", isMoving);
+            SharedPreferences settings = activity.getSharedPreferences(TAG, 0);
+            SharedPreferences.Editor editor = settings.edit();
+            
+            editor.putBoolean("isMoving", isMoving);
+            
             if (config.has("distanceFilter")) {
-                backgroundServiceIntent.putExtra("distanceFilter", (float) config.getInt("distanceFilter"));
+                editor.putFloat("distanceFilter", config.getInt("distanceFilter"));
             }
             if (config.has("desiredAccuracy")) {
-                backgroundServiceIntent.putExtra("desiredAccuracy", config.getInt("desiredAccuracy"));
+                editor.putInt("desiredAccuracy", config.getInt("desiredAccuracy"));
             }
             if (config.has("locationUpdateInterval")) {
-                backgroundServiceIntent.putExtra("locationUpdateInterval", config.getInt("locationUpdateInterval"));
+                editor.putInt("locationUpdateInterval", config.getInt("locationUpdateInterval"));
             }
             if (config.has("activityRecognitionInterval")) {
-                backgroundServiceIntent.putExtra("activityRecognitionInterval", config.getInt("activityRecognitionInterval"));
+                editor.putInt("activityRecognitionInterval", config.getInt("activityRecognitionInterval"));
             }
             if (config.has("stopTimeout")) {
-                backgroundServiceIntent.putExtra("stopTimeout", config.getLong("stopTimeout"));
+                editor.putLong("stopTimeout", config.getLong("stopTimeout"));
             }
             if (config.has("debug")) {
-                backgroundServiceIntent.putExtra("debug", config.getBoolean("debug"));
+                editor.putBoolean("debug", config.getBoolean("debug"));
             }
             if (config.has("stopOnTerminate")) {
-                stopOnTerminate = config.getBoolean("stopOnTerminate");
-                backgroundServiceIntent.putExtra("stopOnTerminate", config.getBoolean("stopOnTerminate"));
+                editor.putBoolean("stopOnTerminate", config.getBoolean("stopOnTerminate"));
+            }
+            if (config.has("startOnBoot")) {
+                editor.putBoolean("startOnBoot", config.getBoolean("startOnBoot"));
             }
             if (config.has("forceReload")) {
-                backgroundServiceIntent.putExtra("forceReload", config.getBoolean("forceReload"));
+                editor.putBoolean("forceReload", config.getBoolean("forceReload"));
             }
             if (config.has("url")) {
-                backgroundServiceIntent.putExtra("url", config.getString("url"));
+                editor.putString("url", config.getString("url"));
             }
             if (config.has("params")) {
-                backgroundServiceIntent.putExtra("params", config.getString("params"));
+                try {
+                    editor.putString("params", config.getJSONObject("params").toString());
+                } catch (JSONException e) {
+                    Log.w(TAG, "- Failed to parse #params to JSONObject.  Ignored");
+                }
             }
             if (config.has("headers")) {
-                backgroundServiceIntent.putExtra("headers", config.getString("headers"));
+                try {
+                    editor.putString("headers", config.getJSONObject("headers").toString());
+                } catch (JSONException e) {
+                    Log.w(TAG, "- Failed to parse #headers to JSONObject.  Ignored");
+                }
             }
+            editor.commit();
             return true;
         } catch (JSONException e) {
+            Log.w(TAG, e);
             return false;
         }
     }    

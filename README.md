@@ -286,8 +286,56 @@ The number of miutes to wait before turning off the GPS after the ActivityRecogn
 
 If the user closes the application while the background-tracking has been started,  location-tracking will continue on if ```stopOnTerminate: false```.  You may choose to force the foreground application to reload (since this is where your Javascript runs) by setting ```foreceReload: true```.  This will guarantee that locations are always sent to your Javascript callback (**WARNING** possibly disruptive to user).
 
+#####`@param {Boolean} startOnBoot`
+
+Set to ```true``` to start the background-service whenever the device boots.  Unless you configure the plugin to ```forceReload``` (ie: boot your app), you should configure the plugin's HTTP features so it can POST to your server in "headless" mode.
+
 #### HTTP Feature
-The Android plugin can run as a "headless" background service, sending the user's location to your server even after the user close the application (by configuring ```stopOnTerminate: false```).
+The Android plugin can run as a "headless" background service, sending the user's location to your server even after the user close the application (by configuring ```stopOnTerminate: false```).  The plugin's HTTP request will arrive at your server as follows:
+
+```
+bgGeo.configure(callbackFn, failureFn, {
+    .
+    .
+    .
+    url: 'http://posttestserver.com/post.php?dir=cordova-background-geolocation',
+    headers: {
+        "X-FOO": "bar"
+    },
+    params: {
+        "auth_token": "maybe_your_server_authenticates_via_token_YES?"
+    }
+});
+
+...
+
+Headers (Some may be inserted by server)
+
+REQUEST_URI = /post.php?dir=cordova-background-geolocation
+QUERY_STRING = dir=cordova-background-geolocation
+REQUEST_METHOD = POST
+GATEWAY_INTERFACE = CGI/1.1
+REMOTE_PORT = 38380
+REMOTE_ADDR = 198.84.250.106
+HTTP_USER_AGENT = Apache-HttpClient/UNAVAILABLE (java 1.4)
+HTTP_CONNECTION = close
+HTTP_HOST = posttestserver.com
+CONTENT_LENGTH = 243
+CONTENT_TYPE = application/json
+HTTP_ACCEPT = application/json
+UNIQUE_ID = VS-YI9Bx6hIAABctKDoAAAAB
+REQUEST_TIME_FLOAT = 1429198883.9584
+REQUEST_TIME = 1429198883
+
+No Post Params.
+
+== Begin post body ==
+{"auth_token":"maybe_your_server_authenticates_via_token_YES?","location":{"latitude":45.5192875,"longitude":-73.6169281,"accuracy":25.42799949645996,"speed":0,"bearing":0,"altitude":0,"timestamp":1429198882716},"android_id":"39dbac67e2c9d80"}
+== End post body ==
+
+Upload contains PUT data:
+{"auth_token":"maybe_your_server_authenticates_via_token_YES?","location":{"latitude":45.5192875,"longitude":-73.6169281,"accuracy":25.42799949645996,"speed":0,"bearing":0,"altitude":0,"timestamp":1429198882716},"android_id":"39dbac67e2c9d80"}
+```
 
 #####`@param {String} url`
 
@@ -300,17 +348,6 @@ Optional HTTP params sent along in HTTP request to above ```#url```.
 #####`@param {Object} headers`
 
 Optional HTTP params sent along in HTTP request to above ```#url```.
-
-#### Autorun on Boot Feature
-
-The Android background-service can be configured to autorun whenever the device is booted.  In ```plugin.xml```, you must first un-comment the Android permission ```android.permission.RECEIVE_BOOT_COMPLETED```
-
-```
-<!-- Autorun your app on device BOOT.  UNCOMMENT TO ENABLE AUTO-BOOT -->
-<!-- <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" /> -->
-```
-
-Next, since the plugin will have no access to your presumably logged-in user at boot-time (eg authentication_token, password, etc), you must manually configure the plugin's parameters within the Java file [src/android/BootReceiver.java](https://github.com/christocracy/cordova-background-geolocation/blob/edge/src/android/BootReceiver.java).  Since the plugin will be running in "headless" mode at boot-time (ie: no foreground application, thus no javascript)  you should configure an ```#url``` so the plugin can automatically POST location to your server.  Since the plugin has no access to any user-identifying information, the Android plugin will send along the device's UUID in the HTTP request params as ```#android_id```.  It's up to you to map this Android UUID to a user on your server (at login time, for example).  You may fetch the device UUID using standard cordova plugin [org.apache.cordova.device](http://plugins.cordova.io/#/package/org.apache.cordova.device).
 
 ### iOS Config
 
