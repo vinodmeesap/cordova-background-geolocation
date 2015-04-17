@@ -123,7 +123,10 @@ public class BackgroundGeolocationService extends Service implements GoogleApiCl
     public int onStartCommand(Intent intent, int flags, int startId) {
         instance = this;
         
-        EventBus.getDefault().register(this);
+        EventBus eventBus = EventBus.getDefault();
+        if (!eventBus.isRegistered(this)) {
+            eventBus.register(this);
+        }
         
         // Load config settings
         SharedPreferences settings = getSharedPreferences(TAG, 0);
@@ -348,7 +351,9 @@ public class BackgroundGeolocationService extends Service implements GoogleApiCl
                 startTone("long_beep");
                 // set our stationaryLocation
                 stationaryLocation = LocationServices.FusedLocationApi.getLastLocation(googleApiClient);
-                EventBus.getDefault().post(new StationaryLocation(stationaryLocation));
+                if (stationaryLocation != null) {
+                    EventBus.getDefault().post(new StationaryLocation(stationaryLocation));
+                }
             }
         }
     }
@@ -579,9 +584,12 @@ public class BackgroundGeolocationService extends Service implements GoogleApiCl
     private void cleanUp() {
         instance = null;
         EventBus.getDefault().unregister(this);
-        removeActivityUpdates();
-        removeLocationUpdates();
-        googleApiClient.disconnect();
+        
+        if (googleApiClient != null && googleApiClient.isConnected()) {
+            removeActivityUpdates();
+            removeLocationUpdates();
+            googleApiClient.disconnect();
+        }
     }
     
     /**
