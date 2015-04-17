@@ -59,20 +59,16 @@ public class BackgroundGeolocationPlugin extends CordovaPlugin {
 
     public boolean execute(String action, JSONArray data, CallbackContext callbackContext) throws JSONException {
         Log.d(TAG, "execute / action : " + action);
-        
-        Activity activity   = this.cordova.getActivity();
-        Boolean result      = false;
 
+        Boolean result      = false;
+        
         if (ACTION_START.equalsIgnoreCase(action) && !isEnabled) {
             result      = true;
-            isEnabled   = true;
-            if (!BackgroundGeolocationService.isInstanceCreated()) {
-                activity.startService(backgroundServiceIntent);
-            }
+            this.setEnabled(true);
+            callbackContext.success();
         } else if (ACTION_STOP.equalsIgnoreCase(action)) {
             result      = true;
-            isEnabled = false;
-            activity.stopService(backgroundServiceIntent);
+            this.setEnabled(false);
             callbackContext.success();
         } else if (ACTION_CONFIGURE.equalsIgnoreCase(action)) {
             result = applyConfig(data);
@@ -106,6 +102,25 @@ public class BackgroundGeolocationPlugin extends CordovaPlugin {
             this.stationaryCallback = callbackContext;  
         }
         return result;
+    }
+    
+    private void setEnabled(boolean value) {
+        isEnabled = value;
+        
+        Activity activity = this.cordova.getActivity();
+        
+        SharedPreferences settings = activity.getSharedPreferences(TAG, 0);
+        SharedPreferences.Editor editor = settings.edit();
+        editor.putBoolean("enabled", isEnabled);
+        editor.commit();
+        
+        if (isEnabled) {
+            if (!BackgroundGeolocationService.isInstanceCreated()) {
+                activity.startService(backgroundServiceIntent);
+            }
+        } else {
+            activity.stopService(backgroundServiceIntent);
+        }
     }
     
     private boolean applyConfig(JSONArray data) {
