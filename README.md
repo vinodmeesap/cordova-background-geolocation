@@ -351,6 +351,10 @@ Optional HTTP params sent along in HTTP request to above ```#url```.
 
 ### iOS Config
 
+#####`@param {Boolean} disableElasticity [false]`
+
+Defaults to ```false```.  Set ```true``` to disable automatic speed-based ```#distanceFilter``` elasticity.  eg:  When device is moving at highway speeds, locations are returned at ~ 1 / km.
+
 #####`@param {String} activityType [AutomotiveNavigation, OtherNavigation, Fitness, Other]`
 
 Presumably, this affects ios GPS algorithm.  See [Apple docs](https://developer.apple.com/library/ios/documentation/CoreLocation/Reference/CLLocationManager_Class/CLLocationManager/CLLocationManager.html#//apple_ref/occ/instp/CLLocationManager/activityType) for more information
