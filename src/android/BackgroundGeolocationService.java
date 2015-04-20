@@ -25,6 +25,7 @@ import android.app.PendingIntent;
 import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.location.Location;
 import android.media.AudioManager;
@@ -58,19 +59,19 @@ public class BackgroundGeolocationService extends Service implements GoogleApiCl
     /**
      * @config {Integer} desiredAccuracy
      */
-    private Integer desiredAccuracy     = 10;
+    private Integer desiredAccuracy                 = 10;
     /**
      * @config {Float} distanceFilter
      */
-    private Float distanceFilter        = (float) 50;
+    private Float distanceFilter                    = 50f;
     /**
      * @config {Boolean} isDebugging
      */
-    private Boolean isDebugging         = false;
+    private Boolean isDebugging                     = false;
     /**
      * @config {Boolean} stopOnTerminate
      */
-    private Boolean stopOnTerminate     = false;
+    private Boolean stopOnTerminate                 = false;
     
     // Android-only config
     /**
@@ -92,21 +93,21 @@ public class BackgroundGeolocationService extends Service implements GoogleApiCl
     /**
      * @config {Integer} stopTimeout The time to wait after ARS STILL to turn of GPS
      */
-     private long stopTimeout                     = 0;
+     private long stopTimeout                       = 0;
      
     // HTTP config
     /**
      * @config {String} url For sending location to your server
      */
-    private String url                  = null;
+    private String url                              = null;
     /**
      * @config {JSONObject} params For sending location to your server
      */
-    private JSONObject params           = new JSONObject();
+    private JSONObject params                       = new JSONObject();
     /**
      * @config {JSONObject} headers For sending location to your server
      */
-    private JSONObject headers          = new JSONObject();
+    private JSONObject headers                      = new JSONObject();
     
     // Flags
     private Boolean isEnabled           = false;
@@ -122,32 +123,42 @@ public class BackgroundGeolocationService extends Service implements GoogleApiCl
     public int onStartCommand(Intent intent, int flags, int startId) {
         instance = this;
         
-        EventBus.getDefault().register(this);
-
-        isEnabled = true;
-        stopOnTerminate             = intent.getBooleanExtra("stopOnTerminate", true);
-        isDebugging                 = intent.getBooleanExtra("debug", false);
-        distanceFilter              = intent.getFloatExtra("distanceFilter", 50);
-        desiredAccuracy             = intent.getIntExtra("desiredAccuracy", 10);
-        locationUpdateInterval      = intent.getIntExtra("locationUpdateInterval", 30000);
-        activityRecognitionInterval = intent.getIntExtra("activityRecognitionInterval", 60000);
-        stopTimeout                 = intent.getLongExtra("stopTimeout", 0);
-        forceReload                 = intent.getBooleanExtra("forceReload", false);
-        isMoving                    = intent.getBooleanExtra("isMoving", false);
-        
-        // HTTP Configuration
-        url = intent.getStringExtra("url");
-        try {
-            if (intent.hasExtra("params")) {
-                params = new JSONObject(intent.getStringExtra("params"));
-            }
-            if (intent.hasExtra("headers")) {
-                headers = new JSONObject(intent.getStringExtra("headers"));
-            }
-        } catch (JSONException e) {
-            e.printStackTrace();
+        EventBus eventBus = EventBus.getDefault();
+        if (!eventBus.isRegistered(this)) {
+            eventBus.register(this);
         }
         
+        // Load config settings
+        SharedPreferences settings = getSharedPreferences(TAG, 0);
+        isEnabled = true;
+
+        isDebugging                 = settings.getBoolean("debug", false);
+        distanceFilter              = settings.getFloat("distanceFilter", 50);
+        desiredAccuracy             = settings.getInt("desiredAccuracy", 10);
+        locationUpdateInterval      = settings.getInt("locationUpdateInterval", 30000);
+        activityRecognitionInterval = settings.getInt("activityRecognitionInterval", 60000);
+        stopTimeout                 = settings.getLong("stopTimeout", 0);
+        stopOnTerminate             = settings.getBoolean("stopOnTerminate", true);
+        forceReload                 = settings.getBoolean("forceReload", false);
+        isMoving                    = settings.getBoolean("isMoving", false);
+        
+        // HTTP Configuration
+        url = settings.getString("url", null);
+        if (settings.contains("params")) {
+            try {
+                params = new JSONObject(settings.getString("params", "{}"));
+            } catch (JSONException e) {
+                Log.w(TAG, "- Faile to parse #params to JSONObject");
+            }
+        }
+        if (settings.contains("headers")) {
+            try {
+                headers = new JSONObject(settings.getString("headers", "{}"));
+            } catch (JSONException e) {
+                Log.w(TAG, "- Failed to parse #headers to JSONObject");
+            }
+        }
+
         Log.i(TAG, "----------------------------------------");
         Log.i(TAG, "- Start BackgroundGeolocationService");
         Log.i(TAG, "  debug: " + isDebugging);
@@ -159,6 +170,7 @@ public class BackgroundGeolocationService extends Service implements GoogleApiCl
         Log.i(TAG, "  stopOnTerminate: " + stopOnTerminate);
         Log.i(TAG, "  forceReload: " + forceReload);
         Log.i(TAG, "  isMoving: " + isMoving);
+        
         Log.i(TAG, "----------------------------------------");
         
         // For debug sounds, turn on ToneGenerator.
@@ -182,7 +194,7 @@ public class BackgroundGeolocationService extends Service implements GoogleApiCl
             Log.e(TAG,  "- GooglePlayServices unavailable");
         }
         
-        return Service.START_REDELIVER_INTENT;
+        return Service.START_STICKY;
     }
     
     @Override
@@ -339,7 +351,9 @@ public class BackgroundGeolocationService extends Service implements GoogleApiCl
                 startTone("long_beep");
                 // set our stationaryLocation
                 stationaryLocation = LocationServices.FusedLocationApi.getLastLocation(googleApiClient);
-                EventBus.getDefault().post(new StationaryLocation(stationaryLocation));
+                if (stationaryLocation != null) {
+                    EventBus.getDefault().post(new StationaryLocation(stationaryLocation));
+                }
             }
         }
     }
@@ -370,7 +384,8 @@ public class BackgroundGeolocationService extends Service implements GoogleApiCl
     
     private Integer getLocationUpdateInterval() {
         // TODO Can add intelligence here based upon currentActivity.
-        return locationUpdateInterval;
+        SharedPreferences settings = getSharedPreferences(TAG, 0);
+        return settings.getInt("locationUpdateInterval", locationUpdateInterval);
     }
     
     private Integer getFastestLocationUpdateInterval() {
@@ -499,7 +514,8 @@ public class BackgroundGeolocationService extends Service implements GoogleApiCl
     }
     
     private void requestActivityUpdates() {
-        ActivityRecognition.ActivityRecognitionApi.requestActivityUpdates(googleApiClient, activityRecognitionInterval, activityRecognitionPI);
+        SharedPreferences settings = getSharedPreferences(TAG, 0);
+        ActivityRecognition.ActivityRecognitionApi.requestActivityUpdates(googleApiClient, settings.getInt("activityRecognitionInterval", activityRecognitionInterval), activityRecognitionPI);
     }
     
     private void removeActivityUpdates() {
@@ -509,12 +525,14 @@ public class BackgroundGeolocationService extends Service implements GoogleApiCl
     private void requestLocationUpdates() {
         if (!isPaused || !isEnabled) { return; }    // <-- Don't engage GPS when app is in foreground
         
+        SharedPreferences settings = getSharedPreferences(TAG, 0);
+        
         // Configure LocationRequest
         locationRequest = LocationRequest.create()
-            .setPriority(translateDesiredAccuracy(desiredAccuracy))
+            .setPriority(translateDesiredAccuracy(settings.getInt("desiredAccuracy", desiredAccuracy)))
             .setInterval(getLocationUpdateInterval())
             .setFastestInterval(getFastestLocationUpdateInterval())
-            .setSmallestDisplacement(distanceFilter);
+            .setSmallestDisplacement(settings.getFloat("distanceFilter", distanceFilter));
         
         LocationServices.FusedLocationApi.requestLocationUpdates(googleApiClient, locationRequest, locationUpdatePI);
     }
@@ -566,9 +584,12 @@ public class BackgroundGeolocationService extends Service implements GoogleApiCl
     private void cleanUp() {
         instance = null;
         EventBus.getDefault().unregister(this);
-        removeActivityUpdates();
-        removeLocationUpdates();
-        googleApiClient.disconnect();
+        
+        if (googleApiClient != null && googleApiClient.isConnected()) {
+            removeActivityUpdates();
+            removeLocationUpdates();
+            googleApiClient.disconnect();
+        }
     }
     
     /**

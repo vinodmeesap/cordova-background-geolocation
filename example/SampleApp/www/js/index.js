@@ -179,8 +179,9 @@ var app = {
             locationUpdateInterval: 5000,
             activityRecognitionInterval: 10000,
             stopTimeout: 0,
-            forceReload: true,      // <-- If the user closes the app **while location-tracking is started** , reboot app (WARNING: possibly distruptive to user) 
-            stopOnTerminate: false, // <-- Allow the background-service to run headless when user closes the app.
+            forceReload: true,      // <-- [Android] If the user closes the app **while location-tracking is started** , reboot app (WARNING: possibly distruptive to user) 
+            stopOnTerminate: false, // <-- [Android] Allow the background-service to run headless when user closes the app.
+            startOnBoot: true,      // <-- [Android] Auto start background-service in headless mode when device is powered-up.
             activityType: 'AutomotiveNavigation'
             /**
             * HTTP Feature:  set an url to allow the native background service to POST locations to your server
