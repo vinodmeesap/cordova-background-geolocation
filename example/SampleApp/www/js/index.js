@@ -176,6 +176,7 @@ var app = {
             desiredAccuracy: 0,
             stationaryRadius: 50,
             distanceFilter: 50,
+            disableElasticity: false, // <-- [iOS] Default is 'false'.  Set true to disable speed-based distanceFilter elasticity
             locationUpdateInterval: 5000,
             activityRecognitionInterval: 10000,
             stopTimeout: 0,
