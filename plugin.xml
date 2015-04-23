@@ -90,6 +90,8 @@
         <framework src="AVFoundation.framework" weak="true" />
         <source-file src="src/ios/CDVBackgroundGeoLocation.m" />
         <header-file src="src/ios/CDVBackgroundGeoLocation.h" />
+        <source-file src="src/ios/BackgroundGeoLocation.m" />
+        <header-file src="src/ios/BackgroundGeoLocation.h" />
      </platform>          
 
 	<!-- wp8 -->
