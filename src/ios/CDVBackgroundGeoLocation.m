@@ -8,13 +8,20 @@
 
 @implementation CDVBackgroundGeoLocation {
     BackgroundGeolocation *bgGeo;
+    NSDictionary *config;
 }
+
+@synthesize syncCallbackId, stationaryRegionListeners;
 
 - (void)pluginInitialize
 {
     bgGeo = [[BackgroundGeolocation alloc] init];
     bgGeo.commandDelegate = self.commandDelegate;
+    
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(onLocationChanged:) name:@"BackgroundGeolocation.location" object:nil];
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(onStationaryLocation:) name:@"BackgroundGeolocation.stationarylocation" object:nil];
 }
+
 /**
  * configure plugin
  * @param {String} token
@@ -24,12 +31,21 @@
  */
 - (void) configure:(CDVInvokedUrlCommand*)command
 {
-    [bgGeo configure:command];
+    self.syncCallbackId = command.callbackId;
+    
+    config = [command.arguments objectAtIndex:0];
+
+    [bgGeo configure:config];
 }
 
 - (void) setConfig:(CDVInvokedUrlCommand*)command
 {
-    [bgGeo setConfig:command];
+    NSDictionary *cfg  = [command.arguments objectAtIndex:0];
+    [bgGeo setConfig:cfg];
+    
+    CDVPluginResult* result = nil;
+    result = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK];
+    [self.commandDelegate sendPluginResult:result callbackId:command.callbackId];
 }
 
 /**
@@ -37,14 +53,23 @@
  */
 - (void) start:(CDVInvokedUrlCommand*)command
 {
-    [bgGeo start:command];
+    [bgGeo start];
+    
+    CDVPluginResult* result = nil;
+    result = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK];
+    [self.commandDelegate sendPluginResult:result callbackId:command.callbackId];
+    
 }
 /**
  * Turn it off
  */
 - (void) stop:(CDVInvokedUrlCommand*)command
 {
-    [bgGeo stop:command];
+    [bgGeo stop];
+    
+    CDVPluginResult* result = nil;
+    result = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK];
+    [self.commandDelegate sendPluginResult:result callbackId:command.callbackId];
 }
 
 /**
@@ -53,7 +78,45 @@
  */
 - (void) onPaceChange:(CDVInvokedUrlCommand *)command
 {
-    [bgGeo onPaceChange:command];
+    BOOL moving = [[command.arguments objectAtIndex: 0] boolValue];
+    [bgGeo onPaceChange:moving];
+    
+    CDVPluginResult* result = nil;
+    result = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK];
+    [self.commandDelegate sendPluginResult:result callbackId:command.callbackId];
+}
+
+/**
+ * location handler from BackgroundGeolocation
+ */
+- (void)onLocationChanged:(NSNotification*)notification {
+    NSDictionary *locationData = notification.object;
+    
+    CDVPluginResult* result = nil;
+    result = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsDictionary:locationData];
+    [result setKeepCallbackAsBool:YES];
+    [self.commandDelegate sendPluginResult:result callbackId:self.syncCallbackId];
+    
+    NSLog(@"-------------------------------onLocation %@", locationData);
+}
+
+- (void) onStationaryLocation:(NSNotification*)notification
+{
+    NSMutableDictionary *data = notification.object;
+    NSLog(@"-------------------------------onStationaryLocation %@", data);
+    
+    if (![self.stationaryRegionListeners count]) {
+        [bgGeo stopBackgroundTask];
+        return;
+    }
+    
+    CDVPluginResult *result = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsDictionary:data];
+    [result setKeepCallbackAsBool:YES];
+    for (NSString *callbackId in self.stationaryRegionListeners)
+    {
+        [self.commandDelegate sendPluginResult:result callbackId:callbackId];
+    }
+    [bgGeo stopBackgroundTask];
 }
 
 /**
@@ -61,12 +124,19 @@
  */
 - (void) getStationaryLocation:(CDVInvokedUrlCommand *)command
 {
-    [bgGeo getStationaryLocation:command];
+    NSDictionary* location = [bgGeo getStationaryLocation];
+    
+    CDVPluginResult *result = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsDictionary:location];
+    result = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK];
+    [self.commandDelegate sendPluginResult:result callbackId:command.callbackId];
 }
 
 - (void) addStationaryRegionListener:(CDVInvokedUrlCommand*)command
 {
-    [bgGeo addStationaryRegionListener:command];
+    if (self.stationaryRegionListeners == nil) {
+        self.stationaryRegionListeners = [[NSMutableArray alloc] init];
+    }
+    [self.stationaryRegionListeners addObject:command.callbackId];
 }
 
 /**
@@ -74,7 +144,7 @@
  */
 -(void) finish:(CDVInvokedUrlCommand*)command
 {
-    [bgGeo finish:command];
+    [bgGeo finish];
 }
 /**
  * If you don't stopMonitoring when application terminates, the app will be awoken still when a

@@ -65,7 +65,7 @@
     
 }
 
-@synthesize syncCallbackId, stationaryRegionListeners, commandDelegate;
+//@synthesize syncCallbackId, stationaryRegionListeners, commandDelegate;
 
 - (id) init
 {
@@ -102,13 +102,9 @@
     return [super init];
 }
 
-- (void) configure:(CDVInvokedUrlCommand*)command
+- (void) configure:(NSDictionary*)config
 {
-    NSDictionary *config = [command.arguments objectAtIndex:0];
-    
-    [self applyConfig:config];
-    
-    self.syncCallbackId = command.callbackId;
+    [self setConfig:config];
     
     locationManager.activityType = activityType;
     locationManager.pausesLocationUpdatesAutomatically = YES;
@@ -126,7 +122,7 @@
     }
 }
 
-- (void) applyConfig:(NSDictionary*)config
+- (void) setConfig:(NSDictionary*)config
 {
     if (config[@"debug"]) {
         isDebugging = [[config objectForKey:@"debug"] boolValue];
@@ -192,7 +188,7 @@
 /**
  * Turn on background geolocation
  */
-- (void) start:(CDVInvokedUrlCommand*)command
+- (void) start
 {
     enabled = YES;
     UIApplicationState state = [[UIApplication sharedApplication] applicationState];
@@ -207,7 +203,7 @@
 /**
  * Turn it off
  */
-- (void) stop:(CDVInvokedUrlCommand*)command
+- (void) stop
 {
     [self log: @"- CDVBackgroundGeoLocation stop"];
     enabled = NO;
@@ -225,9 +221,9 @@
  * Change pace to moving/stopped
  * @param {Boolean} isMoving
  */
-- (void) onPaceChange:(CDVInvokedUrlCommand *)command
+- (void) onPaceChange:(BOOL)value
 {
-    isMoving = [[command.arguments objectAtIndex: 0] boolValue];
+    isMoving = value;
     [self log: @"- CDVBackgroundGeoLocation onPaceChange %d", isMoving];
     UIApplicationState state = [[UIApplication sharedApplication] applicationState];
     if (state == UIApplicationStateBackground) {
@@ -235,18 +231,9 @@
     }
 }
 
-- (void) setConfig:(CDVInvokedUrlCommand*)command
-{
-    NSDictionary *config = [command.arguments objectAtIndex:0];
-    [self applyConfig:config];
-    
-    CDVPluginResult* result = nil;
-    result = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK];
-    [self.commandDelegate sendPluginResult:result callbackId:command.callbackId];
-}
-
 - (void) addStationaryRegionListener:(CDVInvokedUrlCommand*)command
 {
+    /*
     if (self.stationaryRegionListeners == nil) {
         self.stationaryRegionListeners = [[NSMutableArray alloc] init];
     }
@@ -254,6 +241,7 @@
     if (stationaryRegion) {
         [self queue:stationaryLocation type:@"stationary"];
     }
+     */
 }
 
 /**
@@ -289,7 +277,6 @@
         [self stopUpdatingLocation];
     }
 }
-
 
 /**
  * toggle passive or aggressive location services
@@ -514,12 +501,12 @@
     // Build a resultset for javascript callback.
     NSString *locationType = [data objectForKey:@"location_type"];
     if ([locationType isEqualToString:@"stationary"]) {
-        [self fireStationaryRegionListeners:data];
+        // Any javascript stationaryRegion event-listeners?
+        [data setObject:[NSNumber numberWithDouble:stationaryRadius] forKey:@"radius"];
+        [[NSNotificationCenter defaultCenter] postNotificationName:@"BackgroundGeolocation.stationarylocation" object:data];
+        //[self fireStationaryRegionListeners:data];
     } else if ([locationType isEqualToString:@"current"]) {
-        CDVPluginResult* result = nil;
-        result = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsDictionary:data];
-        [result setKeepCallbackAsBool:YES];
-        [self.commandDelegate sendPluginResult:result callbackId:self.syncCallbackId];
+        [[NSNotificationCenter defaultCenter] postNotificationName:@"BackgroundGeolocation.location" object:data];
     } else {
         [self log: @"- CDVBackgroundGeoLocation#sync could not determine location_type."];
         [self stopBackgroundTask];
@@ -529,48 +516,20 @@
 /**
  * Called by js to signify the end of a background-geolocation event
  */
--(void) finish:(CDVInvokedUrlCommand*)command
+-(void) finish
 {
      [self log: @"- CDVBackgroundGeoLocation finish"];
      [self stopBackgroundTask];
 }
 
-- (void) fireStationaryRegionListeners:(NSMutableDictionary*)data
-{
-    [self log: @"- CDVBackgroundGeoLocation#fireStationaryRegionListener"];
-    if (![self.stationaryRegionListeners count]) {
-        [self stopBackgroundTask];
-        return;
-    }
-    // Any javascript stationaryRegion event-listeners?
-    [data setObject:[NSNumber numberWithDouble:stationaryRadius] forKey:@"radius"];
-    
-    CDVPluginResult *result = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsDictionary:data];
-    [result setKeepCallbackAsBool:YES];
-    for (NSString *callbackId in self.stationaryRegionListeners)
-    {
-        [self.commandDelegate sendPluginResult:result callbackId:callbackId];
-    }
-}
 
 /**
  * Fetches current stationaryLocation
  */
-- (void) getStationaryLocation:(CDVInvokedUrlCommand *)command
+- (NSDictionary*) getStationaryLocation
 {
-    [self log: @"- CDVBackgroundGeoLocation getStationaryLocation"];
-    
-    // Build a resultset for javascript callback.
-    CDVPluginResult* result = nil;
-    
-    if (stationaryLocation) {
-        NSMutableDictionary *returnInfo = [self locationToHash:stationaryLocation];
-        
-        result = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsDictionary:returnInfo];
-    } else {
-        result = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsBool:NO];
-    }
-    [self.commandDelegate sendPluginResult:result callbackId:command.callbackId];
+    NSDictionary *data = [self locationToHash:stationaryLocation];
+    return data;
 }
 
 - (bool) stationaryRegionContainsLocation:(CLLocation*)location {

@@ -4,19 +4,16 @@
 
 @interface BackgroundGeolocation : NSObject <CLLocationManagerDelegate>
 
-@property (nonatomic, strong) NSString* syncCallbackId;
-@property (nonatomic, strong) NSMutableArray* stationaryRegionListeners;
-
 @property (nonatomic, weak) id <CDVCommandDelegate> commandDelegate;
 
-- (void) configure:(CDVInvokedUrlCommand*)config;
-- (void) start:(CDVInvokedUrlCommand*)command;
-- (void) stop:(CDVInvokedUrlCommand*)command;
-- (void) finish:(CDVInvokedUrlCommand*)command;
-- (void) onPaceChange:(CDVInvokedUrlCommand*)command;
-- (void) setConfig:(CDVInvokedUrlCommand*)command;
-- (void) addStationaryRegionListener:(CDVInvokedUrlCommand*)command;
-- (void) getStationaryLocation:(CDVInvokedUrlCommand *)command;
+- (void) configure:(NSDictionary*)config;
+- (void) start;
+- (void) stop;
+- (void) finish;
+- (void) stopBackgroundTask;
+- (void) onPaceChange:(BOOL)value;
+- (void) setConfig:(NSDictionary*)command;
+- (NSDictionary*) getStationaryLocation;
 - (void) onSuspend:(NSNotification *)notification;
 - (void) onResume:(NSNotification *)notification;
 - (void) onAppTerminate;
