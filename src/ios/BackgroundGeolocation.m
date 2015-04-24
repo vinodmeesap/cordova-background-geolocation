@@ -6,8 +6,6 @@
 //
 //
 #import "BackgroundGeolocation.h"
-#import <Cordova/CDVPlugin.h>
-#import <Cordova/CDVJSON.h>
 
 // Debug sounds for bg-geolocation life-cycle events.
 // http://iphonedevwiki.net/index.php/AudioServices
@@ -61,11 +59,7 @@
     CLLocationAccuracy desiredAccuracy;
     CLActivityType activityType;
     BOOL disableElasticity;
-
-    
 }
-
-//@synthesize syncCallbackId, stationaryRegionListeners, commandDelegate;
 
 - (id) init
 {
@@ -229,19 +223,6 @@
     if (state == UIApplicationStateBackground) {
         [self setPace:isMoving];
     }
-}
-
-- (void) addStationaryRegionListener:(CDVInvokedUrlCommand*)command
-{
-    /*
-    if (self.stationaryRegionListeners == nil) {
-        self.stationaryRegionListeners = [[NSMutableArray alloc] init];
-    }
-    [self.stationaryRegionListeners addObject:command.callbackId];
-    if (stationaryRegion) {
-        [self queue:stationaryLocation type:@"stationary"];
-    }
-     */
 }
 
 /**
@@ -473,10 +454,15 @@
         
         // Create a background-task and delegate to Javascript for syncing location
         bgTask = [self createBackgroundTask];
-        [self.commandDelegate runInBackground:^{
+        [self runInBackground:^{
             [self sync:data];
         }];
     }
+}
+
+- (void)runInBackground:(void (^)())block
+{
+    dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), block);
 }
 
 /**

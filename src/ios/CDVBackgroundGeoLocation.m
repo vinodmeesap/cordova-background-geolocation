@@ -16,7 +16,6 @@
 - (void)pluginInitialize
 {
     bgGeo = [[BackgroundGeolocation alloc] init];
-    bgGeo.commandDelegate = self.commandDelegate;
     
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(onLocationChanged:) name:@"BackgroundGeolocation.location" object:nil];
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(onStationaryLocation:) name:@"BackgroundGeolocation.stationarylocation" object:nil];
@@ -96,21 +95,18 @@
     result = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsDictionary:locationData];
     [result setKeepCallbackAsBool:YES];
     [self.commandDelegate sendPluginResult:result callbackId:self.syncCallbackId];
-    
-    NSLog(@"-------------------------------onLocation %@", locationData);
 }
 
 - (void) onStationaryLocation:(NSNotification*)notification
 {
-    NSMutableDictionary *data = notification.object;
-    NSLog(@"-------------------------------onStationaryLocation %@", data);
+    NSMutableDictionary *locationData = notification.object;
     
     if (![self.stationaryRegionListeners count]) {
         [bgGeo stopBackgroundTask];
         return;
     }
     
-    CDVPluginResult *result = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsDictionary:data];
+    CDVPluginResult *result = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsDictionary:locationData];
     [result setKeepCallbackAsBool:YES];
     for (NSString *callbackId in self.stationaryRegionListeners)
     {

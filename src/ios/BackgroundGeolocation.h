@@ -1,6 +1,5 @@
 #import <CoreLocation/CoreLocation.h>
 #import <AudioToolbox/AudioToolbox.h>
-#import <Cordova/CDVCommandDelegate.h>
 
 @interface BackgroundGeolocation : NSObject <CLLocationManagerDelegate>
 
