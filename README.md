@@ -35,7 +35,7 @@ The plugin creates the object `window.plugins.backgroundGeoLocation` with the me
 ```
 
 ////
-// As will all Cordova plugins, you must configure within an #deviceready callback.
+// As with all Cordova plugins, you must configure within an #deviceready callback.
 //
 function onDeviceReady() {
     /**
@@ -289,7 +289,7 @@ Enable this in order to force a stop() when the application terminated (e.g. on 
 
 Both iOS and Android can send the Geolocation to your server simply by configuring an ```#url``` in addition to optional ```#headers``` and ```#params```.  This is the preferred way to send the Geolocation to your server, rather than doing it yourself with Ajax in your javascript.  
 
-## In-Plugin SQLite Storage
+##### In-Plugin SQLite Storage
 
 When you enable HTTP Feature by configuring an ```#url```, the plugin will cache every recorded geolocation to its internal SQLite database -- when your server responds with HTTP ```200, 201 or 204```, the plugin will DELETE the stored location from cache.  The plugin has a cache-pruning feature with ```@config {Integer} maxDaysToPersist``` -- If your server hasn't responded with 200 before ```maxDaysToPersist``` expires, the plugin will give up on it and that geolocation will be pruned from the database.
 
