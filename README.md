@@ -33,20 +33,11 @@ The plugin creates the object `window.plugins.backgroundGeoLocation` with the me
 ## Example
 
 ```
-    //
-    //
-    // after deviceready
-    //
-    //
 
-    // Your app must execute AT LEAST ONE call for the current position via standard Cordova geolocation,
-    //  in order to prompt the user for Location permission.
-    window.navigator.geolocation.getCurrentPosition(function(location) {
-        console.log('Location from Phonegap');
-    });
-
-    var bgGeo = window.plugins.backgroundGeoLocation;
-
+////
+// As will all Cordova plugins, you must configure within an #deviceready callback.
+//
+function onDeviceReady() {
     /**
     * This would be your own callback for Ajax-requests after POSTing background geolocation to your server.
     */
@@ -77,14 +68,31 @@ The plugin creates the object `window.plugins.backgroundGeoLocation` with the me
 
     // BackgroundGeoLocation is highly configurable.
     bgGeo.configure(callbackFn, failureFn, {
-        desiredAccuracy: 0,                         // <-- 0:  highest power, highest accuracy; 1000:  lowest power, lowest accuracy.
+        debug: true, // <-- enable this hear sounds for background-geolocation life-cycle.
+        desiredAccuracy: 0,
         stationaryRadius: 50,
-        distanceFilter: 50,                         // <-- minimum distance between location events
-        activityType: 'AutomotiveNavigation',       // <-- [ios]
-        locationUpdateInterval: 30000,              // <-- [android] minimum time between location updates, used in conjunction with #distanceFilter
-        activityRecognitionInterval: 10000,         // <-- [android] sampling-rate activity-recognition system for movement/stationary detection
-        debug: true,                                // <-- enable this hear sounds, see notifications during life-cycle events.
-        stopOnTerminate: false                      // <-- enable this to clear background location settings when the app terminates
+        distanceFilter: 50,
+        disableElasticity: false, // <-- [iOS] Default is 'false'.  Set true to disable speed-based distanceFilter elasticity
+        locationUpdateInterval: 5000,
+        minimumActivityRecognitionConfidence: 80,   // percentage 
+        fastestLocationUpdateInterval: 5000,
+        activityRecognitionInterval: 10000,
+        stopTimeout: 0,
+        forceReload: true,      // <-- [Android] If the user closes the app **while location-tracking is started** , reboot app (WARNING: possibly distruptive to user) 
+        stopOnTerminate: false, // <-- [Android] Allow the background-service to run headless when user closes the app.
+        startOnBoot: true,      // <-- [Android] Auto start background-service in headless mode when device is powered-up.
+        activityType: 'AutomotiveNavigation'
+        /**
+        * HTTP Feature:  set an url to allow the native background service to POST locations to your server
+        */
+        ,url: 'http://posttestserver.com/post.php?dir=cordova-background-geolocation',
+        maxDaysToPersist: 1,    // <-- Maximum days to persist a location in plugin's SQLite database when HTTP fails
+        headers: {
+            "X-FOO": "bar"
+        },
+        params: {
+            "auth_token": "maybe_your_server_authenticates_via_token_YES?"
+        }
     });
 
     // Turn ON the background-geolocation system.  The user will be tracked whenever they suspend the app.
@@ -92,23 +100,24 @@ The plugin creates the object `window.plugins.backgroundGeoLocation` with the me
 
     // If you wish to turn OFF background-tracking, call the #stop method.
     // bgGeo.stop()
+}
 
 
 ```
-
-NOTE: The plugin includes `org.apache.cordova.geolocation` as a dependency.  You must enable Cordova's GeoLocation in the foreground and have the user accept Location services by executing `#watchPosition` or `#getCurrentPosition`.
 
 ## Example Application
 
 ![SampleApp](/android-sample-app.png "SampleApp")
 
-This plugin hosts a SampleApp in ```example/SampleApp``` folder.  This SampleApp contains no plugins so you must first start by adding this plugin.  **NOTE** In order to use the SampleApp, it's important to make a copy of it outside of the plugin itself.
+This plugin hosts a SampleApp in ```example/SampleApp``` folder.  This SampleApp contains no plugins so you must first start by adding its required plugins (most importantly, this one).  **NOTE** In order to use the SampleApp, it's important to make a copy of it outside of the plugin itself.
 
 ```
 $ git clone git@github.com:christocracy/cordova-background-geolocation.git
 $ mkdir tmp
 $ cp -R cordova-background-geolocation/example/SampleApp tmp
 $ cd tmp/SampleApp
+$ cordova plugin add cordova-plugin-whitelist
+$ cordova plugin add cordova-plugin-geolocation
 $ cordova plugin add git@github.com:christocracy/cordova-background-geolocation.git
 $ cordova platform add ios
 $ cordova platform add android
@@ -119,6 +128,22 @@ $ cordova build android
 
 If you're using XCode, boot the SampleApp in the iOS Simulator and enable ```Debug->Location->City Drive```.
 
+## Help!  It doesn't work!
+
+Yes it does.
+
+- on iOS, background tracking won't be engaged until you travel about **2-3 city blocks**, so go for a walk or car-ride (or use the Simulator with ```Debug->Location->City Drive```)
+- Android is much quicker detecting movements; typically several meters of walking will do it.
+- When in doubt, **nuke everything**:  First delete the app from your device (or simulator)
+
+```
+$ cordova plugin remove com.transistorsoft.cordova.background-geolocation
+$ cordova plugin add git@github.com:christocracy/cordova-background-geolocation.git
+
+$ cordova platform remove ios
+$ cordova build ios
+
+```
 
 ## Behaviour
 
