@@ -5,8 +5,9 @@
 //
 
 #import <Cordova/CDVPlugin.h>
+#import <TSLocationManager/TSLocationManager.h>
 
-@interface CDVBackgroundGeoLocation : CDVPlugin
+@interface CDVBackgroundGeolocation : CDVPlugin
 
 @property (nonatomic, strong) NSString* syncCallbackId;
 @property (nonatomic, strong) NSMutableArray* stationaryRegionListeners;

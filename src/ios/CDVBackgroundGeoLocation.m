@@ -4,10 +4,9 @@
 //  Created by Chris Scott <chris@transistorsoft.com> on 2013-06-15
 //
 #import "CDVBackgroundGeoLocation.h"
-#import "BackgroundGeolocation.h"
 
-@implementation CDVBackgroundGeoLocation {
-    BackgroundGeolocation *bgGeo;
+@implementation CDVBackgroundGeolocation {
+    TSLocationManager *bgGeo;
     NSDictionary *config;
 }
 
@@ -15,10 +14,10 @@
 
 - (void)pluginInitialize
 {
-    bgGeo = [[BackgroundGeolocation alloc] init];
+    bgGeo = [[TSLocationManager alloc] init];
     
-    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(onLocationChanged:) name:@"BackgroundGeolocation.location" object:nil];
-    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(onStationaryLocation:) name:@"BackgroundGeolocation.stationarylocation" object:nil];
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(onLocationChanged:) name:@"TSLocationManager.location" object:nil];
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(onStationaryLocation:) name:@"TSLocationManager.stationary" object:nil];
 }
 
 /**
@@ -53,11 +52,6 @@
 - (void) start:(CDVInvokedUrlCommand*)command
 {
     [bgGeo start];
-    
-    CDVPluginResult* result = nil;
-    result = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK];
-    [self.commandDelegate sendPluginResult:result callbackId:command.callbackId];
-    
 }
 /**
  * Turn it off
@@ -65,10 +59,6 @@
 - (void) stop:(CDVInvokedUrlCommand*)command
 {
     [bgGeo stop];
-    
-    CDVPluginResult* result = nil;
-    result = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK];
-    [self.commandDelegate sendPluginResult:result callbackId:command.callbackId];
 }
 
 /**
@@ -79,17 +69,14 @@
 {
     BOOL moving = [[command.arguments objectAtIndex: 0] boolValue];
     [bgGeo onPaceChange:moving];
-    
-    CDVPluginResult* result = nil;
-    result = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK];
-    [self.commandDelegate sendPluginResult:result callbackId:command.callbackId];
 }
 
 /**
  * location handler from BackgroundGeolocation
  */
 - (void)onLocationChanged:(NSNotification*)notification {
-    NSDictionary *locationData = notification.object;
+    CLLocation *location = notification.object;
+    NSDictionary *locationData = [bgGeo locationToDictionary:location];
     
     CDVPluginResult* result = nil;
     result = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsDictionary:locationData];
@@ -99,8 +86,9 @@
 
 - (void) onStationaryLocation:(NSNotification*)notification
 {
-    NSMutableDictionary *locationData = notification.object;
-    
+    CLLocation *location = notification.object;
+    NSDictionary *locationData = [bgGeo locationToDictionary:location];
+
     if (![self.stationaryRegionListeners count]) {
         [bgGeo stopBackgroundTask];
         return;

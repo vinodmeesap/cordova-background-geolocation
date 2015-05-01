@@ -1,9 +1,11 @@
 #import <CoreLocation/CoreLocation.h>
 #import <AudioToolbox/AudioToolbox.h>
+#import <sqlite3.h>
 
-@interface BackgroundGeolocation : NSObject <CLLocationManagerDelegate>
+@interface TSLocationManager : NSObject <CLLocationManagerDelegate>
 
-@property (nonatomic, weak) id <CDVCommandDelegate> commandDelegate;
+@property (strong, nonatomic) NSString *databasePath;
+@property (nonatomic) sqlite3 *db;
 
 - (void) configure:(NSDictionary*)config;
 - (void) start;
@@ -16,6 +18,8 @@
 - (void) onSuspend:(NSNotification *)notification;
 - (void) onResume:(NSNotification *)notification;
 - (void) onAppTerminate;
+- (BOOL) isEnabled;
+- (NSMutableDictionary*) locationToDictionary:(CLLocation*)location;
 
 @end
 

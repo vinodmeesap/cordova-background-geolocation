@@ -8,9 +8,10 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 import org.json.JSONException;
 
-import com.transistorsoft.cordova.bggeo.BackgroundGeolocationService.PaceChangeEvent;
-import com.transistorsoft.cordova.bggeo.BackgroundGeolocationService.PausedEvent;
-import com.transistorsoft.cordova.bggeo.BackgroundGeolocationService.StationaryLocation;
+import com.transistorsoft.locationmanager.BackgroundGeolocationService;
+import com.transistorsoft.locationmanager.BackgroundGeolocationService.PaceChangeEvent;
+import com.transistorsoft.locationmanager.BackgroundGeolocationService.PausedEvent;
+//import com.transistorsoft.locationmanager.BackgroundGeolocationService.StationaryLocation;
 
 import de.greenrobot.event.EventBus;
 import android.app.Activity;
@@ -19,7 +20,7 @@ import android.content.SharedPreferences;
 import android.location.Location;
 import android.util.Log;
 
-public class BackgroundGeolocationPlugin extends CordovaPlugin {
+public class CDVBackgroundGeolocation extends CordovaPlugin {
     private static final String TAG = "BackgroundGeolocation";
     private static CordovaWebView gWebView;
     public static Boolean forceReload = false;
@@ -109,7 +110,7 @@ public class BackgroundGeolocationPlugin extends CordovaPlugin {
         
         Activity activity = this.cordova.getActivity();
         
-        SharedPreferences settings = activity.getSharedPreferences(TAG, 0);
+        SharedPreferences settings = activity.getSharedPreferences("TSLocationManager", 0);
         SharedPreferences.Editor editor = settings.edit();
         editor.putBoolean("enabled", isEnabled);
         editor.commit();
@@ -130,9 +131,10 @@ public class BackgroundGeolocationPlugin extends CordovaPlugin {
             JSONObject config = data.getJSONObject(0);
             Log.i(TAG, "- configure: " + config.toString());
             
-            SharedPreferences settings = activity.getSharedPreferences(TAG, 0);
+            SharedPreferences settings = activity.getSharedPreferences("TSLocationManager", 0);
             SharedPreferences.Editor editor = settings.edit();
             
+            editor.putBoolean("activityIsActive", true);
             editor.putBoolean("isMoving", isMoving);
             
             if (config.has("distanceFilter")) {
@@ -145,7 +147,7 @@ public class BackgroundGeolocationPlugin extends CordovaPlugin {
                 editor.putInt("locationUpdateInterval", config.getInt("locationUpdateInterval"));
             }
             if (config.has("activityRecognitionInterval")) {
-                editor.putInt("activityRecognitionInterval", config.getInt("activityRecognitionInterval"));
+                editor.putLong("activityRecognitionInterval", config.getLong("activityRecognitionInterval"));
             }
             if (config.has("stopTimeout")) {
                 editor.putLong("stopTimeout", config.getLong("stopTimeout"));
@@ -190,13 +192,13 @@ public class BackgroundGeolocationPlugin extends CordovaPlugin {
     public void onPause(boolean multitasking) {
         Log.i(TAG, "- onPause");
         if (isEnabled) {
-            EventBus.getDefault().post(new PausedEvent(true));
+            
         }
     }
     public void onResume(boolean multitasking) {
         Log.i(TAG, "- onResume");
         if (isEnabled) {
-            EventBus.getDefault().post(new PausedEvent(false));
+            
         }
     }
     
@@ -207,8 +209,8 @@ public class BackgroundGeolocationPlugin extends CordovaPlugin {
     public void onEventMainThread(Location location) {
         PluginResult result = new PluginResult(PluginResult.Status.OK, BackgroundGeolocationService.locationToJson(location));
         result.setKeepCallback(true);
-        
-        if (location instanceof StationaryLocation) {
+
+        if (location instanceof com.transistorsoft.locationmanager.BackgroundGeolocationService.StationaryLocation) {
             isMoving = false;
             if (stationaryCallback != null) {
                 runInBackground(stationaryCallback, result);
@@ -234,7 +236,7 @@ public class BackgroundGeolocationPlugin extends CordovaPlugin {
             });
         }
     }
-    
+
     /**
      * Override method in CordovaPlugin.
      * Checks to see if it should turn off
@@ -244,6 +246,13 @@ public class BackgroundGeolocationPlugin extends CordovaPlugin {
         Log.i(TAG, "  stopOnTerminate: " + stopOnTerminate);
         Log.i(TAG, "  isEnabled: " + isEnabled);
         
+        Activity activity = this.cordova.getActivity();
+
+        SharedPreferences settings = activity.getSharedPreferences("TSLocationManager", 0);
+        SharedPreferences.Editor editor = settings.edit();
+        editor.putBoolean("activityIsActive", false);
+        editor.commit();
+
         if(isEnabled && stopOnTerminate) {
             this.cordova.getActivity().stopService(backgroundServiceIntent);
         }

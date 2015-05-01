@@ -36,7 +36,7 @@ var app = {
     /**
     * @property {google.maps.Marker} location The current location
     */
-    location: undefined,
+    currentLocationMarker: undefined,
     /**
     * @property {google.map.PolyLine} path The list of background geolocations
     */
@@ -49,6 +49,10 @@ var app = {
     * @property {Array} locations List of rendered map markers of prev locations
     */
     locations: [],
+    /**
+     * @property currentLocation {Location}
+     */
+    currentLocation: null,
     /**
     * @private
     */
@@ -120,11 +124,10 @@ var app = {
     onDeviceReady: function() {
         app.receivedEvent('deviceready');
         app.configureBackgroundGeoLocation();
-        app.watchPosition();
+        app.watchForegroundPosition();
     },
     configureBackgroundGeoLocation: function() {
-        var fgGeo = window.navigator.geolocation,
-            bgGeo = window.plugins.backgroundGeoLocation;
+        var bgGeo = window.plugins.backgroundGeoLocation;
 
         app.onClickHome();
 
@@ -132,6 +135,8 @@ var app = {
         * This would be your own callback for Ajax-requests after POSTing background geolocation to your server.
         */
         var yourAjaxCallback = function(response) {
+            // Very important to call #finish -- it signals to the native plugin that it can destroy the background thread, which your callbackFn is running in.
+            // IF YOU DON'T, THE OS CAN KILL YOUR APP FOR RUNNING TOO LONG IN THE BACKGROUND
             bgGeo.finish();
         };
 
@@ -155,6 +160,12 @@ var app = {
         // Only ios emits this stationary event
         bgGeo.onStationary(function(location) {
             console.log('[js] BackgroundGeoLocation onStationary ' + JSON.stringify(location));
+            
+            app.setCurrentLocation(location);
+                           
+            // Center ourself on map
+            app.onClickHome();
+                           
             if (!app.stationaryRadius) {
                 app.stationaryRadius = new google.maps.Circle({
                     fillColor: '#cc0000',
@@ -163,7 +174,7 @@ var app = {
                     map: app.map
                 });
             }
-            var radius = (location.accuracy < location.radius) ? location.radius : location.accuracy;
+            var radius = 50;
             var center = new google.maps.LatLng(location.latitude, location.longitude);
             app.stationaryRadius.setRadius(radius);
             app.stationaryRadius.setCenter(center);
@@ -178,6 +189,7 @@ var app = {
             distanceFilter: 50,
             disableElasticity: false, // <-- [iOS] Default is 'false'.  Set true to disable speed-based distanceFilter elasticity
             locationUpdateInterval: 5000,
+            fastestLocationUpdateInterval: 5000,
             activityRecognitionInterval: 10000,
             stopTimeout: 0,
             forceReload: true,      // <-- [Android] If the user closes the app **while location-tracking is started** , reboot app (WARNING: possibly distruptive to user) 
@@ -186,16 +198,15 @@ var app = {
             activityType: 'AutomotiveNavigation'
             /**
             * HTTP Feature:  set an url to allow the native background service to POST locations to your server
-            *
+            */
             ,url: 'http://posttestserver.com/post.php?dir=cordova-background-geolocation',
+            maxDaysToPersist: 1,    // <-- Maximum days to persist a location in plugin's SQLite database when HTTP fails
             headers: {
                 "X-FOO": "bar"
             },
             params: {
                 "auth_token": "maybe_your_server_authenticates_via_token_YES?"
             }
-            *
-            */
         });
         
         // Turn ON the background-geolocation system.  The user will be tracked whenever they suspend the app.
@@ -210,22 +221,20 @@ var app = {
         }
     },
     onClickHome: function() {
-        var fgGeo = window.navigator.geolocation;
+        var location = app.currentLocation;
+        if (!location) {
+            // No location recorded yet; bail out.
+            return;
+        }
+        var map     = app.map,
+            coords  = location.coords,
+            ll      = new google.maps.LatLng(location.latitude, location.longitude),
+            zoom    = map.getZoom();
 
-        // Your app must execute AT LEAST ONE call for the current position via standard Cordova geolocation,
-        //  in order to prompt the user for Location permission.
-        fgGeo.getCurrentPosition(function(location) {
-            var map     = app.map,
-                coords  = location.coords,
-                ll      = new google.maps.LatLng(coords.latitude, coords.longitude),
-                zoom    = map.getZoom();
-
-            map.setCenter(ll);
-            if (zoom < 15) {
-                map.setZoom(15);
-            }
-            app.setCurrentLocation(coords);
-        });
+        map.setCenter(ll);
+        if (zoom < 15) {
+            map.setZoom(15);
+        }
     },
     onClickChangePace: function(value) {
         var bgGeo   = window.plugins.backgroundGeoLocation,
@@ -273,26 +282,27 @@ var app = {
             bgGeo.stop();
         }
     },
-    watchPosition: function() {
+    /**
+    * We use standard cordova-plugin-geolocation to watch position in foreground.
+    */
+    watchForegroundPosition: function() {
         var fgGeo = window.navigator.geolocation;
-        if (app.watchId) {
+        if (app.foregroundWatchId) {
             app.stopPositionWatch();
         }
         // Watch foreground location
-        app.watchId = fgGeo.watchPosition(function(location) {
+        app.foregroundWatchId = fgGeo.watchPosition(function(location) {
             app.setCurrentLocation(location.coords);
-        }, function() {}, {
-            enableHighAccuracy: true,
-            maximumAge: 5000,
-            frequency: 10000,
-            timeout: 10000
         });
     },
-    stopPositionWatch: function() {
+    /**
+    * Stop watching position in foreground when we pause:  THIS IS VERY IMPORTANT
+    */
+    stopWatchingForegroundPosition: function() {
         var fgGeo = window.navigator.geolocation;
-        if (app.watchId) {
-            fgGeo.clearWatch(app.watchId);
-            app.watchId = undefined;
+        if (app.foregroundWatchId) {
+            fgGeo.clearWatch(app.foregroundWatchId);
+            app.foregroundWatchId = undefined;
         }
     },
     /**
@@ -301,23 +311,26 @@ var app = {
     * determine start/stop of device.
     */
     onPause: function() {
-        console.log('- onPause');
-        app.stopPositionWatch();
+        console.log('[js] onPause');
+        app.stopWatchingForegroundPosition();
     },
     /**
     * Once in foreground, re-engage foreground geolocation watch with standard Cordova GeoLocation api
     */
     onResume: function() {
-        console.log('- onResume');
-        app.watchPosition();
+        console.log('[js] onResume');
+        app.watchForegroundPosition();
     },
     // Update DOM on a Received Event
     receivedEvent: function(id) {
         console.log('Received Event: ' + id);
     },
     setCurrentLocation: function(location) {
-        if (!app.location) {
-            app.location = new google.maps.Marker({
+        // Set currentLocation @property
+        app.currentLocation = location;
+        
+        if (!app.currentLocationMarker) {
+            app.currentLocationMarker = new google.maps.Marker({
                 map: app.map,
                 icon: {
                     path: google.maps.SymbolPath.CIRCLE,
@@ -327,7 +340,7 @@ var app = {
                     strokeWeight: 5
                 }
             });
-            app.locationAccuracy = new google.maps.Circle({
+            app.locationAccuracyMarker = new google.maps.Circle({
                 fillColor: '#3366cc',
                 fillOpacity: 0.4,
                 strokeOpacity: 0,
@@ -360,9 +373,9 @@ var app = {
         }
 
         // Update our current position marker and accuracy bubble.
-        app.location.setPosition(latlng);
-        app.locationAccuracy.setCenter(latlng);
-        app.locationAccuracy.setRadius(location.accuracy);
+        app.currentLocationMarker.setPosition(latlng);
+        app.locationAccuracyMarker.setCenter(latlng);
+        app.locationAccuracyMarker.setRadius(location.accuracy);
 
         // Add breadcrumb to current Polyline path.
         app.path.getPath().push(latlng);
