@@ -299,6 +299,10 @@ Optional HTTP params sent along in HTTP request to above ```#url```.
 
 Optional HTTP params sent along in HTTP request to above ```#url```.
 
+#####`@param {Integer} maxDaysToPersist`
+
+Maximum number of days to store a geolocation in plugin's SQLite database when your server fails to respond with ```HTTP 200 OK```.  The plugin will continue attempting to sync with your server until ```maxDaysToPersist``` when it will give up and remove the location from the database.
+
 Both iOS and Android can send the Geolocation to your server simply by configuring an ```#url``` in addition to optional ```#headers``` and ```#params```.  This is the preferred way to send the Geolocation to your server, rather than doing it yourself with Ajax in your javascript.  
 
 ##### In-Plugin SQLite Storage
