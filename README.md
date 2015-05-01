@@ -287,6 +287,18 @@ Enable this in order to force a stop() when the application terminated (e.g. on 
 
 #### HTTP Features
 
+#####`@param {String} url`
+
+By configuring an ```#url```, the  plugin will always attempt to HTTP POST the location to your server.
+
+#####`@param {Object} params`
+
+Optional HTTP params sent along in HTTP request to above ```#url```.
+
+#####`@param {Object} headers`
+
+Optional HTTP params sent along in HTTP request to above ```#url```.
+
 Both iOS and Android can send the Geolocation to your server simply by configuring an ```#url``` in addition to optional ```#headers``` and ```#params```.  This is the preferred way to send the Geolocation to your server, rather than doing it yourself with Ajax in your javascript.  
 
 ##### In-Plugin SQLite Storage
@@ -337,18 +349,6 @@ No Post Params.
 Upload contains PUT data:
 {"auth_token":"maybe_your_server_authenticates_via_token_YES?","location":{"latitude":45.5192875,"longitude":-73.6169281,"accuracy":25.42799949645996,"speed":0,"bearing":0,"altitude":0,"timestamp":1429198882716},"android_id":"39dbac67e2c9d80"}
 ```
-
-#####`@param {String} url`
-
-By configuring an ```#url```, the  plugin will always attempt to HTTP POST the location to your server.
-
-#####`@param {Object} params`
-
-Optional HTTP params sent along in HTTP request to above ```#url```.
-
-#####`@param {Object} headers`
-
-Optional HTTP params sent along in HTTP request to above ```#url```.
 
 ### Android Config
 
