@@ -285,38 +285,13 @@ Compare now background-geolocation in the scope of a city.  In this image, the l
 #####`@param {Boolean} stopOnTerminate`
 Enable this in order to force a stop() when the application terminated (e.g. on iOS, double-tap home button, swipe away the app).  On Android, ```stopOnTerminate: false``` will cause the plugin to operate as a headless background-service (in this case, you should configure an #url in order for the background-service to send the location to your server)
 
-### Android Config
+#### HTTP Features
 
-#####`@param {Integer millis} locationUpdateInterval`
+Both iOS and Android can send the Geolocation to your server simply by configuring an ```#url``` in addition to optional ```#headers``` and ```#params```.  This is the preferred way to send the Geolocation to your server, rather than doing it yourself with Ajax in your javascript.  
 
-Set the desired interval for active location updates, in milliseconds.
+## In-Plugin SQLite Storage
 
-The location client will actively try to obtain location updates for your application at this interval, so it has a direct influence on the amount of power used by your application. Choose your interval wisely.
-
-This interval is inexact. You may not receive updates at all (if no location sources are available), or you may receive them slower than requested. You may also receive them faster than requested (if other applications are requesting location at a faster interval). 
-
-Applications with only the coarse location permission may have their interval silently throttled.
-
-An interval of 0 is allowed, but not recommended, since location updates may be extremely fast on future implementations.
-
-#####`@param {Integer millis} activityRecognitionInterval`
-
-the desired time between activity detections. Larger values will result in fewer activity detections while improving battery life. A value of 0 will result in activity detections at the fastest possible rate.
-
-#####`@param {Integer minutes} stopTimeout`
-
-The number of miutes to wait before turning off the GPS after the ActivityRecognition System (ARS) detects the device is ```STILL``` (defaults to 0, no timeout).  If you don't set a value, the plugin is eager to turn off the GPS ASAP.  An example use-case for this configuration is to delay GPS OFF while in a car waiting at a traffic light.
-
-#####`@param {Boolean} forceReload`
-
-If the user closes the application while the background-tracking has been started,  location-tracking will continue on if ```stopOnTerminate: false```.  You may choose to force the foreground application to reload (since this is where your Javascript runs) by setting ```foreceReload: true```.  This will guarantee that locations are always sent to your Javascript callback (**WARNING** possibly disruptive to user).
-
-#####`@param {Boolean} startOnBoot`
-
-Set to ```true``` to start the background-service whenever the device boots.  Unless you configure the plugin to ```forceReload``` (ie: boot your app), you should configure the plugin's HTTP features so it can POST to your server in "headless" mode.
-
-#### HTTP Feature
-The Android plugin can run as a "headless" background service, sending the user's location to your server even after the user close the application (by configuring ```stopOnTerminate: false```).  The plugin's HTTP request will arrive at your server as follows:
+When you enable HTTP Feature by configuring an ```#url```, the plugin will cache every recorded geolocation to its internal SQLite database -- when your server responds with HTTP ```200, 201 or 204```, the plugin will DELETE the stored location from cache.  The plugin has a cache-pruning feature with ```@config {Integer} maxDaysToPersist``` -- If your server hasn't responded with 200 before ```maxDaysToPersist``` expires, the plugin will give up on it and that geolocation will be pruned from the database.
 
 ```
 bgGeo.configure(callbackFn, failureFn, {
@@ -324,6 +299,7 @@ bgGeo.configure(callbackFn, failureFn, {
     .
     .
     url: 'http://posttestserver.com/post.php?dir=cordova-background-geolocation',
+    maxDaysToPersist: 1,
     headers: {
         "X-FOO": "bar"
     },
@@ -373,6 +349,38 @@ Optional HTTP params sent along in HTTP request to above ```#url```.
 #####`@param {Object} headers`
 
 Optional HTTP params sent along in HTTP request to above ```#url```.
+
+### Android Config
+
+#####`@param {Integer millis} locationUpdateInterval`
+
+Set the desired interval for active location updates, in milliseconds.
+
+The location client will actively try to obtain location updates for your application at this interval, so it has a direct influence on the amount of power used by your application. Choose your interval wisely.
+
+This interval is inexact. You may not receive updates at all (if no location sources are available), or you may receive them slower than requested. You may also receive them faster than requested (if other applications are requesting location at a faster interval). 
+
+Applications with only the coarse location permission may have their interval silently throttled.
+
+An interval of 0 is allowed, but not recommended, since location updates may be extremely fast on future implementations.
+
+#####`@param {Integer millis} activityRecognitionInterval`
+
+the desired time between activity detections. Larger values will result in fewer activity detections while improving battery life. A value of 0 will result in activity detections at the fastest possible rate.
+
+#####`@param {Integer minutes} stopTimeout`
+
+The number of miutes to wait before turning off the GPS after the ActivityRecognition System (ARS) detects the device is ```STILL``` (defaults to 0, no timeout).  If you don't set a value, the plugin is eager to turn off the GPS ASAP.  An example use-case for this configuration is to delay GPS OFF while in a car waiting at a traffic light.
+
+#####`@param {Boolean} forceReload`
+
+If the user closes the application while the background-tracking has been started,  location-tracking will continue on if ```stopOnTerminate: false```.  You may choose to force the foreground application to reload (since this is where your Javascript runs) by setting ```foreceReload: true```.  This will guarantee that locations are always sent to your Javascript callback (**WARNING** possibly disruptive to user).
+
+#####`@param {Boolean} startOnBoot`
+
+Set to ```true``` to start the background-service whenever the device boots.  Unless you configure the plugin to ```forceReload``` (ie: boot your app), you should configure the plugin's HTTP features so it can POST to your server in "headless" mode.
+
+
 
 ### iOS Config
 
