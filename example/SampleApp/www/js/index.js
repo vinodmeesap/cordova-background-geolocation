@@ -162,7 +162,9 @@ var app = {
             console.log('[js] BackgroundGeoLocation onStationary ' + JSON.stringify(location));
             
             app.setCurrentLocation(location);
-                           
+
+            var coords = location.coords;
+            
             // Center ourself on map
             app.onClickHome();
                            
@@ -175,7 +177,7 @@ var app = {
                 });
             }
             var radius = 50;
-            var center = new google.maps.LatLng(location.latitude, location.longitude);
+            var center = new google.maps.LatLng(coords.latitude, coords.longitude);
             app.stationaryRadius.setRadius(radius);
             app.stationaryRadius.setCenter(center);
 
@@ -189,6 +191,7 @@ var app = {
             distanceFilter: 50,
             disableElasticity: false, // <-- [iOS] Default is 'false'.  Set true to disable speed-based distanceFilter elasticity
             locationUpdateInterval: 5000,
+            minimumActivityRecognitionConfidence: 80,   // percentage 
             fastestLocationUpdateInterval: 5000,
             activityRecognitionInterval: 10000,
             stopTimeout: 0,
@@ -228,7 +231,7 @@ var app = {
         }
         var map     = app.map,
             coords  = location.coords,
-            ll      = new google.maps.LatLng(location.latitude, location.longitude),
+            ll      = new google.maps.LatLng(coords.latitude, coords.longitude),
             zoom    = map.getZoom();
 
         map.setCenter(ll);
@@ -292,7 +295,7 @@ var app = {
         }
         // Watch foreground location
         app.foregroundWatchId = fgGeo.watchPosition(function(location) {
-            app.setCurrentLocation(location.coords);
+            app.setCurrentLocation(location);
         });
     },
     /**
@@ -329,6 +332,8 @@ var app = {
         // Set currentLocation @property
         app.currentLocation = location;
         
+        var coords = location.coords;
+    
         if (!app.currentLocationMarker) {
             app.currentLocationMarker = new google.maps.Marker({
                 map: app.map,
@@ -346,6 +351,7 @@ var app = {
                 strokeOpacity: 0,
                 map: app.map
             });
+            app.onClickHome();
         }
         if (!app.path) {
             app.path = new google.maps.Polyline({
@@ -354,7 +360,8 @@ var app = {
                 fillOpacity: 0.4
             });
         }
-        var latlng = new google.maps.LatLng(location.latitude, location.longitude);
+        var latlng = new google.maps.LatLng(coords.latitude, coords.longitude);
+        
         
         if (app.previousLocation) {
             var prevLocation = app.previousLocation;
@@ -368,14 +375,14 @@ var app = {
                     strokeWeight: 5
                 },
                 map: app.map,
-                position: new google.maps.LatLng(prevLocation.latitude, prevLocation.longitude)
+                position: new google.maps.LatLng(prevLocation.coords.latitude, prevLocation.coords.longitude)
             }));
         }
 
         // Update our current position marker and accuracy bubble.
         app.currentLocationMarker.setPosition(latlng);
         app.locationAccuracyMarker.setCenter(latlng);
-        app.locationAccuracyMarker.setRadius(location.accuracy);
+        app.locationAccuracyMarker.setRadius(location.coords.accuracy);
 
         // Add breadcrumb to current Polyline path.
         app.path.getPath().push(latlng);

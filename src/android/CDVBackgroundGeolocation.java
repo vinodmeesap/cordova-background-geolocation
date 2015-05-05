@@ -155,6 +155,9 @@ public class CDVBackgroundGeolocation extends CordovaPlugin {
             if (config.has("debug")) {
                 editor.putBoolean("debug", config.getBoolean("debug"));
             }
+            if (config.has("stopAfterElapsedMinutes")) {
+                editor.putInt("stopAfterElapsedMinutes", config.getInt("stopAfterElapsedMinutes"));
+            }
             if (config.has("stopOnTerminate")) {
                 editor.putBoolean("stopOnTerminate", config.getBoolean("stopOnTerminate"));
             }
