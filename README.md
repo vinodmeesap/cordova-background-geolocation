@@ -224,6 +224,18 @@ bgGeo.onStationary(function(location) {
 
 Use the following config-parameters with the #configure method:
 
+#####`@param {Boolean} debug`
+
+When enabled, the plugin will emit sounds for life-cycle events of background-geolocation!  **NOTE iOS**:  In addition, you must manually enable the *Audio and Airplay* background mode in *Background Capabilities* to hear these debugging sounds.
+
+- Exit stationary region:  **[ios]** Calendar event notification sound
+- GeoLocation recorded:  **[ios]** SMS-sent sound, **[android]** "blip", *[WP8]* High beep, 1 sec.
+- Aggressive geolocation engaged:  **[ios]** SIRI listening sound, **[android]** "Doodly-doo"
+- Acquiring stationary location sound: **[ios]** "tick,tick,tick" sound, *[android]* none
+- Stationary location acquired sound:  **[ios]** "bloom" sound, **[android]** long "beeeeeep"
+
+![Enable Background Audio](/enable-background-audio.png "Enable Background Audio")
+
 #####`@param {Integer} desiredAccuracy [0, 10, 100, 1000] in meters`
 
 Specify the desired-accuracy of the geolocation system with 1 of 4 values, ```0, 10, 100, 1000``` where ```0``` means HIGHEST POWER, HIGHEST ACCURACY and ```1000``` means LOWEST POWER, LOWEST ACCURACY
@@ -234,19 +246,6 @@ Specify the desired-accuracy of the geolocation system with 1 of 4 values, ```0,
 #####`@param {Integer} stationaryRadius (meters)`
 
 When stopped, the minimum distance the device must move beyond the stationary location for aggressive background-tracking to engage.  Note, since the plugin uses iOS significant-changes API, the plugin cannot detect the exact moment the device moves out of the stationary-radius.  In normal conditions, it can take as much as 3 city-blocks to 1/2 km before staionary-region exit is detected.
-
-#####`@param {Boolean} debug`
-
-When enabled, the plugin will emit sounds for life-cycle events of background-geolocation!  **NOTE iOS**:  In addition, you must manually enable the *Audio and Airplay* background mode in *Background Capabilities* to hear these debugging sounds.
-
-- Exit stationary region:  *[ios]* Calendar event notification sound *[android]* dialtone beep-beep-beep
-- GeoLocation recorded:  *[ios]* SMS sent sound, *[android]* tt short beep, *[WP8]* High beep, 1 sec.
-- Aggressive geolocation engaged:  *[ios]* SIRI listening sound, *[android]* none
-- Passive geolocation engaged:  *[ios]* SIRI stop listening sound, *[android]* none
-- Acquiring stationary location sound: *[ios]* "tick,tick,tick" sound, *[android]* none
-- Stationary location acquired sound:  *[ios]* "bloom" sound, *[android]* long tt beep.
-
-![Enable Background Audio](/enable-background-audio.png "Enable Background Audio")
 
 #####`@param {Integer} distanceFilter`
 
@@ -284,6 +283,10 @@ Compare now background-geolocation in the scope of a city.  In this image, the l
 
 #####`@param {Boolean} stopOnTerminate`
 Enable this in order to force a stop() when the application terminated (e.g. on iOS, double-tap home button, swipe away the app).  On Android, ```stopOnTerminate: false``` will cause the plugin to operate as a headless background-service (in this case, you should configure an #url in order for the background-service to send the location to your server)
+
+#####`@param {Boolean} stopAfterElapsedMinutes`
+
+The plugin can optionally auto-stop monitoring location when some number of minutes elapse after being the #start method was called.
 
 #### HTTP Features
 
@@ -347,11 +350,25 @@ REQUEST_TIME = 1429198883
 No Post Params.
 
 == Begin post body ==
-{"auth_token":"maybe_your_server_authenticates_via_token_YES?","location":{"latitude":45.5192875,"longitude":-73.6169281,"accuracy":25.42799949645996,"speed":0,"bearing":0,"altitude":0,"timestamp":1429198882716},"android_id":"39dbac67e2c9d80"}
+{
+  "location":{
+    "timestamp":"2015-05-05T04:31:54Z",  // <-- ISO-8601, UTC
+    "coords":{
+      "latitude":45.519282,
+      "longitude":-73.6169562,
+      "accuracy":12.850000381469727,
+      "speed":0,
+      "heading":0,
+      "altitude":0
+    },
+    "activity":{  // <-- Android-only currently
+      "type":"still",
+      "confidence":48
+    }
+  },
+  "android_id":"39dbac67e2c9d80"
+}
 == End post body ==
-
-Upload contains PUT data:
-{"auth_token":"maybe_your_server_authenticates_via_token_YES?","location":{"latitude":45.5192875,"longitude":-73.6169281,"accuracy":25.42799949645996,"speed":0,"bearing":0,"altitude":0,"timestamp":1429198882716},"android_id":"39dbac67e2c9d80"}
 ```
 
 ### Android Config
