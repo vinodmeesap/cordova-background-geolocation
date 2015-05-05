@@ -141,6 +141,7 @@ $ cordova plugin remove com.transistorsoft.cordova.background-geolocation
 $ cordova plugin add git@github.com:christocracy/cordova-background-geolocation.git
 
 $ cordova platform remove ios
+$ cordova platform add ios
 $ cordova build ios
 
 ```
