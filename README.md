@@ -32,7 +32,7 @@ The plugin creates the object `window.plugins.backgroundGeoLocation` with the me
 
 ## Help
 
-[See the Wiki](wiki)
+[See the Wiki](/wiki)
 
 ## Example
 
