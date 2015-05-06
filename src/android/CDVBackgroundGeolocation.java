@@ -8,6 +8,8 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 import org.json.JSONException;
 
+import com.google.android.gms.location.ActivityRecognitionResult;
+import com.google.android.gms.location.DetectedActivity;
 import com.transistorsoft.locationmanager.BackgroundGeolocationService;
 import com.transistorsoft.locationmanager.BackgroundGeolocationService.PaceChangeEvent;
 import com.transistorsoft.locationmanager.BackgroundGeolocationService.PausedEvent;
@@ -39,6 +41,8 @@ public class CDVBackgroundGeolocation extends CordovaPlugin {
     
     private Intent backgroundServiceIntent;
     
+    private DetectedActivity currentActivity;
+
     // Geolocation callback
     private CallbackContext locationCallback;
     // Called when DetectedActivity is STILL
@@ -206,11 +210,22 @@ public class CDVBackgroundGeolocation extends CordovaPlugin {
     }
     
     /**
+     * EventBus listener for ARS
+     * @param {ActivityRecognitionResult} result
+     */
+    public void onEventMainThread(ActivityRecognitionResult result) {
+        currentActivity = result.getMostProbableActivity();
+        String activityName = BackgroundGeolocationService.getActivityName(currentActivity.getType());
+        int confidence = currentActivity.getConfidence();
+        Log.i(TAG, "----------- currentActivity: " + currentActivity);
+    }
+    /**
      * EventBus listener
      * @param {Location} location
      */
     public void onEventMainThread(Location location) {
-        PluginResult result = new PluginResult(PluginResult.Status.OK, BackgroundGeolocationService.locationToJson(location));
+        PluginResult result;
+        result = new PluginResult(PluginResult.Status.OK, BackgroundGeolocationService.locationToJson(location, currentActivity));
         result.setKeepCallback(true);
 
         if (location instanceof com.transistorsoft.locationmanager.BackgroundGeolocationService.StationaryLocation) {

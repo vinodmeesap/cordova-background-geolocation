@@ -20,8 +20,15 @@ module.exports = {
     configure: function(success, failure, config) {
         config = config || {};
         this.config = config;
-
-        exec(success || function() {},
+        success = success || function(location) {};
+        var mySuccess = function(location) {
+            // Transform timestamp to Date instance.
+            if (location.timestamp) {
+                location.timestamp = new Date(location.timestamp);
+            }
+            success.call(this, location);
+        }
+        exec(mySuccess,
              failure || function() {},
              'BackgroundGeoLocation',
              'configure',
