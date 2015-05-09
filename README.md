@@ -388,7 +388,7 @@ This interval is inexact. You may not receive updates at all (if no location sou
 
 Applications with only the coarse location permission may have their interval silently throttled.
 
-#####`@param {Integer millis} fasttestLocationUpdateInterval`
+#####`@param {Integer millis} fastestLocationUpdateInterval`
 
 Explicitly set the fastest interval for location updates, in milliseconds.
 
