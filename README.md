@@ -388,6 +388,23 @@ This interval is inexact. You may not receive updates at all (if no location sou
 
 Applications with only the coarse location permission may have their interval silently throttled.
 
+#####`@param {Integer millis} fasttestLocationUpdateInterval`
+
+Explicitly set the fastest interval for location updates, in milliseconds.
+
+This controls the fastest rate at which your application will receive location updates, which might be faster than ```#locationUpdateInterval``` in some situations (for example, if other applications are triggering location updates).
+
+This allows your application to passively acquire locations at a rate faster than it actively acquires locations, saving power.
+
+Unlike ```#locationUpdateInterval```, this parameter is exact. Your application will never receive updates faster than this value.
+
+If you don't call this method, a fastest interval will be set to **30000 (30s)**. 
+
+An interval of 0 is allowed, but not recommended, since location updates may be extremely fast on future implementations.
+
+If ```#fastestLocationUpdateInterval``` is set slower than ```#locationUpdateInterval```, then your effective fastest interval is ```#locationUpdateInterval```.
+
+========
 An interval of 0 is allowed, but not recommended, since location updates may be extremely fast on future implementations.
 
 #####`@param {Integer millis} activityRecognitionInterval`
