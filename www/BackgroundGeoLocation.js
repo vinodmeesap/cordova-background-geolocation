@@ -105,6 +105,47 @@ module.exports = {
             'addStationaryRegionListener',
             []);
     },
+    getLocations: function(success, failure) {
+        if (typeof(success) !== 'function') {
+            throw "BackgroundGeolocation#getLocations requires a success callback";
+        }
+        var me = this;
+        var mySuccess = function(locations) {
+            success.call(this, me._setTimestamp(locations));
+        }
+        exec(mySuccess,
+            failure || function() {},
+            'BackgroundGeoLocation',
+            'getLocations',
+            []);
+    },
+    /**
+    * Signal native plugin to sync locations queue to HTTP
+    */
+    sync: function(success, failure) {
+        if (typeof(success) !== 'function') {
+            throw "BackgroundGeolocation#sync requires a success callback";
+        }
+        var me = this;
+        var mySuccess = function(locations) {
+            success.call(this, me._setTimestamp(locations));
+        }
+        exec(mySuccess,
+            failure || function() {},
+            'BackgroundGeoLocation',
+            'sync',
+            []);
+    },
+
+    _setTimestamp: function(rs) {
+        // Transform timestamp to Date instance.
+        if (typeof(rs) === 'object') {
+            for (var n=0,len=rs.length;n<len;n++) {
+                rs[n].timestamp = new Date(rs[n].timestamp);
+            }
+        }
+        return rs;
+    },
     apply: function(destination, source) {
         source = source || {};
         for (var property in source) {

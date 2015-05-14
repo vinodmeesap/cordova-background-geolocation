@@ -22,7 +22,10 @@ The plugin creates the object `window.plugins.backgroundGeoLocation` with the me
   
   `onStationary(callback, fail)`
   
-
+  `getLocations(callback, fail)`
+  
+  `sync(callback, fail)`
+  
 ## Installing the plugin ##
 
 ```
@@ -78,18 +81,20 @@ function onDeviceReady() {
         distanceFilter: 50,
         disableElasticity: false, // <-- [iOS] Default is 'false'.  Set true to disable speed-based distanceFilter elasticity
         locationUpdateInterval: 5000,
-        minimumActivityRecognitionConfidence: 80,   // percentage 
+        minimumActivityRecognitionConfidence: 80,   // 0-100%.  Minimum activity-confidence for a state-change 
         fastestLocationUpdateInterval: 5000,
         activityRecognitionInterval: 10000,
         stopTimeout: 0,
         forceReload: true,      // <-- [Android] If the user closes the app **while location-tracking is started** , reboot app (WARNING: possibly distruptive to user) 
         stopOnTerminate: false, // <-- [Android] Allow the background-service to run headless when user closes the app.
         startOnBoot: true,      // <-- [Android] Auto start background-service in headless mode when device is powered-up.
-        activityType: 'AutomotiveNavigation'
+        activityType: 'AutomotiveNavigation',
         /**
         * HTTP Feature:  set an url to allow the native background service to POST locations to your server
         */
-        ,url: 'http://posttestserver.com/post.php?dir=cordova-background-geolocation',
+        url: 'http://posttestserver.com/post.php?dir=cordova-background-geolocation',
+        batchSync: false,       // <-- [Default: false] Set true to sync locations to server in 1 HTTP request.
+        autoSync: true,		// <-- [Default: true] Set true to sync each location to server as it arrives.
         maxDaysToPersist: 1,    // <-- Maximum days to persist a location in plugin's SQLite database when HTTP fails
         headers: {
             "X-FOO": "bar"
@@ -225,6 +230,29 @@ bgGeo.onStationary(function(location) {
 });
 ```
 
+#####`getLocations(callbackFn, failureFn)`
+Fetch all the locations currently stored in native plugin's SQLite database.  Your ```callbackFn`` will receive an ```Array``` of locations in the 1st parameter.  Eg:
+
+```
+    bgGeo.getLocations(function(locations) {
+        console.log("locations: ", locations);
+    });
+```
+
+#####`sync(callbackFn, failureFn)`
+
+If the plugin is configured for HTTP with an ```#url``` and ```#autoSync: false```, this method will initiate POSTing the locations currently stored in the native SQLite database to your configured ```#url```.  All records in the database will be DELETED.  If you configured ```batchSync: true```, all the locations will be sent to your server in a single HTTP POST request, otherwise the plugin will create execute an HTTP post for **each** location in the database (REST-style).  Your ```callbackFn``` will be executed and provided with an Array of all the locations from the SQLite database.  If the plugin failed to sync to your server (possibly because of no network connection), the ```failureFn``` will be called with an ```errorMessage```.  If you are **not** using the HTTP features, ```sync``` is the only way to clear the native SQLite datbase.  Eg:
+
+```
+    bgGeo.sync(function(locations) {
+    	// Here are all the locations from the database.  The database is now EMPTY.
+    	console.log('synced locations: ', locations);
+    }, function(errorMessage) {
+        console.warn('Sync FAILURE: ', errorMessage);
+    });
+
+```
+
 ## Config
 
 Use the following config-parameters with the #configure method:
@@ -298,6 +326,14 @@ The plugin can optionally auto-stop monitoring location when some number of minu
 #####`@param {String} url`
 
 By configuring an ```#url```, the  plugin will always attempt to HTTP POST the location to your server.
+
+#####`@param {String} batchSync [false]`
+
+Default is ```false```.  If you've enabled HTTP feature by configuring an ```#url```, ```batchSync: true``` will POST all the locations currently stored in native SQLite datbase to your server in a single HTTP POST request.  With ```batchSync: false```, an HTTP POST request will be initiated for **each** location in database.
+
+#####`@param {String} autoSync [true]`
+
+Default is ```true```.  If you've enabeld HTTP feature by configuring an ```#url```, the plugin will attempt to HTTP POST each location to your server as it is recorded.  If you set ```autoSync: false```, it's up to you to manually execute the ```#sync``` method to initate the HTTP POST (**NOTE** The plugin will continue to persist **every** recorded location in the SQLite database until you execute ```#sync```).
 
 #####`@param {Object} params`
 

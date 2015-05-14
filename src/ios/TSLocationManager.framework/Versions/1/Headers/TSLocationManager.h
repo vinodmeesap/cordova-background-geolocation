@@ -4,13 +4,12 @@
 
 @interface TSLocationManager : NSObject <CLLocationManagerDelegate>
 
-@property (strong, nonatomic) NSString *databasePath;
-@property (nonatomic) sqlite3 *db;
-
 - (void) configure:(NSDictionary*)config;
 - (void) start;
 - (void) stop;
 - (void) finish;
+- (NSArray*) sync;
+- (NSArray*) getLocations;
 - (void) stopBackgroundTask;
 - (void) onPaceChange:(BOOL)value;
 - (void) setConfig:(NSDictionary*)command;
@@ -19,7 +18,6 @@
 - (void) onResume:(NSNotification *)notification;
 - (void) onAppTerminate;
 - (BOOL) isEnabled;
-- (NSMutableDictionary*) locationToDictionary:(CLLocation*)location;
-
+- (NSDictionary*) locationToDictionary:(CLLocation*)location;
 @end
 
