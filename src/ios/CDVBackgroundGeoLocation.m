@@ -136,7 +136,7 @@
         CDVPluginResult *result = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsArray:locations];
         [self.commandDelegate sendPluginResult:result callbackId:command.callbackId];
     } else {
-        CDVPluginResult* result = [CDVPluginResult resultWithStatus:CDVCommandStatus_ERROR messageAsDictionary:@"Failed to sync to server.  Is there a network connection?"];
+        CDVPluginResult* result = [CDVPluginResult resultWithStatus:CDVCommandStatus_ERROR messageAsString:@"Failed to sync to server.  Is there a network connection?"];
         [self.commandDelegate sendPluginResult:result callbackId:command.callbackId];
     }
 }
