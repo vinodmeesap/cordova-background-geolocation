@@ -22,7 +22,10 @@ The plugin creates the object `window.plugins.backgroundGeoLocation` with the me
   
   `onStationary(callback, fail)`
   
-
+  `getLocations(callback, fail)`
+  
+  `sync(callback, fail)`
+  
 ## Installing the plugin ##
 
 ```
