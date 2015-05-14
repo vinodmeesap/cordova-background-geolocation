@@ -191,18 +191,20 @@ var app = {
             distanceFilter: 50,
             disableElasticity: false, // <-- [iOS] Default is 'false'.  Set true to disable speed-based distanceFilter elasticity
             locationUpdateInterval: 5000,
-            minimumActivityRecognitionConfidence: 80,   // percentage 
+            minimumActivityRecognitionConfidence: 80,   // 0-100%.  Minimum activity-confidence for a state-change 
             fastestLocationUpdateInterval: 5000,
             activityRecognitionInterval: 10000,
             stopTimeout: 0,
             forceReload: true,      // <-- [Android] If the user closes the app **while location-tracking is started** , reboot app (WARNING: possibly distruptive to user) 
             stopOnTerminate: false, // <-- [Android] Allow the background-service to run headless when user closes the app.
             startOnBoot: true,      // <-- [Android] Auto start background-service in headless mode when device is powered-up.
-            activityType: 'AutomotiveNavigation'
+            activityType: 'AutomotiveNavigation',
             /**
             * HTTP Feature:  set an url to allow the native background service to POST locations to your server
             */
-            ,url: 'http://posttestserver.com/post.php?dir=cordova-background-geolocation',
+            url: 'http://posttestserver.com/post.php?dir=cordova-background-geolocation',
+            batchSync: false,       // <-- [Default: false] Set true to sync locations to server in a single HTTP request.
+            autoSync: true,         // <-- [Default: true] Set true to sync each location to server as it arrives.
             maxDaysToPersist: 1,    // <-- Maximum days to persist a location in plugin's SQLite database when HTTP fails
             headers: {
                 "X-FOO": "bar"

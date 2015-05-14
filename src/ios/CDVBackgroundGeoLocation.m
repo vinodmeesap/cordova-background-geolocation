@@ -111,8 +111,34 @@
     NSDictionary* location = [bgGeo getStationaryLocation];
     
     CDVPluginResult *result = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsDictionary:location];
-    result = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK];
     [self.commandDelegate sendPluginResult:result callbackId:command.callbackId];
+}
+
+/**
+ * Fetches current stationaryLocation
+ */
+- (void) getLocations:(CDVInvokedUrlCommand *)command
+{
+    NSArray* locations = [bgGeo getLocations];
+    
+    CDVPluginResult *result = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsArray:locations];
+    [self.commandDelegate sendPluginResult:result callbackId:command.callbackId];
+}
+
+/**
+ * Fetches current stationaryLocation
+ */
+- (void) sync:(CDVInvokedUrlCommand *)command
+{
+    NSArray* locations = [bgGeo sync];
+    
+    if (locations != nil) {
+        CDVPluginResult *result = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsArray:locations];
+        [self.commandDelegate sendPluginResult:result callbackId:command.callbackId];
+    } else {
+        CDVPluginResult* result = [CDVPluginResult resultWithStatus:CDVCommandStatus_ERROR messageAsDictionary:@"Failed to sync to server.  Is there a network connection?"];
+        [self.commandDelegate sendPluginResult:result callbackId:command.callbackId];
+    }
 }
 
 - (void) addStationaryRegionListener:(CDVInvokedUrlCommand*)command

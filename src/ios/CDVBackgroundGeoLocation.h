@@ -20,6 +20,7 @@
 - (void) setConfig:(CDVInvokedUrlCommand*)command;
 - (void) addStationaryRegionListener:(CDVInvokedUrlCommand*)command;
 - (void) getStationaryLocation:(CDVInvokedUrlCommand *)command;
-
+- (void) getLocations:(CDVInvokedUrlCommand *)command;
+- (void) sync:(CDVInvokedUrlCommand *)command;
 @end
 
