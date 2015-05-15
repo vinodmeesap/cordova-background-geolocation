@@ -4,6 +4,8 @@
 
 @interface TSLocationManager : NSObject <CLLocationManagerDelegate>
 
+@property (nonatomic) CLLocationDistance odometer;
+
 - (void) configure:(NSDictionary*)config;
 - (void) start;
 - (void) stop;
