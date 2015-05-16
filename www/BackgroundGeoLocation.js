@@ -136,7 +136,26 @@ module.exports = {
             'sync',
             []);
     },
-
+    /**
+    * Fetch current odometer value
+    */
+    getOdometer: function(success, failure) {
+        exec(success || function() {},
+            failure || function() {},
+            'BackgroundGeoLocation',
+            'getOdometer',
+            []);
+    },
+    /**
+    * Reset Odometer to 0
+    */
+    resetOdometer: function(success, failure) {
+        exec(success || function() {},
+            failure || function() {},
+            'BackgroundGeoLocation',
+            'resetOdometer',
+            []);
+    },
     _setTimestamp: function(rs) {
         // Transform timestamp to Date instance.
         if (typeof(rs) === 'object') {

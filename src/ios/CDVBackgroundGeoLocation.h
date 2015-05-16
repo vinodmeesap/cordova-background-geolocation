@@ -22,5 +22,7 @@
 - (void) getStationaryLocation:(CDVInvokedUrlCommand *)command;
 - (void) getLocations:(CDVInvokedUrlCommand *)command;
 - (void) sync:(CDVInvokedUrlCommand *)command;
+- (void) getOdometer:(CDVInvokedUrlCommand *)command;
+- (void) resetOdometer:(CDVInvokedUrlCommand *)command;
 @end
 

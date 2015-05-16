@@ -35,6 +35,8 @@ public class CDVBackgroundGeolocation extends CordovaPlugin {
     public static final String ACTION_ON_STATIONARY = "addStationaryRegionListener";
     public static final String ACTION_GET_LOCATIONS = "getLocations";
     public static final String ACTION_SYNC          = "sync";
+    public static final String ACTION_GET_ODOMETER  = "getOdometer";
+    public static final String ACTION_RESET_ODOMETER  = "resetOdometer";
     
     private Boolean isEnabled           = false;
     private Boolean stopOnTerminate     = false;
@@ -52,6 +54,10 @@ public class CDVBackgroundGeolocation extends CordovaPlugin {
     private CallbackContext getLocationsCallback;
 
     private CallbackContext syncCallback;
+
+    private CallbackContext getOdometerCallback;
+
+    private CallbackContext resetOdometerCallback;
 
     public static boolean isActive() {
         return gWebView != null;
@@ -123,6 +129,20 @@ public class CDVBackgroundGeolocation extends CordovaPlugin {
             event.putString("name", action);
             event.putBoolean("request", true);
             syncCallback = callbackContext;
+            EventBus.getDefault().post(event);
+        } else if (ACTION_GET_ODOMETER.equalsIgnoreCase(action)) {
+            result = true;
+            Bundle event = new Bundle();
+            event.putString("name", action);
+            event.putBoolean("request", true);
+            getOdometerCallback = callbackContext;
+            EventBus.getDefault().post(event);
+        } else if (ACTION_RESET_ODOMETER.equalsIgnoreCase(action)) {
+            result = true;
+            Bundle event = new Bundle();
+            event.putString("name", action);
+            event.putBoolean("request", true);
+            resetOdometerCallback = callbackContext;
             EventBus.getDefault().post(event);
         }
         return result;
@@ -271,6 +291,12 @@ public class CDVBackgroundGeolocation extends CordovaPlugin {
                 PluginResult result = new PluginResult(PluginResult.Status.IO_EXCEPTION, event.getString("message"));
                 runInBackground(syncCallback, result);
             }
+        } else if (ACTION_GET_ODOMETER.equalsIgnoreCase(name)) {
+            PluginResult result = new PluginResult(PluginResult.Status.OK, event.getFloat("data"));
+            runInBackground(getOdometerCallback, result);
+        } else if (ACTION_RESET_ODOMETER.equalsIgnoreCase(name)) {
+            PluginResult result = new PluginResult(PluginResult.Status.OK);
+            runInBackground(resetOdometerCallback, result);
         }
     }
 

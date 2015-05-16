@@ -1,4 +1,4 @@
-BackgroundGeoLocation
+Background Geolocation
 ==============================
 
 Cross-platform background geolocation for Cordova with battery-saving "circular region monitoring" and "stop detection".
@@ -25,6 +25,10 @@ The plugin creates the object `window.plugins.backgroundGeoLocation` with the me
   `getLocations(callback, fail)`
   
   `sync(callback, fail)`
+  
+  `getOdometer(callback, fail)`
+  
+  `resetOdometer(callback, fail)`
   
 ## Installing the plugin ##
 
@@ -157,9 +161,13 @@ $ cordova build ios
 
 ## Behaviour
 
-The plugin has features allowing you to control the behaviour of background-tracking, striking a balance between accuracy and battery-usage.  In stationary-mode, the plugin attempts to descrease its power usage and accuracy by setting up a circular stationary-region of configurable #stationaryRadius.  iOS has a nice system  [Significant Changes API](https://developer.apple.com/library/ios/documentation/CoreLocation/Reference/CLLocationManager_Class/CLLocationManager/CLLocationManager.html#//apple_ref/occ/instm/CLLocationManager/startMonitoringSignificantLocationChanges), which allows the os to suspend your app until a cell-tower change is detected (typically 2-3 city-block change) Android uses the Google Play Services APIs [FusedLocationProvider API](https://developer.android.com/reference/com/google/android/gms/location/FusedLocationProviderApi.html) as well as the [ActivityRecognition API](https://developer.android.com/reference/com/google/android/gms/location/ActivityRecognitionApi.html) (for movement/stationary detection). Windows Phone does not have such a API.
+The plugin has features allowing you to control the behaviour of background-tracking, striking a balance between accuracy and battery-usage.  In stationary-mode, the plugin attempts to descrease its power usage and accuracy by setting up a circular stationary-region of configurable #stationaryRadius.  
 
-The plugin will execute your configured ```callback``` provided to the ```#configure(callback, config)``` method. You must manually POST the received ```GeoLocation``` to your server using standard XHR, as well as manually cache a recieved location into ```localStorage``` if no network connection is available.
+iOS has a nice system  [Significant Changes API](https://developer.apple.com/library/ios/documentation/CoreLocation/Reference/CLLocationManager_Class/CLLocationManager/CLLocationManager.html#//apple_ref/occ/instm/CLLocationManager/startMonitoringSignificantLocationChanges), which allows the os to suspend your app until a cell-tower change is detected (typically 2-3 city-block change) 
+
+Android uses the Google Play Services APIs [FusedLocationProvider API](https://developer.android.com/reference/com/google/android/gms/location/FusedLocationProviderApi.html) as well as the [ActivityRecognition API](https://developer.android.com/reference/com/google/android/gms/location/ActivityRecognitionApi.html) (for movement/stationary detection). Windows Phone does not have such a API.
+
+The plugin will execute your configured ```callback``` provided to the ```#configure(callback, config)``` method.  Both iOS & Android use a SQLite database to persist **every** recorded geolocation so you don't have to worry about persistence when no network is detected.  The plugin provides a Javascript API to fetch and destroy the records in the database.  In addition, the plugin has an optional HTTP layer allowing allowing you to automatically HTTP POST recorded geolocations to your server.
 
 The function ```changePace(isMoving, success, failure)``` is provided to force the plugin to enter "moving" or "stationary" state.
 
@@ -253,6 +261,20 @@ If the plugin is configured for HTTP with an ```#url``` and ```#autoSync: false`
 
 ```
 
+#####`getOdometer(callbackFn, failureFn)`
+
+The plugin constantly tracks distance travelled.  To fetch the current **odometer** reading:
+
+```
+    bgGeo.getOdometer(function(distance) {
+        console.log("Distance travelled: ", distance);
+    });
+```
+
+#####`resetOdometer(callbackFn, failureFn)`
+
+Reset the **odometer** to zero.  The plugin never automatically resets the odometer so it's up to you to reset it as desired.
+
 ## Config
 
 Use the following config-parameters with the #configure method:
@@ -321,11 +343,24 @@ Enable this in order to force a stop() when the application terminated (e.g. on 
 
 The plugin can optionally auto-stop monitoring location when some number of minutes elapse after being the #start method was called.
 
+#### In-Plugin SQLite Storage
+
+The plugin will cache **every** recorded geolocation to its internal SQLite database -- when you sync the locations and your server responds with HTTP ```200, 201 or 204```, the plugin will **DELETE** the stored location from cache.  The plugin has a cache-pruning feature with ```@config {Integer} maxDaysToPersist``` -- If the plugin hasn't successfully synced these these records in the database before  ```maxDaysToPersist``` expires, the plugin will give up and those geolocation records will be pruned from the database.
+
+If you **don't** configure the optional HTTP feature, the only way to delete the SQLite database is by executing the ```#sync``` method.
+
+```
+    bgGeo.sync(function(locations) {
+    	// The SQLite database is now EMPTY.  
+        console.log('locations: ', locations);
+    });
+```
+
 #### HTTP Features
 
 #####`@param {String} url`
 
-By configuring an ```#url```, the  plugin will always attempt to HTTP POST the location to your server.
+Your server url where you wish to HTTP POST location data to.
 
 #####`@param {String} batchSync [false]`
 
@@ -333,7 +368,7 @@ Default is ```false```.  If you've enabled HTTP feature by configuring an ```#ur
 
 #####`@param {String} autoSync [true]`
 
-Default is ```true```.  If you've enabeld HTTP feature by configuring an ```#url```, the plugin will attempt to HTTP POST each location to your server as it is recorded.  If you set ```autoSync: false```, it's up to you to manually execute the ```#sync``` method to initate the HTTP POST (**NOTE** The plugin will continue to persist **every** recorded location in the SQLite database until you execute ```#sync```).
+Default is ```true```.  If you've enabeld HTTP feature by configuring an ```#url```, the plugin will attempt to HTTP POST each location to your server **as it is recorded**.  If you set ```autoSync: false```, it's up to you to **manually** execute the ```#sync``` method to initate the HTTP POST (**NOTE** The plugin will continue to persist **every** recorded location in the SQLite database until you execute ```#sync```).
 
 #####`@param {Object} params`
 
@@ -349,16 +384,14 @@ Maximum number of days to store a geolocation in plugin's SQLite database when y
 
 Both iOS and Android can send the Geolocation to your server simply by configuring an ```#url``` in addition to optional ```#headers``` and ```#params```.  This is the preferred way to send the Geolocation to your server, rather than doing it yourself with Ajax in your javascript.  
 
-##### In-Plugin SQLite Storage
-
-When you enable HTTP Feature by configuring an ```#url```, the plugin will cache every recorded geolocation to its internal SQLite database -- when your server responds with HTTP ```200, 201 or 204```, the plugin will DELETE the stored location from cache.  The plugin has a cache-pruning feature with ```@config {Integer} maxDaysToPersist``` -- If your server hasn't responded with 200 before ```maxDaysToPersist``` expires, the plugin will give up on it and that geolocation will be pruned from the database.
-
 ```
 bgGeo.configure(callbackFn, failureFn, {
     .
     .
     .
     url: 'http://posttestserver.com/post.php?dir=cordova-background-geolocation',
+    autoSync: true,
+    batchSync: false,
     maxDaysToPersist: 1,
     headers: {
         "X-FOO": "bar"

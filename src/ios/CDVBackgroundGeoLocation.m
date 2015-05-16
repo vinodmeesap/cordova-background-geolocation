@@ -60,6 +60,17 @@
 {
     [bgGeo stop];
 }
+- (void) getOdometer:(CDVInvokedUrlCommand*)command
+{
+    CDVPluginResult* result = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsDouble: bgGeo.odometer];
+    [self.commandDelegate sendPluginResult:result callbackId:command.callbackId];
+}
+- (void) resetOdometer:(CDVInvokedUrlCommand*)command
+{
+    bgGeo.odometer = 0;
+    CDVPluginResult* result = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK];
+    [self.commandDelegate sendPluginResult:result callbackId:command.callbackId];
+}
 
 /**
  * Change pace to moving/stopped
