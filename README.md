@@ -1,4 +1,4 @@
-BackgroundGeoLocation
+Background Geolocation
 ==============================
 
 Cross-platform background geolocation for Cordova with battery-saving "circular region monitoring" and "stop detection".
