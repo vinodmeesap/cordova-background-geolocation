@@ -10,6 +10,7 @@
 @interface CDVBackgroundGeolocation : CDVPlugin
 
 @property (nonatomic, strong) NSString* syncCallbackId;
+@property (nonatomic, strong) NSString* geofenceCallbackId;
 @property (nonatomic, strong) NSMutableArray* stationaryRegionListeners;
 
 - (void) configure:(CDVInvokedUrlCommand*)command;
@@ -24,5 +25,7 @@
 - (void) sync:(CDVInvokedUrlCommand *)command;
 - (void) getOdometer:(CDVInvokedUrlCommand *)command;
 - (void) resetOdometer:(CDVInvokedUrlCommand *)command;
+- (void) addGeofence:(CDVInvokedUrlCommand *)command;
+- (void) onGeofence:(CDVInvokedUrlCommand *)command;
 @end
 
