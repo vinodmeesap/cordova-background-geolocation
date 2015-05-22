@@ -10,7 +10,7 @@
     NSDictionary *config;
 }
 
-@synthesize syncCallbackId, stationaryRegionListeners;
+@synthesize syncCallbackId, geofenceCallbackId, stationaryRegionListeners;
 
 - (void)pluginInitialize
 {
@@ -18,6 +18,7 @@
     
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(onLocationChanged:) name:@"TSLocationManager.location" object:nil];
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(onStationaryLocation:) name:@"TSLocationManager.stationary" object:nil];
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(onEnterGeofence:) name:@"TSLocationManager.geofence" object:nil];
 }
 
 /**
@@ -114,6 +115,17 @@
     [bgGeo stopBackgroundTask];
 }
 
+- (void) onEnterGeofence:(NSNotification*)notification
+{
+    if (self.geofenceCallbackId == nil) {
+        return;
+    }
+    CLCircularRegion *region = notification.object;
+
+    CDVPluginResult *result = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsString:region.identifier];
+    [result setKeepCallbackAsBool:YES];
+    [self.commandDelegate sendPluginResult:result callbackId:self.geofenceCallbackId];
+}
 /**
  * Fetches current stationaryLocation
  */
@@ -160,6 +172,23 @@
     [self.stationaryRegionListeners addObject:command.callbackId];
 }
 
+- (void) addGeofence:(CDVInvokedUrlCommand*)command
+{
+    NSDictionary *cfg  = [command.arguments objectAtIndex:0];
+
+    [bgGeo addGeofence:[cfg objectForKey:@"identifier"] 
+        radius:[[cfg objectForKey:@"radius"] doubleValue] 
+        latitude:[[cfg objectForKey:@"latitude"] doubleValue] 
+        longitude:[[cfg objectForKey:@"longitude"] doubleValue]
+    ];
+    CDVPluginResult *result = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK];
+    [self.commandDelegate sendPluginResult:result callbackId:command.callbackId];
+}
+
+- (void) onGeofence:(CDVInvokedUrlCommand*)command
+{
+    self.geofenceCallbackId = command.callbackId;
+}
 /**
  * Called by js to signify the end of a background-geolocation event
  */

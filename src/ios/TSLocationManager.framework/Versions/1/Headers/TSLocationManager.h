@@ -4,6 +4,8 @@
 
 @interface TSLocationManager : NSObject <CLLocationManagerDelegate>
 
+@property (nonatomic) CLLocationDistance odometer;
+
 - (void) configure:(NSDictionary*)config;
 - (void) start;
 - (void) stop;
@@ -19,5 +21,7 @@
 - (void) onAppTerminate;
 - (BOOL) isEnabled;
 - (NSDictionary*) locationToDictionary:(CLLocation*)location;
+- (void) addGeofence:(NSString*)identifier radius:(CLLocationDistance)radius latitude:(CLLocationDegrees)latitude longitude:(CLLocationDegrees)longitude;
+
 @end
 

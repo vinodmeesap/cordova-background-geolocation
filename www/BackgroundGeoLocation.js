@@ -156,6 +156,36 @@ module.exports = {
             'resetOdometer',
             []);
     },
+    /**
+    * add geofence
+    */
+    addGeofence: function(config, success, failure) {
+        config = config || {};
+        if (!config.identifier) {
+            throw "#addGeofence requires an 'identifier'";
+        }
+        if (!(config.latitude && config.longitude)) {
+            throw "#addGeofence requires a #latitude and #longitude";
+        } 
+        if (!config.radius) {
+            throw "#addGeofence requires a #radius";
+        }
+        exec(success || function() {},
+            failure || function() {},
+            'BackgroundGeoLocation',
+            'addGeofence',
+            [config]);
+    },
+    onGeofence: function(success, failure) {
+        if (!typeof(success) === 'function') {
+            throw "#onGeofence requires a success callback";
+        }
+        exec(success,
+            failure || function() {},
+            'BackgroundGeoLocation',
+            'onGeofence',
+            []);
+    },
     _setTimestamp: function(rs) {
         // Transform timestamp to Date instance.
         if (typeof(rs) === 'object') {

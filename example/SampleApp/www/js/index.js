@@ -54,6 +54,10 @@ var app = {
      */
     currentLocation: null,
     /**
+    * @property geofence {google.maps.Cirlce}
+    */
+    geofence: undefined,
+    /**
     * @private
     */
     btnEnabled: undefined,
@@ -83,6 +87,9 @@ var app = {
         canvas.width(window.clientWidth);
 
         app.map = new google.maps.Map(canvas[0], mapOptions);
+
+        // Add custom LongPress event to google map so we can add Geofences with longpress event!
+        new LongPress(app.map, 500);
     },
     // Bind Event Listeners
     //
@@ -188,7 +195,7 @@ var app = {
             debug: true, // <-- enable this hear sounds for background-geolocation life-cycle.
             desiredAccuracy: 0,
             stationaryRadius: 50,
-            distanceFilter: 50,
+            distanceFilter: 25,
             disableElasticity: false, // <-- [iOS] Default is 'false'.  Set true to disable speed-based distanceFilter elasticity
             locationUpdateInterval: 5000,
             minimumActivityRecognitionConfidence: 80,   // 0-100%.  Minimum activity-confidence for a state-change 
@@ -214,6 +221,33 @@ var app = {
             }
         });
         
+        bgGeo.onGeofence(function(identifier) {
+            alert('Enter Geofence: ' + identifier);
+            console.log('[js] Geofence ENTER: ', identifier);
+        });
+
+        // Add longpress event for adding GeoFence of hard-coded radius 200m.
+        google.maps.event.addListener(app.map, 'longpress', function(e) {
+            if (app.geofence) {
+                app.geofence.setMap(null);
+            }
+            bgGeo.addGeofence({
+                identifier: 'MyGeofence',
+                radius: 200,
+                latitude: e.latLng.lat(),
+                longitude: e.latLng.lng()
+            }, function() {
+                app.geofence = new google.maps.Circle({
+                    fillColor: '#00cc00',
+                    fillOpacity: 0.4,
+                    strokeOpacity: 0,
+                    radius: 200,
+                    center: e.latLng,
+                    map: app.map
+                });
+            })
+        });
+
         // Turn ON the background-geolocation system.  The user will be tracked whenever they suspend the app.
         var settings = ENV.settings;
 
