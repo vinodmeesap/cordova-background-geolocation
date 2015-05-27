@@ -22,6 +22,10 @@ The plugin creates the object `window.plugins.backgroundGeoLocation` with the me
   
   `onStationary(callback, fail)`
   
+  `addGeofence(callback, fail)`
+
+  `onGeofence(callback, fail)`
+
   `getLocations(callback, fail)`
   
   `sync(callback, fail)`
@@ -50,26 +54,26 @@ The plugin creates the object `window.plugins.backgroundGeoLocation` with the me
 //
 function onDeviceReady() {
     /**
-    * This would be your own callback for Ajax-requests after POSTing background geolocation to your server.
-    */
-    var yourAjaxCallback = function(response) {
-        ////
-        // IMPORTANT:  You must execute the #finish method here to inform the native plugin that you're finished,
-        //  and the background-task may be completed.  You must do this regardless if your HTTP request is successful or not.
-        // IF YOU DON'T, ios will CRASH YOUR APP for spending too much time in the background.
-        //
-        //
-        bgGeo.finish();
-    };
-
-    /**
     * This callback will be executed every time a geolocation is recorded in the background.
     */
-    var callbackFn = function(location) {
+    var callbackFn = function(location, taskId) {
         console.log('[js] BackgroundGeoLocation callback:  ' + location.latitude + ',' + location.longitude);
-        // Do your HTTP request here to POST location to your server.
-        //
-        //
+
+        /**
+        * This would be your own callback for Ajax-requests after POSTing background geolocation to your server.
+        * eg:  
+        *     $.post({url: url, success: yourAjaxCallback});
+        */
+        var yourAjaxCallback = function(response) {
+            ////
+            // IMPORTANT:  You must execute the #finish, providing the taskId provided to callbackFn above in order to inform the native plugin that you're finished,
+            //  and the background-task may be completed.  You must do this regardless if your HTTP request is successful or not.
+            // IF YOU DON'T, ios will CRASH YOUR APP for spending too much time in the background.
+            //
+            //
+            bgGeo.finish(taskId);
+        };
+
         yourAjaxCallback.call(this);
     };
 
@@ -193,7 +197,11 @@ Keep in mind that it is **not** possible to use ```start()``` at the ```pause```
 
 #####`configure(locationCallback, failureCallback, config)`
 
-Configures the plugin's parameters (@see following [Config](https://github.com/christocracy/cordova-background-geolocation/blob/edge/README.md#config) section for accepted ```config``` params.  The ```locationCallback``` will be executed each time a new Geolocation is recorded.
+Configures the plugin's parameters (@see following [Config](https://github.com/christocracy/cordova-background-geolocation/blob/edge/README.md#config) section for accepted ```config``` params.  The ```locationCallback``` will be executed each time a new Geolocation is recorded and provided with the following parameters:
+
+######`@param {Object} location` The Location data
+`{"coords":{"latitude":45.5192735,"longitude":-73.6168883,"accuracy":10,"speed":0,"heading":0,"altitude":0},"timestamp":"2015-05-27T18:26:44Z"}`
+######`@param {Integer} taskId` The taskId used to send to bgGeo.finish(taskId) in order to signal completion of your callbackFn
 
 #####`setConfig(successFn, failureFn, config)`
 Reconfigure plugin's configuration (@see followign ##Config## section for accepted ```config``` params.  **NOTE** The plugin will continue to send recorded Geolocation to the ```locationCallback``` you provided to ```configure``` method -- use this method only to change configuration params (eg: ```distanceFilter```, ```stationaryRadius```, etc).
@@ -230,11 +238,54 @@ bgGeo.changePace(false); // <-- Disable aggressive GPS monitoring.  Engages stat
 ```
 
 #####`onStationary(callbackFn, failureFn)`
-Your ```callbackFn``` will be executed each time the device has entered stationary-monitoring mode.  The ```callbackFn``` will be provided with a ```Geolocation``` object as the 1st param, with the usual params (```latitude, longitude, accuracy, speed, bearing, altitude```).
+Your ```callbackFn``` will be executed each time the device has entered stationary-monitoring mode.  The ```callbackFn``` will be provided with a ```Location``` object as the 1st param, with the usual params (```latitude, longitude, accuracy, speed, bearing, altitude```), in addition to a ```taskId``` used to signal that your callback is finished.
 
 ```
-bgGeo.onStationary(function(location) {
+bgGeo.onStationary(function(location, taskId) {
     console.log('- Device is stopped: ', location.latitude, location.longitude);
+
+    // The plugin runs your callback in a background-thread:  
+    // you MUST signal to the native plugin when your callback is finished so it can halt the thread.
+    // IF YOU DON'T, iOS WILL KILL YOUR APP
+    bgGeo.finish(taskId);
+});
+```
+
+#####`addGeofence(config, callbackFn, failureFn)`
+Adds a geofence to be monitored by the native plugin.  Monitoring of a geofence is halted after a crossing occurs.  The `config` object accepts the following params.
+
+######`@config {String} identifier The name of your geofence, eg: "Home", "Office"
+######`@config {Float} radius The radius (meters) of the geofence.  In practice, you should make this >= 100 meters.
+######`@config {Float} latitude Latitude of the center-point of the circular geofence.
+######`@config {Float} longitude Longitude of the center-point of the circular geofence.
+
+```
+bgGeo.addGeofence({
+    identifier: "Home",
+    radius: 150,
+    latitude: 45.51921926,
+    longitude: -73.61678581
+}, function() {
+    console.log("Successfully added geofence");
+}, function(error) {
+    console.warn("Failed to add geofence", error);
+});
+```
+
+#####`onGeofence(callbackFn)`
+Adds a geofence event-listener.  Your supplied callback will be called when any monitored geofence crossing occurs.  The `callbackFn` will be provided the following parameters:
+
+######`@param {String} identifier The name of the geofence which generated the crossing event, eg: "Home"
+######`@param {Integer} taskId The background taskId which you must send back to the native plugin via `bgGeo.finish(taskId)` in order to signal that your callback is complete.
+
+```
+bgGeo.onGeofence(function(identifier, taskId) {
+    console.log('A geofence has been entered: ' + identifier);
+
+    // The plugin runs your callback in a background-thread:  
+    // you MUST signal to the native plugin when your callback is finished so it can halt the thread.
+    // IF YOU DON'T, iOS WILL KILL YOUR APP
+    bgGeo.finish(taskId);
 });
 ```
 

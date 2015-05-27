@@ -10,7 +10,7 @@
     NSDictionary *config;
 }
 
-@synthesize syncCallbackId, geofenceCallbackId, stationaryRegionListeners;
+@synthesize syncCallbackId, geofenceListeners, stationaryRegionListeners;
 
 - (void)pluginInitialize
 {
@@ -87,44 +87,61 @@
  * location handler from BackgroundGeolocation
  */
 - (void)onLocationChanged:(NSNotification*)notification {
-    CLLocation *location = notification.object;
-    NSDictionary *locationData = [bgGeo locationToDictionary:location];
+    CLLocation *location = [notification.userInfo objectForKey:@"location"];
     
-    CDVPluginResult* result = nil;
-    result = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsDictionary:locationData];
+    NSDictionary *params = @{
+        @"location": [bgGeo locationToDictionary:location],
+        @"taskId": @([bgGeo createBackgroundTask])
+    };
+    CDVPluginResult* result = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsDictionary:params];
     [result setKeepCallbackAsBool:YES];
-    [self.commandDelegate sendPluginResult:result callbackId:self.syncCallbackId];
+
+    [self.commandDelegate runInBackground:^{
+        [self.commandDelegate sendPluginResult:result callbackId:self.syncCallbackId];
+    }];
 }
 
 - (void) onStationaryLocation:(NSNotification*)notification
 {
-    CLLocation *location = notification.object;
-    NSDictionary *locationData = [bgGeo locationToDictionary:location];
-
     if (![self.stationaryRegionListeners count]) {
-        [bgGeo stopBackgroundTask];
         return;
     }
-    
-    CDVPluginResult *result = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsDictionary:locationData];
-    [result setKeepCallbackAsBool:YES];
-    for (NSString *callbackId in self.stationaryRegionListeners)
-    {
-        [self.commandDelegate sendPluginResult:result callbackId:callbackId];
+    CLLocation *location = [notification.userInfo objectForKey:@"location"];   
+    NSDictionary *locationData = [bgGeo locationToDictionary:location];
+
+    for (NSString *callbackId in self.stationaryRegionListeners) {
+        NSDictionary *params = @{
+            @"location": locationData,
+            @"taskId": @([bgGeo createBackgroundTask])
+        };
+        CDVPluginResult *result = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsDictionary:params];
+        [result setKeepCallbackAsBool:YES];
+        [self.commandDelegate runInBackground:^{
+            [self.commandDelegate sendPluginResult:result callbackId:callbackId];
+        }];
+        
     }
-    [bgGeo stopBackgroundTask];
 }
 
 - (void) onEnterGeofence:(NSNotification*)notification
 {
-    if (self.geofenceCallbackId == nil) {
+    if (![self.geofenceListeners count]) {
         return;
     }
-    CLCircularRegion *region = notification.object;
+    CLCircularRegion *region = [notification.userInfo objectForKey:@"geofence"];
 
-    CDVPluginResult *result = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsString:region.identifier];
-    [result setKeepCallbackAsBool:YES];
-    [self.commandDelegate sendPluginResult:result callbackId:self.geofenceCallbackId];
+    for (NSString *callbackId in self.stationaryRegionListeners) {
+        NSDictionary *params = @{
+            @"identifier": region.identifier,
+            @"taskId": @([bgGeo createBackgroundTask])
+        };
+        CDVPluginResult *result = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsDictionary:params];
+        [result setKeepCallbackAsBool:YES];
+        [self.commandDelegate runInBackground:^{
+            [self.commandDelegate sendPluginResult:result callbackId:callbackId];
+        }];
+        
+    }
 }
 /**
  * Fetches current stationaryLocation
@@ -187,14 +204,18 @@
 
 - (void) onGeofence:(CDVInvokedUrlCommand*)command
 {
-    self.geofenceCallbackId = command.callbackId;
+    if (self.geofenceListeners == nil) {
+        self.geofenceListeners = [[NSMutableArray alloc] init];
+    }
+    [self.geofenceListeners addObject:command.callbackId];
 }
 /**
  * Called by js to signify the end of a background-geolocation event
  */
 -(void) finish:(CDVInvokedUrlCommand*)command
 {
-    [bgGeo finish];
+    UIBackgroundTaskIdentifier taskId = [[command.arguments objectAtIndex: 0] integerValue];
+    [bgGeo stopBackgroundTask:taskId];
 }
 /**
  * If you don't stopMonitoring when application terminates, the app will be awoken still when a

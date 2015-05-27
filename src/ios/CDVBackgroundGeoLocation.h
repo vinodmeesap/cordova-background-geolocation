@@ -10,7 +10,7 @@
 @interface CDVBackgroundGeolocation : CDVPlugin
 
 @property (nonatomic, strong) NSString* syncCallbackId;
-@property (nonatomic, strong) NSString* geofenceCallbackId;
+@property (nonatomic, strong) NSMutableArray* geofenceListeners;
 @property (nonatomic, strong) NSMutableArray* stationaryRegionListeners;
 
 - (void) configure:(CDVInvokedUrlCommand*)command;

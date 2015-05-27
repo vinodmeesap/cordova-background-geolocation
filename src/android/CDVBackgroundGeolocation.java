@@ -1,5 +1,7 @@
 package com.transistorsoft.cordova.bggeo;
 
+import java.util.List;
+import java.util.ArrayList;
 import org.apache.cordova.CallbackContext;
 import org.apache.cordova.CordovaPlugin;
 import org.apache.cordova.CordovaWebView;
@@ -11,8 +13,8 @@ import android.os.Bundle;
 import com.google.android.gms.location.ActivityRecognitionResult;
 import com.google.android.gms.location.DetectedActivity;
 import com.transistorsoft.locationmanager.BackgroundGeolocationService;
-import com.transistorsoft.locationmanager.BackgroundGeolocationService.PaceChangeEvent;
-import com.transistorsoft.locationmanager.BackgroundGeolocationService.PausedEvent;
+import com.google.android.gms.location.Geofence;
+import com.google.android.gms.location.GeofencingEvent;
 //import com.transistorsoft.locationmanager.BackgroundGeolocationService.StationaryLocation;
 
 import de.greenrobot.event.EventBus;
@@ -37,6 +39,8 @@ public class CDVBackgroundGeolocation extends CordovaPlugin {
     public static final String ACTION_SYNC          = "sync";
     public static final String ACTION_GET_ODOMETER  = "getOdometer";
     public static final String ACTION_RESET_ODOMETER  = "resetOdometer";
+    public static final String ACTION_ADD_GEOFENCE  = "addGeofence";
+    public static final String ACTION_ON_GEOFENCE   = "onGeofence";
     
     private Boolean isEnabled           = false;
     private Boolean stopOnTerminate     = false;
@@ -48,16 +52,13 @@ public class CDVBackgroundGeolocation extends CordovaPlugin {
 
     // Geolocation callback
     private CallbackContext locationCallback;
-    // Called when DetectedActivity is STILL
     private CallbackContext stationaryCallback;
-    
     private CallbackContext getLocationsCallback;
-
     private CallbackContext syncCallback;
-
     private CallbackContext getOdometerCallback;
-
     private CallbackContext resetOdometerCallback;
+    private CallbackContext paceChangeCallback;
+    private List<CallbackContext> geofenceCallbacks = new ArrayList<CallbackContext>();
 
     public static boolean isActive() {
         return gWebView != null;
@@ -98,12 +99,14 @@ public class CDVBackgroundGeolocation extends CordovaPlugin {
                 Log.w(TAG, "- Cannot change pace while disabled");
                 result = false;
                 callbackContext.error("Cannot #changePace while disabled");
-            } else { 
-                PaceChangeEvent event = new PaceChangeEvent(data.getBoolean(0));
-                EventBus.getDefault().post(event);
-
+            } else {
                 result = true;
-                callbackContext.success();
+                paceChangeCallback = callbackContext; 
+                Bundle event = new Bundle();
+                event.putString("name", action);
+                event.putBoolean("request", true);
+                event.putBoolean("isMoving", data.getBoolean(0));
+                EventBus.getDefault().post(event);
             }
         } else if (ACTION_SET_CONFIG.equalsIgnoreCase(action)) {
             result = applyConfig(data);
@@ -144,6 +147,29 @@ public class CDVBackgroundGeolocation extends CordovaPlugin {
             event.putBoolean("request", true);
             resetOdometerCallback = callbackContext;
             EventBus.getDefault().post(event);
+        } else if (ACTION_ADD_GEOFENCE.equalsIgnoreCase(action)) {
+            result = true;
+
+            JSONObject config = data.getJSONObject(0);
+            try {
+                Bundle event = new Bundle();
+                event.putString("name", action);
+                event.putBoolean("request", true);
+                event.putFloat("radius", (float) config.getLong("radius"));
+                event.putDouble("latitude", config.getDouble("latitude"));
+                event.putDouble("longitude", config.getDouble("longitude"));
+                event.putString("identifier", config.getString("identifier"));
+
+                EventBus.getDefault().post(event);
+                callbackContext.success();
+            } catch (JSONException e) {
+                Log.w(TAG, e);
+                callbackContext.error("Failed to add geofence");
+                result = false;
+            }
+        } else if (ACTION_ON_GEOFENCE.equalsIgnoreCase(action)) {
+            result = true;
+            geofenceCallbacks.add(callbackContext);
         }
         return result;
     }
@@ -296,7 +322,10 @@ public class CDVBackgroundGeolocation extends CordovaPlugin {
             runInBackground(getOdometerCallback, result);
         } else if (ACTION_RESET_ODOMETER.equalsIgnoreCase(name)) {
             PluginResult result = new PluginResult(PluginResult.Status.OK);
-            runInBackground(resetOdometerCallback, result);
+            resetOdometerCallback.sendPluginResult(result);
+        } else if (ACTION_ON_PACE_CHANGE.equalsIgnoreCase(name)) {
+            PluginResult result = new PluginResult(PluginResult.Status.OK);
+            paceChangeCallback.sendPluginResult(result);
         }
     }
 
@@ -329,7 +358,30 @@ public class CDVBackgroundGeolocation extends CordovaPlugin {
             runInBackground(locationCallback, result);
         }
     }
-    
+    /**
+    * EventBus handler for Geofencing events
+    */    
+    public void onEventMainThread(GeofencingEvent geofenceEvent) {
+        Log.i(TAG, "- Rx GeofencingEvent: " + geofenceEvent);
+
+
+        if (!geofenceCallbacks.isEmpty()) {
+            for (Geofence geofence : geofenceEvent.getTriggeringGeofences()) {
+                JSONObject params = new JSONObject();
+                try {
+                    params.put("identifier", geofence.getRequestId());
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+                PluginResult result = new PluginResult(PluginResult.Status.OK, params);
+                result.setKeepCallback(true);
+                for (CallbackContext callback : geofenceCallbacks) {
+                    runInBackground(callback, result);
+                }
+            }
+        }
+    }
+
     /**
      * Run a javascript callback in Background
      * @param cb

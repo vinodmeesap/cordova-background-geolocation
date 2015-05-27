@@ -9,24 +9,30 @@
 var exec = require("cordova/exec");
 module.exports = {
     /**
-    * @property {Object} stationaryRegion
+    * @property {Object} stationaryLocation
     */
-    stationaryRegion: null,
+    stationaryLocation: null,
     /**
     * @property {Object} config
     */
     config: {},
 
     configure: function(success, failure, config) {
+        var me = this;
         config = config || {};
         this.config = config;
-        success = success || function(location) {};
-        var mySuccess = function(location) {
+        success = success || function(location, taskId) {
+            me.finish(taskId);
+        };
+        
+        var mySuccess = function(params) {
+            var location    = params.location || params;
+            var taskId      = params.taskId || 'task-id-undefined';
             // Transform timestamp to Date instance.
             if (location.timestamp) {
                 location.timestamp = new Date(location.timestamp);
             }
-            success.call(this, location);
+            success.call(this, location, taskId);
         }
         exec(mySuccess,
              failure || function() {},
@@ -49,12 +55,15 @@ module.exports = {
             'stop',
             []);
     },
-    finish: function(success, failure) {
+    finish: function(taskId, success, failure) {
+        if (!taskId) {
+            throw "BackgroundGeolocation#finish must now be provided with a taskId as 1st param, eg: bgGeo.finish(taskId).  taskId is provided by 2nd param in callback";
+        }
         exec(success || function() {},
             failure || function() {},
             'BackgroundGeoLocation',
             'finish',
-            []);
+            [taskId]);
     },
     changePace: function(isMoving, success, failure) {
         exec(success || function() {},
@@ -94,10 +103,15 @@ module.exports = {
     */
     onStationary: function(success, failure) {
         var me = this;
-        success = success || function() {};
-        var callback = function(region) {
-            me.stationaryRegion = region;
-            success.apply(me, arguments);
+        success = success || function(location, taskId) {
+            me.finish(taskId);
+        };
+        var callback = function(params) {
+            var location    = params.location || params,
+                taskId      = params.taskId || 'task-id-undefined';
+            
+            me.stationaryLocation = location;
+            success.call(me, location, taskId);
         };
         exec(callback,
             failure || function() {},
@@ -180,7 +194,13 @@ module.exports = {
         if (!typeof(success) === 'function') {
             throw "#onGeofence requires a success callback";
         }
-        exec(success,
+        var me = this;
+        var mySuccess = function(params) {
+            var identifier  = params.identifier,
+                taskId      = params.taskId || 'task-id-undefined';
+            success.call(me, identifier, taskId);
+        }
+        exec(mySuccess,
             failure || function() {},
             'BackgroundGeoLocation',
             'onGeofence',
