@@ -1,4 +1,4 @@
-BackgroundGeoLocation
+Background Geolocation
 ==============================
 
 Cross-platform background geolocation for Cordova with battery-saving "circular region monitoring" and "stop detection".
@@ -22,7 +22,14 @@ The plugin creates the object `window.plugins.backgroundGeoLocation` with the me
   
   `onStationary(callback, fail)`
   
-
+  `getLocations(callback, fail)`
+  
+  `sync(callback, fail)`
+  
+  `getOdometer(callback, fail)`
+  
+  `resetOdometer(callback, fail)`
+  
 ## Installing the plugin ##
 
 ```
@@ -30,23 +37,18 @@ The plugin creates the object `window.plugins.backgroundGeoLocation` with the me
    cordova plugin add https://github.com/christocracy/cordova-background-geolocation.git
 ```
 
+## Help
+
+[See the Wiki](https://github.com/christocracy/cordova-background-geolocation/wiki)
+
 ## Example
 
 ```
-    //
-    //
-    // after deviceready
-    //
-    //
 
-    // Your app must execute AT LEAST ONE call for the current position via standard Cordova geolocation,
-    //  in order to prompt the user for Location permission.
-    window.navigator.geolocation.getCurrentPosition(function(location) {
-        console.log('Location from Phonegap');
-    });
-
-    var bgGeo = window.plugins.backgroundGeoLocation;
-
+////
+// As with all Cordova plugins, you must configure within an #deviceready callback.
+//
+function onDeviceReady() {
     /**
     * This would be your own callback for Ajax-requests after POSTing background geolocation to your server.
     */
@@ -77,14 +79,33 @@ The plugin creates the object `window.plugins.backgroundGeoLocation` with the me
 
     // BackgroundGeoLocation is highly configurable.
     bgGeo.configure(callbackFn, failureFn, {
-        desiredAccuracy: 0,                         // <-- 0:  highest power, highest accuracy; 1000:  lowest power, lowest accuracy.
+        debug: true, // <-- enable this hear sounds for background-geolocation life-cycle.
+        desiredAccuracy: 0,
         stationaryRadius: 50,
-        distanceFilter: 50,                         // <-- minimum distance between location events
-        activityType: 'AutomotiveNavigation',       // <-- [ios]
-        locationUpdateInterval: 30000,              // <-- [android] minimum time between location updates, used in conjunction with #distanceFilter
-        activityRecognitionInterval: 10000,         // <-- [android] sampling-rate activity-recognition system for movement/stationary detection
-        debug: true,                                // <-- enable this hear sounds, see notifications during life-cycle events.
-        stopOnTerminate: false                      // <-- enable this to clear background location settings when the app terminates
+        distanceFilter: 50,
+        disableElasticity: false, // <-- [iOS] Default is 'false'.  Set true to disable speed-based distanceFilter elasticity
+        locationUpdateInterval: 5000,
+        minimumActivityRecognitionConfidence: 80,   // 0-100%.  Minimum activity-confidence for a state-change 
+        fastestLocationUpdateInterval: 5000,
+        activityRecognitionInterval: 10000,
+        stopTimeout: 0,
+        forceReload: true,      // <-- [Android] If the user closes the app **while location-tracking is started** , reboot app (WARNING: possibly distruptive to user) 
+        stopOnTerminate: false, // <-- [Android] Allow the background-service to run headless when user closes the app.
+        startOnBoot: true,      // <-- [Android] Auto start background-service in headless mode when device is powered-up.
+        activityType: 'AutomotiveNavigation',
+        /**
+        * HTTP Feature:  set an url to allow the native background service to POST locations to your server
+        */
+        url: 'http://posttestserver.com/post.php?dir=cordova-background-geolocation',
+        batchSync: false,       // <-- [Default: false] Set true to sync locations to server in 1 HTTP request.
+        autoSync: true,		// <-- [Default: true] Set true to sync each location to server as it arrives.
+        maxDaysToPersist: 1,    // <-- Maximum days to persist a location in plugin's SQLite database when HTTP fails
+        headers: {
+            "X-FOO": "bar"
+        },
+        params: {
+            "auth_token": "maybe_your_server_authenticates_via_token_YES?"
+        }
     });
 
     // Turn ON the background-geolocation system.  The user will be tracked whenever they suspend the app.
@@ -92,23 +113,24 @@ The plugin creates the object `window.plugins.backgroundGeoLocation` with the me
 
     // If you wish to turn OFF background-tracking, call the #stop method.
     // bgGeo.stop()
+}
 
 
 ```
-
-NOTE: The plugin includes `org.apache.cordova.geolocation` as a dependency.  You must enable Cordova's GeoLocation in the foreground and have the user accept Location services by executing `#watchPosition` or `#getCurrentPosition`.
 
 ## Example Application
 
 ![SampleApp](/android-sample-app.png "SampleApp")
 
-This plugin hosts a SampleApp in ```example/SampleApp``` folder.  This SampleApp contains no plugins so you must first start by adding this plugin.  **NOTE** In order to use the SampleApp, it's important to make a copy of it outside of the plugin itself.
+This plugin hosts a SampleApp in ```example/SampleApp``` folder.  This SampleApp contains no plugins so you must first start by adding its required plugins (most importantly, this one).  **NOTE** In order to use the SampleApp, it's important to make a copy of it outside of the plugin itself.
 
 ```
 $ git clone git@github.com:christocracy/cordova-background-geolocation.git
 $ mkdir tmp
 $ cp -R cordova-background-geolocation/example/SampleApp tmp
 $ cd tmp/SampleApp
+$ cordova plugin add cordova-plugin-whitelist
+$ cordova plugin add cordova-plugin-geolocation
 $ cordova plugin add git@github.com:christocracy/cordova-background-geolocation.git
 $ cordova platform add ios
 $ cordova platform add android
@@ -119,12 +141,33 @@ $ cordova build android
 
 If you're using XCode, boot the SampleApp in the iOS Simulator and enable ```Debug->Location->City Drive```.
 
+## Help!  It doesn't work!
+
+Yes it does.  [See the Wiki](https://github.com/christocracy/cordova-background-geolocation/wiki)
+
+- on iOS, background tracking won't be engaged until you travel about **2-3 city blocks**, so go for a walk or car-ride (or use the Simulator with ```Debug->Location->City Drive```)
+- Android is much quicker detecting movements; typically several meters of walking will do it.
+- When in doubt, **nuke everything**:  First delete the app from your device (or simulator)
+
+```
+$ cordova plugin remove com.transistorsoft.cordova.background-geolocation
+$ cordova plugin add git@github.com:christocracy/cordova-background-geolocation.git
+
+$ cordova platform remove ios
+$ cordova platform add ios
+$ cordova build ios
+
+```
 
 ## Behaviour
 
-The plugin has features allowing you to control the behaviour of background-tracking, striking a balance between accuracy and battery-usage.  In stationary-mode, the plugin attempts to descrease its power usage and accuracy by setting up a circular stationary-region of configurable #stationaryRadius.  iOS has a nice system  [Significant Changes API](https://developer.apple.com/library/ios/documentation/CoreLocation/Reference/CLLocationManager_Class/CLLocationManager/CLLocationManager.html#//apple_ref/occ/instm/CLLocationManager/startMonitoringSignificantLocationChanges), which allows the os to suspend your app until a cell-tower change is detected (typically 2-3 city-block change) Android uses the Google Play Services APIs [FusedLocationProvider API](https://developer.android.com/reference/com/google/android/gms/location/FusedLocationProviderApi.html) as well as the [ActivityRecognition API](https://developer.android.com/reference/com/google/android/gms/location/ActivityRecognitionApi.html) (for movement/stationary detection). Windows Phone does not have such a API.
+The plugin has features allowing you to control the behaviour of background-tracking, striking a balance between accuracy and battery-usage.  In stationary-mode, the plugin attempts to descrease its power usage and accuracy by setting up a circular stationary-region of configurable #stationaryRadius.  
 
-The plugin will execute your configured ```callback``` provided to the ```#configure(callback, config)``` method. You must manually POST the received ```GeoLocation``` to your server using standard XHR, as well as manually cache a recieved location into ```localStorage``` if no network connection is available.
+iOS has a nice system  [Significant Changes API](https://developer.apple.com/library/ios/documentation/CoreLocation/Reference/CLLocationManager_Class/CLLocationManager/CLLocationManager.html#//apple_ref/occ/instm/CLLocationManager/startMonitoringSignificantLocationChanges), which allows the os to suspend your app until a cell-tower change is detected (typically 2-3 city-block change) 
+
+Android uses the Google Play Services APIs [FusedLocationProvider API](https://developer.android.com/reference/com/google/android/gms/location/FusedLocationProviderApi.html) as well as the [ActivityRecognition API](https://developer.android.com/reference/com/google/android/gms/location/ActivityRecognitionApi.html) (for movement/stationary detection). Windows Phone does not have such a API.
+
+The plugin will execute your configured ```callback``` provided to the ```#configure(callback, config)``` method.  Both iOS & Android use a SQLite database to persist **every** recorded geolocation so you don't have to worry about persistence when no network is detected.  The plugin provides a Javascript API to fetch and destroy the records in the database.  In addition, the plugin has an optional HTTP layer allowing allowing you to automatically HTTP POST recorded geolocations to your server.
 
 The function ```changePace(isMoving, success, failure)``` is provided to force the plugin to enter "moving" or "stationary" state.
 
@@ -195,9 +238,58 @@ bgGeo.onStationary(function(location) {
 });
 ```
 
+#####`getLocations(callbackFn, failureFn)`
+Fetch all the locations currently stored in native plugin's SQLite database.  Your ```callbackFn`` will receive an ```Array``` of locations in the 1st parameter.  Eg:
+
+```
+    bgGeo.getLocations(function(locations) {
+        console.log("locations: ", locations);
+    });
+```
+
+#####`sync(callbackFn, failureFn)`
+
+If the plugin is configured for HTTP with an ```#url``` and ```#autoSync: false```, this method will initiate POSTing the locations currently stored in the native SQLite database to your configured ```#url```.  All records in the database will be DELETED.  If you configured ```batchSync: true```, all the locations will be sent to your server in a single HTTP POST request, otherwise the plugin will create execute an HTTP post for **each** location in the database (REST-style).  Your ```callbackFn``` will be executed and provided with an Array of all the locations from the SQLite database.  If the plugin failed to sync to your server (possibly because of no network connection), the ```failureFn``` will be called with an ```errorMessage```.  If you are **not** using the HTTP features, ```sync``` is the only way to clear the native SQLite datbase.  Eg:
+
+```
+    bgGeo.sync(function(locations) {
+    	// Here are all the locations from the database.  The database is now EMPTY.
+    	console.log('synced locations: ', locations);
+    }, function(errorMessage) {
+        console.warn('Sync FAILURE: ', errorMessage);
+    });
+
+```
+
+#####`getOdometer(callbackFn, failureFn)`
+
+The plugin constantly tracks distance travelled.  To fetch the current **odometer** reading:
+
+```
+    bgGeo.getOdometer(function(distance) {
+        console.log("Distance travelled: ", distance);
+    });
+```
+
+#####`resetOdometer(callbackFn, failureFn)`
+
+Reset the **odometer** to zero.  The plugin never automatically resets the odometer so it's up to you to reset it as desired.
+
 ## Config
 
 Use the following config-parameters with the #configure method:
+
+#####`@param {Boolean} debug`
+
+When enabled, the plugin will emit sounds for life-cycle events of background-geolocation!  **NOTE iOS**:  In addition, you must manually enable the *Audio and Airplay* background mode in *Background Capabilities* to hear these debugging sounds.
+
+- Exit stationary region:  **[ios]** Calendar event notification sound
+- GeoLocation recorded:  **[ios]** SMS-sent sound, **[android]** "blip", *[WP8]* High beep, 1 sec.
+- Aggressive geolocation engaged:  **[ios]** SIRI listening sound, **[android]** "Doodly-doo"
+- Acquiring stationary location sound: **[ios]** "tick,tick,tick" sound, *[android]* none
+- Stationary location acquired sound:  **[ios]** "bloom" sound, **[android]** long "beeeeeep"
+
+![Enable Background Audio](/enable-background-audio.png "Enable Background Audio")
 
 #####`@param {Integer} desiredAccuracy [0, 10, 100, 1000] in meters`
 
@@ -209,19 +301,6 @@ Specify the desired-accuracy of the geolocation system with 1 of 4 values, ```0,
 #####`@param {Integer} stationaryRadius (meters)`
 
 When stopped, the minimum distance the device must move beyond the stationary location for aggressive background-tracking to engage.  Note, since the plugin uses iOS significant-changes API, the plugin cannot detect the exact moment the device moves out of the stationary-radius.  In normal conditions, it can take as much as 3 city-blocks to 1/2 km before staionary-region exit is detected.
-
-#####`@param {Boolean} debug`
-
-When enabled, the plugin will emit sounds for life-cycle events of background-geolocation!  **NOTE iOS**:  In addition, you must manually enable the *Audio and Airplay* background mode in *Background Capabilities* to hear these debugging sounds.
-
-- Exit stationary region:  *[ios]* Calendar event notification sound *[android]* dialtone beep-beep-beep
-- GeoLocation recorded:  *[ios]* SMS sent sound, *[android]* tt short beep, *[WP8]* High beep, 1 sec.
-- Aggressive geolocation engaged:  *[ios]* SIRI listening sound, *[android]* none
-- Passive geolocation engaged:  *[ios]* SIRI stop listening sound, *[android]* none
-- Acquiring stationary location sound: *[ios]* "tick,tick,tick" sound, *[android]* none
-- Stationary location acquired sound:  *[ios]* "bloom" sound, *[android]* long tt beep.
-
-![Enable Background Audio](/enable-background-audio.png "Enable Background Audio")
 
 #####`@param {Integer} distanceFilter`
 
@@ -260,38 +339,50 @@ Compare now background-geolocation in the scope of a city.  In this image, the l
 #####`@param {Boolean} stopOnTerminate`
 Enable this in order to force a stop() when the application terminated (e.g. on iOS, double-tap home button, swipe away the app).  On Android, ```stopOnTerminate: false``` will cause the plugin to operate as a headless background-service (in this case, you should configure an #url in order for the background-service to send the location to your server)
 
-### Android Config
+#####`@param {Boolean} stopAfterElapsedMinutes`
 
-#####`@param {Integer millis} locationUpdateInterval`
+The plugin can optionally auto-stop monitoring location when some number of minutes elapse after being the #start method was called.
 
-Set the desired interval for active location updates, in milliseconds.
+#### In-Plugin SQLite Storage
 
-The location client will actively try to obtain location updates for your application at this interval, so it has a direct influence on the amount of power used by your application. Choose your interval wisely.
+The plugin will cache **every** recorded geolocation to its internal SQLite database -- when you sync the locations and your server responds with HTTP ```200, 201 or 204```, the plugin will **DELETE** the stored location from cache.  The plugin has a cache-pruning feature with ```@config {Integer} maxDaysToPersist``` -- If the plugin hasn't successfully synced these these records in the database before  ```maxDaysToPersist``` expires, the plugin will give up and those geolocation records will be pruned from the database.
 
-This interval is inexact. You may not receive updates at all (if no location sources are available), or you may receive them slower than requested. You may also receive them faster than requested (if other applications are requesting location at a faster interval). 
+If you **don't** configure the optional HTTP feature, the only way to delete the SQLite database is by executing the ```#sync``` method.
 
-Applications with only the coarse location permission may have their interval silently throttled.
+```
+    bgGeo.sync(function(locations) {
+    	// The SQLite database is now EMPTY.  
+        console.log('locations: ', locations);
+    });
+```
 
-An interval of 0 is allowed, but not recommended, since location updates may be extremely fast on future implementations.
+#### HTTP Features
 
-#####`@param {Integer millis} activityRecognitionInterval`
+#####`@param {String} url`
 
-the desired time between activity detections. Larger values will result in fewer activity detections while improving battery life. A value of 0 will result in activity detections at the fastest possible rate.
+Your server url where you wish to HTTP POST location data to.
 
-#####`@param {Integer minutes} stopTimeout`
+#####`@param {String} batchSync [false]`
 
-The number of miutes to wait before turning off the GPS after the ActivityRecognition System (ARS) detects the device is ```STILL``` (defaults to 0, no timeout).  If you don't set a value, the plugin is eager to turn off the GPS ASAP.  An example use-case for this configuration is to delay GPS OFF while in a car waiting at a traffic light.
+Default is ```false```.  If you've enabled HTTP feature by configuring an ```#url```, ```batchSync: true``` will POST all the locations currently stored in native SQLite datbase to your server in a single HTTP POST request.  With ```batchSync: false```, an HTTP POST request will be initiated for **each** location in database.
 
-#####`@param {Boolean} forceReload`
+#####`@param {String} autoSync [true]`
 
-If the user closes the application while the background-tracking has been started,  location-tracking will continue on if ```stopOnTerminate: false```.  You may choose to force the foreground application to reload (since this is where your Javascript runs) by setting ```foreceReload: true```.  This will guarantee that locations are always sent to your Javascript callback (**WARNING** possibly disruptive to user).
+Default is ```true```.  If you've enabeld HTTP feature by configuring an ```#url```, the plugin will attempt to HTTP POST each location to your server **as it is recorded**.  If you set ```autoSync: false```, it's up to you to **manually** execute the ```#sync``` method to initate the HTTP POST (**NOTE** The plugin will continue to persist **every** recorded location in the SQLite database until you execute ```#sync```).
 
-#####`@param {Boolean} startOnBoot`
+#####`@param {Object} params`
 
-Set to ```true``` to start the background-service whenever the device boots.  Unless you configure the plugin to ```forceReload``` (ie: boot your app), you should configure the plugin's HTTP features so it can POST to your server in "headless" mode.
+Optional HTTP params sent along in HTTP request to above ```#url```.
 
-#### HTTP Feature
-The Android plugin can run as a "headless" background service, sending the user's location to your server even after the user close the application (by configuring ```stopOnTerminate: false```).  The plugin's HTTP request will arrive at your server as follows:
+#####`@param {Object} headers`
+
+Optional HTTP params sent along in HTTP request to above ```#url```.
+
+#####`@param {Integer} maxDaysToPersist`
+
+Maximum number of days to store a geolocation in plugin's SQLite database when your server fails to respond with ```HTTP 200 OK```.  The plugin will continue attempting to sync with your server until ```maxDaysToPersist``` when it will give up and remove the location from the database.
+
+Both iOS and Android can send the Geolocation to your server simply by configuring an ```#url``` in addition to optional ```#headers``` and ```#params```.  This is the preferred way to send the Geolocation to your server, rather than doing it yourself with Ajax in your javascript.  
 
 ```
 bgGeo.configure(callbackFn, failureFn, {
@@ -299,6 +390,9 @@ bgGeo.configure(callbackFn, failureFn, {
     .
     .
     url: 'http://posttestserver.com/post.php?dir=cordova-background-geolocation',
+    autoSync: true,
+    batchSync: false,
+    maxDaysToPersist: 1,
     headers: {
         "X-FOO": "bar"
     },
@@ -330,24 +424,75 @@ REQUEST_TIME = 1429198883
 No Post Params.
 
 == Begin post body ==
-{"auth_token":"maybe_your_server_authenticates_via_token_YES?","location":{"latitude":45.5192875,"longitude":-73.6169281,"accuracy":25.42799949645996,"speed":0,"bearing":0,"altitude":0,"timestamp":1429198882716},"android_id":"39dbac67e2c9d80"}
+{
+  "location":{
+    "timestamp":"2015-05-05T04:31:54Z",  // <-- ISO-8601, UTC
+    "coords":{
+      "latitude":45.519282,
+      "longitude":-73.6169562,
+      "accuracy":12.850000381469727,
+      "speed":0,
+      "heading":0,
+      "altitude":0
+    },
+    "activity":{  // <-- Android-only currently
+      "type":"still",
+      "confidence":48
+    }
+  },
+  "android_id":"39dbac67e2c9d80"
+}
 == End post body ==
-
-Upload contains PUT data:
-{"auth_token":"maybe_your_server_authenticates_via_token_YES?","location":{"latitude":45.5192875,"longitude":-73.6169281,"accuracy":25.42799949645996,"speed":0,"bearing":0,"altitude":0,"timestamp":1429198882716},"android_id":"39dbac67e2c9d80"}
 ```
 
-#####`@param {String} url`
+### Android Config
 
-By configuring an ```#url```, the  plugin will always attempt to HTTP POST the location to your server.
+#####`@param {Integer millis} locationUpdateInterval`
 
-#####`@param {Object} params`
+Set the desired interval for active location updates, in milliseconds.
 
-Optional HTTP params sent along in HTTP request to above ```#url```.
+The location client will actively try to obtain location updates for your application at this interval, so it has a direct influence on the amount of power used by your application. Choose your interval wisely.
 
-#####`@param {Object} headers`
+This interval is inexact. You may not receive updates at all (if no location sources are available), or you may receive them slower than requested. You may also receive them faster than requested (if other applications are requesting location at a faster interval). 
 
-Optional HTTP params sent along in HTTP request to above ```#url```.
+Applications with only the coarse location permission may have their interval silently throttled.
+
+#####`@param {Integer millis} fastestLocationUpdateInterval`
+
+Explicitly set the fastest interval for location updates, in milliseconds.
+
+This controls the fastest rate at which your application will receive location updates, which might be faster than ```#locationUpdateInterval``` in some situations (for example, if other applications are triggering location updates).
+
+This allows your application to passively acquire locations at a rate faster than it actively acquires locations, saving power.
+
+Unlike ```#locationUpdateInterval```, this parameter is exact. Your application will never receive updates faster than this value.
+
+If you don't call this method, a fastest interval will be set to **30000 (30s)**. 
+
+An interval of 0 is allowed, but not recommended, since location updates may be extremely fast on future implementations.
+
+If ```#fastestLocationUpdateInterval``` is set slower than ```#locationUpdateInterval```, then your effective fastest interval is ```#locationUpdateInterval```.
+
+========
+An interval of 0 is allowed, but not recommended, since location updates may be extremely fast on future implementations.
+
+#####`@param {Integer millis} activityRecognitionInterval`
+
+the desired time between activity detections. Larger values will result in fewer activity detections while improving battery life. A value of 0 will result in activity detections at the fastest possible rate.
+
+#####`@param {Integer minutes} stopTimeout`
+
+The number of miutes to wait before turning off the GPS after the ActivityRecognition System (ARS) detects the device is ```STILL``` (defaults to 0, no timeout).  If you don't set a value, the plugin is eager to turn off the GPS ASAP.  An example use-case for this configuration is to delay GPS OFF while in a car waiting at a traffic light.
+
+#####`@param {Boolean} forceReload`
+
+If the user closes the application while the background-tracking has been started,  location-tracking will continue on if ```stopOnTerminate: false```.  You may choose to force the foreground application to reload (since this is where your Javascript runs) by setting ```foreceReload: true```.  This will guarantee that locations are always sent to your Javascript callback (**WARNING** possibly disruptive to user).
+
+#####`@param {Boolean} startOnBoot`
+
+Set to ```true``` to start the background-service whenever the device boots.  Unless you configure the plugin to ```forceReload``` (ie: boot your app), you should configure the plugin's HTTP features so it can POST to your server in "headless" mode.
+
+
 
 ### iOS Config
 

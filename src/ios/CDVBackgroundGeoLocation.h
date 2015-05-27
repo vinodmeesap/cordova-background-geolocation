@@ -5,12 +5,12 @@
 //
 
 #import <Cordova/CDVPlugin.h>
-#import "CDVLocation.h"
-#import <AudioToolbox/AudioToolbox.h>
+#import <TSLocationManager/TSLocationManager.h>
 
-@interface CDVBackgroundGeoLocation : CDVPlugin <CLLocationManagerDelegate>
+@interface CDVBackgroundGeolocation : CDVPlugin
 
 @property (nonatomic, strong) NSString* syncCallbackId;
+@property (nonatomic, strong) NSString* geofenceCallbackId;
 @property (nonatomic, strong) NSMutableArray* stationaryRegionListeners;
 
 - (void) configure:(CDVInvokedUrlCommand*)command;
@@ -21,9 +21,11 @@
 - (void) setConfig:(CDVInvokedUrlCommand*)command;
 - (void) addStationaryRegionListener:(CDVInvokedUrlCommand*)command;
 - (void) getStationaryLocation:(CDVInvokedUrlCommand *)command;
-- (void) onSuspend:(NSNotification *)notification;
-- (void) onResume:(NSNotification *)notification;
-- (void) onAppTerminate;
-
+- (void) getLocations:(CDVInvokedUrlCommand *)command;
+- (void) sync:(CDVInvokedUrlCommand *)command;
+- (void) getOdometer:(CDVInvokedUrlCommand *)command;
+- (void) resetOdometer:(CDVInvokedUrlCommand *)command;
+- (void) addGeofence:(CDVInvokedUrlCommand *)command;
+- (void) onGeofence:(CDVInvokedUrlCommand *)command;
 @end
 

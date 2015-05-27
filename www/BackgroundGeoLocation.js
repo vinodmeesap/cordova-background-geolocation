@@ -20,8 +20,15 @@ module.exports = {
     configure: function(success, failure, config) {
         config = config || {};
         this.config = config;
-
-        exec(success || function() {},
+        success = success || function(location) {};
+        var mySuccess = function(location) {
+            // Transform timestamp to Date instance.
+            if (location.timestamp) {
+                location.timestamp = new Date(location.timestamp);
+            }
+            success.call(this, location);
+        }
+        exec(mySuccess,
              failure || function() {},
              'BackgroundGeoLocation',
              'configure',
@@ -97,6 +104,96 @@ module.exports = {
             'BackgroundGeoLocation',
             'addStationaryRegionListener',
             []);
+    },
+    getLocations: function(success, failure) {
+        if (typeof(success) !== 'function') {
+            throw "BackgroundGeolocation#getLocations requires a success callback";
+        }
+        var me = this;
+        var mySuccess = function(locations) {
+            success.call(this, me._setTimestamp(locations));
+        }
+        exec(mySuccess,
+            failure || function() {},
+            'BackgroundGeoLocation',
+            'getLocations',
+            []);
+    },
+    /**
+    * Signal native plugin to sync locations queue to HTTP
+    */
+    sync: function(success, failure) {
+        if (typeof(success) !== 'function') {
+            throw "BackgroundGeolocation#sync requires a success callback";
+        }
+        var me = this;
+        var mySuccess = function(locations) {
+            success.call(this, me._setTimestamp(locations));
+        }
+        exec(mySuccess,
+            failure || function() {},
+            'BackgroundGeoLocation',
+            'sync',
+            []);
+    },
+    /**
+    * Fetch current odometer value
+    */
+    getOdometer: function(success, failure) {
+        exec(success || function() {},
+            failure || function() {},
+            'BackgroundGeoLocation',
+            'getOdometer',
+            []);
+    },
+    /**
+    * Reset Odometer to 0
+    */
+    resetOdometer: function(success, failure) {
+        exec(success || function() {},
+            failure || function() {},
+            'BackgroundGeoLocation',
+            'resetOdometer',
+            []);
+    },
+    /**
+    * add geofence
+    */
+    addGeofence: function(config, success, failure) {
+        config = config || {};
+        if (!config.identifier) {
+            throw "#addGeofence requires an 'identifier'";
+        }
+        if (!(config.latitude && config.longitude)) {
+            throw "#addGeofence requires a #latitude and #longitude";
+        } 
+        if (!config.radius) {
+            throw "#addGeofence requires a #radius";
+        }
+        exec(success || function() {},
+            failure || function() {},
+            'BackgroundGeoLocation',
+            'addGeofence',
+            [config]);
+    },
+    onGeofence: function(success, failure) {
+        if (!typeof(success) === 'function') {
+            throw "#onGeofence requires a success callback";
+        }
+        exec(success,
+            failure || function() {},
+            'BackgroundGeoLocation',
+            'onGeofence',
+            []);
+    },
+    _setTimestamp: function(rs) {
+        // Transform timestamp to Date instance.
+        if (typeof(rs) === 'object') {
+            for (var n=0,len=rs.length;n<len;n++) {
+                rs[n].timestamp = new Date(rs[n].timestamp);
+            }
+        }
+        return rs;
     },
     apply: function(destination, source) {
         source = source || {};
