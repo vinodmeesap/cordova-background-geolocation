@@ -199,8 +199,8 @@ Keep in mind that it is **not** possible to use ```start()``` at the ```pause```
 
 Configures the plugin's parameters (@see following [Config](https://github.com/christocracy/cordova-background-geolocation/blob/edge/README.md#config) section for accepted ```config``` params.  The ```locationCallback``` will be executed each time a new Geolocation is recorded and provided with the following parameters:
 
-######`@param {Object} location` The Location data
-######`@param {Integer} taskId` The taskId used to send to bgGeo.finish(taskId) in order to signal completion of your callbackFn
+######@param {Object} location The Location data
+######@param {Integer} taskId The taskId used to send to bgGeo.finish(taskId) in order to signal completion of your callbackFn
 
 ```
 bgGeo.configure(function(location, taskId) {
@@ -260,8 +260,8 @@ bgGeo.changePace(false); // <-- Disable aggressive GPS monitoring.  Engages stat
 ####`onStationary(callbackFn, failureFn)`
 Your ```callbackFn``` will be executed each time the device has entered stationary-monitoring mode.  The ```callbackFn``` will be provided with a ```Location``` object as the 1st param, with the usual params (```latitude, longitude, accuracy, speed, bearing, altitude```), in addition to a ```taskId``` used to signal that your callback is finished.
 
-######`@param {Object} location` The Location data
-######`@param {Integer} taskId` The taskId used to send to bgGeo.finish(taskId) in order to signal completion of your callbackFn
+######@param {Object} location The Location data
+######@param {Integer} taskId The taskId used to send to bgGeo.finish(taskId) in order to signal completion of your callbackFn
 
 ```
 bgGeo.onStationary(function(location, taskId) {
@@ -277,10 +277,10 @@ bgGeo.onStationary(function(location, taskId) {
 ####`addGeofence(config, callbackFn, failureFn)`
 Adds a geofence to be monitored by the native plugin.  Monitoring of a geofence is halted after a crossing occurs.  The `config` object accepts the following params.
 
-######`@config {String} identifier The name of your geofence, eg: "Home", "Office"
-######`@config {Float} radius The radius (meters) of the geofence.  In practice, you should make this >= 100 meters.
-######`@config {Float} latitude Latitude of the center-point of the circular geofence.
-######`@config {Float} longitude Longitude of the center-point of the circular geofence.
+######@config {String} identifier The name of your geofence, eg: "Home", "Office"
+######@config {Float} radius The radius (meters) of the geofence.  In practice, you should make this >= 100 meters.
+######@config {Float} latitude Latitude of the center-point of the circular geofence.
+######@config {Float} longitude Longitude of the center-point of the circular geofence.
 
 ```
 bgGeo.addGeofence({
@@ -298,8 +298,8 @@ bgGeo.addGeofence({
 ####`onGeofence(callbackFn)`
 Adds a geofence event-listener.  Your supplied callback will be called when any monitored geofence crossing occurs.  The `callbackFn` will be provided the following parameters:
 
-######`@param {String} identifier The name of the geofence which generated the crossing event, eg: "Home"
-######`@param {Integer} taskId The background taskId which you must send back to the native plugin via `bgGeo.finish(taskId)` in order to signal that your callback is complete.
+######@param {String} identifier The name of the geofence which generated the crossing event, eg: "Home"
+######@param {Integer} taskId The background taskId which you must send back to the native plugin via `bgGeo.finish(taskId)` in order to signal that your callback is complete.
 
 ```
 bgGeo.onGeofence(function(identifier, taskId) {
