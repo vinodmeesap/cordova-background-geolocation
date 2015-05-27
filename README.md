@@ -200,10 +200,30 @@ Keep in mind that it is **not** possible to use ```start()``` at the ```pause```
 Configures the plugin's parameters (@see following [Config](https://github.com/christocracy/cordova-background-geolocation/blob/edge/README.md#config) section for accepted ```config``` params.  The ```locationCallback``` will be executed each time a new Geolocation is recorded and provided with the following parameters:
 
 ######`@param {Object} location` The Location data
-`{"coords":{"latitude":45.5192735,"longitude":-73.6168883,"accuracy":10,"speed":0,"heading":0,"altitude":0},"timestamp":"2015-05-27T18:26:44Z"}`
 ######`@param {Integer} taskId` The taskId used to send to bgGeo.finish(taskId) in order to signal completion of your callbackFn
 
-#####`setConfig(successFn, failureFn, config)`
+```
+bgGeo.configure(function(location, taskId) {
+    var coords      = location.coords,
+        timestamp   = location.timestamp
+        latitude    = coords.latitude,
+        longitude   = coords.longitude,
+        speed       = coords.speed;
+
+    console.log("A location has arrived:", timestamp, latitude, longitude, speed);
+
+    // The plugin runs your callback in a background-thread:  
+    // you MUST signal to the native plugin when your callback is finished so it can halt the thread.
+    // IF YOU DON'T, iOS WILL KILL YOUR APP
+    bgGeo.finish(taskId);
+}, failureFn, {
+    distanceFilter: 50,
+    desiredAccuracy: 0,
+    stationaryRadius: 25
+});
+```
+
+####`setConfig(successFn, failureFn, config)`
 Reconfigure plugin's configuration (@see followign ##Config## section for accepted ```config``` params.  **NOTE** The plugin will continue to send recorded Geolocation to the ```locationCallback``` you provided to ```configure``` method -- use this method only to change configuration params (eg: ```distanceFilter```, ```stationaryRadius```, etc).
 
 ```
@@ -387,14 +407,14 @@ Compare now background-geolocation in the scope of a city.  In this image, the l
 
 ![distanceFilter at city scale](/distance-filter-city.png "distanceFilter at city scale")
 
-#####`@param {Boolean} stopOnTerminate`
+####`@param {Boolean} stopOnTerminate`
 Enable this in order to force a stop() when the application terminated (e.g. on iOS, double-tap home button, swipe away the app).  On Android, ```stopOnTerminate: false``` will cause the plugin to operate as a headless background-service (in this case, you should configure an #url in order for the background-service to send the location to your server)
 
-#####`@param {Boolean} stopAfterElapsedMinutes`
+####`@param {Boolean} stopAfterElapsedMinutes`
 
 The plugin can optionally auto-stop monitoring location when some number of minutes elapse after being the #start method was called.
 
-#### In-Plugin SQLite Storage
+### In-Plugin SQLite Storage
 
 The plugin will cache **every** recorded geolocation to its internal SQLite database -- when you sync the locations and your server responds with HTTP ```200, 201 or 204```, the plugin will **DELETE** the stored location from cache.  The plugin has a cache-pruning feature with ```@config {Integer} maxDaysToPersist``` -- If the plugin hasn't successfully synced these these records in the database before  ```maxDaysToPersist``` expires, the plugin will give up and those geolocation records will be pruned from the database.
 
