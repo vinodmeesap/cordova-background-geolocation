@@ -260,6 +260,9 @@ bgGeo.changePace(false); // <-- Disable aggressive GPS monitoring.  Engages stat
 ####`onStationary(callbackFn, failureFn)`
 Your ```callbackFn``` will be executed each time the device has entered stationary-monitoring mode.  The ```callbackFn``` will be provided with a ```Location``` object as the 1st param, with the usual params (```latitude, longitude, accuracy, speed, bearing, altitude```), in addition to a ```taskId``` used to signal that your callback is finished.
 
+######`@param {Object} location` The Location data
+######`@param {Integer} taskId` The taskId used to send to bgGeo.finish(taskId) in order to signal completion of your callbackFn
+
 ```
 bgGeo.onStationary(function(location, taskId) {
     console.log('- Device is stopped: ', location.latitude, location.longitude);
