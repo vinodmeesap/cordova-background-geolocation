@@ -22,6 +22,10 @@ The plugin creates the object `window.plugins.backgroundGeoLocation` with the me
   
   `onStationary(callback, fail)`
   
+  `addGeofence(callback, fail)`
+
+  `onGeofence(config, callback, fail)`
+
   `getLocations(callback, fail)`
   
   `sync(callback, fail)`
@@ -50,26 +54,26 @@ The plugin creates the object `window.plugins.backgroundGeoLocation` with the me
 //
 function onDeviceReady() {
     /**
-    * This would be your own callback for Ajax-requests after POSTing background geolocation to your server.
-    */
-    var yourAjaxCallback = function(response) {
-        ////
-        // IMPORTANT:  You must execute the #finish method here to inform the native plugin that you're finished,
-        //  and the background-task may be completed.  You must do this regardless if your HTTP request is successful or not.
-        // IF YOU DON'T, ios will CRASH YOUR APP for spending too much time in the background.
-        //
-        //
-        bgGeo.finish();
-    };
-
-    /**
     * This callback will be executed every time a geolocation is recorded in the background.
     */
-    var callbackFn = function(location) {
+    var callbackFn = function(location, taskId) {
         console.log('[js] BackgroundGeoLocation callback:  ' + location.latitude + ',' + location.longitude);
-        // Do your HTTP request here to POST location to your server.
-        //
-        //
+
+        /**
+        * This would be your own callback for Ajax-requests after POSTing background geolocation to your server.
+        * eg:  
+        *     $.post({url: url, success: yourAjaxCallback});
+        */
+        var yourAjaxCallback = function(response) {
+            ////
+            // IMPORTANT:  You must execute the #finish, providing the taskId provided to callbackFn above in order to inform the native plugin that you're finished,
+            //  and the background-task may be completed.  You must do this regardless if your HTTP request is successful or not.
+            // IF YOU DON'T, ios will CRASH YOUR APP for spending too much time in the background.
+            //
+            //
+            bgGeo.finish(taskId);
+        };
+
         yourAjaxCallback.call(this);
     };
 
@@ -191,11 +195,35 @@ Keep in mind that it is **not** possible to use ```start()``` at the ```pause```
 
 ## Methods
 
-#####`configure(locationCallback, failureCallback, config)`
+####`configure(locationCallback, failureCallback, config)`
 
-Configures the plugin's parameters (@see following [Config](https://github.com/christocracy/cordova-background-geolocation/blob/edge/README.md#config) section for accepted ```config``` params.  The ```locationCallback``` will be executed each time a new Geolocation is recorded.
+Configures the plugin's parameters (@see following [Config](https://github.com/christocracy/cordova-background-geolocation/blob/edge/README.md#config) section for accepted ```config``` params.  The ```locationCallback``` will be executed each time a new Geolocation is recorded and provided with the following parameters:
 
-#####`setConfig(successFn, failureFn, config)`
+######@param {Object} location The Location data
+######@param {Integer} taskId The taskId used to send to bgGeo.finish(taskId) in order to signal completion of your callbackFn
+
+```
+bgGeo.configure(function(location, taskId) {
+    var coords      = location.coords,
+        timestamp   = location.timestamp
+        latitude    = coords.latitude,
+        longitude   = coords.longitude,
+        speed       = coords.speed;
+
+    console.log("A location has arrived:", timestamp, latitude, longitude, speed);
+
+    // The plugin runs your callback in a background-thread:  
+    // you MUST signal to the native plugin when your callback is finished so it can halt the thread.
+    // IF YOU DON'T, iOS WILL KILL YOUR APP
+    bgGeo.finish(taskId);
+}, failureFn, {
+    distanceFilter: 50,
+    desiredAccuracy: 0,
+    stationaryRadius: 25
+});
+```
+
+####`setConfig(successFn, failureFn, config)`
 Reconfigure plugin's configuration (@see followign ##Config## section for accepted ```config``` params.  **NOTE** The plugin will continue to send recorded Geolocation to the ```locationCallback``` you provided to ```configure``` method -- use this method only to change configuration params (eg: ```distanceFilter```, ```stationaryRadius```, etc).
 
 ```
@@ -205,7 +233,7 @@ bgGeo.setConfig(function(){}, function(){}, {
 });
 ```
 
-#####`start(successFn, failureFn)`
+####`start(successFn, failureFn)`
 
 Enable background geolocation tracking.
 
@@ -213,7 +241,7 @@ Enable background geolocation tracking.
 bgGeo.start()
 ```
 
-#####`stop(successFn, failureFn)`
+####`stop(successFn, failureFn)`
 
 Disable background geolocation tracking.
 
@@ -221,7 +249,7 @@ Disable background geolocation tracking.
 bgGeo.stop();
 ```
 
-#####`changePace(enabled, successFn, failureFn)`
+####`changePace(enabled, successFn, failureFn)`
 Initiate or cancel immediate background tracking.  When set to ```true```, the plugin will begin aggressively tracking the devices Geolocation, bypassing stationary monitoring.  If you were making a "Jogging" application, this would be your [Start Workout] button to immediately begin GPS tracking.  Send ```false``` to disable aggressive GPS monitoring and return to stationary-monitoring mode.
 
 ```
@@ -229,16 +257,62 @@ bgGeo.changePace(true);  // <-- Aggressive GPS monitoring immediately engaged.
 bgGeo.changePace(false); // <-- Disable aggressive GPS monitoring.  Engages stationary-mode.
 ```
 
-#####`onStationary(callbackFn, failureFn)`
-Your ```callbackFn``` will be executed each time the device has entered stationary-monitoring mode.  The ```callbackFn``` will be provided with a ```Geolocation``` object as the 1st param, with the usual params (```latitude, longitude, accuracy, speed, bearing, altitude```).
+####`onStationary(callbackFn, failureFn)`
+Your ```callbackFn``` will be executed each time the device has entered stationary-monitoring mode.  The ```callbackFn``` will be provided with a ```Location``` object as the 1st param, with the usual params (```latitude, longitude, accuracy, speed, bearing, altitude```), in addition to a ```taskId``` used to signal that your callback is finished.
+
+######@param {Object} location The Location data
+######@param {Integer} taskId The taskId used to send to bgGeo.finish(taskId) in order to signal completion of your callbackFn
 
 ```
-bgGeo.onStationary(function(location) {
+bgGeo.onStationary(function(location, taskId) {
     console.log('- Device is stopped: ', location.latitude, location.longitude);
+
+    // The plugin runs your callback in a background-thread:  
+    // you MUST signal to the native plugin when your callback is finished so it can halt the thread.
+    // IF YOU DON'T, iOS WILL KILL YOUR APP
+    bgGeo.finish(taskId);
 });
 ```
 
-#####`getLocations(callbackFn, failureFn)`
+####`addGeofence(config, callbackFn, failureFn)`
+Adds a geofence to be monitored by the native plugin.  Monitoring of a geofence is halted after a crossing occurs.  The `config` object accepts the following params.
+
+######@config {String} identifier The name of your geofence, eg: "Home", "Office"
+######@config {Float} radius The radius (meters) of the geofence.  In practice, you should make this >= 100 meters.
+######@config {Float} latitude Latitude of the center-point of the circular geofence.
+######@config {Float} longitude Longitude of the center-point of the circular geofence.
+
+```
+bgGeo.addGeofence({
+    identifier: "Home",
+    radius: 150,
+    latitude: 45.51921926,
+    longitude: -73.61678581
+}, function() {
+    console.log("Successfully added geofence");
+}, function(error) {
+    console.warn("Failed to add geofence", error);
+});
+```
+
+####`onGeofence(callbackFn)`
+Adds a geofence event-listener.  Your supplied callback will be called when any monitored geofence crossing occurs.  The `callbackFn` will be provided the following parameters:
+
+######@param {String} identifier The name of the geofence which generated the crossing event, eg: "Home"
+######@param {Integer} taskId The background taskId which you must send back to the native plugin via `bgGeo.finish(taskId)` in order to signal that your callback is complete.
+
+```
+bgGeo.onGeofence(function(identifier, taskId) {
+    console.log('A geofence has been entered: ' + identifier);
+
+    // The plugin runs your callback in a background-thread:  
+    // you MUST signal to the native plugin when your callback is finished so it can halt the thread.
+    // IF YOU DON'T, iOS WILL KILL YOUR APP
+    bgGeo.finish(taskId);
+});
+```
+
+####`getLocations(callbackFn, failureFn)`
 Fetch all the locations currently stored in native plugin's SQLite database.  Your ```callbackFn`` will receive an ```Array``` of locations in the 1st parameter.  Eg:
 
 ```
@@ -247,7 +321,7 @@ Fetch all the locations currently stored in native plugin's SQLite database.  Yo
     });
 ```
 
-#####`sync(callbackFn, failureFn)`
+####`sync(callbackFn, failureFn)`
 
 If the plugin is configured for HTTP with an ```#url``` and ```#autoSync: false```, this method will initiate POSTing the locations currently stored in the native SQLite database to your configured ```#url```.  All records in the database will be DELETED.  If you configured ```batchSync: true```, all the locations will be sent to your server in a single HTTP POST request, otherwise the plugin will create execute an HTTP post for **each** location in the database (REST-style).  Your ```callbackFn``` will be executed and provided with an Array of all the locations from the SQLite database.  If the plugin failed to sync to your server (possibly because of no network connection), the ```failureFn``` will be called with an ```errorMessage```.  If you are **not** using the HTTP features, ```sync``` is the only way to clear the native SQLite datbase.  Eg:
 
@@ -261,7 +335,7 @@ If the plugin is configured for HTTP with an ```#url``` and ```#autoSync: false`
 
 ```
 
-#####`getOdometer(callbackFn, failureFn)`
+####`getOdometer(callbackFn, failureFn)`
 
 The plugin constantly tracks distance travelled.  To fetch the current **odometer** reading:
 
@@ -271,7 +345,7 @@ The plugin constantly tracks distance travelled.  To fetch the current **odomete
     });
 ```
 
-#####`resetOdometer(callbackFn, failureFn)`
+####`resetOdometer(callbackFn, failureFn)`
 
 Reset the **odometer** to zero.  The plugin never automatically resets the odometer so it's up to you to reset it as desired.
 
@@ -279,7 +353,7 @@ Reset the **odometer** to zero.  The plugin never automatically resets the odome
 
 Use the following config-parameters with the #configure method:
 
-#####`@param {Boolean} debug`
+####`@param {Boolean} debug`
 
 When enabled, the plugin will emit sounds for life-cycle events of background-geolocation!  **NOTE iOS**:  In addition, you must manually enable the *Audio and Airplay* background mode in *Background Capabilities* to hear these debugging sounds.
 
@@ -291,18 +365,18 @@ When enabled, the plugin will emit sounds for life-cycle events of background-ge
 
 ![Enable Background Audio](/enable-background-audio.png "Enable Background Audio")
 
-#####`@param {Integer} desiredAccuracy [0, 10, 100, 1000] in meters`
+####`@param {Integer} desiredAccuracy [0, 10, 100, 1000] in meters`
 
 Specify the desired-accuracy of the geolocation system with 1 of 4 values, ```0, 10, 100, 1000``` where ```0``` means HIGHEST POWER, HIGHEST ACCURACY and ```1000``` means LOWEST POWER, LOWEST ACCURACY
 
 - [Android](https://developer.android.com/reference/com/google/android/gms/location/LocationRequest.html#PRIORITY_BALANCED_POWER_ACCURACY)
 - [iOS](https://developer.apple.com/library/ios/documentation/CoreLocation/Reference/CLLocationManager_Class/index.html#//apple_ref/occ/instp/CLLocationManager/desiredAccuracy) 
 
-#####`@param {Integer} stationaryRadius (meters)`
+####`@param {Integer} stationaryRadius (meters)`
 
 When stopped, the minimum distance the device must move beyond the stationary location for aggressive background-tracking to engage.  Note, since the plugin uses iOS significant-changes API, the plugin cannot detect the exact moment the device moves out of the stationary-radius.  In normal conditions, it can take as much as 3 city-blocks to 1/2 km before staionary-region exit is detected.
 
-#####`@param {Integer} distanceFilter`
+####`@param {Integer} distanceFilter`
 
 The minimum distance (measured in meters) a device must move horizontally before an update event is generated.  @see [Apple docs](https://developer.apple.com/library/ios/documentation/CoreLocation/Reference/CLLocationManager_Class/CLLocationManager/CLLocationManager.html#//apple_ref/occ/instp/CLLocationManager/distanceFilter).  However, #distanceFilter is elastically auto-calculated by the plugin:  When speed increases, #distanceFilter increases;  when speed decreases, so does distanceFilter.
 
@@ -336,14 +410,14 @@ Compare now background-geolocation in the scope of a city.  In this image, the l
 
 ![distanceFilter at city scale](/distance-filter-city.png "distanceFilter at city scale")
 
-#####`@param {Boolean} stopOnTerminate`
+####`@param {Boolean} stopOnTerminate`
 Enable this in order to force a stop() when the application terminated (e.g. on iOS, double-tap home button, swipe away the app).  On Android, ```stopOnTerminate: false``` will cause the plugin to operate as a headless background-service (in this case, you should configure an #url in order for the background-service to send the location to your server)
 
-#####`@param {Boolean} stopAfterElapsedMinutes`
+####`@param {Boolean} stopAfterElapsedMinutes`
 
 The plugin can optionally auto-stop monitoring location when some number of minutes elapse after being the #start method was called.
 
-#### In-Plugin SQLite Storage
+### In-Plugin SQLite Storage
 
 The plugin will cache **every** recorded geolocation to its internal SQLite database -- when you sync the locations and your server responds with HTTP ```200, 201 or 204```, the plugin will **DELETE** the stored location from cache.  The plugin has a cache-pruning feature with ```@config {Integer} maxDaysToPersist``` -- If the plugin hasn't successfully synced these these records in the database before  ```maxDaysToPersist``` expires, the plugin will give up and those geolocation records will be pruned from the database.
 
@@ -356,33 +430,35 @@ If you **don't** configure the optional HTTP feature, the only way to delete the
     });
 ```
 
-#### HTTP Features
+### HTTP Features
 
-#####`@param {String} url`
+####`@param {String} url`
 
 Your server url where you wish to HTTP POST location data to.
 
-#####`@param {String} batchSync [false]`
+####`@param {String} batchSync [false]`
 
 Default is ```false```.  If you've enabled HTTP feature by configuring an ```#url```, ```batchSync: true``` will POST all the locations currently stored in native SQLite datbase to your server in a single HTTP POST request.  With ```batchSync: false```, an HTTP POST request will be initiated for **each** location in database.
 
-#####`@param {String} autoSync [true]`
+####`@param {String} autoSync [true]`
 
 Default is ```true```.  If you've enabeld HTTP feature by configuring an ```#url```, the plugin will attempt to HTTP POST each location to your server **as it is recorded**.  If you set ```autoSync: false```, it's up to you to **manually** execute the ```#sync``` method to initate the HTTP POST (**NOTE** The plugin will continue to persist **every** recorded location in the SQLite database until you execute ```#sync```).
 
-#####`@param {Object} params`
+####`@param {Object} params`
 
 Optional HTTP params sent along in HTTP request to above ```#url```.
 
-#####`@param {Object} headers`
+####`@param {Object} headers`
 
 Optional HTTP params sent along in HTTP request to above ```#url```.
 
-#####`@param {Integer} maxDaysToPersist`
+####`@param {Integer} maxDaysToPersist`
 
 Maximum number of days to store a geolocation in plugin's SQLite database when your server fails to respond with ```HTTP 200 OK```.  The plugin will continue attempting to sync with your server until ```maxDaysToPersist``` when it will give up and remove the location from the database.
 
 Both iOS and Android can send the Geolocation to your server simply by configuring an ```#url``` in addition to optional ```#headers``` and ```#params```.  This is the preferred way to send the Geolocation to your server, rather than doing it yourself with Ajax in your javascript.  
+
+#### Sample HTTP Request arriving at your server
 
 ```
 bgGeo.configure(callbackFn, failureFn, {
@@ -447,7 +523,7 @@ No Post Params.
 
 ### Android Config
 
-#####`@param {Integer millis} locationUpdateInterval`
+####`@param {Integer millis} locationUpdateInterval`
 
 Set the desired interval for active location updates, in milliseconds.
 
@@ -457,7 +533,7 @@ This interval is inexact. You may not receive updates at all (if no location sou
 
 Applications with only the coarse location permission may have their interval silently throttled.
 
-#####`@param {Integer millis} fastestLocationUpdateInterval`
+####`@param {Integer millis} fastestLocationUpdateInterval`
 
 Explicitly set the fastest interval for location updates, in milliseconds.
 
@@ -476,19 +552,19 @@ If ```#fastestLocationUpdateInterval``` is set slower than ```#locationUpdateInt
 ========
 An interval of 0 is allowed, but not recommended, since location updates may be extremely fast on future implementations.
 
-#####`@param {Integer millis} activityRecognitionInterval`
+####`@param {Integer millis} activityRecognitionInterval`
 
 the desired time between activity detections. Larger values will result in fewer activity detections while improving battery life. A value of 0 will result in activity detections at the fastest possible rate.
 
-#####`@param {Integer minutes} stopTimeout`
+####`@param {Integer minutes} stopTimeout`
 
 The number of miutes to wait before turning off the GPS after the ActivityRecognition System (ARS) detects the device is ```STILL``` (defaults to 0, no timeout).  If you don't set a value, the plugin is eager to turn off the GPS ASAP.  An example use-case for this configuration is to delay GPS OFF while in a car waiting at a traffic light.
 
-#####`@param {Boolean} forceReload`
+####`@param {Boolean} forceReload`
 
 If the user closes the application while the background-tracking has been started,  location-tracking will continue on if ```stopOnTerminate: false```.  You may choose to force the foreground application to reload (since this is where your Javascript runs) by setting ```foreceReload: true```.  This will guarantee that locations are always sent to your Javascript callback (**WARNING** possibly disruptive to user).
 
-#####`@param {Boolean} startOnBoot`
+####`@param {Boolean} startOnBoot`
 
 Set to ```true``` to start the background-service whenever the device boots.  Unless you configure the plugin to ```forceReload``` (ie: boot your app), you should configure the plugin's HTTP features so it can POST to your server in "headless" mode.
 
@@ -496,19 +572,19 @@ Set to ```true``` to start the background-service whenever the device boots.  Un
 
 ### iOS Config
 
-#####`@param {Boolean} disableElasticity [false]`
+####`@param {Boolean} disableElasticity [false]`
 
 Defaults to ```false```.  Set ```true``` to disable automatic speed-based ```#distanceFilter``` elasticity.  eg:  When device is moving at highway speeds, locations are returned at ~ 1 / km.
 
-#####`@param {String} activityType [AutomotiveNavigation, OtherNavigation, Fitness, Other]`
+####`@param {String} activityType [AutomotiveNavigation, OtherNavigation, Fitness, Other]`
 
 Presumably, this affects ios GPS algorithm.  See [Apple docs](https://developer.apple.com/library/ios/documentation/CoreLocation/Reference/CLLocationManager_Class/CLLocationManager/CLLocationManager.html#//apple_ref/occ/instp/CLLocationManager/activityType) for more information
 
 ### WP8 Config
 
-#####`{Integer [0, 10, 100, 1000]} desiredAccuracy`
+####`{Integer [0, 10, 100, 1000]} desiredAccuracy`
 
-###### Windows Phone
+##### Windows Phone
 The underlying GeoLocator you can choose to use 'DesiredAccuracy' or 'DesiredAccuracyInMeters'. Since this plugins default configuration accepts meters, the default desiredAccuracy is mapped to the Windows Phone DesiredAccuracyInMeters leaving the DesiredAccuracy enum empty. For more info see the [MS docs](http://msdn.microsoft.com/en-us/library/windows/apps/windows.devices.geolocation.geolocator.desiredaccuracyinmeters) for more information.
 
 ## Licence ##

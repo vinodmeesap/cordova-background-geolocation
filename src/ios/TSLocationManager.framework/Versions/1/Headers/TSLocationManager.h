@@ -9,10 +9,10 @@
 - (void) configure:(NSDictionary*)config;
 - (void) start;
 - (void) stop;
-- (void) finish;
 - (NSArray*) sync;
 - (NSArray*) getLocations;
-- (void) stopBackgroundTask;
+- (UIBackgroundTaskIdentifier) createBackgroundTask;
+- (void) stopBackgroundTask:(UIBackgroundTaskIdentifier)taskId;
 - (void) onPaceChange:(BOOL)value;
 - (void) setConfig:(NSDictionary*)command;
 - (NSDictionary*) getStationaryLocation;
