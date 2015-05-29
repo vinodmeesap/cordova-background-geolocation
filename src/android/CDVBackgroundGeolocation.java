@@ -71,7 +71,6 @@ public class CDVBackgroundGeolocation extends CordovaPlugin {
         backgroundServiceIntent = new Intent(this.cordova.getActivity(), BackgroundGeolocationService.class);
 
         // Register for events fired by our IntentService "LocationService"
-        EventBus.getDefault().register(this);
     }
 
     public boolean execute(String action, JSONArray data, CallbackContext callbackContext) throws JSONException {
@@ -110,8 +109,11 @@ public class CDVBackgroundGeolocation extends CordovaPlugin {
             }
         } else if (ACTION_SET_CONFIG.equalsIgnoreCase(action)) {
             result = applyConfig(data);
-            // TODO reconfigure Service
             if (result) {
+                Bundle event = new Bundle();
+                event.putString("name", action);
+                event.putBoolean("request", true);
+                EventBus.getDefault().post(event);
                 callbackContext.success();
             } else {
                 callbackContext.error("- Configuration error!");
@@ -185,10 +187,12 @@ public class CDVBackgroundGeolocation extends CordovaPlugin {
         editor.commit();
         
         if (isEnabled) {
+            EventBus.getDefault().register(this);
             if (!BackgroundGeolocationService.isInstanceCreated()) {
                 activity.startService(backgroundServiceIntent);
             }
         } else {
+            EventBus.getDefault().unregister(this);
             activity.stopService(backgroundServiceIntent);
         }
     }
@@ -215,6 +219,9 @@ public class CDVBackgroundGeolocation extends CordovaPlugin {
             if (config.has("locationUpdateInterval")) {
                 editor.putInt("locationUpdateInterval", config.getInt("locationUpdateInterval"));
             }
+            if (config.has("fastestLocationUpdateInterval")) {
+                editor.putInt("fastestLocationUpdateInterval", config.getInt("fastestLocationUpdateInterval"));
+            }
             if (config.has("activityRecognitionInterval")) {
                 editor.putLong("activityRecognitionInterval", config.getLong("activityRecognitionInterval"));
             }
@@ -231,7 +238,8 @@ public class CDVBackgroundGeolocation extends CordovaPlugin {
                 editor.putInt("stopAfterElapsedMinutes", config.getInt("stopAfterElapsedMinutes"));
             }
             if (config.has("stopOnTerminate")) {
-                editor.putBoolean("stopOnTerminate", config.getBoolean("stopOnTerminate"));
+                stopOnTerminate = config.getBoolean("stopOnTerminate");
+                editor.putBoolean("stopOnTerminate", stopOnTerminate);
             }
             if (config.has("startOnBoot")) {
                 editor.putBoolean("startOnBoot", config.getBoolean("startOnBoot"));
@@ -407,6 +415,8 @@ public class CDVBackgroundGeolocation extends CordovaPlugin {
         Log.i(TAG, "  isEnabled: " + isEnabled);
         
         Activity activity = this.cordova.getActivity();
+
+        EventBus.getDefault().unregister(this);
 
         SharedPreferences settings = activity.getSharedPreferences("TSLocationManager", 0);
         SharedPreferences.Editor editor = settings.edit();
