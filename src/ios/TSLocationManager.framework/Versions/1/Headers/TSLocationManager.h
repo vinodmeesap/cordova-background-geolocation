@@ -22,6 +22,6 @@
 - (BOOL) isEnabled;
 - (NSDictionary*) locationToDictionary:(CLLocation*)location;
 - (void) addGeofence:(NSString*)identifier radius:(CLLocationDistance)radius latitude:(CLLocationDegrees)latitude longitude:(CLLocationDegrees)longitude;
-
+- (void) playSound:(SystemSoundID)soundId;
 @end
 

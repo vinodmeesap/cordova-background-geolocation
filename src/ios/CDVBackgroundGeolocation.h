@@ -27,5 +27,6 @@
 - (void) resetOdometer:(CDVInvokedUrlCommand *)command;
 - (void) addGeofence:(CDVInvokedUrlCommand *)command;
 - (void) onGeofence:(CDVInvokedUrlCommand *)command;
+- (void) playSound:(CDVInvokedUrlCommand *)command;
 @end
 
