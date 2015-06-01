@@ -128,9 +128,13 @@ A fully-featured [SampleApp](https://github.com/christocracy/cordova-background-
 
 ![SampleApp](/resources/sampleapp-ionic-home.png "SampleApp")
 
+This plugin itself hosts a more rudimentary SampleApp in ```example/SampleApp``` folder.  This SampleApp should be used for reference only -- for actual field-testing, please use the **more advanced** [SampleApp](https://github.com/christocracy/cordova-background-geolocation-SampleApp) above.  
+
+This SampleApp contains no plugins so you must first start by adding its required plugins (most importantly, this one).  **NOTE** In order to use the SampleApp, it's important to make a copy of it **outside** of the plugin itself.
+
 ![SampleApp](/android-sample-app.png "SampleApp")
 
-This plugin itself hosts a more rudimentary SampleApp in ```example/SampleApp``` folder.  This SampleApp contains no plugins so you must first start by adding its required plugins (most importantly, this one).  **NOTE** In order to use the SampleApp, it's important to make a copy of it outside of the plugin itself.
+
 
 ```
 $ git clone git@github.com:christocracy/cordova-background-geolocation.git
