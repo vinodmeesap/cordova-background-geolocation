@@ -124,7 +124,7 @@ function onDeviceReady() {
 
 ## Advanced Sample Application for Field-testing
 
-A fully-featured [SampleApp](https://github.com/christocracy/cordova-background-geolocation-SampleApp) is available.  After first cloning that repo, follow the installation instructions in the **README** there.  This SampleApp includes a settings-screen allowing you to quickly experiment with all the different settings available for each platform.
+A fully-featured [SampleApp](https://github.com/christocracy/cordova-background-geolocation-SampleApp) is available in its own public repo.  After first cloning that repo, follow the installation instructions in the **README** there.  This SampleApp includes a settings-screen allowing you to quickly experiment with all the different settings available for each platform.
 
 ![SampleApp](/resources/sampleapp-ionic-home.png "SampleApp")
 
