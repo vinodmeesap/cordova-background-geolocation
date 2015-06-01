@@ -206,6 +206,15 @@ module.exports = {
             'onGeofence',
             []);
     },
+    playSound: function(soundId) {
+        var success = function() {};
+        var failure = function() {};
+        exec(success,
+            failure,
+            'BackgroundGeoLocation',
+            'playSound',
+            [soundId]);  
+    },
     _setTimestamp: function(rs) {
         // Transform timestamp to Date instance.
         if (typeof(rs) === 'object') {

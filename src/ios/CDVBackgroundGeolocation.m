@@ -1,9 +1,9 @@
 ////
-//  CDVBackgroundGeoLocation
+//  CDVBackgroundGeolocation
 //
 //  Created by Chris Scott <chris@transistorsoft.com> on 2013-06-15
 //
-#import "CDVBackgroundGeoLocation.h"
+#import "CDVBackgroundGeolocation.h"
 
 @implementation CDVBackgroundGeolocation {
     TSLocationManager *bgGeo;
@@ -209,6 +209,15 @@
     }
     [self.geofenceListeners addObject:command.callbackId];
 }
+
+- (void) playSound:(CDVInvokedUrlCommand*)command
+{
+    int soundId = [[command.arguments objectAtIndex:0] integerValue];
+    [bgGeo playSound: soundId];
+    CDVPluginResult *result = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK];
+    [self.commandDelegate sendPluginResult:result callbackId:command.callbackId];
+}
+
 /**
  * Called by js to signify the end of a background-geolocation event
  */
