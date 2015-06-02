@@ -23,6 +23,8 @@ The plugin creates the object `window.plugins.backgroundGeoLocation` with the me
   `onStationary(callback, fail)`
   
   `addGeofence(callback, fail)`
+  
+  `removeGeofence(identifier, callback, fail)` 
 
   `onGeofence(config, callback, fail)`
 
@@ -33,6 +35,8 @@ The plugin creates the object `window.plugins.backgroundGeoLocation` with the me
   `getOdometer(callback, fail)`
   
   `resetOdometer(callback, fail)`
+  
+  `playSound(int soundId)`
   
 ## Installing the plugin ##
 
@@ -291,17 +295,36 @@ Adds a geofence to be monitored by the native plugin.  Monitoring of a geofence 
 ######@config {Float} radius The radius (meters) of the geofence.  In practice, you should make this >= 100 meters.
 ######@config {Float} latitude Latitude of the center-point of the circular geofence.
 ######@config {Float} longitude Longitude of the center-point of the circular geofence.
+######@config {Boolean} notifyOnExit Whether to listen to EXIT events
+######@config {Boolean} notifyOnEntry Whether to listen to ENTER events
 
 ```
 bgGeo.addGeofence({
     identifier: "Home",
     radius: 150,
     latitude: 45.51921926,
-    longitude: -73.61678581
+    longitude: -73.61678581,
+    notifyOnEntry: true,
+    notifyOnExit: false
 }, function() {
     console.log("Successfully added geofence");
 }, function(error) {
     console.warn("Failed to add geofence", error);
+});
+```
+
+####`removeGeofence(identifier, callbackFn, failureFn)`
+Removes a geofence having the given `{String} identifier`.
+
+######@config {String} identifier The name of your geofence, eg: "Home", "Office"
+######@config {Function} callbackFn successfully removed geofence.
+######@config {Function} failureFn failed to remove geofence
+
+```
+bgGeo.removeGeofence("Home", function() {
+    console.log("Successfully removed geofence");
+}, function(error) {
+    console.warn("Failed to remove geofence", error);
 });
 ```
 
@@ -333,7 +356,7 @@ Fetch all the locations currently stored in native plugin's SQLite database.  Yo
 
 ####`sync(callbackFn, failureFn)`
 
-If the plugin is configured for HTTP with an ```#url``` and ```#autoSync: false```, this method will initiate POSTing the locations currently stored in the native SQLite database to your configured ```#url```.  All records in the database will be DELETED.  If you configured ```batchSync: true```, all the locations will be sent to your server in a single HTTP POST request, otherwise the plugin will create execute an HTTP post for **each** location in the database (REST-style).  Your ```callbackFn``` will be executed and provided with an Array of all the locations from the SQLite database.  If the plugin failed to sync to your server (possibly because of no network connection), the ```failureFn``` will be called with an ```errorMessage```.  If you are **not** using the HTTP features, ```sync``` is the only way to clear the native SQLite datbase.  Eg:
+If the plugin is configured for HTTP with an ```#url``` and ```#autoSync: false```, this method will initiate POSTing the locations currently stored in the native SQLite database to your configured ```#url```.  All records in the database will be DELETED.  If you configured ```batchSync: true```, all the locations will be sent to your server in a single HTTP POST request, otherwise the plugin will create execute an HTTP post for **each** location in the database (REST-style).  Your ```callbackFn``` will be executed and provided with an Array of all the locations from the SQLite database.  If you configured the plugin for HTTP (by configuring an `#url`, your `callbackFn` will be executed after the HTTP request(s) have completed.  If the plugin failed to sync to your server (possibly because of no network connection), the ```failureFn``` will be called with an ```errorMessage```.  If you are **not** using the HTTP features, ```sync``` is the only way to clear the native SQLite datbase.  Eg:
 
 ```
     bgGeo.sync(function(locations) {
@@ -358,6 +381,19 @@ The plugin constantly tracks distance travelled.  To fetch the current **odomete
 ####`resetOdometer(callbackFn, failureFn)`
 
 Reset the **odometer** to zero.  The plugin never automatically resets the odometer so it's up to you to reset it as desired.
+
+####`playSound(soundId)`
+
+Here's a fun one.  The plugin can play a number of OS system sounds for each platform.  For [IOS](http://iphonedevwiki.net/index.php/AudioServices) and [Android](http://developer.android.com/reference/android/media/ToneGenerator.html).  I offer this API as-is, it's up to you to figure out how this works.
+
+```
+    // A soundId iOS recognizes
+    bgGeo.playSound(1303);
+    
+    // An Android soundId
+    bgGeo.playSound(90);
+```
+
 
 ## Config
 
