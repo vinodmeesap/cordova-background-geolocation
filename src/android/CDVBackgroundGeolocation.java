@@ -40,7 +40,9 @@ public class CDVBackgroundGeolocation extends CordovaPlugin {
     public static final String ACTION_GET_ODOMETER  = "getOdometer";
     public static final String ACTION_RESET_ODOMETER  = "resetOdometer";
     public static final String ACTION_ADD_GEOFENCE  = "addGeofence";
+    public static final String ACTION_REMOVE_GEOFENCE  = "removeGeofence";
     public static final String ACTION_ON_GEOFENCE   = "onGeofence";
+    public static final String ACTION_PLAY_SOUND   = "playSound";
     
     private Boolean isEnabled           = false;
     private Boolean stopOnTerminate     = false;
@@ -169,9 +171,32 @@ public class CDVBackgroundGeolocation extends CordovaPlugin {
                 callbackContext.error("Failed to add geofence");
                 result = false;
             }
+        } else if (ACTION_REMOVE_GEOFENCE.equalsIgnoreCase(action)) {
+            result = true;
+            try {
+                Bundle event = new Bundle();
+                event.putString("name", action);
+                event.putBoolean("request", true);
+                event.putString("identifier", data.getString(0));
+
+                EventBus.getDefault().post(event);
+                callbackContext.success();
+            } catch (JSONException e) {
+                Log.w(TAG, e);
+                callbackContext.error("Failed to add geofence");
+                result = false;
+            }
         } else if (ACTION_ON_GEOFENCE.equalsIgnoreCase(action)) {
             result = true;
             geofenceCallbacks.add(callbackContext);
+        } else if (ACTION_PLAY_SOUND.equalsIgnoreCase(action)) {
+            result = true;
+            Bundle event = new Bundle();
+            event.putString("name", action);
+            event.putBoolean("request", true);
+            event.putInt("soundId", data.getInt(0));
+            EventBus.getDefault().post(event);
+            callbackContext.success();
         }
         return result;
     }

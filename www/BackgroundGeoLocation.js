@@ -190,6 +190,20 @@ module.exports = {
             'addGeofence',
             [config]);
     },
+    /**
+    * remove a geofence
+    * @param {String} identifier
+    */
+    removeGeofence: function(identifier, success, failure) {
+        if (!identifier) {
+            throw "#removeGeofence requires an 'identifier'";
+        }
+        exec(success || function() {},
+            failure || function() {},
+            'BackgroundGeoLocation',
+            'removeGeofence',
+            [identifier]);
+    },
     onGeofence: function(success, failure) {
         if (!typeof(success) === 'function') {
             throw "#onGeofence requires a success callback";
@@ -206,6 +220,11 @@ module.exports = {
             'onGeofence',
             []);
     },
+    /**
+    * Play a system sound.  This is totally experimental.
+    * iOS http://iphonedevwiki.net/index.php/AudioServices
+    * Android:
+    */
     playSound: function(soundId) {
         var success = function() {};
         var failure = function() {};
