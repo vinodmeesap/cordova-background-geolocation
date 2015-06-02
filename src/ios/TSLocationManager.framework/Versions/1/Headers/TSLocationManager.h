@@ -21,7 +21,8 @@
 - (void) onAppTerminate;
 - (BOOL) isEnabled;
 - (NSDictionary*) locationToDictionary:(CLLocation*)location;
-- (void) addGeofence:(NSString*)identifier radius:(CLLocationDistance)radius latitude:(CLLocationDegrees)latitude longitude:(CLLocationDegrees)longitude;
+- (void) addGeofence:(NSString*)identifier radius:(CLLocationDistance)radius latitude:(CLLocationDegrees)latitude longitude:(CLLocationDegrees)longitude notifyOnEntry:(BOOL)notifyOnEntry notifyOnExit:(BOOL)notifyOnExit;
+- (BOOL) removeGeofence:(NSString*)identifier;
 - (void) playSound:(SystemSoundID)soundId;
 @end
 
