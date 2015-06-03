@@ -231,6 +231,22 @@
     [self.commandDelegate sendPluginResult:result callbackId:command.callbackId];
 }
 
+- (void) getGeofences:(CDVInvokedUrlCommand*)command
+{
+    NSMutableArray *rs = [[NSMutableArray alloc] init];
+    for (CLRegion *geofence in [bgGeo getGeofences]) {
+        [rs addObject:@{
+            @"identifier":geofence.identifier,
+            @"radius": @(geofence.radius),
+            @"latitude": @(geofence.center.latitude),
+            @"longitude": @(geofence.center.longitude)
+        }];
+    }
+    CDVPluginResult *result = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsArray:rs];
+    [self.commandDelegate sendPluginResult:result callbackId:command.callbackId];
+}
+
+
 - (void) onGeofence:(CDVInvokedUrlCommand*)command
 {
     if (self.geofenceListeners == nil) {
