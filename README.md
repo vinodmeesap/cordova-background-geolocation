@@ -649,7 +649,7 @@ Presumably, this affects ios GPS algorithm.  See [Apple docs](https://developer.
 ##### Windows Phone
 The underlying GeoLocator you can choose to use 'DesiredAccuracy' or 'DesiredAccuracyInMeters'. Since this plugins default configuration accepts meters, the default desiredAccuracy is mapped to the Windows Phone DesiredAccuracyInMeters leaving the DesiredAccuracy enum empty. For more info see the [MS docs](http://msdn.microsoft.com/en-us/library/windows/apps/windows.devices.geolocation.geolocator.desiredaccuracyinmeters) for more information.
 
-## Geofence Features
+# Geofence Features
 
 The plugin now includes native geofencing features.  You may add, remove and query the list of monitored geofences from the native plugin.  The native plugin will persist monitored geofences and re-initiate them when the app boots or the device is restarted.
 
