@@ -244,6 +244,7 @@ module.exports = {
             'playSound',
             [soundId]);  
     },
+
     _setTimestamp: function(rs) {
         // Transform timestamp to Date instance.
         if (typeof(rs) === 'object') {

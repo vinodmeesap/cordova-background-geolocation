@@ -129,19 +129,21 @@
     if (![self.geofenceListeners count]) {
         return;
     }
+    NSLog(@"- onEnterGeofence: %@", notification.userInfo);
+    
     CLCircularRegion *region = [notification.userInfo objectForKey:@"geofence"];
 
-    for (NSString *callbackId in self.stationaryRegionListeners) {
+    for (NSString *callbackId in self.geofenceListeners) {
         NSDictionary *params = @{
             @"identifier": region.identifier,
+            @"action": [notification.userInfo objectForKey:@"action"],
             @"taskId": @([bgGeo createBackgroundTask])
         };
         CDVPluginResult *result = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsDictionary:params];
         [result setKeepCallbackAsBool:YES];
         [self.commandDelegate runInBackground:^{
             [self.commandDelegate sendPluginResult:result callbackId:callbackId];
-        }];
-        
+        }];       
     }
 }
 
