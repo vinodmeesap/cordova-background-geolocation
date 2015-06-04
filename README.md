@@ -655,21 +655,21 @@ The plugin now includes native geofencing features.  You may add, remove and que
 
 A monitored geofence will persit until you explicity remove it via `bgGeo.removeGeofence("Home")`.
 
-### Geofence Model
+#### Geofence Model
 
-####`@param {String} identifier`
+#####`@param {String} identifier`
 
 A unique `String` to identify your Geofence, eg: "Home", "Office".
 
-####`@param {Integer} radius`
+#####`@param {Integer} radius`
 
 The radius of the circular geofence.  A radius of >100 meters works best.
 
-####`@param {Boolean} notifyOnEntry`
+#####`@param {Boolean} notifyOnEntry`
 
 Transitioning **into** the geofence will generate an event.
 
-####`@param {Boolean} notifyOnExit`
+#####`@param {Boolean} notifyOnExit`
 
 Transitioning **out of** the geofence will generate an event.
 
