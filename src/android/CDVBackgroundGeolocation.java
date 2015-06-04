@@ -41,6 +41,7 @@ public class CDVBackgroundGeolocation extends CordovaPlugin {
     public static final String ACTION_RESET_ODOMETER  = "resetOdometer";
     public static final String ACTION_ADD_GEOFENCE  = "addGeofence";
     public static final String ACTION_REMOVE_GEOFENCE  = "removeGeofence";
+    public static final String ACTION_GET_GEOFENCES  = "getGeofences";
     public static final String ACTION_ON_GEOFENCE   = "onGeofence";
     public static final String ACTION_PLAY_SOUND   = "playSound";
     
@@ -60,6 +61,8 @@ public class CDVBackgroundGeolocation extends CordovaPlugin {
     private CallbackContext getOdometerCallback;
     private CallbackContext resetOdometerCallback;
     private CallbackContext paceChangeCallback;
+    private CallbackContext getGeofencesCallback;
+
     private List<CallbackContext> geofenceCallbacks = new ArrayList<CallbackContext>();
 
     public static boolean isActive() {
@@ -163,7 +166,13 @@ public class CDVBackgroundGeolocation extends CordovaPlugin {
                 event.putDouble("latitude", config.getDouble("latitude"));
                 event.putDouble("longitude", config.getDouble("longitude"));
                 event.putString("identifier", config.getString("identifier"));
-
+                if (config.has("notifyOnEnter")) {
+                    event.putBoolean("notifyOnEnter", config.getBoolean("notifyOnEnter"));
+                }
+                if (config.has("notifyOnExit")) {
+                    event.putBoolean("notifyOnExit", config.getBoolean("notifyOnExit"));
+                }
+                
                 EventBus.getDefault().post(event);
                 callbackContext.success();
             } catch (JSONException e) {
@@ -189,6 +198,14 @@ public class CDVBackgroundGeolocation extends CordovaPlugin {
         } else if (ACTION_ON_GEOFENCE.equalsIgnoreCase(action)) {
             result = true;
             geofenceCallbacks.add(callbackContext);
+        } else if (ACTION_GET_GEOFENCES.equalsIgnoreCase(action)) {
+            result = true;
+            getGeofencesCallback = callbackContext;
+
+            Bundle event = new Bundle();
+            event.putString("name", action);
+            event.putBoolean("request", true);
+            EventBus.getDefault().post(event);
         } else if (ACTION_PLAY_SOUND.equalsIgnoreCase(action)) {
             result = true;
             Bundle event = new Bundle();
@@ -334,6 +351,8 @@ public class CDVBackgroundGeolocation extends CordovaPlugin {
             } catch (JSONException e) {
                 // TODO Auto-generated catch block
                 e.printStackTrace();
+                PluginResult result = new PluginResult(PluginResult.Status.JSON_EXCEPTION, e.getMessage());
+                runInBackground(getLocationsCallback, result);
             }
         } else if (ACTION_SYNC.equalsIgnoreCase(name)) {
             Boolean success = event.getBoolean("success");
@@ -359,6 +378,17 @@ public class CDVBackgroundGeolocation extends CordovaPlugin {
         } else if (ACTION_ON_PACE_CHANGE.equalsIgnoreCase(name)) {
             PluginResult result = new PluginResult(PluginResult.Status.OK);
             paceChangeCallback.sendPluginResult(result);
+        } else if (ACTION_GET_GEOFENCES.equalsIgnoreCase(name)) {
+            try {
+                JSONArray json      = new JSONArray(event.getString("data"));
+                PluginResult result = new PluginResult(PluginResult.Status.OK, json);
+                runInBackground(getGeofencesCallback, result);
+            } catch (JSONException e) {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+                PluginResult result = new PluginResult(PluginResult.Status.JSON_EXCEPTION, e.getMessage());
+                runInBackground(getGeofencesCallback, result);
+            }
         }
     }
 
@@ -400,9 +430,18 @@ public class CDVBackgroundGeolocation extends CordovaPlugin {
         if (!geofenceCallbacks.isEmpty()) {
             for (Geofence geofence : geofenceEvent.getTriggeringGeofences()) {
                 JSONObject params = new JSONObject();
+                String action = "";
+                int transitionType = geofenceEvent.getGeofenceTransition();
+                if (transitionType == Geofence.GEOFENCE_TRANSITION_ENTER) {
+                    action = "ENTER";
+                } else if (transitionType == Geofence.GEOFENCE_TRANSITION_EXIT) {
+                    action = "EXIT";
+                } else {
+                    action = "DWELL";
+                }
                 try {
                     params.put("identifier", geofence.getRequestId());
-                    params.put("action", "TODO");
+                    params.put("action", action);
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
