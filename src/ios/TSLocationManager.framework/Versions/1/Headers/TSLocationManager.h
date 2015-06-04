@@ -5,7 +5,7 @@
 @interface TSLocationManager : NSObject <CLLocationManagerDelegate>
 
 @property (nonatomic) CLLocationDistance odometer;
-
+@property (nonatomic, strong) CLLocationManager* locationManager;
 - (void) configure:(NSDictionary*)config;
 - (void) start;
 - (void) stop;
@@ -23,6 +23,7 @@
 - (NSDictionary*) locationToDictionary:(CLLocation*)location;
 - (void) addGeofence:(NSString*)identifier radius:(CLLocationDistance)radius latitude:(CLLocationDegrees)latitude longitude:(CLLocationDegrees)longitude notifyOnEntry:(BOOL)notifyOnEntry notifyOnExit:(BOOL)notifyOnExit;
 - (BOOL) removeGeofence:(NSString*)identifier;
+- (NSArray*) getGeofences;
 - (void) playSound:(SystemSoundID)soundId;
 @end
 

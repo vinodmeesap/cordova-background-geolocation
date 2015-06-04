@@ -210,14 +210,24 @@ module.exports = {
         }
         var me = this;
         var mySuccess = function(params) {
-            var identifier  = params.identifier,
-                taskId      = params.taskId || 'task-id-undefined';
-            success.call(me, identifier, taskId);
-        }
+            var taskId = params.taskId || 'task-id-undefined';
+            delete(params.taskId);
+            success.call(me, params, taskId);
+        };
         exec(mySuccess,
             failure || function() {},
             'BackgroundGeoLocation',
             'onGeofence',
+            []);
+    },
+    /**
+    * Fetch a list of all monitored geofences
+    */
+    getGeofences: function(success, failure) {
+        exec(success || function() {},
+            failure || function() {},
+            'BackgroundGeoLocation',
+            'getGeofences',
             []);
     },
     /**
@@ -234,6 +244,7 @@ module.exports = {
             'playSound',
             [soundId]);  
     },
+
     _setTimestamp: function(rs) {
         // Transform timestamp to Date instance.
         if (typeof(rs) === 'object') {
