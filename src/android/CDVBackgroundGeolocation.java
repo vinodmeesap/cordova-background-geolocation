@@ -31,6 +31,7 @@ public class CDVBackgroundGeolocation extends CordovaPlugin {
     
     public static final String ACTION_START         = "start";
     public static final String ACTION_STOP          = "stop";
+    public static final String ACTION_FINISH        = "finish";
     public static final String ACTION_ON_PACE_CHANGE = "onPaceChange";
     public static final String ACTION_CONFIGURE     = "configure";
     public static final String ACTION_SET_CONFIG    = "setConfig";
@@ -88,8 +89,12 @@ public class CDVBackgroundGeolocation extends CordovaPlugin {
             this.setEnabled(true);
             callbackContext.success();
         } else if (ACTION_STOP.equalsIgnoreCase(action)) {
+            // No implementation to stop background-tasks with Android.  Just say "success"
             result      = true;
             this.setEnabled(false);
+            callbackContext.success();
+        } else if (ACTION_FINISH.equalsIgnoreCase(action)) {
+            result = true;
             callbackContext.success();
         } else if (ACTION_CONFIGURE.equalsIgnoreCase(action)) {
             result = applyConfig(data);
@@ -166,8 +171,8 @@ public class CDVBackgroundGeolocation extends CordovaPlugin {
                 event.putDouble("latitude", config.getDouble("latitude"));
                 event.putDouble("longitude", config.getDouble("longitude"));
                 event.putString("identifier", config.getString("identifier"));
-                if (config.has("notifyOnEnter")) {
-                    event.putBoolean("notifyOnEnter", config.getBoolean("notifyOnEnter"));
+                if (config.has("notifyOnEntry")) {
+                    event.putBoolean("notifyOnEntry", config.getBoolean("notifyOnEntry"));
                 }
                 if (config.has("notifyOnExit")) {
                     event.putBoolean("notifyOnExit", config.getBoolean("notifyOnExit"));
