@@ -26,6 +26,8 @@ The plugin creates the object `window.plugins.backgroundGeoLocation` with the me
   
   `removeGeofence(identifier, callback, fail)` 
 
+  `getGeofences(callback, fail)` 
+  
   `onGeofence(config, callback, fail)`
 
   `getLocations(callback, fail)`
@@ -328,14 +330,28 @@ bgGeo.removeGeofence("Home", function() {
 });
 ```
 
+####`getGeofences(callbackFn, failureFn)`
+
+Fetch the list of monitored geofences.  Your `callbackFn` will be provided with an `Array` of geofences.  If there are no geofences being monitored, you'll receive an empty Array `[]`.
+
+```
+bgGeo.getGeofences(function(geofences) {
+    for (var n=0,len=geofences.length;n<len;n++) {
+        console.log("Geofence: ", geofence.identifier, geofence.radius, geofence.latitude, geofence.longitude);
+    }
+}, function(error) {
+    console.warn("Failed to fetch geofences from server");
+});
+```
+
 ####`onGeofence(callbackFn)`
 Adds a geofence event-listener.  Your supplied callback will be called when any monitored geofence crossing occurs.  The `callbackFn` will be provided the following parameters:
 
-######@param {String} identifier The name of the geofence which generated the crossing event, eg: "Home"
+######@param {Object} geofence.  This object contains 2 keys: `@param {String} identifier` and `@param {String} action [ENTER|EXIT]`.
 ######@param {Integer} taskId The background taskId which you must send back to the native plugin via `bgGeo.finish(taskId)` in order to signal that your callback is complete.
 
 ```
-bgGeo.onGeofence(function(identifier, taskId) {
+bgGeo.onGeofence(function(params, taskId) {
     console.log('A geofence has been entered: ' + identifier);
 
     // The plugin runs your callback in a background-thread:  
@@ -633,6 +649,81 @@ Presumably, this affects ios GPS algorithm.  See [Apple docs](https://developer.
 ##### Windows Phone
 The underlying GeoLocator you can choose to use 'DesiredAccuracy' or 'DesiredAccuracyInMeters'. Since this plugins default configuration accepts meters, the default desiredAccuracy is mapped to the Windows Phone DesiredAccuracyInMeters leaving the DesiredAccuracy enum empty. For more info see the [MS docs](http://msdn.microsoft.com/en-us/library/windows/apps/windows.devices.geolocation.geolocator.desiredaccuracyinmeters) for more information.
 
+# Geofence Features
+
+The plugin now includes native geofencing features.  You may add, remove and query the list of monitored geofences from the native plugin.  The native plugin will persist monitored geofences and re-initiate them when the app boots or the device is restarted.
+
+A monitored geofence will persit until you explicity remove it via `bgGeo.removeGeofence("Home")`.
+
+#### Geofence Model
+
+#####`@param {String} identifier`
+
+A unique `String` to identify your Geofence, eg: "Home", "Office".
+
+#####`@param {Integer} radius`
+
+The radius of the circular geofence.  A radius of >100 meters works best.
+
+#####`@param {Boolean} notifyOnEntry`
+
+Transitioning **into** the geofence will generate an event.
+
+#####`@param {Boolean} notifyOnExit`
+
+Transitioning **out of** the geofence will generate an event.
+
+#### Listening to Geofence Events
+
+Listen to geofence transition events using the method `#onGeofence`.  You may set up any number of `#onGeofence` event-listeners throughout your code -- they will all be executed.
+
+```
+    bgGeo.addGeofence({
+        identifier: "Home",
+        radius: 200,
+        latitude: 47.2342323,
+        longitude: -57.342342,
+        notifyOnEntry: true
+    });
+    
+    bgGeo.onGeofence(function(geofence, taskId) {
+        try {
+            console.log("- A Geofence transition occurred");
+            console.log("  identifier: ", geofence.identifier);
+            console.log("  action: ", geofence.action);
+        } catch(e) {
+            console.error("An error occurred in my code!", e);
+        }
+        // Be sure to call #finish!!
+        bgGeo.finish(taskId);
+    });
+```
+
+#### Removing Geofences
+
+The native plugin will continue to monitor geofences and fire transition-events until you explicity tell the plugin to remove a geofence via `#removeGeofence(identifier)`.
+
+```
+    bgGeo.removeGeofence("Home");
+
+```
+
+#### Querying Geofences
+
+The native plugin persists monitored geofences between application boots and device restarts.  When your app boots, you can fetch the currently monitored geofences from the native plugin and, for example, re-draw markers on your map.
+
+```
+    bgGeo.getGeofences(function(geofences) {
+        for (var n=0,len=geofences.length;n<len;n++) {
+            var geofence = geofences[n];
+            var marker = new google.maps.Circle({
+                radius: parseInt(geofence.radius, 10),
+                center: new google.maps.LatLng(geofence.latitude, geofence.longitude),
+                map: myMapInstance
+            });
+        }
+    });
+    
 ## Licence ##
 ```
 cordova-background-geolocation
