@@ -397,12 +397,12 @@ public class CDVBackgroundGeolocation extends CordovaPlugin {
     public void onEventMainThread(GeofencingEvent geofenceEvent) {
         Log.i(TAG, "- Rx GeofencingEvent: " + geofenceEvent);
 
-
         if (!geofenceCallbacks.isEmpty()) {
             for (Geofence geofence : geofenceEvent.getTriggeringGeofences()) {
                 JSONObject params = new JSONObject();
                 try {
                     params.put("identifier", geofence.getRequestId());
+                    params.put("action", "TODO");
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
