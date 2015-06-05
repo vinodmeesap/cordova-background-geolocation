@@ -15,7 +15,8 @@ import com.google.android.gms.location.DetectedActivity;
 import com.transistorsoft.locationmanager.BackgroundGeolocationService;
 import com.google.android.gms.location.Geofence;
 import com.google.android.gms.location.GeofencingEvent;
-//import com.transistorsoft.locationmanager.BackgroundGeolocationService.StationaryLocation;
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 
 import de.greenrobot.event.EventBus;
 import android.app.Activity;
@@ -23,6 +24,8 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.location.Location;
 import android.util.Log;
+import android.media.AudioManager;
+import android.media.ToneGenerator;
 
 public class CDVBackgroundGeolocation extends CordovaPlugin {
     private static final String TAG = "BackgroundGeolocation";
@@ -32,6 +35,7 @@ public class CDVBackgroundGeolocation extends CordovaPlugin {
     public static final String ACTION_START         = "start";
     public static final String ACTION_STOP          = "stop";
     public static final String ACTION_FINISH        = "finish";
+    public static final String ACTION_ERROR         = "error";
     public static final String ACTION_ON_PACE_CHANGE = "onPaceChange";
     public static final String ACTION_CONFIGURE     = "configure";
     public static final String ACTION_SET_CONFIG    = "setConfig";
@@ -64,6 +68,8 @@ public class CDVBackgroundGeolocation extends CordovaPlugin {
     private CallbackContext paceChangeCallback;
     private CallbackContext getGeofencesCallback;
 
+    private ToneGenerator toneGenerator;
+
     private List<CallbackContext> geofenceCallbacks = new ArrayList<CallbackContext>();
 
     public static boolean isActive() {
@@ -76,6 +82,7 @@ public class CDVBackgroundGeolocation extends CordovaPlugin {
         
         backgroundServiceIntent = new Intent(this.cordova.getActivity(), BackgroundGeolocationService.class);
 
+        toneGenerator = new ToneGenerator(AudioManager.STREAM_NOTIFICATION, 100);
         // Register for events fired by our IntentService "LocationService"
     }
 
@@ -95,6 +102,10 @@ public class CDVBackgroundGeolocation extends CordovaPlugin {
             callbackContext.success();
         } else if (ACTION_FINISH.equalsIgnoreCase(action)) {
             result = true;
+            callbackContext.success();
+        } else if (ACTION_ERROR.equalsIgnoreCase(action)) {
+            result = true;
+            this.onError(data.getString(1));
             callbackContext.success();
         } else if (ACTION_CONFIGURE.equalsIgnoreCase(action)) {
             result = applyConfig(data);
@@ -213,11 +224,7 @@ public class CDVBackgroundGeolocation extends CordovaPlugin {
             EventBus.getDefault().post(event);
         } else if (ACTION_PLAY_SOUND.equalsIgnoreCase(action)) {
             result = true;
-            Bundle event = new Bundle();
-            event.putString("name", action);
-            event.putBoolean("request", true);
-            event.putInt("soundId", data.getInt(0));
-            EventBus.getDefault().post(event);
+            playSound(data.getInt(0));
             callbackContext.success();
         }
         return result;
@@ -350,8 +357,10 @@ public class CDVBackgroundGeolocation extends CordovaPlugin {
 
         if (ACTION_GET_LOCATIONS.equalsIgnoreCase(name)) {
             try {
-                JSONArray json      = new JSONArray(event.getString("data"));
-                PluginResult result = new PluginResult(PluginResult.Status.OK, json);
+                JSONObject params = new JSONObject();
+                params.put("locations", new JSONArray(event.getString("data")));
+                params.put("taskId", "android-bg-task-id");
+                PluginResult result = new PluginResult(PluginResult.Status.OK, params);
                 runInBackground(getLocationsCallback, result);
             } catch (JSONException e) {
                 // TODO Auto-generated catch block
@@ -363,8 +372,10 @@ public class CDVBackgroundGeolocation extends CordovaPlugin {
             Boolean success = event.getBoolean("success");
             if (success) {
                 try {
-                    JSONArray json      = new JSONArray(event.getString("data"));
-                    PluginResult result = new PluginResult(PluginResult.Status.OK, json);
+                    JSONObject params       = new JSONObject();
+                    params.put("locations", new JSONArray(event.getString("data")));
+                    params.put("taskId", "android-bg-task-id");
+                    PluginResult result = new PluginResult(PluginResult.Status.OK, params);
                     runInBackground(syncCallback, result);
                 } catch (JSONException e) {
                     // TODO Auto-generated catch block
@@ -459,6 +470,12 @@ public class CDVBackgroundGeolocation extends CordovaPlugin {
         }
     }
 
+    private void playSound(int soundId) {
+        int duration = 1000;
+        toneGenerator = new ToneGenerator(AudioManager.STREAM_NOTIFICATION, 100);
+        toneGenerator.startTone(soundId, duration);
+    }
+
     /**
      * Run a javascript callback in Background
      * @param cb
@@ -474,6 +491,27 @@ public class CDVBackgroundGeolocation extends CordovaPlugin {
         }
     }
 
+    private void onError(String error) {        
+        String message = "BG Geolocation caught a Javascript exception while running in background-thread:\n".concat(error);
+        Log.e(TAG, message);
+        
+        SharedPreferences settings = this.cordova.getActivity().getSharedPreferences("TSLocationManager", 0);
+
+        // Show alert popup with js error
+        if (settings.contains("debug") && settings.getBoolean("debug", false)) {
+            playSound(68);
+            AlertDialog.Builder builder = new AlertDialog.Builder(this.cordova.getActivity());
+            builder.setMessage(message)
+            .setCancelable(false)
+            .setNegativeButton("OK", new DialogInterface.OnClickListener() {
+                public void onClick(DialogInterface dialog, int id) {
+                    //do things
+                }
+            });
+            AlertDialog alert = builder.create();
+            alert.show();
+        }        
+    }
     /**
      * Override method in CordovaPlugin.
      * Checks to see if it should turn off

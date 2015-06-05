@@ -10,7 +10,7 @@
     NSDictionary *config;
 }
 
-@synthesize syncCallbackId, locationCallbackId, geofenceListeners, stationaryRegionListeners;
+@synthesize syncCallbackId, syncTaskId, locationCallbackId, geofenceListeners, stationaryRegionListeners;
 
 - (void)pluginInitialize
 {
@@ -149,10 +149,16 @@
 
 - (void) onSyncComplete:(NSNotification*)notification
 {
-    NSArray *locations = [notification.userInfo objectForKey:@"locations"];
-    CDVPluginResult *result = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsArray:locations];
+    NSDictionary *params = @{
+        @"locations": [notification.userInfo objectForKey:@"locations"],
+        @"taskId": @(syncTaskId)
+    };
+    CDVPluginResult *result = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsDictionary:params];
     [self.commandDelegate sendPluginResult:result callbackId:syncCallbackId];
-    syncCallbackId = nil;
+    
+    // Ready for another sync task.
+    syncCallbackId  = nil;
+    syncTaskId      = UIBackgroundTaskInvalid;
 }
 
 /**
@@ -170,10 +176,12 @@
  * Fetches current stationaryLocation
  */
 - (void) getLocations:(CDVInvokedUrlCommand *)command
-{
-    NSArray* locations = [bgGeo getLocations];
-    
-    CDVPluginResult *result = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsArray:locations];
+{   
+    NSDictionary *params = @{
+        @"locations": [bgGeo getLocations],
+        @"taskId": @([bgGeo createBackgroundTask])
+    };
+    CDVPluginResult *result = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsDictionary:params];
     [self.commandDelegate sendPluginResult:result callbackId:command.callbackId];
 }
 
@@ -187,10 +195,15 @@
         [self.commandDelegate sendPluginResult:result callbackId:command.callbackId];
         return;
     }
-    syncCallbackId = command.callbackId;
+
+    // Important to set these before we execute #sync since this fires a *very fast* async NSNotification event!
+    syncCallbackId  = command.callbackId;
+    syncTaskId      = [bgGeo createBackgroundTask];
+
     NSArray* locations = [bgGeo sync];
     if (locations == nil) {
-        syncCallbackId = nil;
+        syncCallbackId  = nil;
+        syncTaskId      = UIBackgroundTaskInvalid;
         CDVPluginResult* result = [CDVPluginResult resultWithStatus:CDVCommandStatus_ERROR messageAsString:@"Sync failed.  Is there a network connection?"];
         [self.commandDelegate sendPluginResult:result callbackId:command.callbackId];
     }
@@ -272,6 +285,17 @@
 {
     UIBackgroundTaskIdentifier taskId = [[command.arguments objectAtIndex: 0] integerValue];
     [bgGeo stopBackgroundTask:taskId];
+}
+
+/**
+ * Called by js to signal a caught exception from application code.
+ */
+-(void) error:(CDVInvokedUrlCommand*)command
+{
+    UIBackgroundTaskIdentifier taskId = [[command.arguments objectAtIndex: 0] integerValue];
+    NSString *error = [command.arguments objectAtIndex:1];
+    [bgGeo error:taskId message:error];
+    
 }
 /**
  * If you don't stopMonitoring when application terminates, the app will be awoken still when a

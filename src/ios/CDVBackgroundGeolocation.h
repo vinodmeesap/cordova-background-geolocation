@@ -10,6 +10,7 @@
 @interface CDVBackgroundGeolocation : CDVPlugin
 
 @property (nonatomic, strong) NSString* syncCallbackId;
+@property (nonatomic) UIBackgroundTaskIdentifier syncTaskId;
 @property (nonatomic, strong) NSString* locationCallbackId;
 @property (nonatomic, strong) NSMutableArray* geofenceListeners;
 @property (nonatomic, strong) NSMutableArray* stationaryRegionListeners;
@@ -18,6 +19,7 @@
 - (void) start:(CDVInvokedUrlCommand*)command;
 - (void) stop:(CDVInvokedUrlCommand*)command;
 - (void) finish:(CDVInvokedUrlCommand*)command;
+- (void) error:(CDVInvokedUrlCommand*)command;
 - (void) onPaceChange:(CDVInvokedUrlCommand*)command;
 - (void) setConfig:(CDVInvokedUrlCommand*)command;
 - (void) addStationaryRegionListener:(CDVInvokedUrlCommand*)command;
