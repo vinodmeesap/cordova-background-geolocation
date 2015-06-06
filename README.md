@@ -22,13 +22,13 @@ The plugin creates the object `window.plugins.backgroundGeoLocation` with the me
   
   `onStationary(callback, fail)`
   
-  `addGeofence(callback, fail)`
+  `addGeofence(config, callback, fail)`
   
   `removeGeofence(identifier, callback, fail)` 
 
   `getGeofences(callback, fail)` 
   
-  `onGeofence(config, callback, fail)`
+  `onGeofence(callback, fail)`
 
   `getLocations(callback, fail)`
   
