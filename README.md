@@ -684,7 +684,7 @@ The underlying GeoLocator you can choose to use 'DesiredAccuracy' or 'DesiredAcc
 
 # Geofence Features
 
-[Geofence Features](https://www.dropbox.com/s/609iibr6ofzoq7p/Screenshot%202015-06-06%2017.05.33.png?dl=1)
+![Geofence Features](https://www.dropbox.com/s/609iibr6ofzoq7p/Screenshot%202015-06-06%2017.05.33.png?dl=1)
 
 The plugin now includes native geofencing features.  You may add, remove and query the list of monitored geofences from the native plugin.  The native plugin will persist monitored geofences and re-initiate them when the app boots or the device is restarted.
 
