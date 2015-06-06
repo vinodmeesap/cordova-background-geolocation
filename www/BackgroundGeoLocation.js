@@ -16,7 +16,9 @@ module.exports = {
     * @property {Object} config
     */
     config: {},
-
+    /**
+    * @private {Error} error
+    */
     configure: function(success, failure, config) {
         var me = this;
         config = config || {};
@@ -32,7 +34,9 @@ module.exports = {
             if (location.timestamp) {
                 location.timestamp = new Date(location.timestamp);
             }
-            success.call(this, location, taskId);
+            me._runBackgroundTask(taskId, function() {
+                success.call(this, location, taskId);
+            });
         }
         exec(mySuccess,
              failure || function() {},
@@ -65,6 +69,16 @@ module.exports = {
             'finish',
             [taskId]);
     },
+    error: function(taskId, message) {
+        if (!taskId) {
+            throw "BackgroundGeolocation#error must now be provided with a taskId as 1st param, eg: bgGeo.finish(taskId).  taskId is provided by 2nd param in callback";
+        }
+        exec(function() {},
+            function() {},
+            'BackgroundGeoLocation',
+            'error',
+            [taskId, message]);
+    },
     changePace: function(isMoving, success, failure) {
         exec(success || function() {},
             failure || function() {},
@@ -79,7 +93,7 @@ module.exports = {
     * @param {Integer} timeout
     */
     setConfig: function(success, failure, config) {
-        this.apply(this.config, config);
+        this._apply(this.config, config);
         exec(success || function() {},
             failure || function() {},
             'BackgroundGeoLocation',
@@ -111,7 +125,10 @@ module.exports = {
                 taskId      = params.taskId || 'task-id-undefined';
             
             me.stationaryLocation = location;
-            success.call(me, location, taskId);
+
+            me._runBackgroundTask(taskId, function() {
+                success.call(me, location, taskId);
+            }, failure);
         };
         exec(callback,
             failure || function() {},
@@ -124,8 +141,12 @@ module.exports = {
             throw "BackgroundGeolocation#getLocations requires a success callback";
         }
         var me = this;
-        var mySuccess = function(locations) {
-            success.call(this, me._setTimestamp(locations));
+        var mySuccess = function(params) {
+            var taskId      = params.taskId;
+            var locations   = me._setTimestamp(params.locations);
+            me._runBackgroundTask(taskId, function() {
+                success.call(me, locations, taskId);
+            });
         }
         exec(mySuccess,
             failure || function() {},
@@ -141,8 +162,13 @@ module.exports = {
             throw "BackgroundGeolocation#sync requires a success callback";
         }
         var me = this;
-        var mySuccess = function(locations) {
-            success.call(this, me._setTimestamp(locations));
+        var mySuccess = function(params) {
+            var locations   = me._setTimestamp(params.locations);
+            var taskId      = params.taskId;
+
+            me._runBackgroundTask(taskId, function() {
+                success.call(me, locations, taskId);
+            });
         }
         exec(mySuccess,
             failure || function() {},
@@ -215,7 +241,10 @@ module.exports = {
         var mySuccess = function(params) {
             var taskId = params.taskId || 'task-id-undefined';
             delete(params.taskId);
-            success.call(me, params, taskId);
+
+            me._runBackgroundTask(taskId, function() {
+                success.call(me, params, taskId);
+            }, failure);
         };
         exec(mySuccess,
             failure || function() {},
@@ -257,7 +286,24 @@ module.exports = {
         }
         return rs;
     },
-    apply: function(destination, source) {
+    _runBackgroundTask: function(taskId, callback) {
+        var me = this;
+        try {
+            callback.call(this);
+        } catch(e) {
+            console.log("*************************************************************************************");
+            console.error("BackgroundGeolocation caught a Javascript Exception in your application code");
+            console.log(" while running in a background thread.  Auto-finishing background-task:", taskId);
+            console.log(" to prevent application crash");
+            console.log("*************************************************************************************");
+            console.log("STACK:\n", e.stack);
+            console.error(e);
+
+            // And finally, here's our raison d'etre:  catching the error in order to ensure background-task is completed.
+            this.error(taskId, e.message);
+        }
+    },
+    _apply: function(destination, source) {
         source = source || {};
         for (var property in source) {
             if (source.hasOwnProperty(property)) {

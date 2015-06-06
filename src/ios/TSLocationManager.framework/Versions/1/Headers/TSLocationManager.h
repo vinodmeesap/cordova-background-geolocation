@@ -13,6 +13,7 @@
 - (NSArray*) getLocations;
 - (UIBackgroundTaskIdentifier) createBackgroundTask;
 - (void) stopBackgroundTask:(UIBackgroundTaskIdentifier)taskId;
+- (void) error:(UIBackgroundTaskIdentifier)taskId message:(NSString*)message;
 - (void) onPaceChange:(BOOL)value;
 - (void) setConfig:(NSDictionary*)command;
 - (NSDictionary*) getStationaryLocation;

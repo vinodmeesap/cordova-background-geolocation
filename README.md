@@ -220,14 +220,17 @@ Configures the plugin's parameters (@see following [Config](https://github.com/c
 
 ```
 bgGeo.configure(function(location, taskId) {
-    var coords      = location.coords,
-        timestamp   = location.timestamp
-        latitude    = coords.latitude,
-        longitude   = coords.longitude,
-        speed       = coords.speed;
+    try {
+        var coords      = location.coords,
+            timestamp   = location.timestamp
+            latitude    = coords.latitude,
+            longitude   = coords.longitude,
+            speed       = coords.speed;
 
-    console.log("A location has arrived:", timestamp, latitude, longitude, speed);
-
+        console.log("A location has arrived:", timestamp, latitude, longitude, speed);
+    } catch(e) {
+        console.error("An error occurred in my application code", e);
+    }
     // The plugin runs your callback in a background-thread:  
     // you MUST signal to the native plugin when your callback is finished so it can halt the thread.
     // IF YOU DON'T, iOS WILL KILL YOUR APP
@@ -281,8 +284,11 @@ Your ```callbackFn``` will be executed each time the device has entered stationa
 
 ```
 bgGeo.onStationary(function(location, taskId) {
-    console.log('- Device is stopped: ', location.latitude, location.longitude);
-
+    try {
+        console.log('- Device is stopped: ', location.latitude, location.longitude);
+    } catch(e) {
+        console.error('An error occurred in my application code', e);
+    }
     // The plugin runs your callback in a background-thread:  
     // you MUST signal to the native plugin when your callback is finished so it can halt the thread.
     // IF YOU DON'T, iOS WILL KILL YOUR APP
@@ -352,8 +358,11 @@ Adds a geofence event-listener.  Your supplied callback will be called when any 
 
 ```
 bgGeo.onGeofence(function(params, taskId) {
-    console.log('A geofence has been entered: ' + identifier);
-
+    try {
+        console.log('A geofence has been entered: ' + identifier);
+    } catch(e) {
+        console.error('An error occurred in my application code', e);
+    }
     // The plugin runs your callback in a background-thread:  
     // you MUST signal to the native plugin when your callback is finished so it can halt the thread.
     // IF YOU DON'T, iOS WILL KILL YOUR APP
@@ -364,9 +373,20 @@ bgGeo.onGeofence(function(params, taskId) {
 ####`getLocations(callbackFn, failureFn)`
 Fetch all the locations currently stored in native plugin's SQLite database.  Your ```callbackFn`` will receive an ```Array``` of locations in the 1st parameter.  Eg:
 
+The `callbackFn` will be executed with following params:
+
+######@param {Array} locations.  The list of locations stored in SQLite database.
+######@param {Integer} taskId The background taskId which you must send back to the native plugin via `bgGeo.finish(taskId)` in order to signal the end of your background thread.
+
+
 ```
-    bgGeo.getLocations(function(locations) {
-        console.log("locations: ", locations);
+    bgGeo.getLocations(function(locations, taskId) {
+        try {
+            console.log("locations: ", locations);
+        } catch(e) {
+            console.error("An error occurred in my application code");
+        }
+        bgGeo.finish(taskId);
     });
 ```
 
@@ -374,10 +394,22 @@ Fetch all the locations currently stored in native plugin's SQLite database.  Yo
 
 If the plugin is configured for HTTP with an ```#url``` and ```#autoSync: false```, this method will initiate POSTing the locations currently stored in the native SQLite database to your configured ```#url```.  All records in the database will be DELETED.  If you configured ```batchSync: true```, all the locations will be sent to your server in a single HTTP POST request, otherwise the plugin will create execute an HTTP post for **each** location in the database (REST-style).  Your ```callbackFn``` will be executed and provided with an Array of all the locations from the SQLite database.  If you configured the plugin for HTTP (by configuring an `#url`, your `callbackFn` will be executed after the HTTP request(s) have completed.  If the plugin failed to sync to your server (possibly because of no network connection), the ```failureFn``` will be called with an ```errorMessage```.  If you are **not** using the HTTP features, ```sync``` is the only way to clear the native SQLite datbase.  Eg:
 
+Your callback will be provided with the following params
+
+######@param {Array} locations.  The list of locations stored in SQLite database.
+######@param {Integer} taskId The background taskId which you must send back to the native plugin via `bgGeo.finish(taskId)` in order to signal the end of your background thread.
+
 ```
-    bgGeo.sync(function(locations) {
-    	// Here are all the locations from the database.  The database is now EMPTY.
-    	console.log('synced locations: ', locations);
+    bgGeo.sync(function(locations, taskId) {
+        try {
+        	// Here are all the locations from the database.  The database is now EMPTY.
+        	console.log('synced locations: ', locations);
+        } catch(e) {
+            console.error('An error occurred in my application code', e);
+        }
+
+        // Be sure to call finish(taskId) in order to signal the end of the background-thread.
+        bgGeo.finish(taskId);
     }, function(errorMessage) {
         console.warn('Sync FAILURE: ', errorMessage);
     });
