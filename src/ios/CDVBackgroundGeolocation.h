@@ -14,15 +14,17 @@
 @property (nonatomic, strong) NSString* locationCallbackId;
 @property (nonatomic, strong) NSMutableArray* geofenceListeners;
 @property (nonatomic, strong) NSMutableArray* stationaryRegionListeners;
+@property (nonatomic, strong) NSMutableArray* motionChangeListeners;
 
 - (void) configure:(CDVInvokedUrlCommand*)command;
 - (void) start:(CDVInvokedUrlCommand*)command;
 - (void) stop:(CDVInvokedUrlCommand*)command;
 - (void) finish:(CDVInvokedUrlCommand*)command;
 - (void) error:(CDVInvokedUrlCommand*)command;
-- (void) onPaceChange:(CDVInvokedUrlCommand*)command;
+- (void) changePace:(CDVInvokedUrlCommand*)command;
 - (void) setConfig:(CDVInvokedUrlCommand*)command;
 - (void) addStationaryRegionListener:(CDVInvokedUrlCommand*)command;
+- (void) addMotionChangeListener:(CDVInvokedUrlCommand*)command;
 - (void) getStationaryLocation:(CDVInvokedUrlCommand *)command;
 - (void) getLocations:(CDVInvokedUrlCommand *)command;
 - (void) sync:(CDVInvokedUrlCommand *)command;

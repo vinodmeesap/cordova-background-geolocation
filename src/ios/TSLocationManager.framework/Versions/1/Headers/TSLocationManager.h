@@ -14,7 +14,7 @@
 - (UIBackgroundTaskIdentifier) createBackgroundTask;
 - (void) stopBackgroundTask:(UIBackgroundTaskIdentifier)taskId;
 - (void) error:(UIBackgroundTaskIdentifier)taskId message:(NSString*)message;
-- (void) onPaceChange:(BOOL)value;
+- (void) changePace:(BOOL)value;
 - (void) setConfig:(NSDictionary*)command;
 - (NSDictionary*) getStationaryLocation;
 - (void) onSuspend:(NSNotification *)notification;
