@@ -20,7 +20,7 @@ The plugin creates the object `window.plugins.backgroundGeoLocation` with the me
 
   `changePace(true) // engages aggressive monitoring immediately`
   
-  `onChangePace(callback, fail)`
+  `onMotionChange(callback, fail)`
 
   `addGeofence(config, callback, fail)`
   
@@ -276,14 +276,26 @@ bgGeo.changePace(true);  // <-- Aggressive GPS monitoring immediately engaged.
 bgGeo.changePace(false); // <-- Disable aggressive GPS monitoring.  Engages stationary-mode.
 ```
 
-####`onChangePace(callbackFn, failureFn)`
+####`onMotionChange(callbackFn, failureFn)`
 Your ```callbackFn``` will be executed each time the device has changed-state between **MOVING** or **STATIONARY.  The ```callbackFn``` will be provided with a ```Location``` object as the 1st param, with the usual params (```latitude, longitude, accuracy, speed, bearing, altitude```), in addition to a ```taskId``` used to signal that your callback is finished.
 
 ######@param {Boolean} isMoving `false` if entered **STATIONARY** mode; `true` if entered **MOVING** mode.
 ######@param {Object} location The location at the state-change.
 ######@param {Integer} taskId The taskId used to send to bgGeo.finish(taskId) in order to signal completion of your callbackFn
 
-####`onStationary(callbackFn, failureFn)` **DEPRECATED &mdash; Use `onChangePace` instead.
+```
+bgGeo.onMotionChange(function(isMoving, location, taskId) {
+    if (isMoving) {
+        console.log('Device has just started MOVING', location);
+    } else {
+        console.log('Device has just STOPPED', location);
+    }
+    bgGeo.finish(taskId);
+})
+
+```
+
+####`onStationary(callbackFn, failureFn)` **DEPRECATED &mdash; Use `onMotionChange` instead.
 Your ```callbackFn``` will be executed each time the device has entered stationary-monitoring mode.  The ```callbackFn``` will be provided with a ```Location``` object as the 1st param, with the usual params (```latitude, longitude, accuracy, speed, bearing, altitude```), in addition to a ```taskId``` used to signal that your callback is finished.
 
 ######@param {Object} location The Location data
