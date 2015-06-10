@@ -295,7 +295,10 @@ bgGeo.onMotionChange(function(isMoving, location, taskId) {
 
 ```
 
-####`onStationary(callbackFn, failureFn)` **DEPRECATED** &mdash; Use `onMotionChange` instead.
+####`onStationary(callbackFn, failureFn)` 
+
+**DEPRECATED** &mdash; Use `onMotionChange` instead.
+
 Your ```callbackFn``` will be executed each time the device has entered stationary-monitoring mode.  The ```callbackFn``` will be provided with a ```Location``` object as the 1st param, with the usual params (```latitude, longitude, accuracy, speed, bearing, altitude```), in addition to a ```taskId``` used to signal that your callback is finished.
 
 ######@param {Object} location The Location data
