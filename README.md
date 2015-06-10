@@ -297,7 +297,7 @@ bgGeo.onMotionChange(function(isMoving, location, taskId) {
 
 ####`onStationary(callbackFn, failureFn)` 
 
-**DEPRECATED** &mdash; Use `onMotionChange` instead.
+**DEPRECATED** &mdash; Use [onMotionChange](https://github.com/christocracy/cordova-background-geolocation/tree/trigger-activities#onmotionchangecallbackfn-failurefn) instead.
 
 Your ```callbackFn``` will be executed each time the device has entered stationary-monitoring mode.  The ```callbackFn``` will be provided with a ```Location``` object as the 1st param, with the usual params (```latitude, longitude, accuracy, speed, bearing, altitude```), in addition to a ```taskId``` used to signal that your callback is finished.
 
