@@ -136,7 +136,8 @@ function onDeviceReady() {
 
 A fully-featured [SampleApp](https://github.com/christocracy/cordova-background-geolocation-SampleApp) is available in its own public repo.  After first cloning that repo, follow the installation instructions in the **README** there.  This SampleApp includes a settings-screen allowing you to quickly experiment with all the different settings available for each platform.
 
-![SampleApp](/assets/images/iphone/screenshot-iphone5-geofences-framed.png "SampleApp")
+![Home](/assets/images/iphone/screenshot-iphone5-geofences-framed.png "Home")
+![Settings](/assets/images/iphone/screenshot-iphone5-settings-framed.png "Settings")
 
 ## Simple Sample Application
 
