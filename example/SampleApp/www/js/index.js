@@ -166,37 +166,9 @@ var app = {
             console.log('BackgroundGeoLocation error');
         };
 
-        // Only ios emits this stationary event
-        bgGeo.onStationary(function(location, taskId) {
-            console.log('[js] BackgroundGeoLocation onStationary ' + JSON.stringify(location));
-            
-            app.setCurrentLocation(location);
-
-            var coords = location.coords;
-            
-            // Center ourself on map
-            app.onClickHome();
-                           
-            if (!app.stationaryRadius) {
-                app.stationaryRadius = new google.maps.Circle({
-                    fillColor: '#cc0000',
-                    fillOpacity: 0.4,
-                    strokeOpacity: 0,
-                    map: app.map
-                });
-            }
-            var radius = 50;
-            var center = new google.maps.LatLng(coords.latitude, coords.longitude);
-            app.stationaryRadius.setRadius(radius);
-            app.stationaryRadius.setCenter(center);
-            
-            bgGeo.finish(taskId);
-
-        });
-
         // BackgroundGeoLocation is highly configurable.
         bgGeo.configure(callbackFn, failureFn, {
-            debug: true, // <-- enable this hear sounds for background-geolocation life-cycle.
+            // Geolocation config
             desiredAccuracy: 0,
             stationaryRadius: 50,
             distanceFilter: 50,
@@ -206,13 +178,17 @@ var app = {
             fastestLocationUpdateInterval: 5000,
             activityRecognitionInterval: 10000,
             stopTimeout: 0,
-            forceReload: false,      // <-- [Android] If the user closes the app **while location-tracking is started** , reboot app (WARNING: possibly distruptive to user) 
-            stopOnTerminate: true, // <-- [Android] Allow the background-service to run headless when user closes the app.
-            startOnBoot: false,      // <-- [Android] Auto start background-service in headless mode when device is powered-up.
             activityType: 'AutomotiveNavigation',
-            /**
-            * HTTP Feature:  set an url to allow the native background service to POST locations to your server
-            */
+
+            // Application config
+            debug: true, // <-- enable this hear sounds for background-geolocation life-cycle.
+            forceReloadOnLocationChange: false,  // <-- [Android] If the user closes the app **while location-tracking is started** , reboot app when a new location is recorded (WARNING: possibly distruptive to user) 
+            forceReloadOnMotionChange: false,    // <-- [Android] If the user closes the app **while location-tracking is started** , reboot app when device changes stationary-state (stationary->moving or vice-versa) --WARNING: possibly distruptive to user) 
+            forceReloadOnGeofence: false,        // <-- [Android] If the user closes the app **while location-tracking is started** , reboot app when a geofence crossing occurs --WARNING: possibly distruptive to user) 
+            stopOnTerminate: false,              // <-- [Android] Allow the background-service to run headless when user closes the app.
+            startOnBoot: true,                   // <-- [Android] Auto start background-service in headless mode when device is powered-up.
+            
+            // HTTP / SQLite config
             url: 'http://posttestserver.com/post.php?dir=cordova-background-geolocation',
             batchSync: true,       // <-- [Default: false] Set true to sync locations to server in a single HTTP request.
             autoSync: true,         // <-- [Default: true] Set true to sync each location to server as it arrives.
@@ -225,9 +201,40 @@ var app = {
             }
         });
         
-        bgGeo.onGeofence(function(identifier, taskId) {
-            alert('Enter Geofence: ' + identifier);
-            console.log('[js] Geofence ENTER: ', identifier, taskId);
+        // Listen to motion-state changes (stationary / moving)
+        bgGeo.onMotionChange(function(isMoving, location, taskId) {
+            console.log('[js] BackgroundGeoLocation stationary-state changed ' + isMoving);
+            console.log('[js] location: ' + JSON.stringify(location));
+            
+            app.setCurrentLocation(location);
+
+            var coords = location.coords;
+            
+            // Center ourself on map
+            app.onClickHome();
+            
+            if (!isMoving) {
+                if (!app.stationaryRadius) {
+                    app.stationaryRadius = new google.maps.Circle({
+                        fillColor: '#cc0000',
+                        fillOpacity: 0.4,
+                        strokeOpacity: 0,
+                        map: app.map
+                    });
+                }
+                var radius = 50;
+                var center = new google.maps.LatLng(coords.latitude, coords.longitude);
+                app.stationaryRadius.setRadius(radius);
+                app.stationaryRadius.setCenter(center);
+            }
+            
+            bgGeo.finish(taskId);
+
+        });
+
+        // Listen to Geofence events.
+        bgGeo.onGeofence(function(params, taskId) {
+            console.log('[js] Geofence crossed: ', params.action, params.identifier);
             bgGeo.finish(taskId);
         });
 
@@ -240,7 +247,8 @@ var app = {
                 identifier: 'MyGeofence',
                 radius: 200,
                 latitude: e.latLng.lat(),
-                longitude: e.latLng.lng()
+                longitude: e.latLng.lng(),
+                notifyOnEntry: true
             }, function() {
                 app.geofence = new google.maps.Circle({
                     fillColor: '#00cc00',

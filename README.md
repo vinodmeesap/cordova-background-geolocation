@@ -89,7 +89,7 @@ function onDeviceReady() {
 
     // BackgroundGeoLocation is highly configurable.
     bgGeo.configure(callbackFn, failureFn, {
-        debug: true, // <-- enable this hear sounds for background-geolocation life-cycle.
+        // Geolocation config
         desiredAccuracy: 0,
         stationaryRadius: 50,
         distanceFilter: 50,
@@ -99,16 +99,20 @@ function onDeviceReady() {
         fastestLocationUpdateInterval: 5000,
         activityRecognitionInterval: 10000,
         stopTimeout: 0,
-        forceReload: true,      // <-- [Android] If the user closes the app **while location-tracking is started** , reboot app (WARNING: possibly distruptive to user) 
-        stopOnTerminate: false, // <-- [Android] Allow the background-service to run headless when user closes the app.
-        startOnBoot: true,      // <-- [Android] Auto start background-service in headless mode when device is powered-up.
         activityType: 'AutomotiveNavigation',
-        /**
-        * HTTP Feature:  set an url to allow the native background service to POST locations to your server
-        */
+
+        // Application config
+        debug: true, // <-- enable this hear sounds for background-geolocation life-cycle.
+        forceReloadOnLocationChange: false,  // <-- [Android] If the user closes the app **while location-tracking is started** , reboot app when a new location is recorded (WARNING: possibly distruptive to user) 
+        forceReloadOnMotionChange: false,    // <-- [Android] If the user closes the app **while location-tracking is started** , reboot app when device changes stationary-state (stationary->moving or vice-versa) --WARNING: possibly distruptive to user) 
+        forceReloadOnGeofence: false,        // <-- [Android] If the user closes the app **while location-tracking is started** , reboot app when a geofence crossing occurs --WARNING: possibly distruptive to user) 
+        stopOnTerminate: false,              // <-- [Android] Allow the background-service to run headless when user closes the app.
+        startOnBoot: true,                   // <-- [Android] Auto start background-service in headless mode when device is powered-up.
+        
+        // HTTP / SQLite config
         url: 'http://posttestserver.com/post.php?dir=cordova-background-geolocation',
-        batchSync: false,       // <-- [Default: false] Set true to sync locations to server in 1 HTTP request.
-        autoSync: true,		// <-- [Default: true] Set true to sync each location to server as it arrives.
+        batchSync: true,       // <-- [Default: false] Set true to sync locations to server in a single HTTP request.
+        autoSync: true,         // <-- [Default: true] Set true to sync each location to server as it arrives.
         maxDaysToPersist: 1,    // <-- Maximum days to persist a location in plugin's SQLite database when HTTP fails
         headers: {
             "X-FOO": "bar"
