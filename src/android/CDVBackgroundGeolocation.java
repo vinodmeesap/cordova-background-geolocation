@@ -56,7 +56,7 @@ public class CDVBackgroundGeolocation extends CordovaPlugin {
     private Boolean isEnabled           = false;
     private Boolean stopOnTerminate     = false;
     private Boolean isMoving            = false;
-    
+    private Boolean isAcquiringCurrentPosition = false;
     private Intent backgroundServiceIntent;
     
     private DetectedActivity currentActivity;
@@ -75,6 +75,7 @@ public class CDVBackgroundGeolocation extends CordovaPlugin {
 
     private List<CallbackContext> motionChangeCallbacks = new ArrayList<CallbackContext>();
     private List<CallbackContext> geofenceCallbacks = new ArrayList<CallbackContext>();
+    private List<CallbackContext> currentPositionCallbacks = new ArrayList<CallbackContext>();
 
     public static boolean isActive() {
         return gWebView != null;
@@ -205,10 +206,22 @@ public class CDVBackgroundGeolocation extends CordovaPlugin {
             result = true;
             playSound(data.getInt(0));
             callbackContext.success();
+        } else if (BackgroundGeolocationService.ACTION_GET_CURRENT_POSITION.equalsIgnoreCase(action)) {
+            result = true;
+            onGetCurrentPosition(callbackContext);
         }
         return result;
     }
 
+    private void onGetCurrentPosition(CallbackContext callbackContext) {
+        isAcquiringCurrentPosition = true;
+        addCurrentPositionListener(callbackContext);
+
+        Bundle event = new Bundle();
+        event.putString("name", BackgroundGeolocationService.ACTION_GET_CURRENT_POSITION);
+        event.putBoolean("request", true);
+        EventBus.getDefault().post(event);
+    }
     private Boolean onAddGeofence(JSONObject config) {
         try {
             Bundle event = new Bundle();
@@ -245,6 +258,9 @@ public class CDVBackgroundGeolocation extends CordovaPlugin {
                 Log.w(TAG, e);
             }
         }
+    }
+    private void addCurrentPositionListener(CallbackContext callbackContext) {
+        currentPositionCallbacks.add(callbackContext);
     }
     private void addMotionChangeListener(CallbackContext callbackContext) {
         motionChangeCallbacks.add(callbackContext);
@@ -500,18 +516,27 @@ public class CDVBackgroundGeolocation extends CordovaPlugin {
      * @param {Location} location
      */
     public void onEventMainThread(Location location) {
-        this.onLocationChange(BackgroundGeolocationService.locationToJson(location, currentActivity));
+        JSONObject locationData = BackgroundGeolocationService.locationToJson(location, currentActivity);
+        this.onLocationChange(locationData);
     }
     private void onLocationChange(JSONObject location) {
-        PluginResult result;
-        result = new PluginResult(PluginResult.Status.OK, location);
+        PluginResult result = new PluginResult(PluginResult.Status.OK, location);
         result.setKeepCallback(true);
 
         isMoving = true;
         result.setKeepCallback(true);
         runInBackground(locationCallback, result);
-    }
 
+        if (isAcquiringCurrentPosition) {
+            isAcquiringCurrentPosition = false;
+            for (CallbackContext callback : currentPositionCallbacks) {
+                result = new PluginResult(PluginResult.Status.OK, location);
+                result.setKeepCallback(false);
+                runInBackground(callback, result);
+            }
+            currentPositionCallbacks.clear(); 
+        }
+    }
     /**
     * EventBus handler for Geofencing events
     */    

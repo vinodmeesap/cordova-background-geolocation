@@ -293,6 +293,31 @@ module.exports = {
             []);
     },
     /**
+    * Fetch the current position
+    */
+    getCurrentPosition: function(success, failure) {
+        var me = this;
+        success = success || function(location, taskId) {
+            me.finish(taskId);
+        };
+        var mySuccess = function(params) {
+            var location    = params.location || params;
+            var taskId      = params.taskId || 'task-id-undefined';
+            // Transform timestamp to Date instance.
+            if (location.timestamp) {
+                location.timestamp = new Date(location.timestamp);
+            }
+            me._runBackgroundTask(taskId, function() {
+                success.call(this, location, taskId);
+            });
+        }
+        exec(mySuccess || function() {},
+            failure || function() {},
+            'BackgroundGeoLocation',
+            'getCurrentPosition',
+            []);
+    },
+    /**
     * Play a system sound.  This is totally experimental.
     * iOS http://iphonedevwiki.net/index.php/AudioServices
     * Android:

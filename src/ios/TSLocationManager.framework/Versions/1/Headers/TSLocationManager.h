@@ -25,6 +25,7 @@
 - (void) addGeofence:(NSString*)identifier radius:(CLLocationDistance)radius latitude:(CLLocationDegrees)latitude longitude:(CLLocationDegrees)longitude notifyOnEntry:(BOOL)notifyOnEntry notifyOnExit:(BOOL)notifyOnExit;
 - (BOOL) removeGeofence:(NSString*)identifier;
 - (NSArray*) getGeofences;
+- (void) updateCurrentPosition;
 - (void) playSound:(SystemSoundID)soundId;
 @end
 

@@ -20,6 +20,8 @@ The plugin creates the object `window.plugins.backgroundGeoLocation` with the me
 
   `changePace(true) // engages aggressive monitoring immediately`
   
+  `getCurrentPosition(success, fail)`
+
   `onMotionChange(callback, fail)`
 
   `addGeofence(config, callback, fail)`
@@ -271,6 +273,17 @@ Disable background geolocation tracking.
 
 ```
 bgGeo.stop();
+```
+
+####`getCurrentPosition(successFn, failureFn)`
+Retrieves the current position.  This method instructs the native code to fetch exactly one location using maximum power & accuracy.  The native code will persist the fetched location to SQLite just as any other location in addition to POSTing to your configured `#url` (if you've enabled the HTTP features).  In addition to your supplied `callbackFn`, the plugin will also execute the `callback` provided to `#configure`.  Your provided `successFn` will be executed with the same signature as that provided to `#configure`:
+
+######@param {Object} location The Location data
+######@param {Integer} taskId The taskId used to send to bgGeo.finish(taskId) in order to signal completion of your callbackFn
+
+```
+bgGeo.changePace(true);  // <-- Aggressive GPS monitoring immediately engaged.
+bgGeo.changePace(false); // <-- Disable aggressive GPS monitoring.  Engages stationary-mode.
 ```
 
 ####`changePace(enabled, successFn, failureFn)`

@@ -10,7 +10,7 @@
     NSDictionary *config;
 }
 
-@synthesize syncCallbackId, syncTaskId, locationCallbackId, geofenceListeners, stationaryRegionListeners, motionChangeListeners;
+@synthesize syncCallbackId, syncTaskId, locationCallbackId, geofenceListeners, stationaryRegionListeners, motionChangeListeners, currentPositionListeners;
 
 - (void)pluginInitialize
 {
@@ -20,6 +20,7 @@
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(onMotionChange:) name:@"TSLocationManager.motionchange" object:nil];
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(onEnterGeofence:) name:@"TSLocationManager.geofence" object:nil];
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(onSyncComplete:) name:@"TSLocationManager.sync" object:nil];
+
 }
 
 /**
@@ -90,8 +91,9 @@
 - (void)onLocationChanged:(NSNotification*)notification {
     CLLocation *location = [notification.userInfo objectForKey:@"location"];
     
+    NSDictionary *locationData = [bgGeo locationToDictionary:location];
     NSDictionary *params = @{
-        @"location": [bgGeo locationToDictionary:location],
+        @"location": locationData,
         @"taskId": @([bgGeo createBackgroundTask])
     };
     CDVPluginResult* result = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsDictionary:params];
@@ -100,6 +102,21 @@
     [self.commandDelegate runInBackground:^{
         [self.commandDelegate sendPluginResult:result callbackId:self.locationCallbackId];
     }];
+
+    if ([self.currentPositionListeners count]) {
+        for (NSString *callbackId in self.currentPositionListeners) {
+            NSDictionary *params = @{
+                @"location": locationData,
+                @"taskId": @([bgGeo createBackgroundTask])
+            };
+            CDVPluginResult *result = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsDictionary:params];
+            [result setKeepCallbackAsBool:NO];
+            [self.commandDelegate runInBackground:^{
+                [self.commandDelegate sendPluginResult:result callbackId:callbackId];
+            }];       
+        }
+        [self.currentPositionListeners removeAllObjects];
+    }
 }
 
 
@@ -297,6 +314,15 @@
         self.geofenceListeners = [[NSMutableArray alloc] init];
     }
     [self.geofenceListeners addObject:command.callbackId];
+}
+
+- (void) getCurrentPosition:(CDVInvokedUrlCommand*)command
+{
+    if (self.currentPositionListeners == nil) {
+        self.currentPositionListeners = [[NSMutableArray alloc] init];
+    }
+    [self.currentPositionListeners addObject:command.callbackId];
+    [bgGeo updateCurrentPosition];
 }
 
 - (void) playSound:(CDVInvokedUrlCommand*)command

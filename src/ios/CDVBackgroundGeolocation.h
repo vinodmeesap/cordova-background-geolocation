@@ -12,6 +12,7 @@
 @property (nonatomic, strong) NSString* syncCallbackId;
 @property (nonatomic) UIBackgroundTaskIdentifier syncTaskId;
 @property (nonatomic, strong) NSString* locationCallbackId;
+@property (nonatomic, strong) NSMutableArray* currentPositionListeners;
 @property (nonatomic, strong) NSMutableArray* geofenceListeners;
 @property (nonatomic, strong) NSMutableArray* stationaryRegionListeners;
 @property (nonatomic, strong) NSMutableArray* motionChangeListeners;
@@ -34,6 +35,7 @@
 - (void) removeGeofence:(CDVInvokedUrlCommand *)command;
 - (void) getGeofences:(CDVInvokedUrlCommand *)command;
 - (void) onGeofence:(CDVInvokedUrlCommand *)command;
+- (void) getCurrentPosition:(CDVInvokedUrlCommand *)command;
 - (void) playSound:(CDVInvokedUrlCommand *)command;
 @end
 
