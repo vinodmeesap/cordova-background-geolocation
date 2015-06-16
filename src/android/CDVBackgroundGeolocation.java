@@ -28,7 +28,7 @@ import android.media.AudioManager;
 import android.media.ToneGenerator;
 
 public class CDVBackgroundGeolocation extends CordovaPlugin {
-    private static final String TAG = "BackgroundGeolocation";
+    private static final String TAG = "TSLocationManager";
     private static CordovaWebView gWebView;
     public static Boolean forceReload = false;
     
@@ -51,6 +51,7 @@ public class CDVBackgroundGeolocation extends CordovaPlugin {
     public static final String ACTION_GET_GEOFENCES     = "getGeofences";
     public static final String ACTION_ON_GEOFENCE       = "onGeofence";
     public static final String ACTION_PLAY_SOUND        = "playSound";
+    public static final String ACTION_ACTIVITY_RELOAD   = "activityReload";
     
     private Boolean isEnabled           = false;
     private Boolean stopOnTerminate     = false;
@@ -147,7 +148,7 @@ public class CDVBackgroundGeolocation extends CordovaPlugin {
             this.stationaryCallback = callbackContext;  
         } else if (ACTION_ADD_MOTION_CHANGE_LISTENER.equalsIgnoreCase(action)) {
             result = true;
-            motionChangeCallbacks.add(callbackContext);
+            this.addMotionChangeListener(callbackContext);
         } else if (ACTION_GET_LOCATIONS.equalsIgnoreCase(action)) {
             result = true;
             Bundle event = new Bundle();
@@ -192,7 +193,7 @@ public class CDVBackgroundGeolocation extends CordovaPlugin {
             }
         } else if (ACTION_ON_GEOFENCE.equalsIgnoreCase(action)) {
             result = true;
-            geofenceCallbacks.add(callbackContext);
+            addGeofenceListener(callbackContext);
         } else if (ACTION_GET_GEOFENCES.equalsIgnoreCase(action)) {
             result = true;
             getGeofencesCallback = callbackContext;
@@ -231,6 +232,33 @@ public class CDVBackgroundGeolocation extends CordovaPlugin {
         }
     }
 
+    private void addGeofenceListener(CallbackContext callbackContext) {
+        geofenceCallbacks.add(callbackContext);
+
+        Activity activity   = this.cordova.getActivity();
+        Intent launchIntent = activity.getIntent();
+        if (launchIntent.hasExtra("forceReload") && launchIntent.hasExtra("geofencingEvent")) {
+            try {
+                JSONObject geofencingEvent  = new JSONObject(launchIntent.getStringExtra("geofencingEvent"));
+                handleGeofencingEvent(geofencingEvent);
+            } catch (JSONException e) {
+                Log.w(TAG, e);
+            }
+        }
+    }
+    private void addMotionChangeListener(CallbackContext callbackContext) {
+        motionChangeCallbacks.add(callbackContext);
+
+        Activity activity = this.cordova.getActivity();
+        Intent launchIntent = activity.getIntent();
+
+        if (launchIntent.hasExtra("forceReload")) {
+            if (launchIntent.getStringExtra("name").equalsIgnoreCase(ACTION_ON_MOTION_CHANGE)) {
+                Bundle event = launchIntent.getExtras();
+                this.onEventMainThread(event);
+            }
+        }
+    }
     private Boolean onRemoveGeofence(String identifier) {
         Bundle event = new Bundle();
         event.putString("name", ACTION_REMOVE_GEOFENCE);
@@ -243,8 +271,18 @@ public class CDVBackgroundGeolocation extends CordovaPlugin {
     private void setEnabled(boolean value) {
         isEnabled = value;
         
-        Activity activity = this.cordova.getActivity();
+        Intent launchIntent = this.cordova.getActivity().getIntent();
+        if (launchIntent.hasExtra("forceReload") && launchIntent.hasExtra("location")) {
+            try {
+                JSONObject location = new JSONObject(launchIntent.getStringExtra("location"));
+                onLocationChange(location);
+            } catch (JSONException e) {
+                Log.w(TAG, e);
+            }
+            
+        }
         
+        Activity activity = this.cordova.getActivity();
         SharedPreferences settings = activity.getSharedPreferences("TSLocationManager", 0);
         SharedPreferences.Editor editor = settings.edit();
         editor.putBoolean("enabled", isEnabled);
@@ -310,9 +348,6 @@ public class CDVBackgroundGeolocation extends CordovaPlugin {
             if (config.has("startOnBoot")) {
                 editor.putBoolean("startOnBoot", config.getBoolean("startOnBoot"));
             }
-            if (config.has("forceReload")) {
-                editor.putBoolean("forceReload", config.getBoolean("forceReload"));
-            }
             if (config.has("forceReloadOnLocationChange")) {
                 editor.putBoolean("forceReloadOnLocationChange", config.getBoolean("forceReloadOnLocationChange"));
             }
@@ -321,6 +356,9 @@ public class CDVBackgroundGeolocation extends CordovaPlugin {
             }
             if (config.has("forceReloadOnMotionChange")) {
                 editor.putBoolean("forceReloadOnMotionChange", config.getBoolean("forceReloadOnMotionChange"));
+            }
+            if (config.has("forceReloadOnGeofence")) {
+                editor.putBoolean("forceReloadOnGeofence", config.getBoolean("forceReloadOnGeofence"));
             }
             if (config.has("url")) {
                 editor.putString("url", config.getString("url"));
@@ -427,24 +465,27 @@ public class CDVBackgroundGeolocation extends CordovaPlugin {
                 runInBackground(getGeofencesCallback, result);
             }
         } else if (ACTION_ON_MOTION_CHANGE.equalsIgnoreCase(name)) {
-            PluginResult result;
-            try {
-                JSONObject params = new JSONObject();
-                params.put("location", new JSONObject(event.getString("location")));
-                params.put("isMoving", event.getBoolean("isMoving"));
-                params.put("taskId", "android-bg-task-id");
-                result = new PluginResult(PluginResult.Status.OK, params);
-            } catch (JSONException e) {
-                e.printStackTrace();
-                result = new PluginResult(PluginResult.Status.JSON_EXCEPTION, e.getMessage());
-            }
-            result.setKeepCallback(true);
-            for (CallbackContext callback : motionChangeCallbacks) {
-                runInBackground(callback, result);
-            }
+            this.onMotionChange(event);
         }
     }
 
+    private void onMotionChange(Bundle event) {
+        PluginResult result;
+        try {
+            JSONObject params = new JSONObject();
+            params.put("location", new JSONObject(event.getString("location")));
+            params.put("isMoving", event.getBoolean("isMoving"));
+            params.put("taskId", "android-bg-task-id");
+            result = new PluginResult(PluginResult.Status.OK, params);
+        } catch (JSONException e) {
+            e.printStackTrace();
+            result = new PluginResult(PluginResult.Status.JSON_EXCEPTION, e.getMessage());
+        }
+        result.setKeepCallback(true);
+        for (CallbackContext callback : motionChangeCallbacks) {
+            runInBackground(callback, result);
+        }
+    }
     /**
      * EventBus listener for ARS
      * @param {ActivityRecognitionResult} result
@@ -459,14 +500,18 @@ public class CDVBackgroundGeolocation extends CordovaPlugin {
      * @param {Location} location
      */
     public void onEventMainThread(Location location) {
+        this.onLocationChange(BackgroundGeolocationService.locationToJson(location, currentActivity));
+    }
+    private void onLocationChange(JSONObject location) {
         PluginResult result;
-        result = new PluginResult(PluginResult.Status.OK, BackgroundGeolocationService.locationToJson(location, currentActivity));
+        result = new PluginResult(PluginResult.Status.OK, location);
         result.setKeepCallback(true);
 
         isMoving = true;
         result.setKeepCallback(true);
         runInBackground(locationCallback, result);
     }
+
     /**
     * EventBus handler for Geofencing events
     */    
@@ -475,28 +520,16 @@ public class CDVBackgroundGeolocation extends CordovaPlugin {
 
         if (!geofenceCallbacks.isEmpty()) {
             for (Geofence geofence : geofenceEvent.getTriggeringGeofences()) {
-                JSONObject params = new JSONObject();
-                String action = "";
-                int transitionType = geofenceEvent.getGeofenceTransition();
-                if (transitionType == Geofence.GEOFENCE_TRANSITION_ENTER) {
-                    action = "ENTER";
-                } else if (transitionType == Geofence.GEOFENCE_TRANSITION_EXIT) {
-                    action = "EXIT";
-                } else {
-                    action = "DWELL";
-                }
-                try {
-                    params.put("identifier", geofence.getRequestId());
-                    params.put("action", action);
-                } catch (JSONException e) {
-                    e.printStackTrace();
-                }
-                PluginResult result = new PluginResult(PluginResult.Status.OK, params);
-                result.setKeepCallback(true);
-                for (CallbackContext callback : geofenceCallbacks) {
-                    runInBackground(callback, result);
-                }
+                JSONObject params = BackgroundGeolocationService.geofencingEventToJson(geofenceEvent, geofence);
+                handleGeofencingEvent(params);
             }
+        }
+    }
+    private void handleGeofencingEvent(JSONObject params) {
+        PluginResult result = new PluginResult(PluginResult.Status.OK, params);
+        result.setKeepCallback(true);
+        for (CallbackContext callback : geofenceCallbacks) {
+            runInBackground(callback, result);
         }
     }
 
