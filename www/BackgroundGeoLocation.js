@@ -83,7 +83,7 @@ module.exports = {
         exec(success || function() {},
             failure || function() {},
             'BackgroundGeoLocation',
-            'changePace',
+            'onPaceChange',
             [isMoving]);
     },
     /**
@@ -112,7 +112,6 @@ module.exports = {
     },
     /**
     * Add a stationary-region listener.  Whenever the devices enters "stationary-mode", your #success callback will be executed with #location param containing #radius of region
-    * @deprecated in favour of dual-function #onMotionChange
     * @param {Function} success
     * @param {Function} failure [optional] NOT IMPLEMENTED
     */
@@ -135,35 +134,6 @@ module.exports = {
             failure || function() {},
             'BackgroundGeoLocation',
             'addStationaryRegionListener',
-            []);
-    },
-    /**
-    * Add a movement-state-change listener.  Whenever the devices enters "stationary" or "moving" mode, your #success callback will be executed with #location param containing #radius of region
-    * @param {Function} success
-    * @param {Function} failure [optional] NOT IMPLEMENTED
-    */
-    onMotionChange: function(success, failure) {
-        var me = this;
-        success = success || function(isMoving, location, taskId) {
-            me.finish(taskId);
-        };
-        var callback = function(params) {
-            var isMoving    = params.isMoving;
-            var location    = params.location;
-            var taskId      = params.taskId || 'task-id-undefined';
-            
-            if (!isMoving) {
-                me.stationaryLocation = location;
-            }
-
-            me._runBackgroundTask(taskId, function() {
-                success.call(me, isMoving, location, taskId);
-            }, failure);
-        };
-        exec(callback,
-            failure || function() {},
-            'BackgroundGeoLocation',
-            'addMotionChangeListener',
             []);
     },
     getLocations: function(success, failure) {
@@ -290,31 +260,6 @@ module.exports = {
             failure || function() {},
             'BackgroundGeoLocation',
             'getGeofences',
-            []);
-    },
-    /**
-    * Fetch the current position
-    */
-    getCurrentPosition: function(success, failure) {
-        var me = this;
-        success = success || function(location, taskId) {
-            me.finish(taskId);
-        };
-        var mySuccess = function(params) {
-            var location    = params.location || params;
-            var taskId      = params.taskId || 'task-id-undefined';
-            // Transform timestamp to Date instance.
-            if (location.timestamp) {
-                location.timestamp = new Date(location.timestamp);
-            }
-            me._runBackgroundTask(taskId, function() {
-                success.call(this, location, taskId);
-            });
-        }
-        exec(mySuccess || function() {},
-            failure || function() {},
-            'BackgroundGeoLocation',
-            'getCurrentPosition',
             []);
     },
     /**
