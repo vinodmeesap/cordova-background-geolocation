@@ -268,6 +268,23 @@ Disable background geolocation tracking.
 bgGeo.stop();
 ```
 
+####`getCurrentPosition(successFn, failureFn)`
+Retrieves the current position.  This method instructs the native code to fetch exactly one location using maximum power & accuracy.  The native code will persist the fetched location to SQLite just as any other location in addition to POSTing to your configured `#url` (if you've enabled the HTTP features).  In addition to your supplied `callbackFn`, the plugin will also execute the `callback` provided to `#configure`.  Your provided `successFn` will be executed with the same signature as that provided to `#configure`:
+
+######@param {Object} location The Location data
+######@param {Integer} taskId The taskId used to send to bgGeo.finish(taskId) in order to signal completion of your callbackFn
+
+```
+bgGeo.getCurrentPosition(function(location, taskId) {
+    // This location is already persisted to plugin’s SQLite db.  
+    // If you’ve configured #autoSync: true, the HTTP POST has already started.
+
+    console.log(“- Current position received: “, location);
+    bgGeo.finish(taskId);
+});
+
+```
+
 ####`changePace(enabled, successFn, failureFn)`
 Initiate or cancel immediate background tracking.  When set to ```true```, the plugin will begin aggressively tracking the devices Geolocation, bypassing stationary monitoring.  If you were making a "Jogging" application, this would be your [Start Workout] button to immediately begin GPS tracking.  Send ```false``` to disable aggressive GPS monitoring and return to stationary-monitoring mode.
 
