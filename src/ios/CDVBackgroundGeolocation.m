@@ -55,6 +55,9 @@
 - (void) start:(CDVInvokedUrlCommand*)command
 {
     [bgGeo start];
+
+    CDVPluginResult* result = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsBool: true];
+    [self.commandDelegate sendPluginResult:result callbackId:command.callbackId];
 }
 /**
  * Turn it off
@@ -62,6 +65,8 @@
 - (void) stop:(CDVInvokedUrlCommand*)command
 {
     [bgGeo stop];
+    CDVPluginResult* result = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsBool: false];
+    [self.commandDelegate sendPluginResult:result callbackId:command.callbackId];
 }
 - (void) getOdometer:(CDVInvokedUrlCommand*)command
 {
@@ -83,6 +88,8 @@
 {
     BOOL moving = [[command.arguments objectAtIndex: 0] boolValue];
     [bgGeo changePace:moving];
+    CDVPluginResult* result = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsBool: moving];
+    [self.commandDelegate sendPluginResult:result callbackId:command.callbackId];
 }
 
 /**
@@ -307,7 +314,6 @@
     [self.commandDelegate sendPluginResult:result callbackId:command.callbackId];
 }
 
-
 - (void) onGeofence:(CDVInvokedUrlCommand*)command
 {
     if (self.geofenceListeners == nil) {
@@ -318,6 +324,13 @@
 
 - (void) getCurrentPosition:(CDVInvokedUrlCommand*)command
 {
+    if (![bgGeo isEnabled]) {
+        NSLog(@"- CDVBackgroundGeolocation#getCurrentPosition cannot be used when plugin is disabled");
+        // If plugin isn't enabled, return 401 Unauthorized
+        CDVPluginResult *result = [CDVPluginResult resultWithStatus:CDVCommandStatus_ERROR messageAsInt:401];
+        [self.commandDelegate sendPluginResult:result callbackId:command.callbackId];
+        return;
+    }
     if (self.currentPositionListeners == nil) {
         self.currentPositionListeners = [[NSMutableArray alloc] init];
     }
@@ -350,7 +363,6 @@
     UIBackgroundTaskIdentifier taskId = [[command.arguments objectAtIndex: 0] integerValue];
     NSString *error = [command.arguments objectAtIndex:1];
     [bgGeo error:taskId message:error];
-    
 }
 
 - (void) onLocationManagerError:(NSNotification*)notification

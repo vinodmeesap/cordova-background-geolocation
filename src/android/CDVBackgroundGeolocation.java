@@ -103,15 +103,15 @@ public class CDVBackgroundGeolocation extends CordovaPlugin {
 
         Boolean result      = false;
         
-        if (ACTION_START.equalsIgnoreCase(action) && !isEnabled) {
+        if (ACTION_START.equalsIgnoreCase(action)) {
             result      = true;
             this.setEnabled(true);
-            callbackContext.success();
+            callbackContext.success(1);
         } else if (ACTION_STOP.equalsIgnoreCase(action)) {
             // No implementation to stop background-tasks with Android.  Just say "success"
             result      = true;
             this.setEnabled(false);
-            callbackContext.success();
+            callbackContext.success(0);
         } else if (ACTION_FINISH.equalsIgnoreCase(action)) {
             result = true;
             callbackContext.success();
@@ -126,7 +126,7 @@ public class CDVBackgroundGeolocation extends CordovaPlugin {
             } else {
                 callbackContext.error("- Configuration error!");
             }
-        } else if (ACTION_CHANGE_PACE.equalsIgnoreCase(action)) {
+        } else if (BackgroundGeolocationService.ACTION_CHANGE_PACE.equalsIgnoreCase(action)) {
             if (!isEnabled) {
                 Log.w(TAG, "- Cannot change pace while disabled");
                 result = false;
@@ -297,6 +297,10 @@ public class CDVBackgroundGeolocation extends CordovaPlugin {
     }
 
     private void setEnabled(boolean value) {
+        // Don't set a state that we're already in.
+        if (value == isEnabled) {
+            return;
+        }
         isEnabled = value;
         
         Intent launchIntent = this.cordova.getActivity().getIntent();
@@ -478,9 +482,9 @@ public class CDVBackgroundGeolocation extends CordovaPlugin {
         } else if (ACTION_RESET_ODOMETER.equalsIgnoreCase(name)) {
             PluginResult result = new PluginResult(PluginResult.Status.OK);
             resetOdometerCallback.sendPluginResult(result);
-        } else if (ACTION_CHANGE_PACE.equalsIgnoreCase(name)) {
-            PluginResult result = new PluginResult(PluginResult.Status.OK);
-            paceChangeCallback.sendPluginResult(result);
+        } else if (BackgroundGeolocationService.ACTION_CHANGE_PACE.equalsIgnoreCase(name)) {
+            int state = event.getBoolean("isMoving") ? 1 : 0;
+            paceChangeCallback.success(state);
         } else if (ACTION_GET_GEOFENCES.equalsIgnoreCase(name)) {
             try {
                 JSONArray json      = new JSONArray(event.getString("data"));
