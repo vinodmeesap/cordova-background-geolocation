@@ -6,6 +6,7 @@
 
 @property (nonatomic) CLLocationDistance odometer;
 @property (nonatomic, strong) CLLocationManager* locationManager;
+
 - (void) configure:(NSDictionary*)config;
 - (void) start;
 - (void) stop;

@@ -31,6 +31,12 @@ public class CDVBackgroundGeolocation extends CordovaPlugin {
     private static final String TAG = "TSLocationManager";
     private static CordovaWebView gWebView;
     public static Boolean forceReload = false;
+
+    /**
+    * Timeout in millis for a getCurrentPosition request to give up.
+    * TODO make configurable.
+    */
+    private static final long GET_CURRENT_POSITION_TIMEOUT = 30000;
     
     public static final String ACTION_START             = "start";
     public static final String ACTION_STOP              = "stop";
@@ -57,6 +63,7 @@ public class CDVBackgroundGeolocation extends CordovaPlugin {
     private Boolean stopOnTerminate     = false;
     private Boolean isMoving            = false;
     private Boolean isAcquiringCurrentPosition = false;
+    private long isAcquiringCurrentPositionSince;
     private Intent backgroundServiceIntent;
     
     private DetectedActivity currentActivity;
@@ -208,13 +215,18 @@ public class CDVBackgroundGeolocation extends CordovaPlugin {
             callbackContext.success();
         } else if (BackgroundGeolocationService.ACTION_GET_CURRENT_POSITION.equalsIgnoreCase(action)) {
             result = true;
-            onGetCurrentPosition(callbackContext);
+            if (!isEnabled) {
+                callbackContext.error(401); // aka HTTP UNAUTHORIZED
+            } else {
+                onGetCurrentPosition(callbackContext);
+            }
         }
         return result;
     }
 
     private void onGetCurrentPosition(CallbackContext callbackContext) {
         isAcquiringCurrentPosition = true;
+        isAcquiringCurrentPositionSince = System.nanoTime();
         addCurrentPositionListener(callbackContext);
 
         Bundle event = new Bundle();
@@ -508,8 +520,18 @@ public class CDVBackgroundGeolocation extends CordovaPlugin {
      */
     public void onEventMainThread(ActivityRecognitionResult result) {
         currentActivity = result.getMostProbableActivity();
-        String activityName = BackgroundGeolocationService.getActivityName(currentActivity.getType());
-        int confidence = currentActivity.getConfidence();
+        
+        if (isAcquiringCurrentPosition) {
+            long elapsedMillis = (System.nanoTime() - isAcquiringCurrentPositionSince) / 1000000;
+            if (elapsedMillis > GET_CURRENT_POSITION_TIMEOUT) {
+                isAcquiringCurrentPosition = false;
+                Log.i(TAG, "- getCurrentPosition timeout, giving up");
+                for (CallbackContext callback : currentPositionCallbacks) {
+                    callback.error(408); // aka HTTP 408 Request Timeout
+                }
+                currentPositionCallbacks.clear();
+            }
+        }
     }
     /**
      * EventBus listener
@@ -528,6 +550,7 @@ public class CDVBackgroundGeolocation extends CordovaPlugin {
         runInBackground(locationCallback, result);
 
         if (isAcquiringCurrentPosition) {
+            // Current position has arrived:  release the hounds.
             isAcquiringCurrentPosition = false;
             for (CallbackContext callback : currentPositionCallbacks) {
                 result = new PluginResult(PluginResult.Status.OK, location);

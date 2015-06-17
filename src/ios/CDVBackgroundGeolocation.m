@@ -20,7 +20,7 @@
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(onMotionChange:) name:@"TSLocationManager.motionchange" object:nil];
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(onEnterGeofence:) name:@"TSLocationManager.geofence" object:nil];
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(onSyncComplete:) name:@"TSLocationManager.sync" object:nil];
-
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(onLocationManagerError:) name:@"TSLocationManager.error" object:nil];
 }
 
 /**
@@ -352,6 +352,25 @@
     [bgGeo error:taskId message:error];
     
 }
+
+- (void) onLocationManagerError:(NSNotification*)notification
+{
+    NSLog(@" - onLocationManagerError: %@", notification.userInfo);
+
+    NSString *errorType = [notification.userInfo objectForKey:@"type"];
+    if ([errorType isEqualToString:@"location"]) {
+        CDVPluginResult *result = [CDVPluginResult resultWithStatus:CDVCommandStatus_ERROR messageAsInt:[[notification.userInfo objectForKey:@"code"] intValue]];
+        if ([self.currentPositionListeners count]) {
+            [result setKeepCallbackAsBool:NO];
+            for (NSString *callbackId in self.currentPositionListeners) {
+                [self.commandDelegate sendPluginResult:result callbackId:callbackId];
+            }
+            [self.currentPositionListeners removeAllObjects];
+        }
+        [self.commandDelegate sendPluginResult:result callbackId:locationCallbackId];
+    }
+}
+
 /**
  * If you don't stopMonitoring when application terminates, the app will be awoken still when a
  * new location arrives, essentially monitoring the user's location even when they've killed the app.

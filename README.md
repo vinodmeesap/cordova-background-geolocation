@@ -282,8 +282,14 @@ Retrieves the current position.  This method instructs the native code to fetch 
 ######@param {Integer} taskId The taskId used to send to bgGeo.finish(taskId) in order to signal completion of your callbackFn
 
 ```
-bgGeo.changePace(true);  // <-- Aggressive GPS monitoring immediately engaged.
-bgGeo.changePace(false); // <-- Disable aggressive GPS monitoring.  Engages stationary-mode.
+bgGeo.getCurrentPosition(function(location, taskId) {
+    // This location is already persisted to plugin’s SQLite db.  
+    // If you’ve configured #autoSync: true, the HTTP POST has already started.
+
+    console.log(“- Current position received: “, location);
+    bgGeo.finish(taskId);
+});
+
 ```
 
 ####`changePace(enabled, successFn, failureFn)`
