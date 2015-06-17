@@ -14,7 +14,7 @@
 - (UIBackgroundTaskIdentifier) createBackgroundTask;
 - (void) stopBackgroundTask:(UIBackgroundTaskIdentifier)taskId;
 - (void) error:(UIBackgroundTaskIdentifier)taskId message:(NSString*)message;
-- (void) changePace:(BOOL)value;
+- (void) onPaceChange:(BOOL)value;
 - (void) setConfig:(NSDictionary*)command;
 - (NSDictionary*) getStationaryLocation;
 - (void) onSuspend:(NSNotification *)notification;
@@ -25,7 +25,6 @@
 - (void) addGeofence:(NSString*)identifier radius:(CLLocationDistance)radius latitude:(CLLocationDegrees)latitude longitude:(CLLocationDegrees)longitude notifyOnEntry:(BOOL)notifyOnEntry notifyOnExit:(BOOL)notifyOnExit;
 - (BOOL) removeGeofence:(NSString*)identifier;
 - (NSArray*) getGeofences;
-- (void) updateCurrentPosition;
 - (void) playSound:(SystemSoundID)soundId;
 @end
 
