@@ -20,10 +20,8 @@ The plugin creates the object `window.plugins.backgroundGeoLocation` with the me
 
   `changePace(true) // engages aggressive monitoring immediately`
   
-  `getCurrentPosition(success, fail)`
-
-  `onMotionChange(callback, fail)`
-
+  `onStationary(callback, fail)`
+  
   `addGeofence(config, callback, fail)`
   
   `removeGeofence(identifier, callback, fail)` 
@@ -91,7 +89,7 @@ function onDeviceReady() {
 
     // BackgroundGeoLocation is highly configurable.
     bgGeo.configure(callbackFn, failureFn, {
-        // Geolocation config
+        debug: true, // <-- enable this hear sounds for background-geolocation life-cycle.
         desiredAccuracy: 0,
         stationaryRadius: 50,
         distanceFilter: 50,
@@ -101,20 +99,16 @@ function onDeviceReady() {
         fastestLocationUpdateInterval: 5000,
         activityRecognitionInterval: 10000,
         stopTimeout: 0,
+        forceReload: true,      // <-- [Android] If the user closes the app **while location-tracking is started** , reboot app (WARNING: possibly distruptive to user) 
+        stopOnTerminate: false, // <-- [Android] Allow the background-service to run headless when user closes the app.
+        startOnBoot: true,      // <-- [Android] Auto start background-service in headless mode when device is powered-up.
         activityType: 'AutomotiveNavigation',
-
-        // Application config
-        debug: true, // <-- enable this hear sounds for background-geolocation life-cycle.
-        forceReloadOnLocationChange: false,  // <-- [Android] If the user closes the app **while location-tracking is started** , reboot app when a new location is recorded (WARNING: possibly distruptive to user) 
-        forceReloadOnMotionChange: false,    // <-- [Android] If the user closes the app **while location-tracking is started** , reboot app when device changes stationary-state (stationary->moving or vice-versa) --WARNING: possibly distruptive to user) 
-        forceReloadOnGeofence: false,        // <-- [Android] If the user closes the app **while location-tracking is started** , reboot app when a geofence crossing occurs --WARNING: possibly distruptive to user) 
-        stopOnTerminate: false,              // <-- [Android] Allow the background-service to run headless when user closes the app.
-        startOnBoot: true,                   // <-- [Android] Auto start background-service in headless mode when device is powered-up.
-        
-        // HTTP / SQLite config
+        /**
+        * HTTP Feature:  set an url to allow the native background service to POST locations to your server
+        */
         url: 'http://posttestserver.com/post.php?dir=cordova-background-geolocation',
-        batchSync: true,       // <-- [Default: false] Set true to sync locations to server in a single HTTP request.
-        autoSync: true,         // <-- [Default: true] Set true to sync each location to server as it arrives.
+        batchSync: false,       // <-- [Default: false] Set true to sync locations to server in 1 HTTP request.
+        autoSync: true,		// <-- [Default: true] Set true to sync each location to server as it arrives.
         maxDaysToPersist: 1,    // <-- Maximum days to persist a location in plugin's SQLite database when HTTP fails
         headers: {
             "X-FOO": "bar"
@@ -138,8 +132,7 @@ function onDeviceReady() {
 
 A fully-featured [SampleApp](https://github.com/christocracy/cordova-background-geolocation-SampleApp) is available in its own public repo.  After first cloning that repo, follow the installation instructions in the **README** there.  This SampleApp includes a settings-screen allowing you to quickly experiment with all the different settings available for each platform.
 
-![Home](/assets/images/iphone/screenshot-iphone5-geofences-framed.png "Home")
-![Settings](/assets/images/iphone/screenshot-iphone5-settings-framed.png "Settings")
+![SampleApp](/resources/sampleapp-ionic-home.png "SampleApp")
 
 ## Simple Sample Application
 
@@ -300,29 +293,7 @@ bgGeo.changePace(true);  // <-- Aggressive GPS monitoring immediately engaged.
 bgGeo.changePace(false); // <-- Disable aggressive GPS monitoring.  Engages stationary-mode.
 ```
 
-####`onMotionChange(callbackFn, failureFn)`
-Your ```callbackFn``` will be executed each time the device has changed-state between **MOVING** or **STATIONARY.  The ```callbackFn``` will be provided with a ```Location``` object as the 1st param, with the usual params (```latitude, longitude, accuracy, speed, bearing, altitude```), in addition to a ```taskId``` used to signal that your callback is finished.
-
-######@param {Boolean} isMoving `false` if entered **STATIONARY** mode; `true` if entered **MOVING** mode.
-######@param {Object} location The location at the state-change.
-######@param {Integer} taskId The taskId used to send to bgGeo.finish(taskId) in order to signal completion of your callbackFn
-
-```
-bgGeo.onMotionChange(function(isMoving, location, taskId) {
-    if (isMoving) {
-        console.log('Device has just started MOVING', location);
-    } else {
-        console.log('Device has just STOPPED', location);
-    }
-    bgGeo.finish(taskId);
-})
-
-```
-
-####`onStationary(callbackFn, failureFn)` 
-
-**DEPRECATED** &mdash; Use [onMotionChange](https://github.com/christocracy/cordova-background-geolocation/tree/trigger-activities#onmotionchangecallbackfn-failurefn) instead.
-
+####`onStationary(callbackFn, failureFn)`
 Your ```callbackFn``` will be executed each time the device has entered stationary-monitoring mode.  The ```callbackFn``` will be provided with a ```Location``` object as the 1st param, with the usual params (```latitude, longitude, accuracy, speed, bearing, altitude```), in addition to a ```taskId``` used to signal that your callback is finished.
 
 ######@param {Object} location The Location data
@@ -697,29 +668,13 @@ An interval of 0 is allowed, but not recommended, since location updates may be 
 
 the desired time between activity detections. Larger values will result in fewer activity detections while improving battery life. A value of 0 will result in activity detections at the fastest possible rate.
 
-####`@param {Integer millis} minimumActivityRecognitionConfidence` 
-
-Each activity-recognition-result returned by the API is tagged with a "confidence" level expressed as a %.  You can set your desired confidence to trigger a state-change.  Defaults to `80`.
-
-####`@param {String} triggerActivities`
-
-These are the comma-delimited list of [activity-names](https://developers.google.com/android/reference/com/google/android/gms/location/DetectedActivity) returned by the `ActivityRecognition` API which will trigger a state-change from **stationary** to **moving**.  By default, this list is set to all five **moving-states**:  `"in_vehicle, on_bicycle, on_foot, running, walking"`.  If you wish, you could configure the plugin to only engage **moving-mode** for vehicles by providing only `"in_vehicle"`.
-
 ####`@param {Integer minutes} stopTimeout`
 
 The number of miutes to wait before turning off the GPS after the ActivityRecognition System (ARS) detects the device is ```STILL``` (defaults to 0, no timeout).  If you don't set a value, the plugin is eager to turn off the GPS ASAP.  An example use-case for this configuration is to delay GPS OFF while in a car waiting at a traffic light.
 
-####`@param {Boolean} forceReloadOnMotionChange`
+####`@param {Boolean} forceReload`
 
-If the user closes the application while the background-tracking has been started,  location-tracking will continue on if ```stopOnTerminate: false```.  You may choose to force the foreground application to reload (since this is where your Javascript runs).  `forceReloadOnMotionChange: true` will reload the app only when a state-change occurs from **stationary -> moving** or vice-versa. (**WARNING** possibly disruptive to user).
-
-####`@param {Boolean} forceReloadOnLocationChange`
-
-If the user closes the application while the background-tracking has been started,  location-tracking will continue on if ```stopOnTerminate: false```.  You may choose to force the foreground application to reload (since this is where your Javascript runs).  `forceReloadOnLocationChange: true` will reload the app when a new location is recorded.
-
-####`@param {Boolean} forceReloadOnGeofence`
-
-If the user closes the application while the background-tracking has been started,  location-tracking will continue on if ```stopOnTerminate: false```.  You may choose to force the foreground application to reload (since this is where your Javascript runs).  `forceReloadOnGeolocation: true` will reload the app only when a geofence crossing event has occurred.
+If the user closes the application while the background-tracking has been started,  location-tracking will continue on if ```stopOnTerminate: false```.  You may choose to force the foreground application to reload (since this is where your Javascript runs) by setting ```foreceReload: true```.  This will guarantee that locations are always sent to your Javascript callback (**WARNING** possibly disruptive to user).
 
 ####`@param {Boolean} startOnBoot`
 

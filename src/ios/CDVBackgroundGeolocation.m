@@ -10,14 +10,14 @@
     NSDictionary *config;
 }
 
-@synthesize syncCallbackId, syncTaskId, locationCallbackId, geofenceListeners, stationaryRegionListeners, motionChangeListeners, currentPositionListeners;
+@synthesize syncCallbackId, syncTaskId, locationCallbackId, geofenceListeners, stationaryRegionListeners;
 
 - (void)pluginInitialize
 {
     bgGeo = [[TSLocationManager alloc] init];
     
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(onLocationChanged:) name:@"TSLocationManager.location" object:nil];
-    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(onMotionChange:) name:@"TSLocationManager.motionchange" object:nil];
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(onStationaryLocation:) name:@"TSLocationManager.stationary" object:nil];
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(onEnterGeofence:) name:@"TSLocationManager.geofence" object:nil];
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(onSyncComplete:) name:@"TSLocationManager.sync" object:nil];
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(onLocationManagerError:) name:@"TSLocationManager.error" object:nil];
@@ -84,7 +84,7 @@
  * Change pace to moving/stopped
  * @param {Boolean} isMoving
  */
-- (void) changePace:(CDVInvokedUrlCommand *)command
+- (void) onPaceChange:(CDVInvokedUrlCommand *)command
 {
     BOOL moving = [[command.arguments objectAtIndex: 0] boolValue];
     [bgGeo changePace:moving];
@@ -98,9 +98,8 @@
 - (void)onLocationChanged:(NSNotification*)notification {
     CLLocation *location = [notification.userInfo objectForKey:@"location"];
     
-    NSDictionary *locationData = [bgGeo locationToDictionary:location];
     NSDictionary *params = @{
-        @"location": locationData,
+        @"location": [bgGeo locationToDictionary:location],
         @"taskId": @([bgGeo createBackgroundTask])
     };
     CDVPluginResult* result = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsDictionary:params];
@@ -109,52 +108,18 @@
     [self.commandDelegate runInBackground:^{
         [self.commandDelegate sendPluginResult:result callbackId:self.locationCallbackId];
     }];
-
-    if ([self.currentPositionListeners count]) {
-        for (NSString *callbackId in self.currentPositionListeners) {
-            NSDictionary *params = @{
-                @"location": locationData,
-                @"taskId": @([bgGeo createBackgroundTask])
-            };
-            CDVPluginResult *result = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsDictionary:params];
-            [result setKeepCallbackAsBool:NO];
-            [self.commandDelegate runInBackground:^{
-                [self.commandDelegate sendPluginResult:result callbackId:callbackId];
-            }];       
-        }
-        [self.currentPositionListeners removeAllObjects];
-    }
 }
 
-
-- (void) onMotionChange:(NSNotification*)notification
+- (void) onStationaryLocation:(NSNotification*)notification
 {
-    if (![self.stationaryRegionListeners count] && ![self.motionChangeListeners count]) {
+    if (![self.stationaryRegionListeners count]) {
         return;
     }
-    BOOL isMoving               = [[notification.userInfo objectForKey:@"isMoving"] boolValue];
-    CLLocation *location        = [notification.userInfo objectForKey:@"location"];
-    NSDictionary *locationData  = [bgGeo locationToDictionary:location];
+    CLLocation *location = [notification.userInfo objectForKey:@"location"];   
+    NSDictionary *locationData = [bgGeo locationToDictionary:location];
 
-    // @deprecated stationaryRegionListeners in favour of dual-function motionChangeListeners
-    if (!isMoving) {
-        for (NSString *callbackId in self.stationaryRegionListeners) {
-            NSLog(@"- CALLBACK: %@", callbackId);
-            NSDictionary *params = @{
-                @"isMoving": @(isMoving),
-                @"location": locationData,
-                @"taskId": @([bgGeo createBackgroundTask])
-            };
-            CDVPluginResult *result = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsDictionary:params];
-            [result setKeepCallbackAsBool:YES];
-            [self.commandDelegate runInBackground:^{
-                [self.commandDelegate sendPluginResult:result callbackId:callbackId];
-            }];
-        }
-    }
-    for (NSString *callbackId in self.motionChangeListeners) {
+    for (NSString *callbackId in self.stationaryRegionListeners) {
         NSDictionary *params = @{
-            @"isMoving": @(isMoving),
             @"location": locationData,
             @"taskId": @([bgGeo createBackgroundTask])
         };
@@ -163,6 +128,7 @@
         [self.commandDelegate runInBackground:^{
             [self.commandDelegate sendPluginResult:result callbackId:callbackId];
         }];
+        
     }
 }
 
@@ -191,9 +157,6 @@
 
 - (void) onSyncComplete:(NSNotification*)notification
 {
-    if (syncCallbackId == nil) {
-        return;
-    }
     NSDictionary *params = @{
         @"locations": [notification.userInfo objectForKey:@"locations"],
         @"taskId": @(syncTaskId)
@@ -260,14 +223,6 @@
         self.stationaryRegionListeners = [[NSMutableArray alloc] init];
     }
     [self.stationaryRegionListeners addObject:command.callbackId];
-}
-
-- (void) addMotionChangeListener:(CDVInvokedUrlCommand*)command
-{
-    if (self.motionChangeListeners == nil) {
-        self.motionChangeListeners = [[NSMutableArray alloc] init];
-    }
-    [self.motionChangeListeners addObject:command.callbackId];
 }
 
 - (void) addGeofence:(CDVInvokedUrlCommand*)command
