@@ -9,24 +9,34 @@
 var exec = require("cordova/exec");
 module.exports = {
     /**
-    * @property {Object} stationaryRegion
+    * @property {Object} stationaryLocation
     */
-    stationaryRegion: null,
+    stationaryLocation: null,
     /**
     * @property {Object} config
     */
     config: {},
-
+    /**
+    * @private {Error} error
+    */
     configure: function(success, failure, config) {
+        var me = this;
         config = config || {};
         this.config = config;
-        success = success || function(location) {};
-        var mySuccess = function(location) {
+        success = success || function(location, taskId) {
+            me.finish(taskId);
+        };
+        
+        var mySuccess = function(params) {
+            var location    = params.location || params;
+            var taskId      = params.taskId || 'task-id-undefined';
             // Transform timestamp to Date instance.
             if (location.timestamp) {
                 location.timestamp = new Date(location.timestamp);
             }
-            success.call(this, location);
+            me._runBackgroundTask(taskId, function() {
+                success.call(this, location, taskId);
+            });
         }
         exec(mySuccess,
              failure || function() {},
@@ -49,18 +59,31 @@ module.exports = {
             'stop',
             []);
     },
-    finish: function(success, failure) {
+    finish: function(taskId, success, failure) {
+        if (!taskId) {
+            throw "BackgroundGeolocation#finish must now be provided with a taskId as 1st param, eg: bgGeo.finish(taskId).  taskId is provided by 2nd param in callback";
+        }
         exec(success || function() {},
             failure || function() {},
             'BackgroundGeoLocation',
             'finish',
-            []);
+            [taskId]);
+    },
+    error: function(taskId, message) {
+        if (!taskId) {
+            throw "BackgroundGeolocation#error must now be provided with a taskId as 1st param, eg: bgGeo.finish(taskId).  taskId is provided by 2nd param in callback";
+        }
+        exec(function() {},
+            function() {},
+            'BackgroundGeoLocation',
+            'error',
+            [taskId, message]);
     },
     changePace: function(isMoving, success, failure) {
         exec(success || function() {},
             failure || function() {},
             'BackgroundGeoLocation',
-            'onPaceChange',
+            'changePace',
             [isMoving]);
     },
     /**
@@ -70,7 +93,7 @@ module.exports = {
     * @param {Integer} timeout
     */
     setConfig: function(success, failure, config) {
-        this.apply(this.config, config);
+        this._apply(this.config, config);
         exec(success || function() {},
             failure || function() {},
             'BackgroundGeoLocation',
@@ -89,15 +112,24 @@ module.exports = {
     },
     /**
     * Add a stationary-region listener.  Whenever the devices enters "stationary-mode", your #success callback will be executed with #location param containing #radius of region
+    * @deprecated in favour of dual-function #onMotionChange
     * @param {Function} success
     * @param {Function} failure [optional] NOT IMPLEMENTED
     */
     onStationary: function(success, failure) {
         var me = this;
-        success = success || function() {};
-        var callback = function(region) {
-            me.stationaryRegion = region;
-            success.apply(me, arguments);
+        success = success || function(location, taskId) {
+            me.finish(taskId);
+        };
+        var callback = function(params) {
+            var location    = params.location || params,
+                taskId      = params.taskId || 'task-id-undefined';
+            
+            me.stationaryLocation = location;
+
+            me._runBackgroundTask(taskId, function() {
+                success.call(me, location, taskId);
+            }, failure);
         };
         exec(callback,
             failure || function() {},
@@ -105,13 +137,46 @@ module.exports = {
             'addStationaryRegionListener',
             []);
     },
+    /**
+    * Add a movement-state-change listener.  Whenever the devices enters "stationary" or "moving" mode, your #success callback will be executed with #location param containing #radius of region
+    * @param {Function} success
+    * @param {Function} failure [optional] NOT IMPLEMENTED
+    */
+    onMotionChange: function(success, failure) {
+        var me = this;
+        success = success || function(isMoving, location, taskId) {
+            me.finish(taskId);
+        };
+        var callback = function(params) {
+            var isMoving    = params.isMoving;
+            var location    = params.location;
+            var taskId      = params.taskId || 'task-id-undefined';
+            
+            if (!isMoving) {
+                me.stationaryLocation = location;
+            }
+
+            me._runBackgroundTask(taskId, function() {
+                success.call(me, isMoving, location, taskId);
+            }, failure);
+        };
+        exec(callback,
+            failure || function() {},
+            'BackgroundGeoLocation',
+            'addMotionChangeListener',
+            []);
+    },
     getLocations: function(success, failure) {
         if (typeof(success) !== 'function') {
             throw "BackgroundGeolocation#getLocations requires a success callback";
         }
         var me = this;
-        var mySuccess = function(locations) {
-            success.call(this, me._setTimestamp(locations));
+        var mySuccess = function(params) {
+            var taskId      = params.taskId;
+            var locations   = me._setTimestamp(params.locations);
+            me._runBackgroundTask(taskId, function() {
+                success.call(me, locations, taskId);
+            });
         }
         exec(mySuccess,
             failure || function() {},
@@ -127,8 +192,13 @@ module.exports = {
             throw "BackgroundGeolocation#sync requires a success callback";
         }
         var me = this;
-        var mySuccess = function(locations) {
-            success.call(this, me._setTimestamp(locations));
+        var mySuccess = function(params) {
+            var locations   = me._setTimestamp(params.locations);
+            var taskId      = params.taskId;
+
+            me._runBackgroundTask(taskId, function() {
+                success.call(me, locations, taskId);
+            });
         }
         exec(mySuccess,
             failure || function() {},
@@ -170,22 +240,98 @@ module.exports = {
         if (!config.radius) {
             throw "#addGeofence requires a #radius";
         }
+        if ( (typeof(config.notifyOnEnter) === 'undefined') && (typeof(config.notifyOnExit) === 'undefined') ) {
+            throw "#addGeofence requires at least notifyOnEnter {Boolean} and/or #notifyOnExit {Boolean}";
+        }
         exec(success || function() {},
             failure || function() {},
             'BackgroundGeoLocation',
             'addGeofence',
             [config]);
     },
+    /**
+    * remove a geofence
+    * @param {String} identifier
+    */
+    removeGeofence: function(identifier, success, failure) {
+        if (!identifier) {
+            throw "#removeGeofence requires an 'identifier'";
+        }
+        exec(success || function() {},
+            failure || function() {},
+            'BackgroundGeoLocation',
+            'removeGeofence',
+            [identifier]);
+    },
     onGeofence: function(success, failure) {
         if (!typeof(success) === 'function') {
             throw "#onGeofence requires a success callback";
         }
-        exec(success,
+        var me = this;
+        var mySuccess = function(params) {
+            var taskId = params.taskId || 'task-id-undefined';
+            delete(params.taskId);
+
+            me._runBackgroundTask(taskId, function() {
+                success.call(me, params, taskId);
+            }, failure);
+        };
+        exec(mySuccess,
             failure || function() {},
             'BackgroundGeoLocation',
             'onGeofence',
             []);
     },
+    /**
+    * Fetch a list of all monitored geofences
+    */
+    getGeofences: function(success, failure) {
+        exec(success || function() {},
+            failure || function() {},
+            'BackgroundGeoLocation',
+            'getGeofences',
+            []);
+    },
+    /**
+    * Fetch the current position
+    */
+    getCurrentPosition: function(success, failure) {
+        var me = this;
+        success = success || function(location, taskId) {
+            me.finish(taskId);
+        };
+        var mySuccess = function(params) {
+            var location    = params.location || params;
+            var taskId      = params.taskId || 'task-id-undefined';
+            // Transform timestamp to Date instance.
+            if (location.timestamp) {
+                location.timestamp = new Date(location.timestamp);
+            }
+            me._runBackgroundTask(taskId, function() {
+                success.call(this, location, taskId);
+            });
+        }
+        exec(mySuccess || function() {},
+            failure || function() {},
+            'BackgroundGeoLocation',
+            'getCurrentPosition',
+            []);
+    },
+    /**
+    * Play a system sound.  This is totally experimental.
+    * iOS http://iphonedevwiki.net/index.php/AudioServices
+    * Android:
+    */
+    playSound: function(soundId) {
+        var success = function() {};
+        var failure = function() {};
+        exec(success,
+            failure,
+            'BackgroundGeoLocation',
+            'playSound',
+            [soundId]);  
+    },
+
     _setTimestamp: function(rs) {
         // Transform timestamp to Date instance.
         if (typeof(rs) === 'object') {
@@ -195,7 +341,24 @@ module.exports = {
         }
         return rs;
     },
-    apply: function(destination, source) {
+    _runBackgroundTask: function(taskId, callback) {
+        var me = this;
+        try {
+            callback.call(this);
+        } catch(e) {
+            console.log("*************************************************************************************");
+            console.error("BackgroundGeolocation caught a Javascript Exception in your application code");
+            console.log(" while running in a background thread.  Auto-finishing background-task:", taskId);
+            console.log(" to prevent application crash");
+            console.log("*************************************************************************************");
+            console.log("STACK:\n", e.stack);
+            console.error(e);
+
+            // And finally, here's our raison d'etre:  catching the error in order to ensure background-task is completed.
+            this.error(taskId, e.message);
+        }
+    },
+    _apply: function(destination, source) {
         source = source || {};
         for (var property in source) {
             if (source.hasOwnProperty(property)) {

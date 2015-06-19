@@ -138,26 +138,28 @@ var app = {
 
         app.onClickHome();
 
-        /**
-        * This would be your own callback for Ajax-requests after POSTing background geolocation to your server.
-        */
-        var yourAjaxCallback = function(response) {
-            // Very important to call #finish -- it signals to the native plugin that it can destroy the background thread, which your callbackFn is running in.
-            // IF YOU DON'T, THE OS CAN KILL YOUR APP FOR RUNNING TOO LONG IN THE BACKGROUND
-            bgGeo.finish();
-        };
-
+        
         /**
         * This callback will be executed every time a geolocation is recorded in the background.
         */
-        var callbackFn = function(location) {
+        var callbackFn = function(location, taskId) {
             console.log('[js] BackgroundGeoLocation callback:  ' + JSON.stringify(location));
             
             // Update our current-position marker.
             app.setCurrentLocation(location);
 
             // After you Ajax callback is complete, you MUST signal to the native code, which is running a background-thread, that you're done and it can gracefully kill that thread.
-            yourAjaxCallback.call(this);
+            
+            /**
+             * This would be your own callback for Ajax-requests after POSTing background geolocation to your server.
+             */
+            var yourAjaxCallback = function(response) {
+                // Very important to call #finish -- it signals to the native plugin that it can destroy the background thread, which your callbackFn is running in.
+                // IF YOU DON'T, THE OS CAN KILL YOUR APP FOR RUNNING TOO LONG IN THE BACKGROUND
+                bgGeo.finish(taskId);
+            };
+            
+            yourAjaxCallback.call(this, {status: 200});
         };
 
         var failureFn = function(error) {
@@ -165,7 +167,7 @@ var app = {
         };
 
         // Only ios emits this stationary event
-        bgGeo.onStationary(function(location) {
+        bgGeo.onStationary(function(location, taskId) {
             console.log('[js] BackgroundGeoLocation onStationary ' + JSON.stringify(location));
             
             app.setCurrentLocation(location);
@@ -187,6 +189,8 @@ var app = {
             var center = new google.maps.LatLng(coords.latitude, coords.longitude);
             app.stationaryRadius.setRadius(radius);
             app.stationaryRadius.setCenter(center);
+            
+            bgGeo.finish(taskId);
 
         });
 
@@ -195,22 +199,22 @@ var app = {
             debug: true, // <-- enable this hear sounds for background-geolocation life-cycle.
             desiredAccuracy: 0,
             stationaryRadius: 50,
-            distanceFilter: 25,
+            distanceFilter: 50,
             disableElasticity: false, // <-- [iOS] Default is 'false'.  Set true to disable speed-based distanceFilter elasticity
             locationUpdateInterval: 5000,
             minimumActivityRecognitionConfidence: 80,   // 0-100%.  Minimum activity-confidence for a state-change 
             fastestLocationUpdateInterval: 5000,
             activityRecognitionInterval: 10000,
             stopTimeout: 0,
-            forceReload: true,      // <-- [Android] If the user closes the app **while location-tracking is started** , reboot app (WARNING: possibly distruptive to user) 
-            stopOnTerminate: false, // <-- [Android] Allow the background-service to run headless when user closes the app.
-            startOnBoot: true,      // <-- [Android] Auto start background-service in headless mode when device is powered-up.
+            forceReload: false,      // <-- [Android] If the user closes the app **while location-tracking is started** , reboot app (WARNING: possibly distruptive to user) 
+            stopOnTerminate: true, // <-- [Android] Allow the background-service to run headless when user closes the app.
+            startOnBoot: false,      // <-- [Android] Auto start background-service in headless mode when device is powered-up.
             activityType: 'AutomotiveNavigation',
             /**
             * HTTP Feature:  set an url to allow the native background service to POST locations to your server
             */
             url: 'http://posttestserver.com/post.php?dir=cordova-background-geolocation',
-            batchSync: false,       // <-- [Default: false] Set true to sync locations to server in a single HTTP request.
+            batchSync: true,       // <-- [Default: false] Set true to sync locations to server in a single HTTP request.
             autoSync: true,         // <-- [Default: true] Set true to sync each location to server as it arrives.
             maxDaysToPersist: 1,    // <-- Maximum days to persist a location in plugin's SQLite database when HTTP fails
             headers: {
@@ -221,9 +225,10 @@ var app = {
             }
         });
         
-        bgGeo.onGeofence(function(identifier) {
+        bgGeo.onGeofence(function(identifier, taskId) {
             alert('Enter Geofence: ' + identifier);
-            console.log('[js] Geofence ENTER: ', identifier);
+            console.log('[js] Geofence ENTER: ', identifier, taskId);
+            bgGeo.finish(taskId);
         });
 
         // Add longpress event for adding GeoFence of hard-coded radius 200m.
