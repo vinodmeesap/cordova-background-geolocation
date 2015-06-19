@@ -10,6 +10,7 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 import org.json.JSONException;
 import android.os.Bundle;
+import com.google.android.gms.common.GooglePlayServicesUtil;
 import com.google.android.gms.location.ActivityRecognitionResult;
 import com.google.android.gms.location.DetectedActivity;
 import com.transistorsoft.locationmanager.BackgroundGeolocationService;
@@ -133,11 +134,12 @@ public class CDVBackgroundGeolocation extends CordovaPlugin {
                 callbackContext.error("Cannot #changePace while disabled");
             } else {
                 result = true;
+                isMoving = data.getBoolean(0);
                 paceChangeCallback = callbackContext; 
                 Bundle event = new Bundle();
                 event.putString("name", action);
                 event.putBoolean("request", true);
-                event.putBoolean("isMoving", data.getBoolean(0));
+                event.putBoolean("isMoving", isMoving);
                 EventBus.getDefault().post(event);
             }
         } else if (ACTION_SET_CONFIG.equalsIgnoreCase(action)) {
@@ -500,15 +502,18 @@ public class CDVBackgroundGeolocation extends CordovaPlugin {
             }
         } else if (ACTION_ON_MOTION_CHANGE.equalsIgnoreCase(name)) {
             this.onMotionChange(event);
+        } else if (name.equalsIgnoreCase(BackgroundGeolocationService.ACTION_GOOGLE_PLAY_SERVICES_CONNECT_ERROR)) {
+            GooglePlayServicesUtil.getErrorDialog(event.getInt("errorCode"), this.cordova.getActivity(), 1001).show();
         }
     }
 
     private void onMotionChange(Bundle event) {
         PluginResult result;
+        isMoving = event.getBoolean("isMoving");
         try {
             JSONObject params = new JSONObject();
             params.put("location", new JSONObject(event.getString("location")));
-            params.put("isMoving", event.getBoolean("isMoving"));
+            params.put("isMoving", isMoving);
             params.put("taskId", "android-bg-task-id");
             result = new PluginResult(PluginResult.Status.OK, params);
         } catch (JSONException e) {
@@ -544,14 +549,13 @@ public class CDVBackgroundGeolocation extends CordovaPlugin {
      * @param {Location} location
      */
     public void onEventMainThread(Location location) {
-        JSONObject locationData = BackgroundGeolocationService.locationToJson(location, currentActivity);
+        JSONObject locationData = BackgroundGeolocationService.locationToJson(location, currentActivity, isMoving);
         this.onLocationChange(locationData);
     }
     private void onLocationChange(JSONObject location) {
         PluginResult result = new PluginResult(PluginResult.Status.OK, location);
         result.setKeepCallback(true);
 
-        isMoving = true;
         result.setKeepCallback(true);
         runInBackground(locationCallback, result);
 
