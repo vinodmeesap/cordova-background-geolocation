@@ -3,7 +3,7 @@
 <plugin xmlns="http://www.phonegap.com/ns/plugins/1.0"
     xmlns:android="http://schemas.android.com/apk/res/android"
     id="com.transistorsoft.cordova.background-geolocation"
-    version="0.5.1">
+    version="0.5.2">
     <name>BackgroundGeolocation</name>
     <description>Sophisticated, battery-efficient background-geolocation plugin for Cordova</description>
     <license>MIT</license>
@@ -25,6 +25,7 @@
         <source-file src="src/android/libs/eventbus-2.4.0.jar" target-dir="libs" />
         <source-file src="src/android/libs/transistor-locationmanager.jar" target-dir="libs" />
         <source-file src="src/android/CDVBackgroundGeolocation.java" target-dir="src/com/transistorsoft/cordova/bggeo" />
+        <source-file src="src/android/BootReceiver.java" target-dir="src/com/transistorsoft/cordova/bggeo" />
 
         <config-file target="AndroidManifest.xml" parent="/manifest/application">
             <service android:name="com.transistorsoft.locationmanager.BackgroundGeolocationService" />
