@@ -134,7 +134,7 @@ var app = {
         app.watchForegroundPosition();
     },
     configureBackgroundGeoLocation: function() {
-        var bgGeo = window.plugins.backgroundGeoLocation;
+        var bgGeo = window.BackgroundGeolocation;
 
         app.onClickHome();
 
@@ -281,7 +281,7 @@ var app = {
         }
     },
     onClickChangePace: function(value) {
-        var bgGeo   = window.plugins.backgroundGeoLocation,
+        var bgGeo   = window.BackgroundGeolocation,
             btnPace = app.btnPace;
 
         btnPace.removeClass('btn-success');
@@ -309,7 +309,7 @@ var app = {
         app.path = undefined;
     },
     onClickToggleEnabled: function(value) {
-        var bgGeo       = window.plugins.backgroundGeoLocation,
+        var bgGeo       = window.BackgroundGeolocation,
             btnEnabled  = app.btnEnabled,
             isEnabled   = ENV.toggle('enabled');
         
