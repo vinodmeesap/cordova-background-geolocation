@@ -40,7 +40,7 @@ module.exports = {
         }
         exec(mySuccess,
              failure || function() {},
-             'BackgroundGeoLocation',
+             'BackgroundGeolocation',
              'configure',
              [config]
         );
@@ -48,14 +48,14 @@ module.exports = {
     start: function(success, failure, config) {
         exec(success || function() {},
              failure || function() {},
-             'BackgroundGeoLocation',
+             'BackgroundGeolocation',
              'start',
              []);
     },
     stop: function(success, failure, config) {
         exec(success || function() {},
             failure || function() {},
-            'BackgroundGeoLocation',
+            'BackgroundGeolocation',
             'stop',
             []);
     },
@@ -65,7 +65,7 @@ module.exports = {
         }
         exec(success || function() {},
             failure || function() {},
-            'BackgroundGeoLocation',
+            'BackgroundGeolocation',
             'finish',
             [taskId]);
     },
@@ -75,14 +75,14 @@ module.exports = {
         }
         exec(function() {},
             function() {},
-            'BackgroundGeoLocation',
+            'BackgroundGeolocation',
             'error',
             [taskId, message]);
     },
     changePace: function(isMoving, success, failure) {
         exec(success || function() {},
             failure || function() {},
-            'BackgroundGeoLocation',
+            'BackgroundGeolocation',
             'changePace',
             [isMoving]);
     },
@@ -96,7 +96,7 @@ module.exports = {
         this._apply(this.config, config);
         exec(success || function() {},
             failure || function() {},
-            'BackgroundGeoLocation',
+            'BackgroundGeolocation',
             'setConfig',
             [config]);
     },
@@ -106,7 +106,7 @@ module.exports = {
     getStationaryLocation: function(success, failure) {
         exec(success || function() {},
             failure || function() {},
-            'BackgroundGeoLocation',
+            'BackgroundGeolocation',
             'getStationaryLocation',
             []);
     },
@@ -133,7 +133,7 @@ module.exports = {
         };
         exec(callback,
             failure || function() {},
-            'BackgroundGeoLocation',
+            'BackgroundGeolocation',
             'addStationaryRegionListener',
             []);
     },
@@ -162,7 +162,7 @@ module.exports = {
         };
         exec(callback,
             failure || function() {},
-            'BackgroundGeoLocation',
+            'BackgroundGeolocation',
             'addMotionChangeListener',
             []);
     },
@@ -180,7 +180,7 @@ module.exports = {
         }
         exec(mySuccess,
             failure || function() {},
-            'BackgroundGeoLocation',
+            'BackgroundGeolocation',
             'getLocations',
             []);
     },
@@ -202,7 +202,7 @@ module.exports = {
         }
         exec(mySuccess,
             failure || function() {},
-            'BackgroundGeoLocation',
+            'BackgroundGeolocation',
             'sync',
             []);
     },
@@ -212,7 +212,7 @@ module.exports = {
     getOdometer: function(success, failure) {
         exec(success || function() {},
             failure || function() {},
-            'BackgroundGeoLocation',
+            'BackgroundGeolocation',
             'getOdometer',
             []);
     },
@@ -222,7 +222,7 @@ module.exports = {
     resetOdometer: function(success, failure) {
         exec(success || function() {},
             failure || function() {},
-            'BackgroundGeoLocation',
+            'BackgroundGeolocation',
             'resetOdometer',
             []);
     },
@@ -245,7 +245,7 @@ module.exports = {
         }
         exec(success || function() {},
             failure || function() {},
-            'BackgroundGeoLocation',
+            'BackgroundGeolocation',
             'addGeofence',
             [config]);
     },
@@ -259,7 +259,7 @@ module.exports = {
         }
         exec(success || function() {},
             failure || function() {},
-            'BackgroundGeoLocation',
+            'BackgroundGeolocation',
             'removeGeofence',
             [identifier]);
     },
@@ -278,7 +278,7 @@ module.exports = {
         };
         exec(mySuccess,
             failure || function() {},
-            'BackgroundGeoLocation',
+            'BackgroundGeolocation',
             'onGeofence',
             []);
     },
@@ -288,7 +288,7 @@ module.exports = {
     getGeofences: function(success, failure) {
         exec(success || function() {},
             failure || function() {},
-            'BackgroundGeoLocation',
+            'BackgroundGeolocation',
             'getGeofences',
             []);
     },
@@ -313,7 +313,7 @@ module.exports = {
         }
         exec(mySuccess || function() {},
             failure || function() {},
-            'BackgroundGeoLocation',
+            'BackgroundGeolocation',
             'getCurrentPosition',
             []);
     },
@@ -327,7 +327,7 @@ module.exports = {
         var failure = function() {};
         exec(success,
             failure,
-            'BackgroundGeoLocation',
+            'BackgroundGeolocation',
             'playSound',
             [soundId]);  
     },
