@@ -324,13 +324,6 @@
 
 - (void) getCurrentPosition:(CDVInvokedUrlCommand*)command
 {
-    if (![bgGeo isEnabled]) {
-        NSLog(@"- CDVBackgroundGeolocation#getCurrentPosition cannot be used when plugin is disabled");
-        // If plugin isn't enabled, return 401 Unauthorized
-        CDVPluginResult *result = [CDVPluginResult resultWithStatus:CDVCommandStatus_ERROR messageAsInt:401];
-        [self.commandDelegate sendPluginResult:result callbackId:command.callbackId];
-        return;
-    }
     if (self.currentPositionListeners == nil) {
         self.currentPositionListeners = [[NSMutableArray alloc] init];
     }
