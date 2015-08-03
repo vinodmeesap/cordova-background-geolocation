@@ -8,7 +8,7 @@ Follows the [Cordova Plugin spec](http://cordova.apache.org/docs/en/3.0.0/plugin
 This plugin leverages Cordova/PhoneGap's [require/define functionality used for plugins](http://simonmacdonald.blogspot.ca/2012/08/so-you-wanna-write-phonegap-200-android.html).
 
 ## Using the plugin ##
-The plugin creates the object `window.plugins.backgroundGeoLocation` with the methods
+The plugin creates the object `window.BackgroundGeolocation` with the methods
 
   `configure(success, fail, option)`,
 	
@@ -61,11 +61,18 @@ The plugin creates the object `window.plugins.backgroundGeoLocation` with the me
 // As with all Cordova plugins, you must configure within an #deviceready callback.
 //
 function onDeviceReady() {
+    // Get a reference to the plugin.
+    var bgGeo = window.BackgroundGeolocation;
+    
     /**
     * This callback will be executed every time a geolocation is recorded in the background.
     */
     var callbackFn = function(location, taskId) {
-        console.log('[js] BackgroundGeoLocation callback:  ' + location.latitude + ',' + location.longitude);
+        var coords = location.coords;
+        var lat    = coords.latitude;
+        var lng    = coords.longitude;
+        
+        console.log('[js] BackgroundGeoLocation callback:  ' + JSON.stringify(location));
 
         /**
         * This would be your own callback for Ajax-requests after POSTing background geolocation to your server.

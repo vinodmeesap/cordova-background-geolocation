@@ -20,6 +20,7 @@ import android.app.AlertDialog;
 import android.content.DialogInterface;
 
 import de.greenrobot.event.EventBus;
+import de.greenrobot.event.Subscribe;
 import android.app.Activity;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -217,11 +218,7 @@ public class CDVBackgroundGeolocation extends CordovaPlugin {
             callbackContext.success();
         } else if (BackgroundGeolocationService.ACTION_GET_CURRENT_POSITION.equalsIgnoreCase(action)) {
             result = true;
-            if (!isEnabled) {
-                callbackContext.error(401); // aka HTTP UNAUTHORIZED
-            } else {
-                onGetCurrentPosition(callbackContext);
-            }
+            onGetCurrentPosition(callbackContext);
         }
         return result;
     }
@@ -231,10 +228,18 @@ public class CDVBackgroundGeolocation extends CordovaPlugin {
         isAcquiringCurrentPositionSince = System.nanoTime();
         addCurrentPositionListener(callbackContext);
 
-        Bundle event = new Bundle();
-        event.putString("name", BackgroundGeolocationService.ACTION_GET_CURRENT_POSITION);
-        event.putBoolean("request", true);
-        EventBus.getDefault().post(event);
+        if (!isEnabled) {
+            EventBus.getDefault().register(this);
+            if (!BackgroundGeolocationService.isInstanceCreated()) {
+                backgroundServiceIntent.putExtra("command", BackgroundGeolocationService.ACTION_GET_CURRENT_POSITION);
+                this.cordova.getActivity().startService(backgroundServiceIntent);
+            }
+        } else {
+            Bundle event = new Bundle();
+            event.putString("name", BackgroundGeolocationService.ACTION_GET_CURRENT_POSITION);
+            event.putBoolean("request", true);
+            EventBus.getDefault().post(event);
+        }
     }
     private Boolean onAddGeofence(JSONObject config) {
         try {
@@ -310,6 +315,8 @@ public class CDVBackgroundGeolocation extends CordovaPlugin {
             try {
                 JSONObject location = new JSONObject(launchIntent.getStringExtra("location"));
                 onLocationChange(location);
+                launchIntent.removeExtra("forceReload");
+                launchIntent.removeExtra("location");
             } catch (JSONException e) {
                 Log.w(TAG, e);
             }
@@ -442,6 +449,7 @@ public class CDVBackgroundGeolocation extends CordovaPlugin {
      * EventBus listener for Event Bundle
      * @param {Bundle} event
      */
+    @Subscribe
     public void onEventMainThread(Bundle event) {
         if (event.containsKey("request")) {
             return;
@@ -529,6 +537,7 @@ public class CDVBackgroundGeolocation extends CordovaPlugin {
      * EventBus listener for ARS
      * @param {ActivityRecognitionResult} result
      */
+    @Subscribe
     public void onEventMainThread(ActivityRecognitionResult result) {
         currentActivity = result.getMostProbableActivity();
         
@@ -548,20 +557,30 @@ public class CDVBackgroundGeolocation extends CordovaPlugin {
      * EventBus listener
      * @param {Location} location
      */
+    @Subscribe
     public void onEventMainThread(Location location) {
         JSONObject locationData = BackgroundGeolocationService.locationToJson(location, currentActivity, isMoving);
         this.onLocationChange(locationData);
     }
     private void onLocationChange(JSONObject location) {
+        Log.i(TAG, "- CDVBackgroundGeolocation Rx Location: " + isEnabled);
+
         PluginResult result = new PluginResult(PluginResult.Status.OK, location);
         result.setKeepCallback(true);
 
-        result.setKeepCallback(true);
         runInBackground(locationCallback, result);
 
         if (isAcquiringCurrentPosition) {
             // Current position has arrived:  release the hounds.
             isAcquiringCurrentPosition = false;
+
+            // When currentPosition is explicitly requested while plugin is stopped, shut Service down again and stop listening to EventBus
+            if (!isEnabled) {
+                backgroundServiceIntent.removeExtra("command");
+                EventBus.getDefault().unregister(this);
+                this.cordova.getActivity().stopService(backgroundServiceIntent);
+            }
+            // Execute callbacks.
             for (CallbackContext callback : currentPositionCallbacks) {
                 result = new PluginResult(PluginResult.Status.OK, location);
                 result.setKeepCallback(false);
@@ -572,7 +591,8 @@ public class CDVBackgroundGeolocation extends CordovaPlugin {
     }
     /**
     * EventBus handler for Geofencing events
-    */    
+    */
+    @Subscribe
     public void onEventMainThread(GeofencingEvent geofenceEvent) {
         Log.i(TAG, "- Rx GeofencingEvent: " + geofenceEvent);
 

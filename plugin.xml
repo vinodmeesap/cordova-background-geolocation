@@ -3,7 +3,7 @@
 <plugin xmlns="http://www.phonegap.com/ns/plugins/1.0"
     xmlns:android="http://schemas.android.com/apk/res/android"
     id="com.transistorsoft.cordova.background-geolocation"
-    version="0.5.2">
+    version="0.5.3">
     <name>BackgroundGeolocation</name>
     <description>Sophisticated, battery-efficient background-geolocation plugin for Cordova</description>
     <license>MIT</license>
@@ -13,17 +13,23 @@
         <engine name="cordova" version=">=3.0.0" />
     </engines>
 
+    <!-- 
+        Pre-Cordova 5, non-npm plugin reference.  Uncomment this if you're not using Cordova 5.
     <dependency id="org.apache.cordova.dialogs" />
+    -->
 
-    <js-module src="www/BackgroundGeoLocation.js" name="BackgroundGeoLocation">
-        <clobbers target="plugins.backgroundGeoLocation" />
+    <!-- Cordova 5 npm-style plugin referernce.  Comment this out if you're not using Cordova 5 -->
+    <dependency id="cordova-plugin-dialogs" />
+
+    <js-module src="www/BackgroundGeolocation.js" name="BackgroundGeolocation">
+        <clobbers target="window.BackgroundGeolocation" />
     </js-module>
 
     <!-- android -->
     <platform name="android">
-        <framework src="com.google.android.gms:play-services-location:7.3.0" />
-        <source-file src="src/android/libs/eventbus-2.4.0.jar" target-dir="libs" />
-        <source-file src="src/android/libs/transistor-locationmanager.jar" target-dir="libs" />
+        <framework src="src/android/build.gradle" custom="true" type="gradleReference" />
+        <resource-file src="src/android/libs/tslocationmanager.aar" target="src/android/libs/tslocationmanager.aar" />
+
         <source-file src="src/android/CDVBackgroundGeolocation.java" target-dir="src/com/transistorsoft/cordova/bggeo" />
         <source-file src="src/android/BootReceiver.java" target-dir="src/com/transistorsoft/cordova/bggeo" />
 
@@ -51,7 +57,7 @@
 
         </config-file>   
         <config-file target="res/xml/config.xml" parent="/*">
-            <feature name="BackgroundGeoLocation">
+            <feature name="BackgroundGeolocation">
                 <param name="android-package" value="com.transistorsoft.cordova.bggeo.CDVBackgroundGeolocation"/>
             </feature>
         </config-file> 
@@ -61,7 +67,7 @@
         <!-- required background modes:  App registers for location updates -->
         
         <config-file target="*-Info.plist" parent="NSLocationAlwaysUsageDescription">
-            <string>This app requires background location tracking</string>
+            <string>TSLocationManager requires background location tracking</string>
         </config-file>
 
         <config-file target="*-Info.plist" parent="UIBackgroundModes">
@@ -71,7 +77,7 @@
         </config-file>
 
         <config-file target="config.xml" parent="/*">
-            <feature name="BackgroundGeoLocation">
+            <feature name="BackgroundGeolocation">
                 <param name="ios-package" value="CDVBackgroundGeolocation"/>
             </feature>
         </config-file>
