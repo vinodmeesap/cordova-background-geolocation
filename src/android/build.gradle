@@ -27,6 +27,5 @@ repositories{
 dependencies {
     compile 'com.google.android.gms:play-services:7.5.0'
     compile 'de.greenrobot:eventbus:3.0.0-beta1'
-    //provided 'de.greenrobot:eventbus-annotation-processor:3.0.0-beta1'
     compile(name:'tslocationmanager', ext:'aar')
 }
