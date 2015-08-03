@@ -20,6 +20,7 @@ import android.app.AlertDialog;
 import android.content.DialogInterface;
 
 import de.greenrobot.event.EventBus;
+import de.greenrobot.event.Subscribe;
 import android.app.Activity;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -448,6 +449,7 @@ public class CDVBackgroundGeolocation extends CordovaPlugin {
      * EventBus listener for Event Bundle
      * @param {Bundle} event
      */
+    @Subscribe
     public void onEventMainThread(Bundle event) {
         if (event.containsKey("request")) {
             return;
@@ -535,6 +537,7 @@ public class CDVBackgroundGeolocation extends CordovaPlugin {
      * EventBus listener for ARS
      * @param {ActivityRecognitionResult} result
      */
+    @Subscribe
     public void onEventMainThread(ActivityRecognitionResult result) {
         currentActivity = result.getMostProbableActivity();
         
@@ -554,6 +557,7 @@ public class CDVBackgroundGeolocation extends CordovaPlugin {
      * EventBus listener
      * @param {Location} location
      */
+    @Subscribe
     public void onEventMainThread(Location location) {
         JSONObject locationData = BackgroundGeolocationService.locationToJson(location, currentActivity, isMoving);
         this.onLocationChange(locationData);
@@ -587,7 +591,8 @@ public class CDVBackgroundGeolocation extends CordovaPlugin {
     }
     /**
     * EventBus handler for Geofencing events
-    */    
+    */
+    @Subscribe
     public void onEventMainThread(GeofencingEvent geofenceEvent) {
         Log.i(TAG, "- Rx GeofencingEvent: " + geofenceEvent);
 

@@ -27,9 +27,9 @@
 
     <!-- android -->
     <platform name="android">
-        <framework src="com.google.android.gms:play-services-location:7.3.0" />
-        <source-file src="src/android/libs/eventbus-2.4.0.jar" target-dir="libs" />
-        <source-file src="src/android/libs/transistor-locationmanager.jar" target-dir="libs" />
+        <framework src="src/android/build.gradle" custom="true" type="gradleReference" />
+        <resource-file src="src/android/libs/tslocationmanager.aar" target="src/android/libs/tslocationmanager.aar" />
+
         <source-file src="src/android/CDVBackgroundGeolocation.java" target-dir="src/com/transistorsoft/cordova/bggeo" />
         <source-file src="src/android/BootReceiver.java" target-dir="src/com/transistorsoft/cordova/bggeo" />
 
