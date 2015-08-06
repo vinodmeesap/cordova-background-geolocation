@@ -46,12 +46,12 @@ The plugin creates the object `window.BackgroundGeolocation` with the methods
 
 ```
 
-   cordova plugin add https://github.com/christocracy/cordova-background-geolocation.git
+   cordova plugin add https://github.com/transistorsoft/cordova-background-geolocation.git
 ```
 
 ## Help
 
-[See the Wiki](https://github.com/christocracy/cordova-background-geolocation/wiki)
+[See the Wiki](https://github.com/transistorsoft/cordova-background-geolocation/wiki)
 
 ## Example
 
@@ -159,13 +159,13 @@ This SampleApp contains no plugins so you must first start by adding its require
 
 
 ```
-$ git clone git@github.com:christocracy/cordova-background-geolocation.git
+$ git clone git@github.com:transistorsoft/cordova-background-geolocation.git
 $ mkdir tmp
 $ cp -R cordova-background-geolocation/example/SampleApp tmp
 $ cd tmp/SampleApp
 $ cordova plugin add cordova-plugin-whitelist
 $ cordova plugin add cordova-plugin-geolocation
-$ cordova plugin add git@github.com:christocracy/cordova-background-geolocation.git
+$ cordova plugin add git@github.com:transistorsoft/cordova-background-geolocation.git
 $ cordova platform add ios
 $ cordova platform add android
 $ cordova build ios
@@ -177,7 +177,7 @@ If you're using XCode, boot the SampleApp in the iOS Simulator and enable ```Deb
 
 ## Help!  It doesn't work!
 
-Yes it does.  [See the Wiki](https://github.com/christocracy/cordova-background-geolocation/wiki)
+Yes it does.  [See the Wiki](https://github.com/transistorsoft/cordova-background-geolocation/wiki)
 
 - on iOS, background tracking won't be engaged until you travel about **2-3 city blocks**, so go for a walk or car-ride (or use the Simulator with ```Debug->Location->City Drive```)
 - Android is much quicker detecting movements; typically several meters of walking will do it.
@@ -185,7 +185,7 @@ Yes it does.  [See the Wiki](https://github.com/christocracy/cordova-background-
 
 ```
 $ cordova plugin remove com.transistorsoft.cordova.background-geolocation
-$ cordova plugin add git@github.com:christocracy/cordova-background-geolocation.git
+$ cordova plugin add git@github.com:transistorsoft/cordova-background-geolocation.git
 
 $ cordova platform remove ios
 $ cordova platform add ios
@@ -227,7 +227,7 @@ Keep in mind that it is **not** possible to use ```start()``` at the ```pause```
 
 ####`configure(locationCallback, failureCallback, config)`
 
-Configures the plugin's parameters (@see following [Config](https://github.com/christocracy/cordova-background-geolocation/blob/edge/README.md#config) section for accepted ```config``` params.  The ```locationCallback``` will be executed each time a new Geolocation is recorded and provided with the following parameters:
+Configures the plugin's parameters (@see following [Config](https://github.com/transistorsoft/cordova-background-geolocation/blob/edge/README.md#config) section for accepted ```config``` params.  The ```locationCallback``` will be executed each time a new Geolocation is recorded and provided with the following parameters:
 
 ######@param {Object} location The Location data
 ######@param {Integer} taskId The taskId used to send to bgGeo.finish(taskId) in order to signal completion of your callbackFn
@@ -328,7 +328,7 @@ bgGeo.onMotionChange(function(isMoving, location, taskId) {
 
 ####`onStationary(callbackFn, failureFn)` 
 
-**DEPRECATED** &mdash; Use [onMotionChange](https://github.com/christocracy/cordova-background-geolocation/tree/trigger-activities#onmotionchangecallbackfn-failurefn) instead.
+**DEPRECATED** &mdash; Use [onMotionChange](https://github.com/transistorsoft/cordova-background-geolocation/tree/trigger-activities#onmotionchangecallbackfn-failurefn) instead.
 
 Your ```callbackFn``` will be executed each time the device has entered stationary-monitoring mode.  The ```callbackFn``` will be provided with a ```Location``` object as the 1st param, with the usual params (```latitude, longitude, accuracy, speed, bearing, altitude```), in addition to a ```taskId``` used to signal that your callback is finished.
 
@@ -662,6 +662,10 @@ No Post Params.
     "activity":{  // <-- Android-only currently
       "type":"still",
       "confidence":48
+    },
+    "battery": {  // <-- Battery charge-state
+      "level": 0.87,
+      "is_charging": false
     }
   },
   "android_id":"39dbac67e2c9d80"
