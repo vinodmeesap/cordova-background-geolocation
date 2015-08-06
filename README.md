@@ -662,6 +662,10 @@ No Post Params.
     "activity":{  // <-- Android-only currently
       "type":"still",
       "confidence":48
+    },
+    "battery": {  // <-- Battery charge-state
+      "level": 0.87,
+      "is_charging": false
     }
   },
   "android_id":"39dbac67e2c9d80"
