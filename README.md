@@ -145,33 +145,8 @@ function onDeviceReady() {
 
 A fully-featured [SampleApp](https://github.com/christocracy/cordova-background-geolocation-SampleApp) is available in its own public repo.  After first cloning that repo, follow the installation instructions in the **README** there.  This SampleApp includes a settings-screen allowing you to quickly experiment with all the different settings available for each platform.
 
-![Home](/assets/images/iphone/screenshot-iphone5-geofences-framed.png "Home")
-![Settings](/assets/images/iphone/screenshot-iphone5-settings-framed.png "Settings")
-
-## Simple Sample Application
-
-This plugin itself hosts a more rudimentary SampleApp in ```example/SampleApp``` folder.  This SampleApp should be used for reference only -- for actual field-testing, please use the **more advanced** [SampleApp](https://github.com/christocracy/cordova-background-geolocation-SampleApp) above.  
-
-This SampleApp contains no plugins so you must first start by adding its required plugins (most importantly, this one).  **NOTE** In order to use the SampleApp, it's important to make a copy of it **outside** of the plugin itself.
-
-![SampleApp](/android-sample-app.png "SampleApp")
-
-
-
-```
-$ git clone git@github.com:transistorsoft/cordova-background-geolocation.git
-$ mkdir tmp
-$ cp -R cordova-background-geolocation/example/SampleApp tmp
-$ cd tmp/SampleApp
-$ cordova plugin add cordova-plugin-whitelist
-$ cordova plugin add cordova-plugin-geolocation
-$ cordova plugin add git@github.com:transistorsoft/cordova-background-geolocation.git
-$ cordova platform add ios
-$ cordova platform add android
-$ cordova build ios
-$ cordova build android
-
-```
+![Home](https://dl.dropboxusercontent.com/u/2319755/cordova-background-geolocaiton/screenshot-iphone5-geofences-framed-README.png)
+![Settings](https://dl.dropboxusercontent.com/u/2319755/cordova-background-geolocaiton/screenshot-iphone5-settings-framed-README.png)
 
 If you're using XCode, boot the SampleApp in the iOS Simulator and enable ```Debug->Location->City Drive```.
 
@@ -511,7 +486,7 @@ When enabled, the plugin will emit sounds for life-cycle events of background-ge
 - Acquiring stationary location sound: **[ios]** "tick,tick,tick" sound, *[android]* none
 - Stationary location acquired sound:  **[ios]** "bloom" sound, **[android]** long "beeeeeep"
 
-![Enable Background Audio](/enable-background-audio.png "Enable Background Audio")
+![Enable Background Audio](https://dl.dropboxusercontent.com/u/2319755/cordova-background-geolocaiton/enable-background-audio.png)
 
 ####`@param {Integer} desiredAccuracy [0, 10, 100, 1000] in meters`
 
@@ -552,11 +527,11 @@ A gps location will be recorded every 930m
 
 Note the following real example of background-geolocation on highway 101 towards San Francisco as the driver slows down as he runs into slower traffic (geolocations become compressed as distanceFilter decreases)
 
-![distanceFilter at highway speed](/distance-filter-highway.png "distanceFilter at highway speed")
+![distanceFilter at highway speed](https://dl.dropboxusercontent.com/u/2319755/cordova-background-geolocaiton/distance-filter-highway.png)
 
 Compare now background-geolocation in the scope of a city.  In this image, the left-hand track is from a cab-ride, while the right-hand track is walking speed.
 
-![distanceFilter at city scale](/distance-filter-city.png "distanceFilter at city scale")
+![distanceFilter at city scale](https://dl.dropboxusercontent.com/u/2319755/cordova-background-geolocaiton/distance-filter-city.png)
 
 ####`@param {Boolean} stopOnTerminate`
 Enable this in order to force a stop() when the application terminated (e.g. on iOS, double-tap home button, swipe away the app).  On Android, ```stopOnTerminate: false``` will cause the plugin to operate as a headless background-service (in this case, you should configure an #url in order for the background-service to send the location to your server)
@@ -757,7 +732,7 @@ The underlying GeoLocator you can choose to use 'DesiredAccuracy' or 'DesiredAcc
 
 # Geofence Features
 
-![Geofence Features](https://www.dropbox.com/s/609iibr6ofzoq7p/Screenshot%202015-06-06%2017.05.33.png?dl=1)
+![Geofence Features](https://dl.dropboxusercontent.com/u/2319755/cordova-background-geolocaiton/screenshot-iphone5-geofences-framed.png)
 
 The plugin includes native **geofencing** features.  You may add, remove and query the list of monitored geofences from the native plugin.  The native plugin will persist monitored geofences and re-initiate them when the app boots or the device is restarted.
 
