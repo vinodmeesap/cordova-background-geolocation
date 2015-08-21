@@ -295,8 +295,9 @@ module.exports = {
     /**
     * Fetch the current position
     */
-    getCurrentPosition: function(success, failure) {
+    getCurrentPosition: function(success, failure, options) {
         var me = this;
+        options = options || {};
         success = success || function(location, taskId) {
             me.finish(taskId);
         };
@@ -315,7 +316,7 @@ module.exports = {
             failure || function() {},
             'BackgroundGeolocation',
             'getCurrentPosition',
-            []);
+            [options]);
     },
     /**
     * Play a system sound.  This is totally experimental.

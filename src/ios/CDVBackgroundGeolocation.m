@@ -17,6 +17,7 @@
     bgGeo = [[TSLocationManager alloc] init];
     
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(onLocationChanged:) name:@"TSLocationManager.location" object:nil];
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(onLocationTimeout:) name:@"TSLocationManager.locationtimeout" object:nil];
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(onMotionChange:) name:@"TSLocationManager.motionchange" object:nil];
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(onEnterGeofence:) name:@"TSLocationManager.geofence" object:nil];
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(onSyncComplete:) name:@"TSLocationManager.sync" object:nil];
@@ -126,6 +127,16 @@
     }
 }
 
+- (void)onLocationTimeout:(NSNotification*)notification {
+    if ([self.currentPositionListeners count]) {
+        for (NSString *callbackId in self.currentPositionListeners) {
+            CDVPluginResult* result = [CDVPluginResult resultWithStatus:CDVCommandStatus_ERROR messageAsString:@"timeout"];
+            [result setKeepCallbackAsBool:NO];
+            [self.commandDelegate sendPluginResult:result callbackId:callbackId];
+        }
+        [self.currentPositionListeners removeAllObjects];
+    }
+}
 
 - (void) onMotionChange:(NSNotification*)notification
 {
@@ -324,11 +335,12 @@
 
 - (void) getCurrentPosition:(CDVInvokedUrlCommand*)command
 {
+    NSDictionary *options  = [command.arguments objectAtIndex:0];
     if (self.currentPositionListeners == nil) {
         self.currentPositionListeners = [[NSMutableArray alloc] init];
     }
     [self.currentPositionListeners addObject:command.callbackId];
-    [bgGeo updateCurrentPosition];
+    [bgGeo updateCurrentPosition:options];
 }
 
 - (void) playSound:(CDVInvokedUrlCommand*)command
