@@ -404,6 +404,9 @@ public class CDVBackgroundGeolocation extends CordovaPlugin {
             if (config.has("url")) {
                 editor.putString("url", config.getString("url"));
             }
+            if (config.has("method")) {
+                editor.putString("method", config.getString("method"));
+            }
             if (config.has("autoSync")) {
                 editor.putBoolean("autoSync", config.getBoolean("autoSync"));
             }
