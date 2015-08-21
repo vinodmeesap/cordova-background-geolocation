@@ -120,6 +120,7 @@ function onDeviceReady() {
         
         // HTTP / SQLite config
         url: 'http://posttestserver.com/post.php?dir=cordova-background-geolocation',
+        method: 'POST',
         batchSync: true,       // <-- [Default: false] Set true to sync locations to server in a single HTTP request.
         autoSync: true,         // <-- [Default: true] Set true to sync each location to server as it arrives.
         maxDaysToPersist: 1,    // <-- Maximum days to persist a location in plugin's SQLite database when HTTP fails
@@ -558,6 +559,10 @@ If you **don't** configure the optional HTTP feature, the only way to delete the
 ####`@param {String} url`
 
 Your server url where you wish to HTTP POST location data to.
+
+####`@param {String} method [POST]`
+
+The HTTP method to use when creating an HTTP request to your configured `#url`.  Defaults to `POST`.  Valid values are `POST`, `PUT` and `OPTIONS`.
 
 ####`@param {String} batchSync [false]`
 
