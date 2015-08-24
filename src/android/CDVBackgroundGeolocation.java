@@ -218,12 +218,13 @@ public class CDVBackgroundGeolocation extends CordovaPlugin {
             callbackContext.success();
         } else if (BackgroundGeolocationService.ACTION_GET_CURRENT_POSITION.equalsIgnoreCase(action)) {
             result = true;
-            onGetCurrentPosition(callbackContext);
+            JSONObject options = data.getJSONObject(0);
+            onGetCurrentPosition(callbackContext, options);
         }
         return result;
     }
 
-    private void onGetCurrentPosition(CallbackContext callbackContext) {
+    private void onGetCurrentPosition(CallbackContext callbackContext, JSONObject options) {
         isAcquiringCurrentPosition = true;
         isAcquiringCurrentPositionSince = System.nanoTime();
         addCurrentPositionListener(callbackContext);
@@ -238,6 +239,13 @@ public class CDVBackgroundGeolocation extends CordovaPlugin {
             Bundle event = new Bundle();
             event.putString("name", BackgroundGeolocationService.ACTION_GET_CURRENT_POSITION);
             event.putBoolean("request", true);
+            if (options.has("timeout")) {
+                try {
+                    event.putInt("timeout", options.getInt("timeout"));
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+            }
             EventBus.getDefault().post(event);
         }
     }
@@ -515,9 +523,34 @@ public class CDVBackgroundGeolocation extends CordovaPlugin {
             this.onMotionChange(event);
         } else if (name.equalsIgnoreCase(BackgroundGeolocationService.ACTION_GOOGLE_PLAY_SERVICES_CONNECT_ERROR)) {
             GooglePlayServicesUtil.getErrorDialog(event.getInt("errorCode"), this.cordova.getActivity(), 1001).show();
+        } else if (name.equalsIgnoreCase(BackgroundGeolocationService.ACTION_GET_CURRENT_POSITION)) {
+            this.onCurrentPositionTimeout(event);
         }
     }
 
+    private void onCurrentPositionTimeout(Bundle event) {
+        this.finishAcquiringCurrentPosition(false);
+        // Execute callbacks.
+        for (CallbackContext callback : currentPositionCallbacks) {
+            Log.i(TAG, "- send callback");
+            
+            PluginResult result = new PluginResult(PluginResult.Status.ERROR);
+            result.setKeepCallback(false);
+            runInBackground(callback, result);
+        }
+        currentPositionCallbacks.clear();
+
+    }
+    private void finishAcquiringCurrentPosition(boolean success) {
+        // Current position has arrived:  release the hounds.
+        isAcquiringCurrentPosition = false;
+        // When currentPosition is explicitly requested while plugin is stopped, shut Service down again and stop listening to EventBus
+        if (!isEnabled) {
+            backgroundServiceIntent.removeExtra("command");
+            EventBus.getDefault().unregister(this);
+            this.cordova.getActivity().stopService(backgroundServiceIntent);
+        }
+    }
     private void onMotionChange(Bundle event) {
         PluginResult result;
         isMoving = event.getBoolean("isMoving");
@@ -574,22 +607,14 @@ public class CDVBackgroundGeolocation extends CordovaPlugin {
         runInBackground(locationCallback, result);
 
         if (isAcquiringCurrentPosition) {
-            // Current position has arrived:  release the hounds.
-            isAcquiringCurrentPosition = false;
-
-            // When currentPosition is explicitly requested while plugin is stopped, shut Service down again and stop listening to EventBus
-            if (!isEnabled) {
-                backgroundServiceIntent.removeExtra("command");
-                EventBus.getDefault().unregister(this);
-                this.cordova.getActivity().stopService(backgroundServiceIntent);
-            }
+            finishAcquiringCurrentPosition(true);
             // Execute callbacks.
             for (CallbackContext callback : currentPositionCallbacks) {
                 result = new PluginResult(PluginResult.Status.OK, location);
                 result.setKeepCallback(false);
                 runInBackground(callback, result);
             }
-            currentPositionCallbacks.clear(); 
+            currentPositionCallbacks.clear();
         }
     }
     /**
