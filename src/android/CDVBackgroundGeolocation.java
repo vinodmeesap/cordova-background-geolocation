@@ -409,6 +409,9 @@ public class CDVBackgroundGeolocation extends CordovaPlugin {
             if (config.has("forceReloadOnGeofence")) {
                 editor.putBoolean("forceReloadOnGeofence", config.getBoolean("forceReloadOnGeofence"));
             }
+            if (config.has("maxDaysToPersist")) {
+                editor.putInt("maxDaysToPersist", config.getInt("maxDaysToPersist"));
+            }
             if (config.has("url")) {
                 editor.putString("url", config.getString("url"));
             }
