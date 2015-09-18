@@ -438,6 +438,13 @@ public class CDVBackgroundGeolocation extends CordovaPlugin {
                     Log.w(TAG, "- Failed to parse #headers to JSONObject.  Ignored");
                 }
             }
+            // License
+            if (preferences.contains("cordova-background-geolocation-license")) {
+                editor.putString("license", preferences.getString("cordova-background-geolocation-license", null));
+            }
+            if (preferences.contains("cordova-background-geolocation-orderId")) {
+                editor.putString("orderId", preferences.getString("cordova-background-geolocation-orderId", null));
+            }
             editor.commit();
             return true;
         } catch (JSONException e) {
