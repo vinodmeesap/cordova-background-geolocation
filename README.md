@@ -52,15 +52,7 @@ Edit your application's `config.xml` and add the following `<parameter>`s.  Ente
 
 ```
 <widget id="com.yourcompany.appname" version="0.0.4" xmlns="http://www.w3.org/ns/widgets" xmlns:cdv="http://cordova.apache.org/ns/1.0">
-  <name>BG Geo</name>
-  <description>
-        Cordova BackgroundGeolocation SampleApp
-  </description>
-  
-  <author email="chris@transistorsoft.com" href="http://christocracy.github.io/cordova-background-geolocation">
-      Transistor Software
-    </author>
-  <content src="index.html"/>
+  <name>Application Name</name>
   .
   .
   .
