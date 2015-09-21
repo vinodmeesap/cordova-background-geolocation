@@ -45,8 +45,33 @@ The plugin creates the object `window.BackgroundGeolocation` with the methods
 ## Installing the plugin ##
 
 ```
-
    cordova plugin add https://github.com/transistorsoft/cordova-background-geolocation.git
+```
+
+Edit your application's `config.xml` and add the following `<parameter>`s.  Enter the values you received in the "Product Registration" email:
+
+```
+<widget id="com.yourcompany.appname" version="0.0.4" xmlns="http://www.w3.org/ns/widgets" xmlns:cdv="http://cordova.apache.org/ns/1.0">
+  <name>BG Geo</name>
+  <description>
+        Cordova BackgroundGeolocation SampleApp
+  </description>
+  
+  <author email="chris@transistorsoft.com" href="http://christocracy.github.io/cordova-background-geolocation">
+      Transistor Software
+    </author>
+  <content src="index.html"/>
+  .
+  .
+  .
+  <!-- Cordova Background Geolocation License -->
+  <preference name="cordova-background-geolocation-license" value="<your License>" />
+  <preference name="cordova-background-geolocation-orderId" value="<your Order ID>" />
+  .
+  .
+  .
+</widget>
+
 ```
 
 ## Help
