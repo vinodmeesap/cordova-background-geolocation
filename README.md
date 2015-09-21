@@ -48,7 +48,7 @@ The plugin creates the object `window.BackgroundGeolocation` with the methods
    cordova plugin add https://github.com/transistorsoft/cordova-background-geolocation.git
 ```
 
-Edit your application's `config.xml` and add the following `<parameter>`s.  Enter the values you received in the "Product Registration" email:
+Edit your application's `config.xml` and add the following `<preference>`s.  Enter the values you received in the "Product Registration" email:
 
 ```
 <widget id="com.yourcompany.appname" version="0.0.4" xmlns="http://www.w3.org/ns/widgets" xmlns:cdv="http://cordova.apache.org/ns/1.0">
