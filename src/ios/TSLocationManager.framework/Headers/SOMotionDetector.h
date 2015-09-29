@@ -46,7 +46,7 @@ typedef enum
 
 #pragma mark - Properties
 
-@property (copy) void (^motionTypeChangedBlock) (SOMotionType motionType);
+@property (copy) void (^motionTypeChangedBlock) (SOMotionType motionType, int shakeCount, double averageVectorSum);
 @property (copy) void (^accelerationChangedBlock) (CMAcceleration acceleration);
 
 @property (nonatomic, readonly) SOMotionType motionType;
