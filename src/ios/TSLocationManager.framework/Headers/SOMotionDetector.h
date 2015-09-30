@@ -64,6 +64,7 @@ typedef enum
 - (void)startDetection;
 - (void)stopDetection;
 - (void)stopShakeDetection;
+- (void)startShakeDetection;
 
 #pragma mark - Customization Methods
 
