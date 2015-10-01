@@ -551,6 +551,18 @@ Compare now background-geolocation in the scope of a city.  In this image, the l
 
 ![distanceFilter at city scale](https://dl.dropboxusercontent.com/u/2319755/cordova-background-geolocaiton/distance-filter-city.png)
 
+####`@param {Integer millis} [10000] activityRecognitionInterval`
+
+Defaults to `10000` (10 seconds).  The desired time between activity detections. Larger values will result in fewer activity detections while improving battery life. A value of 0 will result in activity detections at the fastest possible rate.
+
+####`@param {Integer millis} minimumActivityRecognitionConfidence` 
+
+Each activity-recognition-result returned by the API is tagged with a "confidence" level expressed as a %.  You can set your desired confidence to trigger a state-change.  Defaults to `80`.
+
+####`@param {Integer minutes} stopTimeout`
+
+The number of miutes to wait before turning off the GPS after the ActivityRecognition System (ARS) detects the device is `STILL` (**Android:** defaults to 0, no timeout, **iOS:** defaults to 5min).  If you don't set a value, the plugin is eager to turn off the GPS ASAP.  An example use-case for this configuration is to delay GPS OFF while in a car waiting at a traffic light.
+
 ####`@param {Boolean} stopOnTerminate`
 Enable this in order to force a stop() when the application terminated (e.g. on iOS, double-tap home button, swipe away the app).  On Android, ```stopOnTerminate: false``` will cause the plugin to operate as a headless background-service (in this case, you should configure an #url in order for the background-service to send the location to your server)
 
@@ -701,21 +713,9 @@ If ```#fastestLocationUpdateInterval``` is set slower than ```#locationUpdateInt
 ========
 An interval of 0 is allowed, but not recommended, since location updates may be extremely fast on future implementations.
 
-####`@param {Integer millis} activityRecognitionInterval`
-
-the desired time between activity detections. Larger values will result in fewer activity detections while improving battery life. A value of 0 will result in activity detections at the fastest possible rate.
-
-####`@param {Integer millis} minimumActivityRecognitionConfidence` 
-
-Each activity-recognition-result returned by the API is tagged with a "confidence" level expressed as a %.  You can set your desired confidence to trigger a state-change.  Defaults to `80`.
-
 ####`@param {String} triggerActivities`
 
 These are the comma-delimited list of [activity-names](https://developers.google.com/android/reference/com/google/android/gms/location/DetectedActivity) returned by the `ActivityRecognition` API which will trigger a state-change from **stationary** to **moving**.  By default, this list is set to all five **moving-states**:  `"in_vehicle, on_bicycle, on_foot, running, walking"`.  If you wish, you could configure the plugin to only engage **moving-mode** for vehicles by providing only `"in_vehicle"`.
-
-####`@param {Integer minutes} stopTimeout`
-
-The number of miutes to wait before turning off the GPS after the ActivityRecognition System (ARS) detects the device is ```STILL``` (defaults to 0, no timeout).  If you don't set a value, the plugin is eager to turn off the GPS ASAP.  An example use-case for this configuration is to delay GPS OFF while in a car waiting at a traffic light.
 
 ####`@param {Boolean} forceReloadOnMotionChange`
 
@@ -744,6 +744,10 @@ Defaults to ```false```.  Set ```true``` to disable automatic speed-based ```#di
 ####`@param {String} activityType [AutomotiveNavigation, OtherNavigation, Fitness, Other]`
 
 Presumably, this affects ios GPS algorithm.  See [Apple docs](https://developer.apple.com/library/ios/documentation/CoreLocation/Reference/CLLocationManager_Class/CLLocationManager/CLLocationManager.html#//apple_ref/occ/instp/CLLocationManager/activityType) for more information
+
+####`@param {Boolean} useSignificantChangesOnly [false]`
+
+Defaults to `false`.  Set `true` in order to disable constant background-tracking and use only the iOS [Significant Changes API](https://developer.apple.com/library/ios/documentation/CoreLocation/Reference/CLLocationManager_Class/index.html#//apple_ref/occ/instm/CLLocationManager/startMonitoringSignificantLocationChanges).  If Apple has denied your application due to background-tracking, this can be a solution.  **NOTE** The Significant Changes API will report a location only when a significant change from the last location has occurred.  Many of the configuration parameters **will be ignored**, such as `#distanceFilter`, `#stationaryRadius`, `#activityType`, etc.
 
 ### WP8 Config
 
