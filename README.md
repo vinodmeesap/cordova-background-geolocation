@@ -124,7 +124,7 @@ function onDeviceReady() {
         minimumActivityRecognitionConfidence: 80,   // 0-100%.  Minimum activity-confidence for a state-change 
         fastestLocationUpdateInterval: 5000,
         activityRecognitionInterval: 10000,
-        stopTimeout: 0,
+        stopTimeout: 2,	 // Stop-detection timeout minutes (wait x minutes to turn off tracking)
         activityType: 'AutomotiveNavigation',
 
         // Application config
