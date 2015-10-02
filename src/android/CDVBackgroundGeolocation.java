@@ -313,6 +313,7 @@ public class CDVBackgroundGeolocation extends CordovaPlugin {
 
     private void setEnabled(boolean value) {
         // Don't set a state that we're already in.
+        Log.i(TAG, "- setEnabled:  current value: " + isEnabled);
         if (value == isEnabled) {
             return;
         }
