@@ -496,15 +496,7 @@ Use the following config-parameters with the #configure method:
 
 ####`@param {Boolean} debug`
 
-When enabled, the plugin will emit sounds for life-cycle events of background-geolocation!  **NOTE iOS**:  In addition, you must manually enable the *Audio and Airplay* background mode in *Background Capabilities* to hear these debugging sounds.
-
-- Exit stationary region:  **[ios]** Calendar event notification sound
-- GeoLocation recorded:  **[ios]** SMS-sent sound, **[android]** "blip", *[WP8]* High beep, 1 sec.
-- Aggressive geolocation engaged:  **[ios]** SIRI listening sound, **[android]** "Doodly-doo"
-- Acquiring stationary location sound: **[ios]** "tick,tick,tick" sound, *[android]* none
-- Stationary location acquired sound:  **[ios]** "bloom" sound, **[android]** long "beeeeeep"
-
-![Enable Background Audio](https://dl.dropboxusercontent.com/u/2319755/cordova-background-geolocaiton/enable-background-audio.png)
+When enabled, the plugin will emit sounds for life-cycle events of background-geolocation!  **NOTE iOS**:  In addition, you must manually enable the *Audio and Airplay* background mode in *Background Capabilities* to hear these [debugging sounds](wiki/Debug-Sounds).  See the wiki [Debug Sounds](wiki/Debug-Sounds) for a detailed description of these sounds.
 
 ####`@param {Integer} desiredAccuracy [0, 10, 100, 1000] in meters`
 
