@@ -636,10 +636,8 @@ public class CDVBackgroundGeolocation extends CordovaPlugin {
         Log.i(TAG, "- Rx GeofencingEvent: " + geofenceEvent);
 
         if (!geofenceCallbacks.isEmpty()) {
-            for (Geofence geofence : geofenceEvent.getTriggeringGeofences()) {
-                JSONObject params = BackgroundGeolocationService.geofencingEventToJson(geofenceEvent, geofence);
-                handleGeofencingEvent(params);
-            }
+            JSONObject params = BackgroundGeolocationService.geofencingEventToJson(geofenceEvent, currentActivity, isMoving);
+            handleGeofencingEvent(params);
         }
     }
     private void handleGeofencingEvent(JSONObject params) {
