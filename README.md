@@ -124,6 +124,7 @@ function onDeviceReady() {
         minimumActivityRecognitionConfidence: 80,   // 0-100%.  Minimum activity-confidence for a state-change 
         fastestLocationUpdateInterval: 5000,
         activityRecognitionInterval: 10000,
+        stopDetectionDelay: 1,   // [iOS] delay x minutes before entering stop-detection mode
         stopTimeout: 2,	 // Stop-detection timeout minutes (wait x minutes to turn off tracking)
         activityType: 'AutomotiveNavigation',
 
@@ -559,6 +560,13 @@ Each activity-recognition-result returned by the API is tagged with a "confidenc
 ####`@param {Integer minutes} stopTimeout`
 
 The number of miutes to wait before turning off the GPS after the ActivityRecognition System (ARS) detects the device is `STILL` (**Android:** defaults to 0, no timeout, **iOS:** defaults to 5min).  If you don't set a value, the plugin is eager to turn off the GPS ASAP.  An example use-case for this configuration is to delay GPS OFF while in a car waiting at a traffic light.
+
+**iOS Stop-detection timing**
+![](https://dl.dropboxusercontent.com/u/2319755/cordova-background-geolocaiton/ios-stop-detection-timing.png)
+
+####`@param {Integer minutes} stopDetectionDelay [0]` 
+
+Allows the stop-detection system to be delayed from activating.  When the stop-detection system is engaged, the GPS is off and only the accelerometer is monitored.  Stop-detection will only engage if this timer expires.  The timer is cancelled if any movement is detected before expiration.  If a value of `0` is specified, the stop-detection system will engage as soon as the device is detected to be stationary.
 
 ####`@param {Boolean} stopOnTerminate`
 Enable this in order to force a stop() when the application terminated (e.g. on iOS, double-tap home button, swipe away the app).  On Android, ```stopOnTerminate: false``` will cause the plugin to operate as a headless background-service (in this case, you should configure an #url in order for the background-service to send the location to your server)
