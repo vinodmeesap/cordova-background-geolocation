@@ -746,6 +746,10 @@ Presumably, this affects ios GPS algorithm.  See [Apple docs](https://developer.
 
 Defaults to `false`.  Set `true` in order to disable constant background-tracking and use only the iOS [Significant Changes API](https://developer.apple.com/library/ios/documentation/CoreLocation/Reference/CLLocationManager_Class/index.html#//apple_ref/occ/instm/CLLocationManager/startMonitoringSignificantLocationChanges).  If Apple has denied your application due to background-tracking, this can be a solution.  **NOTE** The Significant Changes API will report a location only when a significant change from the last location has occurred.  Many of the configuration parameters **will be ignored**, such as `#distanceFilter`, `#stationaryRadius`, `#activityType`, etc.
 
+####`@param {Boolan} disableMotionActivityUpdates [false]`
+
+Set `true` to disable iOS `CMMotionActivity` updates (eg: walking, running, vehicle, biking, stationary)
+
 ### WP8 Config
 
 ####`{Integer [0, 10, 100, 1000]} desiredAccuracy`
