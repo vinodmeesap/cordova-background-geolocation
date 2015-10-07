@@ -28,6 +28,7 @@ import android.location.Location;
 import android.util.Log;
 import android.media.AudioManager;
 import android.media.ToneGenerator;
+import android.widget.Toast;
 
 public class CDVBackgroundGeolocation extends CordovaPlugin {
     private static final String TAG = "TSLocationManager";
@@ -536,6 +537,8 @@ public class CDVBackgroundGeolocation extends CordovaPlugin {
             GooglePlayServicesUtil.getErrorDialog(event.getInt("errorCode"), this.cordova.getActivity(), 1001).show();
         } else if (name.equalsIgnoreCase(BackgroundGeolocationService.ACTION_GET_CURRENT_POSITION)) {
             this.onCurrentPositionTimeout(event);
+        } else if (name.equalsIgnoreCase(BackgroundGeolocationService.ACTION_LOCATION_ERROR)) {
+            this.onLocationError(event);
         }
     }
 
@@ -669,14 +672,17 @@ public class CDVBackgroundGeolocation extends CordovaPlugin {
         }
     }
 
+    private Boolean isDebugging() {
+        SharedPreferences settings = this.cordova.getActivity().getSharedPreferences("TSLocationManager", 0);
+        return settings.contains("debug") && settings.getBoolean("debug", false);
+    }
+
     private void onError(String error) {        
         String message = "BG Geolocation caught a Javascript exception while running in background-thread:\n".concat(error);
         Log.e(TAG, message);
         
-        SharedPreferences settings = this.cordova.getActivity().getSharedPreferences("TSLocationManager", 0);
-
         // Show alert popup with js error
-        if (settings.contains("debug") && settings.getBoolean("debug", false)) {
+        if (isDebugging()) {
             playSound(68);
             AlertDialog.Builder builder = new AlertDialog.Builder(this.cordova.getActivity());
             builder.setMessage(message)
@@ -690,6 +696,29 @@ public class CDVBackgroundGeolocation extends CordovaPlugin {
             alert.show();
         }        
     }
+
+    private void onLocationError(Bundle event) {
+        Integer code = event.getInt("code");
+        if (code == 1 && isDebugging()) {
+            Toast.makeText(this.cordova.getActivity(), "Location services disabled!", Toast.LENGTH_SHORT).show();
+        }
+        PluginResult result = new PluginResult(PluginResult.Status.ERROR, code);
+        result.setKeepCallback(true);
+
+        runInBackground(locationCallback, result);
+
+        if (isAcquiringCurrentPosition) {
+            finishAcquiringCurrentPosition(true);
+            // Execute callbacks.
+            for (CallbackContext callback : currentPositionCallbacks) {
+                result = new PluginResult(PluginResult.Status.ERROR, code);
+                result.setKeepCallback(false);
+                runInBackground(callback, result);
+            }
+            currentPositionCallbacks.clear();
+        }
+    }
+
     /**
      * Override method in CordovaPlugin.
      * Checks to see if it should turn off
