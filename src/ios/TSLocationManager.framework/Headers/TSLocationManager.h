@@ -11,7 +11,6 @@
 @property (nonatomic, strong) CLLocationManager* locationManager;
 @property (nonatomic) NSDate *stoppedAt;
 @property (nonatomic) UIBackgroundTaskIdentifier motionDetectionTask;
-@property (nonatomic) NSTimeInterval *stopDetectionDelay;
 
 @property (nonatomic) SOMotionType motionType;
 
