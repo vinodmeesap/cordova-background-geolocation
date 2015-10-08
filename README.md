@@ -14,6 +14,8 @@ The plugin creates the object `window.BackgroundGeolocation` with the methods
 	
   `setConfig(success, fail, config) // reconfigure`,
   
+  `getState(success, fail)`
+
   `start(success, fail)`
 
   `stop(success, fail)`.
@@ -274,6 +276,49 @@ Disable background geolocation tracking.
 
 ```
 bgGeo.stop();
+```
+
+####`getState(successFn)`
+
+Fetch the current-state of the plugin, including all configuration parameters.
+
+```
+bgGeo.getState(function(state) {
+  console.log(JSON.stringify(state));
+});
+
+{
+  "stopOnTerminate": true,
+  "disableMotionActivityUpdates": false,
+  "params": {
+    "device": {
+      "manufacturer": "Apple",
+       "available": true,
+       "platform": "iOS",
+       "cordova": "3.9.1",
+       "uuid": "61CA53C7-BC4B-44D3-991B-E9021AE7F8EE",
+       "model": "iPhone8,1",
+       "version": "9.0.2"
+    }
+  },
+  "url": "http://192.168.11.120:8080/locations",
+  "desiredAccuracy": 0,
+  "stopDetectionDelay": 0,
+  "activityRecognitionInterval": 10000,
+  "distanceFilter": 50,
+  "activityType": 2,
+  "useSignificantChangesOnly": false,
+  "autoSync": false,
+  "isMoving": false,
+  "maxDaysToPersist": 1,
+  "stopTimeout": 2,
+  "enabled": false,
+  "debug": true,
+  "batchSync": false,
+  "headers": {},
+  "disableElasticity": false,
+  "stationaryRadius": 20
+}
 ```
 
 ####`getCurrentPosition(successFn, failureFn)`
