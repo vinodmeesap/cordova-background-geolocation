@@ -238,7 +238,11 @@ public class CDVBackgroundGeolocation extends CordovaPlugin {
         addCurrentPositionListener(callbackContext);
 
         if (!isEnabled) {
-            EventBus.getDefault().register(this);
+
+            EventBus eventBus = EventBus.getDefault();
+            if (!eventBus.isRegistered(this)) {
+                eventBus.register(this);
+            }
             if (!BackgroundGeolocationService.isInstanceCreated()) {
                 backgroundServiceIntent.putExtra("command", BackgroundGeolocationService.ACTION_GET_CURRENT_POSITION);
                 this.cordova.getActivity().startService(backgroundServiceIntent);
@@ -347,7 +351,10 @@ public class CDVBackgroundGeolocation extends CordovaPlugin {
         editor.commit();
         
         if (isEnabled) {
-            EventBus.getDefault().register(this);
+            EventBus eventBus = EventBus.getDefault();
+            if (!eventBus.isRegistered(this)) {
+                eventBus.register(this);
+            }
             if (!BackgroundGeolocationService.isInstanceCreated()) {
                 activity.startService(backgroundServiceIntent);
             }
@@ -784,8 +791,11 @@ public class CDVBackgroundGeolocation extends CordovaPlugin {
 
     private void onLocationError(Bundle event) {
         Integer code = event.getInt("code");
-        if (code == 1 && isDebugging()) {
-            Toast.makeText(this.cordova.getActivity(), "Location services disabled!", Toast.LENGTH_SHORT).show();
+        if (code == BackgroundGeolocationService.LOCATION_ERROR_DENIED) {
+            setEnabled(false);
+            if (isDebugging()) {
+                Toast.makeText(this.cordova.getActivity(), "Location services disabled!", Toast.LENGTH_SHORT).show();
+            }
         }
         PluginResult result = new PluginResult(PluginResult.Status.ERROR, code);
         result.setKeepCallback(true);
