@@ -238,7 +238,6 @@ public class CDVBackgroundGeolocation extends CordovaPlugin {
         addCurrentPositionListener(callbackContext);
 
         if (!isEnabled) {
-
             EventBus eventBus = EventBus.getDefault();
             if (!eventBus.isRegistered(this)) {
                 eventBus.register(this);
@@ -251,6 +250,14 @@ public class CDVBackgroundGeolocation extends CordovaPlugin {
             Bundle event = new Bundle();
             event.putString("name", BackgroundGeolocationService.ACTION_GET_CURRENT_POSITION);
             event.putBoolean("request", true);
+            if (options.has("metaData")) {
+                //event.putString(options.getString("metaData"));
+                try {
+                    event.putString("metaData", options.getString("metaData"));
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+            }
             if (options.has("timeout")) {
                 try {
                     event.putInt("timeout", options.getInt("timeout"));
