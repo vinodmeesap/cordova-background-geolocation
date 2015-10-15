@@ -250,21 +250,7 @@ public class CDVBackgroundGeolocation extends CordovaPlugin {
             Bundle event = new Bundle();
             event.putString("name", BackgroundGeolocationService.ACTION_GET_CURRENT_POSITION);
             event.putBoolean("request", true);
-            if (options.has("metaData")) {
-                //event.putString(options.getString("metaData"));
-                try {
-                    event.putString("metaData", options.getString("metaData"));
-                } catch (JSONException e) {
-                    e.printStackTrace();
-                }
-            }
-            if (options.has("timeout")) {
-                try {
-                    event.putInt("timeout", options.getInt("timeout"));
-                } catch (JSONException e) {
-                    e.printStackTrace();
-                }
-            }
+            event.putString("options", options.toString());
             EventBus.getDefault().post(event);
         }
     }
