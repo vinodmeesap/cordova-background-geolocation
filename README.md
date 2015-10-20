@@ -12,9 +12,22 @@ The plugin creates the object `window.BackgroundGeolocation`.  See [API Document
   
 ## Installing the plugin ##
 
+### From master (latest, greatest.)
+
 ```
    cordova plugin add https://github.com/transistorsoft/cordova-background-geolocation.git
 ```
+
+### Installing a tagged version.
+
+This plugin has tagged stable versions.  To install a particular version, append a version code to the github url prefixed by `#`.
+
+eg:
+```
+    cordova plugin add <giturl>#0.6.0
+```
+
+### Configure your license
 
 Edit your application's `config.xml` and add the following `<preference>`s.  Enter the values you received in the "Product Registration" email:
 
