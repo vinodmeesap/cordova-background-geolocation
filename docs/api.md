@@ -42,11 +42,11 @@
 
 ## Events
 
-| Event Name | Returns | Notes
-|---|---|---|
-| [`onMotionChange`](#onmotionchangecallbackfn-failurefn) | `{location}, `taskId` | Fired when the device changes stationary / moving state. |
-| [`onGeofence`](#ongeofencecallbackfn) | `{geofence}`, `taskId` | Fired when a geofence crossing event occurs |
-| [`onHttp`](#onhttpsuccessfn-failurefn) | `{response}`, `taskId` | Fired after a successful HTTP response. `response` object is provided with `status` and `responseText`|
+| Event Name | Notes
+|---|---|
+| [`onMotionChange`](#onmotionchangecallbackfn-failurefn) | Fired when the device changes stationary / moving state. |
+| [`onGeofence`](#ongeofencecallbackfn) | Fired when a geofence crossing event occurs |
+| [`onHttp`](#onhttpsuccessfn-failurefn) | Fired after a successful HTTP response. `response` object is provided with `status` and `responseText`|
 
 ## Methods
 
@@ -434,11 +434,11 @@ bgGeo.getState(function(state) {
 Retrieves the current position.  This method instructs the native code to fetch exactly one location using maximum power & accuracy.  The native code will persist the fetched location to its SQLite database just as any other location in addition to POSTing to your configured `#url` (if you've enabled the HTTP features).  In addition to your supplied `callbackFn`, the plugin will also execute the `callback` provided to `#configure`.
 
 You may supply the following *optional* `options`:
-`######@param {Integer} timeout [30]`
+######@param {Integer} timeout [30]
 An optional location-timeout.  If the timeout expires before a location is retrieved, the `failureFn` will be executed.
 
-`######@param {Object} metaData`
-Optional extra data to attach to the location.  This `metaData` will be persisted and POSTed to your server if you've configured the HTTP Layer.
+######@param {Object} extras
+Optional extra-data to attach to the location.  These `extras {Object}` will be persisted and POSTed to your server if you've configured the HTTP Layer.
 
 Your provided `successFn` will be executed with the same signature as that provided to `#configure`:
 
