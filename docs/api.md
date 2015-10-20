@@ -2,6 +2,30 @@
 
 ## Geolocation Options
 
+The following **Options** can all be provided to the plugin's `#configure` method:
+
+```
+bgGeo.configure(successFn, failureFn, {
+	desiredAccuracy: 0,
+	distanceFilter: 50,
+	.
+	.
+	.
+});
+
+// Use #setConfig if you need to change options after you've executed #configure
+
+bgGeo.setConfig(function() {
+	console.log('set config success');
+}, {
+	console.log('failed to setConfig');
+}, {
+	desiredAccuracy: 10,
+	distanceFilter: 10
+});
+
+```
+
 | Option | Type | Opt/Required | Default | Note |
 |---|---|---|---|---|
 | [`desiredAccuracy`](#param-integer-desiredaccuracy-0-10-100-1000-in-meters) | `Integer` | Required | 0 | Specify the desired-accuracy of the geolocation system with 1 of 4 values, `0`, `10`, `100`, `1000` where `0` means **HIGHEST POWER, HIGHEST ACCURACY** and `1000` means **LOWEST POWER, LOWEST ACCURACY** |
