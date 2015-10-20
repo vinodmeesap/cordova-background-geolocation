@@ -51,9 +51,9 @@ Edit your application's `config.xml` and add the following `<preference>`s.  Ent
 ## Documentation
 - [API Documentation](docs/api.md)
 - [Location Data Schema](../../wiki/Location-Data-Schema)
-- [Debugging Sounds](wiki/Debug-Sounds)
-- [Geofence Features](wiki/Geofence-Features)
-- [Background Tasks](wiki/Background-Tasks)
+- [Debugging Sounds](../../wiki/Debug-Sounds)
+- [Geofence Features](../../wiki/Geofence-Features)
+- [Background Tasks](../../wiki/Background-Tasks)
 
 ## Help
 
