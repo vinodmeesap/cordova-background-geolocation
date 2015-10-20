@@ -44,9 +44,9 @@
 
 | Event Name | Returns | Notes
 |---|---|---|
-| [`onMotionChange`]() | `{location}, `taskId` | Fired when the device changes stationary / moving state. |
-| [`onGeofence`]() | `{geofence}`, `taskId` | Fired when a geofence crossing event occurs |
-| [`onHttp`]() | `{response}`, `taskId` | Fired after a successful HTTP response. `response` object is provided with `status` and `responseText`|
+| [`onMotionChange`](#onmotionchangecallbackfn-failurefn) | `{location}, `taskId` | Fired when the device changes stationary / moving state. |
+| [`onGeofence`](#ongeofencecallbackfn) | `{geofence}`, `taskId` | Fired when a geofence crossing event occurs |
+| [`onHttp`](#onhttpsuccessfn-failurefn) | `{response}`, `taskId` | Fired after a successful HTTP response. `response` object is provided with `status` and `responseText`|
 
 ## Methods
 
@@ -309,8 +309,8 @@ bgGeo.onGeofence(function(params, taskId) {
 
 The `successFn` will be executed for each successful HTTP request.  `failureFn` will be executed on HTTP failure.  The `successFn` and `failureFn` will be provided a single `response {Object}` parameter with the following properties:
 
-`######@param {Integer} status`.  The HTTP status
-`######@param {String} responseText` The HTTP response as text.
+######@param {Integer} status.  The HTTP status
+######@param {String} responseText The HTTP response as text.
 
 Example:
 ```
