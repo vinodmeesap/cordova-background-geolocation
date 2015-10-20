@@ -473,7 +473,7 @@ bgGeo.getCurrentPosition(function(location, taskId) {
 If a location failed to be retrieved, you `failureFn` will be executed with an error-code parameter
 
 | Error | Reason | Code |
-|---|---|
+|---|---|---|
 | kCLErrorLocationUnknown | Could not fetch location | 0 |
 | kCLErrorDenied | The user disabled location-services in Settings | 1 |
 | kCLErrorNetwork | Network error | 2 |
