@@ -24,7 +24,7 @@ This plugin has tagged stable versions.  To install a particular version, append
 
 eg:
 ```
-    cordova plugin add <giturl>#0.6.0
+    cordova plugin add <git.url>#0.6.0
 ```
 
 #### Configure your license
