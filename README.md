@@ -21,12 +21,12 @@ The plugin creates the object `window.BackgroundGeolocation`.  See [API Document
 #### Installing a tagged version.
 
 This plugin has tagged stable versions.  To install a particular version, append a version code to the github url prefixed by `#`.
-![](https://www.dropbox.com/s/2gzb0jbpdjx36en/Screenshot%202015-10-20%2012.15.10.png?dl=1)
 
-eg:
 ```
     cordova plugin add <git.url>#0.6.0
 ```
+
+![](https://www.dropbox.com/s/2gzb0jbpdjx36en/Screenshot%202015-10-20%2012.15.10.png?dl=1)
 
 #### Configure your license
 
