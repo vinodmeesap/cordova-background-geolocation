@@ -44,9 +44,9 @@
 
 | Event Name | Returns | Notes
 |---|---|---|
-| `onMotionChange` | `{location}, `taskId` | Fired when the device changes stationary / moving state. |
-| `onGeofence` | `{geofence}`, `taskId` | Fired when a geofence crossing event occurs |
-| `onHttp` | `{response}`, `taskId` | Fired after a successful HTTP response. `response` object is provided with `status` and `responseText`|
+| [`onMotionChange`]() | `{location}, `taskId` | Fired when the device changes stationary / moving state. |
+| [`onGeofence`]() | `{geofence}`, `taskId` | Fired when a geofence crossing event occurs |
+| [`onHttp`]() | `{response}`, `taskId` | Fired after a successful HTTP response. `response` object is provided with `status` and `responseText`|
 
 ## Methods
 
@@ -258,6 +258,75 @@ If the user closes the application while the background-tracking has been starte
 
 Set to ```true``` to start the background-service whenever the device boots.  Unless you configure the plugin to ```forceReload``` (ie: boot your app), you should configure the plugin's HTTP features so it can POST to your server in "headless" mode.
 
+# Events
+
+####`onMotionChange(callbackFn, failureFn)`
+Your ```callbackFn``` will be executed each time the device has changed-state between **MOVING** or **STATIONARY**.  The ```callbackFn``` will be provided with a ```Location``` object as the 1st param, with the usual params (```latitude, longitude, accuracy, speed, bearing, altitude```), in addition to a ```taskId``` used to signal that your callback is finished.
+
+######@param {Boolean} isMoving `false` if entered **STATIONARY** mode; `true` if entered **MOVING** mode.
+######@param {Object} location The location at the state-change.
+######@param {Integer} taskId The taskId used to send to bgGeo.finish(taskId) in order to signal completion of your callbackFn
+
+```
+bgGeo.onMotionChange(function(isMoving, location, taskId) {
+    if (isMoving) {
+        console.log('Device has just started MOVING', location);
+    } else {
+        console.log('Device has just STOPPED', location);
+    }
+    bgGeo.finish(taskId);
+})
+
+```
+
+####`onGeofence(callbackFn)`
+Adds a geofence event-listener.  Your supplied callback will be called when any monitored geofence crossing occurs.  The `callbackFn` will be provided the following parameters:
+
+######@param {Object} params.  This object contains 2 keys: `@param {String} identifier`, `@param {String} action [ENTER|EXIT]` and `@param {Object} location`.
+######@param {Integer} taskId The background taskId which you must send back to the native plugin via `bgGeo.finish(taskId)` in order to signal that your callback is complete.
+
+```
+bgGeo.onGeofence(function(params, taskId) {
+    try {
+        var location = params.location;
+        var identifier = params.identifier;
+        var action = params.action;
+        
+        console.log('A geofence has been crossed: ', identifier);
+        console.log('ENTER or EXIT?: ', action);
+        console.log('location: ', JSON.stringify(location));
+    } catch(e) {
+        console.error('An error occurred in my application code', e);
+    }
+    // The plugin runs your callback in a background-thread:  
+    // you MUST signal to the native plugin when your callback is finished so it can halt the thread.
+    // IF YOU DON'T, iOS WILL KILL YOUR APP
+    bgGeo.finish(taskId);
+});
+```
+
+####`onHttp(successFn, failureFn)`
+
+The `successFn` will be executed for each successful HTTP request.  `failureFn` will be executed on HTTP failure.  The `successFn` and `failureFn` will be provided a single `response {Object}` parameter with the following properties:
+
+`######@param {Integer} status`.  The HTTP status
+`######@param {String} responseText` The HTTP response as text.
+
+Example:
+```
+bgGeo.onHttp(function(response) {
+	var status = response.status;
+	var responseText = response.responseText;
+	var res = JSON.parse(responseText);  // <-- if your server returns JSON
+
+	console.log("- HTTP success", status, res);
+
+}, function(response) {
+	var status = response.status;
+	var responseText = response.responseText;
+	console.log("- HTTP failure: ", status, responseText);
+})
+```
 
 # Methods
 
@@ -400,48 +469,6 @@ bgGeo.changePace(true);  // <-- Aggressive GPS monitoring immediately engaged.
 bgGeo.changePace(false); // <-- Disable aggressive GPS monitoring.  Engages stationary-mode.
 ```
 
-####`onMotionChange(callbackFn, failureFn)`
-Your ```callbackFn``` will be executed each time the device has changed-state between **MOVING** or **STATIONARY**.  The ```callbackFn``` will be provided with a ```Location``` object as the 1st param, with the usual params (```latitude, longitude, accuracy, speed, bearing, altitude```), in addition to a ```taskId``` used to signal that your callback is finished.
-
-######@param {Boolean} isMoving `false` if entered **STATIONARY** mode; `true` if entered **MOVING** mode.
-######@param {Object} location The location at the state-change.
-######@param {Integer} taskId The taskId used to send to bgGeo.finish(taskId) in order to signal completion of your callbackFn
-
-```
-bgGeo.onMotionChange(function(isMoving, location, taskId) {
-    if (isMoving) {
-        console.log('Device has just started MOVING', location);
-    } else {
-        console.log('Device has just STOPPED', location);
-    }
-    bgGeo.finish(taskId);
-})
-
-```
-
-####`onStationary(callbackFn, failureFn)` 
-
-**DEPRECATED** &mdash; Use [onMotionChange](https://github.com/transistorsoft/cordova-background-geolocation/tree/trigger-activities#onmotionchangecallbackfn-failurefn) instead.
-
-Your ```callbackFn``` will be executed each time the device has entered stationary-monitoring mode.  The ```callbackFn``` will be provided with a ```Location``` object as the 1st param, with the usual params (```latitude, longitude, accuracy, speed, bearing, altitude```), in addition to a ```taskId``` used to signal that your callback is finished.
-
-######@param {Object} location The Location data
-######@param {Integer} taskId The taskId used to send to bgGeo.finish(taskId) in order to signal completion of your callbackFn
-
-```
-bgGeo.onStationary(function(location, taskId) {
-    try {
-        console.log('- Device is stopped: ', location.latitude, location.longitude);
-    } catch(e) {
-        console.error('An error occurred in my application code', e);
-    }
-    // The plugin runs your callback in a background-thread:  
-    // you MUST signal to the native plugin when your callback is finished so it can halt the thread.
-    // IF YOU DON'T, iOS WILL KILL YOUR APP
-    bgGeo.finish(taskId);
-});
-```
-
 ####`addGeofence(config, callbackFn, failureFn)`
 Adds a geofence to be monitored by the native plugin.  Monitoring of a geofence is halted after a crossing occurs.  The `config` object accepts the following params.
 
@@ -493,32 +520,6 @@ bgGeo.getGeofences(function(geofences) {
     }
 }, function(error) {
     console.warn("Failed to fetch geofences from server");
-});
-```
-
-####`onGeofence(callbackFn)`
-Adds a geofence event-listener.  Your supplied callback will be called when any monitored geofence crossing occurs.  The `callbackFn` will be provided the following parameters:
-
-######@param {Object} params.  This object contains 2 keys: `@param {String} identifier`, `@param {String} action [ENTER|EXIT]` and `@param {Object} location`.
-######@param {Integer} taskId The background taskId which you must send back to the native plugin via `bgGeo.finish(taskId)` in order to signal that your callback is complete.
-
-```
-bgGeo.onGeofence(function(params, taskId) {
-    try {
-        var location = params.location;
-        var identifier = params.identifier;
-        var action = params.action;
-        
-        console.log('A geofence has been crossed: ', identifier);
-        console.log('ENTER or EXIT?: ', action);
-        console.log('location: ', JSON.stringify(location));
-    } catch(e) {
-        console.error('An error occurred in my application code', e);
-    }
-    // The plugin runs your callback in a background-thread:  
-    // you MUST signal to the native plugin when your callback is finished so it can halt the thread.
-    // IF YOU DON'T, iOS WILL KILL YOUR APP
-    bgGeo.finish(taskId);
 });
 ```
 
