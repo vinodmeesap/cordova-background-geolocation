@@ -433,14 +433,21 @@ bgGeo.getState(function(state) {
 ####`getCurrentPosition(successFn, failureFn, options)`
 Retrieves the current position.  This method instructs the native code to fetch exactly one location using maximum power & accuracy.  The native code will persist the fetched location to its SQLite database just as any other location in addition to POSTing to your configured `#url` (if you've enabled the HTTP features).  In addition to your supplied `callbackFn`, the plugin will also execute the `callback` provided to `#configure`.
 
-You may supply the following *optional* `options`:
+#### Options
+
 ######@param {Integer} timeout [30]
 An optional location-timeout.  If the timeout expires before a location is retrieved, the `failureFn` will be executed.
 
-######@param {Object} extras
-Optional extra-data to attach to the location.  These `extras {Object}` will be persisted and POSTed to your server if you've configured the HTTP Layer.
+######@param {Integer millis} maximumAge [0]
+Accept the last-recorded-location if no older than supplied value in milliseconds.
 
-Your provided `successFn` will be executed with the same signature as that provided to `#configure`:
+######@param {Integer} minimumAccuracy
+Attempt to fetch a location with the supplied minimum accuracy
+
+######@param {Object} extras
+Optional extra-data to attach to the location.  These `extras {Object}` will be merged to the recorded `location` and persisted / POSTed to your server (if you've configured the HTTP Layer).
+
+#### Callback
 
 ######@param {Object} location The Location data
 ######@param {Integer} taskId The taskId used to send to bgGeo.finish(taskId) in order to signal completion of your callbackFn
@@ -454,7 +461,9 @@ bgGeo.getCurrentPosition(function(location, taskId) {
     bgGeo.finish(taskId);
 }, {
   timeout: 30,    // 30 second timeout to fetch location
-  metaData: {     // [Optional] Attach your own custom `metaData` to this location.  This metaData will be persisted to SQLite and POSTed to your server
+  maximumAge: 5000,	// Accept the last-known-location if not older than 5000 ms.
+  minimumAccuracy: 10,	// Fetch a location with a minimum accuracy of `10` meters.
+  extras: {       // [Optional] Attach your own custom `metaData` to this location.  This metaData will be persisted to SQLite and POSTed to your server
     foo: "bar"  
   }
 });
