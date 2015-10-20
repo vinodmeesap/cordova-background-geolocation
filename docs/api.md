@@ -48,25 +48,25 @@
 | `onGeofence` | `{geofence}`, `taskId` | Fired when a geofence crossing event occurs |
 | `onHttp` | `{response}`, `taskId` | Fired after a successful HTTP response. `response` object is provided with `status` and `responseText`|
 
-## [Methods](#methods-1)
+## Methods
 
 | Method Name | Arguments | Notes
 |---|---|---|
-| `configure` | `{config}` | Configures the plugin's parameters (@see following Config section for accepted config params. The locationCallback will be executed each time a new Geolocation is recorded and provided with the following parameters |
-| `setConfig` | `{config}` | Re-configure the plugin with new values |
-| `start` | `callbackFn`| Enable location tracking.  Supplied `callbackFn` will be executed when tracking is successfully engaged |
-| `stop` | `callbackFn` | Disable location tracking.  Supplied `callbackFn` will be executed when tracking is successfully engaged |
-| `getState` | `callbackFn` | Fetch the current-state of the plugin, including `enabled`, `isMoving`, as well as all other config params |
-| `getCurrentPosition` | `callbackFn` | Retrieves the current position. This method instructs the native code to fetch exactly one location using maximum power & accuracy. |
-| `changePace` | `isMoving` | Initiate or cancel immediate background tracking. When set to true, the plugin will begin aggressively tracking the devices Geolocation, bypassing stationary monitoring. If you were making a "Jogging" application, this would be your [Start Workout] button to immediately begin GPS tracking. Send false to disable aggressive GPS monitoring and return to stationary-monitoring mode. |
-| `getLocations` | `callbackFn` | Fetch all the locations currently stored in native plugin's SQLite database. Your callbackFn`` will receive an `Array` of locations in the 1st parameter |
-| `sync` | - | If the plugin is configured for HTTP with an `#url` and `#autoSync: false`, this method will initiate POSTing the locations currently stored in the native SQLite database to your configured `#url`|
-| `getOdometer` | `callbackFn` | The plugin constantly tracks distance travelled. The supplied callback will be executed and provided with a `distance` as the 1st parameter.|
-| `resetOdometer` | `callbackFn` | Reset the **odometer** to `0`.  The plugin never automatically resets the odometer -- this is **up to you** |
-| `playSound` | `soundId` | Here's a fun one.  The plugin can play a number of OS system sounds for each platform.  For [IOS](http://iphonedevwiki.net/index.php/AudioServices) and [Android](http://developer.android.com/reference/android/media/ToneGenerator.html).  I offer this API as-is, it's up to you to figure out how this works. |
-| `addGeofence` | `{config}` | Adds a geofence to be monitored by the native plugin. Monitoring of a geofence is halted after a crossing occurs.|
-| `removeGeofence` | `identifier` | Removes a geofence identified by the provided `identifier` |
-| `getGeofences` | `callbackFn` | Fetch the list of monitored geofences. Your callbackFn will be provided with an Array of geofences. If there are no geofences being monitored, you'll receive an empty `Array []`.|
+| [`configure`]() | `{config}` | Configures the plugin's parameters (@see following Config section for accepted config params. The locationCallback will be executed each time a new Geolocation is recorded and provided with the following parameters |
+| [`setConfig`]() | `{config}` | Re-configure the plugin with new values |
+| [`start`]() | `callbackFn`| Enable location tracking.  Supplied `callbackFn` will be executed when tracking is successfully engaged |
+| [`stop`]() | `callbackFn` | Disable location tracking.  Supplied `callbackFn` will be executed when tracking is successfully engaged |
+| [`getState`]() | `callbackFn` | Fetch the current-state of the plugin, including `enabled`, `isMoving`, as well as all other config params |
+| [`getCurrentPosition`]() | `callbackFn` | Retrieves the current position. This method instructs the native code to fetch exactly one location using maximum power & accuracy. |
+| [`changePace`]() | `isMoving` | Initiate or cancel immediate background tracking. When set to true, the plugin will begin aggressively tracking the devices Geolocation, bypassing stationary monitoring. If you were making a "Jogging" application, this would be your [Start Workout] button to immediately begin GPS tracking. Send false to disable aggressive GPS monitoring and return to stationary-monitoring mode. |
+| [`getLocations`]() | `callbackFn` | Fetch all the locations currently stored in native plugin's SQLite database. Your callbackFn`` will receive an `Array` of locations in the 1st parameter |
+| [`sync`]() | - | If the plugin is configured for HTTP with an `#url` and `#autoSync: false`, this method will initiate POSTing the locations currently stored in the native SQLite database to your configured `#url`|
+| [`getOdometer`]() | `callbackFn` | The plugin constantly tracks distance travelled. The supplied callback will be executed and provided with a `distance` as the 1st parameter.|
+| [`resetOdometer`]() | `callbackFn` | Reset the **odometer** to `0`.  The plugin never automatically resets the odometer -- this is **up to you** |
+| [`playSound`]() | `soundId` | Here's a fun one.  The plugin can play a number of OS system sounds for each platform.  For [IOS](http://iphonedevwiki.net/index.php/AudioServices) and [Android](http://developer.android.com/reference/android/media/ToneGenerator.html).  I offer this API as-is, it's up to you to figure out how this works. |
+| [`addGeofence`]() | `{config}` | Adds a geofence to be monitored by the native plugin. Monitoring of a geofence is halted after a crossing occurs.|
+| [`removeGeofence`]() | `identifier` | Removes a geofence identified by the provided `identifier` |
+| [`getGeofences`]() | `callbackFn` | Fetch the list of monitored geofences. Your callbackFn will be provided with an Array of geofences. If there are no geofences being monitored, you'll receive an empty `Array []`.|
 
 
 ## Geolocation Options
@@ -257,5 +257,340 @@ If the user closes the application while the background-tracking has been starte
 
 Set to ```true``` to start the background-service whenever the device boots.  Unless you configure the plugin to ```forceReload``` (ie: boot your app), you should configure the plugin's HTTP features so it can POST to your server in "headless" mode.
 
+
+## Methods
+
+####`configure(locationCallback, failureCallback, config)`
+
+Configures the plugin's parameters (@see following [Config](https://github.com/transistorsoft/cordova-background-geolocation/blob/edge/README.md#config) section for accepted ```config``` params.  The ```locationCallback``` will be executed each time a new Geolocation is recorded and provided with the following parameters:
+
+######@param {Object} location The Location data
+######@param {Integer} taskId The taskId used to send to bgGeo.finish(taskId) in order to signal completion of your callbackFn
+
+```
+bgGeo.configure(function(location, taskId) {
+    try {
+        var coords      = location.coords,
+            timestamp   = location.timestamp
+            latitude    = coords.latitude,
+            longitude   = coords.longitude,
+            speed       = coords.speed;
+
+        console.log("A location has arrived:", timestamp, latitude, longitude, speed);
+    } catch(e) {
+        console.error("An error occurred in my application code", e);
+    }
+    // The plugin runs your callback in a background-thread:  
+    // you MUST signal to the native plugin when your callback is finished so it can halt the thread.
+    // IF YOU DON'T, iOS WILL KILL YOUR APP
+    bgGeo.finish(taskId);
+}, failureFn, {
+    distanceFilter: 50,
+    desiredAccuracy: 0,
+    stationaryRadius: 25
+});
+```
+
+####`setConfig(successFn, failureFn, config)`
+Reconfigure plugin's configuration (@see followign ##Config## section for accepted ```config``` params.  **NOTE** The plugin will continue to send recorded Geolocation to the ```locationCallback``` you provided to ```configure``` method -- use this method only to change configuration params (eg: ```distanceFilter```, ```stationaryRadius```, etc).
+
+```
+bgGeo.setConfig(function(){}, function(){}, {
+    desiredAccuracy: 10,
+    distanceFilter: 100
+});
+```
+
+####`start(successFn, failureFn)`
+
+Enable background geolocation tracking.
+
+```
+bgGeo.start()
+```
+
+####`stop(successFn, failureFn)`
+
+Disable background geolocation tracking.
+
+```
+bgGeo.stop();
+```
+
+####`getState(successFn)`
+
+Fetch the current-state of the plugin, including all configuration parameters.
+
+```
+bgGeo.getState(function(state) {
+  console.log(JSON.stringify(state));
+});
+
+{
+  "stopOnTerminate": true,
+  "disableMotionActivityUpdates": false,
+  "params": {
+    "device": {
+      "manufacturer": "Apple",
+       "available": true,
+       "platform": "iOS",
+       "cordova": "3.9.1",
+       "uuid": "61CA53C7-BC4B-44D3-991B-E9021AE7F8EE",
+       "model": "iPhone8,1",
+       "version": "9.0.2"
+    }
+  },
+  "url": "http://192.168.11.120:8080/locations",
+  "desiredAccuracy": 0,
+  "stopDetectionDelay": 0,
+  "activityRecognitionInterval": 10000,
+  "distanceFilter": 50,
+  "activityType": 2,
+  "useSignificantChangesOnly": false,
+  "autoSync": false,
+  "isMoving": false,
+  "maxDaysToPersist": 1,
+  "stopTimeout": 2,
+  "enabled": false,
+  "debug": true,
+  "batchSync": false,
+  "headers": {},
+  "disableElasticity": false,
+  "stationaryRadius": 20
+}
+```
+
+####`getCurrentPosition(successFn, failureFn, options)`
+Retrieves the current position.  This method instructs the native code to fetch exactly one location using maximum power & accuracy.  The native code will persist the fetched location to its SQLite database just as any other location in addition to POSTing to your configured `#url` (if you've enabled the HTTP features).  In addition to your supplied `callbackFn`, the plugin will also execute the `callback` provided to `#configure`.
+
+You may supply the following *optional* `options`:
+`######@param {Integer} timeout [30]`
+An optional location-timeout.  If the timeout expires before a location is retrieved, the `failureFn` will be executed.
+
+`######@param {Object} metaData`
+Optional extra data to attach to the location.  This `metaData` will be persisted and POSTed to your server if you've configured the HTTP Layer.
+
+Your provided `successFn` will be executed with the same signature as that provided to `#configure`:
+
+######@param {Object} location The Location data
+######@param {Integer} taskId The taskId used to send to bgGeo.finish(taskId) in order to signal completion of your callbackFn
+
+```
+bgGeo.getCurrentPosition(function(location, taskId) {
+    // This location is already persisted to plugin’s SQLite db.  
+    // If you’ve configured #autoSync: true, the HTTP POST has already started.
+
+    console.log(“- Current position received: “, location);
+    bgGeo.finish(taskId);
+}, {
+  timeout: 30,    // 30 second timeout to fetch location
+  metaData: {     // [Optional] Attach your own custom `metaData` to this location.  This metaData will be persisted to SQLite and POSTed to your server
+    foo: "bar"  
+  }
+});
+
+```
+
+####`changePace(enabled, successFn, failureFn)`
+Initiate or cancel immediate background tracking.  When set to ```true```, the plugin will begin aggressively tracking the devices Geolocation, bypassing stationary monitoring.  If you were making a "Jogging" application, this would be your [Start Workout] button to immediately begin GPS tracking.  Send ```false``` to disable aggressive GPS monitoring and return to stationary-monitoring mode.
+
+```
+bgGeo.changePace(true);  // <-- Aggressive GPS monitoring immediately engaged.
+bgGeo.changePace(false); // <-- Disable aggressive GPS monitoring.  Engages stationary-mode.
+```
+
+####`onMotionChange(callbackFn, failureFn)`
+Your ```callbackFn``` will be executed each time the device has changed-state between **MOVING** or **STATIONARY**.  The ```callbackFn``` will be provided with a ```Location``` object as the 1st param, with the usual params (```latitude, longitude, accuracy, speed, bearing, altitude```), in addition to a ```taskId``` used to signal that your callback is finished.
+
+######@param {Boolean} isMoving `false` if entered **STATIONARY** mode; `true` if entered **MOVING** mode.
+######@param {Object} location The location at the state-change.
+######@param {Integer} taskId The taskId used to send to bgGeo.finish(taskId) in order to signal completion of your callbackFn
+
+```
+bgGeo.onMotionChange(function(isMoving, location, taskId) {
+    if (isMoving) {
+        console.log('Device has just started MOVING', location);
+    } else {
+        console.log('Device has just STOPPED', location);
+    }
+    bgGeo.finish(taskId);
+})
+
+```
+
+####`onStationary(callbackFn, failureFn)` 
+
+**DEPRECATED** &mdash; Use [onMotionChange](https://github.com/transistorsoft/cordova-background-geolocation/tree/trigger-activities#onmotionchangecallbackfn-failurefn) instead.
+
+Your ```callbackFn``` will be executed each time the device has entered stationary-monitoring mode.  The ```callbackFn``` will be provided with a ```Location``` object as the 1st param, with the usual params (```latitude, longitude, accuracy, speed, bearing, altitude```), in addition to a ```taskId``` used to signal that your callback is finished.
+
+######@param {Object} location The Location data
+######@param {Integer} taskId The taskId used to send to bgGeo.finish(taskId) in order to signal completion of your callbackFn
+
+```
+bgGeo.onStationary(function(location, taskId) {
+    try {
+        console.log('- Device is stopped: ', location.latitude, location.longitude);
+    } catch(e) {
+        console.error('An error occurred in my application code', e);
+    }
+    // The plugin runs your callback in a background-thread:  
+    // you MUST signal to the native plugin when your callback is finished so it can halt the thread.
+    // IF YOU DON'T, iOS WILL KILL YOUR APP
+    bgGeo.finish(taskId);
+});
+```
+
+####`addGeofence(config, callbackFn, failureFn)`
+Adds a geofence to be monitored by the native plugin.  Monitoring of a geofence is halted after a crossing occurs.  The `config` object accepts the following params.
+
+######@config {String} identifier The name of your geofence, eg: "Home", "Office"
+######@config {Float} radius The radius (meters) of the geofence.  In practice, you should make this >= 100 meters.
+######@config {Float} latitude Latitude of the center-point of the circular geofence.
+######@config {Float} longitude Longitude of the center-point of the circular geofence.
+######@config {Boolean} notifyOnExit Whether to listen to EXIT events
+######@config {Boolean} notifyOnEntry Whether to listen to ENTER events
+
+```
+bgGeo.addGeofence({
+    identifier: "Home",
+    radius: 150,
+    latitude: 45.51921926,
+    longitude: -73.61678581,
+    notifyOnEntry: true,
+    notifyOnExit: false
+}, function() {
+    console.log("Successfully added geofence");
+}, function(error) {
+    console.warn("Failed to add geofence", error);
+});
+```
+
+####`removeGeofence(identifier, callbackFn, failureFn)`
+Removes a geofence having the given `{String} identifier`.
+
+######@config {String} identifier The name of your geofence, eg: "Home", "Office"
+######@config {Function} callbackFn successfully removed geofence.
+######@config {Function} failureFn failed to remove geofence
+
+```
+bgGeo.removeGeofence("Home", function() {
+    console.log("Successfully removed geofence");
+}, function(error) {
+    console.warn("Failed to remove geofence", error);
+});
+```
+
+####`getGeofences(callbackFn, failureFn)`
+
+Fetch the list of monitored geofences.  Your `callbackFn` will be provided with an `Array` of geofences.  If there are no geofences being monitored, you'll receive an empty Array `[]`.
+
+```
+bgGeo.getGeofences(function(geofences) {
+    for (var n=0,len=geofences.length;n<len;n++) {
+        console.log("Geofence: ", geofence.identifier, geofence.radius, geofence.latitude, geofence.longitude);
+    }
+}, function(error) {
+    console.warn("Failed to fetch geofences from server");
+});
+```
+
+####`onGeofence(callbackFn)`
+Adds a geofence event-listener.  Your supplied callback will be called when any monitored geofence crossing occurs.  The `callbackFn` will be provided the following parameters:
+
+######@param {Object} params.  This object contains 2 keys: `@param {String} identifier`, `@param {String} action [ENTER|EXIT]` and `@param {Object} location`.
+######@param {Integer} taskId The background taskId which you must send back to the native plugin via `bgGeo.finish(taskId)` in order to signal that your callback is complete.
+
+```
+bgGeo.onGeofence(function(params, taskId) {
+    try {
+        var location = params.location;
+        var identifier = params.identifier;
+        var action = params.action;
+        
+        console.log('A geofence has been crossed: ', identifier);
+        console.log('ENTER or EXIT?: ', action);
+        console.log('location: ', JSON.stringify(location));
+    } catch(e) {
+        console.error('An error occurred in my application code', e);
+    }
+    // The plugin runs your callback in a background-thread:  
+    // you MUST signal to the native plugin when your callback is finished so it can halt the thread.
+    // IF YOU DON'T, iOS WILL KILL YOUR APP
+    bgGeo.finish(taskId);
+});
+```
+
+####`getLocations(callbackFn, failureFn)`
+Fetch all the locations currently stored in native plugin's SQLite database.  Your ```callbackFn`` will receive an ```Array``` of locations in the 1st parameter.  Eg:
+
+The `callbackFn` will be executed with following params:
+
+######@param {Array} locations.  The list of locations stored in SQLite database.
+######@param {Integer} taskId The background taskId which you must send back to the native plugin via `bgGeo.finish(taskId)` in order to signal the end of your background thread.
+
+
+```
+    bgGeo.getLocations(function(locations, taskId) {
+        try {
+            console.log("locations: ", locations);
+        } catch(e) {
+            console.error("An error occurred in my application code");
+        }
+        bgGeo.finish(taskId);
+    });
+```
+
+####`sync(callbackFn, failureFn)`
+
+If the plugin is configured for HTTP with an ```#url``` and ```#autoSync: false```, this method will initiate POSTing the locations currently stored in the native SQLite database to your configured ```#url```.  All records in the database will be DELETED.  If you configured ```batchSync: true```, all the locations will be sent to your server in a single HTTP POST request, otherwise the plugin will create execute an HTTP post for **each** location in the database (REST-style).  Your ```callbackFn``` will be executed and provided with an Array of all the locations from the SQLite database.  If you configured the plugin for HTTP (by configuring an `#url`, your `callbackFn` will be executed after the HTTP request(s) have completed.  If the plugin failed to sync to your server (possibly because of no network connection), the ```failureFn``` will be called with an ```errorMessage```.  If you are **not** using the HTTP features, ```sync``` is the only way to clear the native SQLite datbase.  Eg:
+
+Your callback will be provided with the following params
+
+######@param {Array} locations.  The list of locations stored in SQLite database.
+######@param {Integer} taskId The background taskId which you must send back to the native plugin via `bgGeo.finish(taskId)` in order to signal the end of your background thread.
+
+```
+    bgGeo.sync(function(locations, taskId) {
+        try {
+        	// Here are all the locations from the database.  The database is now EMPTY.
+        	console.log('synced locations: ', locations);
+        } catch(e) {
+            console.error('An error occurred in my application code', e);
+        }
+
+        // Be sure to call finish(taskId) in order to signal the end of the background-thread.
+        bgGeo.finish(taskId);
+    }, function(errorMessage) {
+        console.warn('Sync FAILURE: ', errorMessage);
+    });
+
+```
+
+####`getOdometer(callbackFn, failureFn)`
+
+The plugin constantly tracks distance travelled.  To fetch the current **odometer** reading:
+
+```
+    bgGeo.getOdometer(function(distance) {
+        console.log("Distance travelled: ", distance);
+    });
+```
+
+####`resetOdometer(callbackFn, failureFn)`
+
+Reset the **odometer** to zero.  The plugin never automatically resets the odometer so it's up to you to reset it as desired.
+
+####`playSound(soundId)`
+
+Here's a fun one.  The plugin can play a number of OS system sounds for each platform.  For [IOS](http://iphonedevwiki.net/index.php/AudioServices) and [Android](http://developer.android.com/reference/android/media/ToneGenerator.html).  I offer this API as-is, it's up to you to figure out how this works.
+
+```
+    // A soundId iOS recognizes
+    bgGeo.playSound(1303);
+    
+    // An Android soundId
+    bgGeo.playSound(90);
+```
 
 
