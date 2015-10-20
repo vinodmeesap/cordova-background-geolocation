@@ -69,7 +69,7 @@ Edit your application's `config.xml` and add the following `<preference>`s.  Ent
 ```
 
 ## Documentation
-[See the Wiki](https://github.com/transistorsoft/cordova-background-geolocation/docs/api.md)
+[API Documentation](docs/api.md)
 
 ## Help
 
