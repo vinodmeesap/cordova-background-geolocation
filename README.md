@@ -26,7 +26,7 @@ This plugin has tagged stable versions.  To install a particular version, append
     cordova plugin add <git.url>#0.6.0
 ```
 
-![](https://www.dropbox.com/s/2gzb0jbpdjx36en/Screenshot%202015-10-20%2012.15.10.png?dl=1)
+![](https://dl.dropboxusercontent.com/u/2319755/cordova-background-geolocaiton/screenshot-github-tagged-branches.png)
 
 #### Configure your license
 
