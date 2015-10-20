@@ -52,12 +52,12 @@
 
 | Method Name | Arguments | Notes
 |---|---|---|
-| [`configure`](#configurelocationcallback-failurecallback-config) | `{config}` | Configures the plugin's parameters (@see following Config section for accepted config params. The locationCallback will be executed each time a new Geolocation is recorded and provided with the following parameters |
-| [`setConfig`](#setconfigsuccessfn-failurefn-config) | `{config}` | Re-configure the plugin with new values |
+| [`configure`](#configurelocationcallback-failurecallback-config) | `successFn`, `failureFn`, `{config}` | Configures the plugin's parameters (@see following Config section for accepted config params. The locationCallback will be executed each time a new Geolocation is recorded and provided with the following parameters |
+| [`setConfig`](#setconfigsuccessfn-failurefn-config) | `successFn`, `failureFn`, `{config}` | Re-configure the plugin with new values |
 | [`start`](#startsuccessfn-failurefn) | `callbackFn`| Enable location tracking.  Supplied `callbackFn` will be executed when tracking is successfully engaged |
 | [`stop`](#stopsuccessfn-failurefn) | `callbackFn` | Disable location tracking.  Supplied `callbackFn` will be executed when tracking is successfully engaged |
 | [`getState`](#getstatesuccessfn) | `callbackFn` | Fetch the current-state of the plugin, including `enabled`, `isMoving`, as well as all other config params |
-| [`getCurrentPosition`](#getcurrentpositionsuccessfn-failurefn-options) | `callbackFn` | Retrieves the current position. This method instructs the native code to fetch exactly one location using maximum power & accuracy. |
+| [`getCurrentPosition`](#getcurrentpositionsuccessfn-failurefn-options) | `successFn`, `failureFn`, `{options} | Retrieves the current position. This method instructs the native code to fetch exactly one location using maximum power & accuracy. |
 | [`changePace`](#changepaceenabled-successfn-failurefn) | `isMoving` | Initiate or cancel immediate background tracking. When set to true, the plugin will begin aggressively tracking the devices Geolocation, bypassing stationary monitoring. If you were making a "Jogging" application, this would be your [Start Workout] button to immediately begin GPS tracking. Send false to disable aggressive GPS monitoring and return to stationary-monitoring mode. |
 | [`getLocations`](#getlocationscallbackfn-failurefn) | `callbackFn` | Fetch all the locations currently stored in native plugin's SQLite database. Your callbackFn`` will receive an `Array` of locations in the 1st parameter |
 | [`sync`](#synccallbackfn-failurefn) | - | If the plugin is configured for HTTP with an `#url` and `#autoSync: false`, this method will initiate POSTing the locations currently stored in the native SQLite database to your configured `#url`|
