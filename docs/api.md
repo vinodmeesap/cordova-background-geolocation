@@ -472,27 +472,37 @@ bgGeo.getCurrentPosition(function(location, taskId) {
 
 If a location failed to be retrieved, you `failureFn` will be executed with an error-code parameter
 
-| Error | Code |
+| Error | Reason | Code |
 |---|---|
-| kCLErrorLocationUnknown | 0 |
-| kCLErrorDenied | 1 |
-| kCLErrorNetwork | 2 |
-| kCLErrorHeadingFailure | 3 |
-| kCLErrorRegionMonitoringDenied | 4 |
-| kCLErrorRegionMonitoringFailure | 5 |
-| kCLErrorRegionMonitoringSetupDelayed | 6 |
-| kCLErrorRegionMonitoringResponseDelayed | 7 |
-| kCLErrorGeocodeFoundNoResult | 8 |
-| kCLErrorGeocodeFoundPartialResult | 9 |
-| kCLErrorGeocodeCanceled | 10 |
-| kCLErrorDeferredFailed | 11 |
-| kCLErrorDeferredNotUpdatingLocation | 12 |
-| kCLErrorDeferredAccuracyTooLow | 13 |
-| kCLErrorDeferredDistanceFiltered | 14 |
-| kCLErrorDeferredCanceled | 15 |
-| kCLErrorRangingUnavailable | 16 |
-| kCLErrorRangingFailure | 17 |
+| kCLErrorLocationUnknown | Could not fetch location | 0 |
+| kCLErrorDenied | The user disabled location-services in Settings | 1 |
+| kCLErrorNetwork | Network error | 2 |
+| kCLErrorHeadingFailure | - | 3 |
+| kCLErrorRegionMonitoringDenied | User disabled region-monitoring in Settings | 4 |
+| kCLErrorRegionMonitoringFailure | Installed in a device with no region-monitoring capability | 5 |
+| kCLErrorRegionMonitoringSetupDelayed | - | 6 |
+| kCLErrorRegionMonitoringResponseDelayed | - | 7 |
+| kCLErrorDeferredFailed | - | 11 |
+| kCLErrorDeferredNotUpdatingLocation | - | 12 |
+| kCLErrorDeferredAccuracyTooLow | - | 13 |
+| kCLErrorDeferredDistanceFiltered | - | 14 |
+| kCLErrorDeferredCanceled | - | 15 |
 
+Eg:
+
+```
+bgGeo.getLocation(succesFn, function(errorCode) {
+	switch (errorCode) {
+		case 0:
+			alert('Failed to retrieve location');
+			break;
+		case 1:
+			alert('You must enable location services in Settings');
+			break;
+
+	}
+})
+```
 
 ####`changePace(enabled, successFn, failureFn)`
 Initiate or cancel immediate background tracking.  When set to ```true```, the plugin will begin aggressively tracking the devices Geolocation, bypassing stationary monitoring.  If you were making a "Jogging" application, this would be your [Start Workout] button to immediately begin GPS tracking.  Send ```false``` to disable aggressive GPS monitoring and return to stationary-monitoring mode.
