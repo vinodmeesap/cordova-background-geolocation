@@ -22,7 +22,6 @@
     bgGeo.geofenceBlock         = [self createGeofenceHandler];
     bgGeo.syncCompleteBlock     = [self createSyncCompleteHandler];
     bgGeo.httpResponseBlock     = [self createHttpResponseHandler];
-    bgGeo.locationTimeoutBlock  = [self createLocationTimeoutHandler];
     bgGeo.errorBlock            = [self createErrorHandler];
 }
 
@@ -129,19 +128,6 @@
                 [self.commandDelegate runInBackground:^{
                     [self.commandDelegate sendPluginResult:result callbackId:callbackId];
                 }];       
-            }
-            [self.currentPositionListeners removeAllObjects];
-        }
-    };
-}
-
--(void (^)(void)) createLocationTimeoutHandler {
-    return ^(void) {
-        if ([self.currentPositionListeners count]) {
-            for (NSString *callbackId in self.currentPositionListeners) {
-                CDVPluginResult* result = [CDVPluginResult resultWithStatus:CDVCommandStatus_ERROR messageAsString:@"timeout"];
-                [result setKeepCallbackAsBool:NO];
-                [self.commandDelegate sendPluginResult:result callbackId:callbackId];
             }
             [self.currentPositionListeners removeAllObjects];
         }
@@ -396,7 +382,7 @@
         NSLog(@" - onLocationManagerError: %@", error);
 
         if ([type isEqualToString:@"location"]) {
-            CDVPluginResult *result = [CDVPluginResult resultWithStatus:CDVCommandStatus_ERROR messageAsInt:error.code];
+            CDVPluginResult *result = [CDVPluginResult resultWithStatus:CDVCommandStatus_ERROR messageAsInt:(int)error.code];
             if ([self.currentPositionListeners count]) {
                 [result setKeepCallbackAsBool:NO];
                 for (NSString *callbackId in self.currentPositionListeners) {
