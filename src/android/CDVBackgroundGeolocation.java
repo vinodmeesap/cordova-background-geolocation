@@ -381,6 +381,9 @@ public class CDVBackgroundGeolocation extends CordovaPlugin {
             if (config.has("fastestLocationUpdateInterval")) {
                 editor.putInt("fastestLocationUpdateInterval", config.getInt("fastestLocationUpdateInterval"));
             }
+            if (config.has("locationTimeout")) {
+                editor.putInt("locationTimeout", config.getInt("locationTimeout"));
+            }
             if (config.has("activityRecognitionInterval")) {
                 editor.putLong("activityRecognitionInterval", config.getLong("activityRecognitionInterval"));
             }
