@@ -12,6 +12,10 @@
 		<data>
 		1AZid89zbukvSnKfLBxvia0qTYg=
 		</data>
+		<key>Headers/TSLogger.h</key>
+		<data>
+		qiACBDmcPTwN/74j5Onc7EXc87Q=
+		</data>
 		<key>Info.plist</key>
 		<data>
 		sGzOGbTjWrufPMfRjHej91SV+Tg=
@@ -30,6 +34,10 @@
 		<key>Headers/TSLocationManager.h</key>
 		<data>
 		1AZid89zbukvSnKfLBxvia0qTYg=
+		</data>
+		<key>Headers/TSLogger.h</key>
+		<data>
+		qiACBDmcPTwN/74j5Onc7EXc87Q=
 		</data>
 		<key>Modules/module.modulemap</key>
 		<data>
