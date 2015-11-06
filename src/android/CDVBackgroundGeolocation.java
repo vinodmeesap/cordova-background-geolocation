@@ -10,7 +10,7 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 import org.json.JSONException;
 import android.os.Bundle;
-import com.google.android.gms.common.GooglePlayServicesUtil;
+import com.google.android.gms.common.GoogleApiAvailability;
 import com.google.android.gms.location.ActivityRecognitionResult;
 import com.google.android.gms.location.DetectedActivity;
 import com.transistorsoft.locationmanager.BackgroundGeolocationService;
@@ -544,7 +544,7 @@ public class CDVBackgroundGeolocation extends CordovaPlugin {
         } else if (ACTION_ON_MOTION_CHANGE.equalsIgnoreCase(name)) {
             this.onMotionChange(event);
         } else if (name.equalsIgnoreCase(BackgroundGeolocationService.ACTION_GOOGLE_PLAY_SERVICES_CONNECT_ERROR)) {
-            GooglePlayServicesUtil.getErrorDialog(event.getInt("errorCode"), this.cordova.getActivity(), 1001).show();
+            GoogleApiAvailability.getInstance().getErrorDialog(this.cordova.getActivity(), event.getInt("errorCode"), 1001).show();
         } else if (name.equalsIgnoreCase(BackgroundGeolocationService.ACTION_GET_CURRENT_POSITION)) {
             this.onCurrentPositionTimeout(event);
         } else if (name.equalsIgnoreCase(BackgroundGeolocationService.ACTION_LOCATION_ERROR)) {
