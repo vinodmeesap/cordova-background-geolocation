@@ -529,10 +529,7 @@ public class CDVBackgroundGeolocation extends CordovaPlugin {
             PluginResult result = new PluginResult(PluginResult.Status.OK);
             resetOdometerCallback.sendPluginResult(result);
         } else if (BackgroundGeolocationService.ACTION_CHANGE_PACE.equalsIgnoreCase(name)) {
-            //PluginResult result = new PluginResult(PluginResult.Status.OK);
-            //paceChangeCallback.sendPluginResult(result);
-            int state = event.getBoolean("isMoving") ? 1 : 0;
-            paceChangeCallback.success(state);
+            this.onChangePace(event);
         } else if (ACTION_GET_GEOFENCES.equalsIgnoreCase(name)) {
             try {
                 JSONArray json      = new JSONArray(event.getString("data"));
@@ -594,6 +591,15 @@ public class CDVBackgroundGeolocation extends CordovaPlugin {
         result.setKeepCallback(true);
         for (CallbackContext callback : motionChangeCallbacks) {
             runInBackground(callback, result);
+        }
+    }
+    private void onChangePace(Bundle event) {
+        Boolean success = event.getBoolean("success");
+        if (success) {
+            int state = event.getBoolean("isMoving") ? 1 : 0;
+            paceChangeCallback.success(state);
+        } else {
+            paceChangeCallback.error(event.getInt("code"));
         }
     }
     private JSONObject getState() {
@@ -791,7 +797,6 @@ public class CDVBackgroundGeolocation extends CordovaPlugin {
     private void onLocationError(Bundle event) {
         Integer code = event.getInt("code");
         if (code == BackgroundGeolocationService.LOCATION_ERROR_DENIED) {
-            setEnabled(false);
             if (isDebugging()) {
                 Toast.makeText(this.cordova.getActivity(), "Location services disabled!", Toast.LENGTH_SHORT).show();
             }
