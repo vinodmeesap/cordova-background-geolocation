@@ -436,6 +436,9 @@ public class CDVBackgroundGeolocation extends CordovaPlugin {
             if (config.has("batchSync")) {
                 editor.putBoolean("batchSync", config.getBoolean("batchSync"));
             }
+            if (config.has("maxBatchSize")) {
+                editor.putInt("maxBatchSize", config.getInt("maxBatchSize"));
+            }
             if (config.has("params")) {
                 try {
                     editor.putString("params", config.getJSONObject("params").toString());
