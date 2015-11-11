@@ -436,9 +436,6 @@ public class CDVBackgroundGeolocation extends CordovaPlugin {
             if (config.has("batchSync")) {
                 editor.putBoolean("batchSync", config.getBoolean("batchSync"));
             }
-            if (config.has("maxBatchSize")) {
-                editor.putInt("maxBatchSize", config.getInt("maxBatchSize"));
-            }
             if (config.has("params")) {
                 try {
                     editor.putString("params", config.getJSONObject("params").toString());
@@ -459,6 +456,12 @@ public class CDVBackgroundGeolocation extends CordovaPlugin {
             }
             if (preferences.contains("cordova-background-geolocation-orderId")) {
                 editor.putString("orderId", preferences.getString("cordova-background-geolocation-orderId", null));
+            }
+            if (config.has("configureUrl")) {
+                editor.putString("configureUrl", config.getString("configureUrl"));
+            }
+            if (config.has("configureInterval")) {
+                editor.putInt("configureInterval", config.getInt("configureInterval"));
             }
             editor.commit();
             return true;
