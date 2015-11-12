@@ -2,6 +2,7 @@ package com.transistorsoft.cordova.bggeo;
 
 import java.util.List;
 import java.util.ArrayList;
+import java.util.Set;
 import org.apache.cordova.CallbackContext;
 import org.apache.cordova.CordovaPlugin;
 import org.apache.cordova.CordovaWebView;
@@ -14,6 +15,7 @@ import com.google.android.gms.common.GoogleApiAvailability;
 import com.google.android.gms.location.ActivityRecognitionResult;
 import com.google.android.gms.location.DetectedActivity;
 import com.transistorsoft.locationmanager.BackgroundGeolocationService;
+import com.transistorsoft.locationmanager.Settings;
 import com.google.android.gms.location.Geofence;
 import com.google.android.gms.location.GeofencingEvent;
 import android.app.AlertDialog;
@@ -96,7 +98,11 @@ public class CDVBackgroundGeolocation extends CordovaPlugin {
     protected void pluginInitialize() {        
         gWebView = this.webView;
         
-        backgroundServiceIntent = new Intent(this.cordova.getActivity(), BackgroundGeolocationService.class);
+        Activity activity = this.cordova.getActivity();
+        backgroundServiceIntent = new Intent(activity, BackgroundGeolocationService.class);
+
+        SharedPreferences settings = activity.getSharedPreferences("TSLocationManager", 0);
+        Settings.init(settings);
 
         toneGenerator = new ToneGenerator(AudioManager.STREAM_NOTIFICATION, 100);
         // Register for events fired by our IntentService "LocationService"
@@ -107,6 +113,7 @@ public class CDVBackgroundGeolocation extends CordovaPlugin {
 
         Boolean result      = false;
         
+    
         if (ACTION_START.equalsIgnoreCase(action)) {
             result      = true;
             this.setEnabled(true);
@@ -124,7 +131,7 @@ public class CDVBackgroundGeolocation extends CordovaPlugin {
             this.onError(data.getString(1));
             callbackContext.success();
         } else if (ACTION_CONFIGURE.equalsIgnoreCase(action)) {
-            result = applyConfig(data);
+            result = applyConfig(data.getJSONObject(0));
             if (result) {
                 this.locationCallback = callbackContext;
             } else {
@@ -146,7 +153,7 @@ public class CDVBackgroundGeolocation extends CordovaPlugin {
                 EventBus.getDefault().post(event);
             }
         } else if (ACTION_SET_CONFIG.equalsIgnoreCase(action)) {
-            result = applyConfig(data);
+            result = applyConfig(data.getJSONObject(0));
             if (result) {
                 Bundle event = new Bundle();
                 event.putString("name", action);
@@ -357,118 +364,36 @@ public class CDVBackgroundGeolocation extends CordovaPlugin {
         }
     }
     
-    private boolean applyConfig(JSONArray data) {
-        Activity activity = this.cordova.getActivity();
-        
-        try {
-            JSONObject config = data.getJSONObject(0);
-            Log.i(TAG, "- configure: " + config.toString());
-            
-            SharedPreferences settings = activity.getSharedPreferences("TSLocationManager", 0);
-            SharedPreferences.Editor editor = settings.edit();
-            
-            editor.putBoolean("activityIsActive", true);
-            
-            if (config.has("distanceFilter")) {
-                editor.putFloat("distanceFilter", config.getInt("distanceFilter"));
-            }
-            if (config.has("desiredAccuracy")) {
-                editor.putInt("desiredAccuracy", config.getInt("desiredAccuracy"));
-            }
-            if (config.has("locationUpdateInterval")) {
-                editor.putInt("locationUpdateInterval", config.getInt("locationUpdateInterval"));
-            }
-            if (config.has("fastestLocationUpdateInterval")) {
-                editor.putInt("fastestLocationUpdateInterval", config.getInt("fastestLocationUpdateInterval"));
-            }
-            if (config.has("locationTimeout")) {
-                editor.putInt("locationTimeout", config.getInt("locationTimeout"));
-            }
-            if (config.has("activityRecognitionInterval")) {
-                editor.putLong("activityRecognitionInterval", config.getLong("activityRecognitionInterval"));
-            }
-            if (config.has("minimumActivityRecognitionConfidence")) {
-                editor.putInt("minimumActivityRecognitionConfidence", config.getInt("minimumActivityRecognitionConfidence"));
-            }
-            if (config.has("triggerActivities")) {
-                editor.putString("triggerActivities", config.getString("triggerActivities"));
-            }
-            if (config.has("stopTimeout")) {
-                editor.putLong("stopTimeout", config.getLong("stopTimeout"));
-            }
-            if (config.has("debug")) {
-                editor.putBoolean("debug", config.getBoolean("debug"));
-            }
-            if (config.has("stopAfterElapsedMinutes")) {
-                editor.putInt("stopAfterElapsedMinutes", config.getInt("stopAfterElapsedMinutes"));
-            }
-            if (config.has("stopOnTerminate")) {
+    private boolean applyConfig(JSONObject config) {
+        if (config.has("stopOnTerminate")) {
+            try {
                 stopOnTerminate = config.getBoolean("stopOnTerminate");
-                editor.putBoolean("stopOnTerminate", stopOnTerminate);
+            } catch (JSONException e) {
+                e.printStackTrace();
             }
-            if (config.has("startOnBoot")) {
-                editor.putBoolean("startOnBoot", config.getBoolean("startOnBoot"));
-            }
-            if (config.has("forceReloadOnLocationChange")) {
-                editor.putBoolean("forceReloadOnLocationChange", config.getBoolean("forceReloadOnLocationChange"));
-            }
-            if (config.has("forceReload")) { // @deprecated, alias to #forceReloadOnLocationChange
-                editor.putBoolean("forceReloadOnLocationChange", config.getBoolean("forceReload"));
-            }
-            if (config.has("forceReloadOnMotionChange")) {
-                editor.putBoolean("forceReloadOnMotionChange", config.getBoolean("forceReloadOnMotionChange"));
-            }
-            if (config.has("forceReloadOnGeofence")) {
-                editor.putBoolean("forceReloadOnGeofence", config.getBoolean("forceReloadOnGeofence"));
-            }
-            if (config.has("maxDaysToPersist")) {
-                editor.putInt("maxDaysToPersist", config.getInt("maxDaysToPersist"));
-            }
-            if (config.has("url")) {
-                editor.putString("url", config.getString("url"));
-            }
-            if (config.has("method")) {
-                editor.putString("method", config.getString("method"));
-            }
-            if (config.has("autoSync")) {
-                editor.putBoolean("autoSync", config.getBoolean("autoSync"));
-            }
-            if (config.has("batchSync")) {
-                editor.putBoolean("batchSync", config.getBoolean("batchSync"));
-            }
-            if (config.has("params")) {
-                try {
-                    editor.putString("params", config.getJSONObject("params").toString());
-                } catch (JSONException e) {
-                    Log.w(TAG, "- Failed to parse #params to JSONObject.  Ignored");
-                }
-            }
-            if (config.has("headers")) {
-                try {
-                    editor.putString("headers", config.getJSONObject("headers").toString());
-                } catch (JSONException e) {
-                    Log.w(TAG, "- Failed to parse #headers to JSONObject.  Ignored");
-                }
-            }
-            // License
+        }
+        SharedPreferences settings = this.cordova.getActivity().getSharedPreferences("TSLocationManager", 0);
+        SharedPreferences.Editor editor = settings.edit();
+
+        try {
             if (preferences.contains("cordova-background-geolocation-license")) {
-                editor.putString("license", preferences.getString("cordova-background-geolocation-license", null));
+                config.put("license", preferences.getString("cordova-background-geolocation-license", null));
             }
             if (preferences.contains("cordova-background-geolocation-orderId")) {
-                editor.putString("orderId", preferences.getString("cordova-background-geolocation-orderId", null));
+                config.put("orderId", preferences.getString("cordova-background-geolocation-orderId", null));
             }
-            if (config.has("configureUrl")) {
-                editor.putString("configureUrl", config.getString("configureUrl"));
-            }
-            if (config.has("configureInterval")) {
-                editor.putInt("configureInterval", config.getInt("configureInterval"));
-            }
-            editor.commit();
-            return true;
         } catch (JSONException e) {
-            Log.w(TAG, e);
-            return false;
+            e.printStackTrace();
+            Log.w(TAG, "- Failed to apply license");
         }
+
+        editor.putString("config", config.toString());
+        editor.putBoolean("activityIsActive", true);
+        
+        editor.commit();
+
+        //return Settings.apply(config);
+        return true;
     }    
 
     public void onPause(boolean multitasking) {
@@ -607,75 +532,16 @@ public class CDVBackgroundGeolocation extends CordovaPlugin {
     }
     private JSONObject getState() {
         SharedPreferences settings = this.cordova.getActivity().getSharedPreferences("TSLocationManager", 0);
+
+        Bundle values = Settings.values;
         JSONObject state = new JSONObject();
+        Set<String> keys = values.keySet();
+
         try {
             state.put("enabled", isEnabled);
             state.put("isMoving", isMoving);
-            if (settings.contains("debug")) {
-                state.put("debug", settings.getBoolean("debug", false));
-            }
-            if (settings.contains("distanceFilter")) {
-                state.put("distanceFilter", settings.getFloat("distanceFilter", -1));
-            }
-            if (settings.contains("desiredAccuracy")) {
-                state.put("desiredAccuracy", settings.getInt("desiredAccuracy", -1));
-            }
-            if (settings.contains("locationUpdateInterval")) {
-                state.put("locationUpdateInterval", settings.getInt("locationUpdateInterval", -1));
-            }
-            if (settings.contains("fastestLocationUpdateInterval")) {
-                state.put("fastestLocationUpdateInterval", settings.getInt("fastestLocationUpdateInterval", -1));
-            }
-            if (settings.contains("activityRecognitionInterval")) {
-                state.put("activityRecognitionInterval", settings.getLong("activityRecognitionInterval", -1));
-            }
-            if (settings.contains("minimumActivityRecognitionConfidence")) {
-                state.put("minimumActivityRecognitionConfidence", settings.getInt("minimumActivityRecognitionConfidence", -1));
-            }
-            if (settings.contains("triggerActivities")) {
-                state.put("triggerActivities", settings.getString("triggerActivities", ""));
-            }
-            if (settings.contains("stopTimeout")) {
-                state.put("stopTimeout", settings.getLong("stopTimeout", -1));
-            }
-            if (settings.contains("stopAfterElapsedMinutes")) {
-                state.put("stopAfterElapsedMinutes", settings.getInt("stopAfterElapsedMinutes", -1));
-            }
-            if (settings.contains("stopOnTerminate")) {
-                state.put("stopOnTerminate", settings.getBoolean("stopOnTerminate", false));
-            }
-            if (settings.contains("startOnBoot")) {
-                state.put("startOnBoot", settings.getBoolean("startOnBoot", false));
-            }
-            if (settings.contains("forceReloadOnLocationChange")) {
-                state.put("forceReloadOnLocationChange", settings.getBoolean("forceReloadOnLocationChange", false));
-            }
-            if (settings.contains("forceReloadOnMotionChange")) {
-                state.put("forceReloadOnMotionChange", settings.getBoolean("forceReloadOnMotionChange", false));
-            }
-            if (settings.contains("forceReloadOnGeofence")) {
-                state.put("forceReloadOnGeofence", settings.getBoolean("forceReloadOnGeofence", false));
-            }
-            if (settings.contains("maxDaysToPersist")) {
-                state.put("maxDaysToPersist", settings.getInt("maxDaysToPersist", -1));
-            }
-            if (settings.contains("url")) {
-                state.put("url", settings.getString("url", ""));
-            }
-            if (settings.contains("method")) {
-                state.put("method", settings.getString("method", ""));
-            }
-            if (settings.contains("autoSync")) {
-                state.put("autoSync", settings.getBoolean("autoSync", false));
-            }
-            if (settings.contains("batchSync")) {
-                state.put("batchSync", settings.getBoolean("batchSync", false));
-            }
-            if (settings.contains("params")) {
-                state.put("params", new JSONObject(settings.getString("params", "{}")));
-            }
-            if (settings.contains("headers")) {
-                state.put("headers", new JSONObject(settings.getString("headers", "{}")));
+            for (String key : keys) {
+                state.put(key, JSONObject.wrap(values.get(key)));
             }
         } catch (JSONException e) {
             e.printStackTrace();
