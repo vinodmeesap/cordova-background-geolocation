@@ -119,8 +119,10 @@ public class CDVBackgroundGeolocation extends CordovaPlugin {
         } else if (ACTION_CONFIGURE.equalsIgnoreCase(action)) {
             result = applyConfig(data.getJSONObject(0));
             if (result) {
+                Log.i(TAG, "*********** configure success");
                 this.locationCallback = callbackContext;
             } else {
+                Log.i(TAG, "*********** configure FAILURE");
                 callbackContext.error("- Configuration error!");
             }
         } else if (BackgroundGeolocationService.ACTION_CHANGE_PACE.equalsIgnoreCase(action)) {
@@ -352,6 +354,8 @@ public class CDVBackgroundGeolocation extends CordovaPlugin {
     }
     
     private boolean applyConfig(JSONObject config) {
+        Log.i(TAG, "************* applyConfig: " + config.toString());
+
         if (config.has("stopOnTerminate")) {
             try {
                 stopOnTerminate = config.getBoolean("stopOnTerminate");
@@ -378,8 +382,6 @@ public class CDVBackgroundGeolocation extends CordovaPlugin {
         editor.putBoolean("activityIsActive", true);
         
         editor.commit();
-
-        //return Settings.apply(config);
         return true;
     }    
 
