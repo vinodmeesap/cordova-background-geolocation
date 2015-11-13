@@ -43,23 +43,11 @@ public class CDVBackgroundGeolocation extends CordovaPlugin {
     */
     private static final long GET_CURRENT_POSITION_TIMEOUT = 30000;
     
-    public static final String ACTION_START             = "start";
-    public static final String ACTION_STOP              = "stop";
     public static final String ACTION_FINISH            = "finish";
     public static final String ACTION_ERROR             = "error";
-    public static final String ACTION_CHANGE_PACE       = "changePace";
     public static final String ACTION_CONFIGURE         = "configure";
     public static final String ACTION_SET_CONFIG        = "setConfig";
-    public static final String ACTION_ON_STATIONARY     = "addStationaryRegionListener";
     public static final String ACTION_ADD_MOTION_CHANGE_LISTENER    = "addMotionChangeListener";
-    public static final String ACTION_ON_MOTION_CHANGE    = "onMotionChange";
-    public static final String ACTION_GET_LOCATIONS     = "getLocations";
-    public static final String ACTION_SYNC              = "sync";
-    public static final String ACTION_GET_ODOMETER      = "getOdometer";
-    public static final String ACTION_RESET_ODOMETER    = "resetOdometer";
-    public static final String ACTION_ADD_GEOFENCE      = "addGeofence";
-    public static final String ACTION_REMOVE_GEOFENCE   = "removeGeofence";
-    public static final String ACTION_GET_GEOFENCES     = "getGeofences";
     public static final String ACTION_ON_GEOFENCE       = "onGeofence";
     public static final String ACTION_PLAY_SOUND        = "playSound";
     public static final String ACTION_ACTIVITY_RELOAD   = "activityReload";
@@ -76,7 +64,6 @@ public class CDVBackgroundGeolocation extends CordovaPlugin {
 
     // Geolocation callback
     private CallbackContext locationCallback;
-    private CallbackContext stationaryCallback;
     private CallbackContext getLocationsCallback;
     private CallbackContext syncCallback;
     private CallbackContext getOdometerCallback;
@@ -113,12 +100,11 @@ public class CDVBackgroundGeolocation extends CordovaPlugin {
 
         Boolean result      = false;
         
-    
-        if (ACTION_START.equalsIgnoreCase(action)) {
+        if (BackgroundGeolocationService.ACTION_START.equalsIgnoreCase(action)) {
             result      = true;
             this.setEnabled(true);
             callbackContext.success(1);
-        } else if (ACTION_STOP.equalsIgnoreCase(action)) {
+        } else if (BackgroundGeolocationService.ACTION_STOP.equalsIgnoreCase(action)) {
             // No implementation to stop background-tasks with Android.  Just say "success"
             result      = true;
             this.setEnabled(false);
@@ -152,7 +138,7 @@ public class CDVBackgroundGeolocation extends CordovaPlugin {
                 event.putBoolean("isMoving", isMoving);
                 EventBus.getDefault().post(event);
             }
-        } else if (ACTION_SET_CONFIG.equalsIgnoreCase(action)) {
+        } else if (BackgroundGeolocationService.ACTION_SET_CONFIG.equalsIgnoreCase(action)) {
             result = applyConfig(data.getJSONObject(0));
             if (result) {
                 Bundle event = new Bundle();
@@ -169,58 +155,55 @@ public class CDVBackgroundGeolocation extends CordovaPlugin {
             PluginResult response = new PluginResult(PluginResult.Status.OK, state);
             response.setKeepCallback(false);
             runInBackground(callbackContext, response);
-        } else if (ACTION_ON_STATIONARY.equalsIgnoreCase(action)) {
-            result = true;
-            this.stationaryCallback = callbackContext;  
         } else if (ACTION_ADD_MOTION_CHANGE_LISTENER.equalsIgnoreCase(action)) {
             result = true;
             this.addMotionChangeListener(callbackContext);
-        } else if (ACTION_GET_LOCATIONS.equalsIgnoreCase(action)) {
+        } else if (BackgroundGeolocationService.ACTION_GET_LOCATIONS.equalsIgnoreCase(action)) {
             result = true;
             Bundle event = new Bundle();
             event.putString("name", action);
             event.putBoolean("request", true);
             getLocationsCallback = callbackContext;
             EventBus.getDefault().post(event);
-        } else if (ACTION_SYNC.equalsIgnoreCase(action)) {
+        } else if (BackgroundGeolocationService.ACTION_SYNC.equalsIgnoreCase(action)) {
             result = true;
             Bundle event = new Bundle();
             event.putString("name", action);
             event.putBoolean("request", true);
             syncCallback = callbackContext;
             EventBus.getDefault().post(event);
-        } else if (ACTION_GET_ODOMETER.equalsIgnoreCase(action)) {
+        } else if (BackgroundGeolocationService.ACTION_GET_ODOMETER.equalsIgnoreCase(action)) {
             result = true;
             Bundle event = new Bundle();
             event.putString("name", action);
             event.putBoolean("request", true);
             getOdometerCallback = callbackContext;
             EventBus.getDefault().post(event);
-        } else if (ACTION_RESET_ODOMETER.equalsIgnoreCase(action)) {
+        } else if (BackgroundGeolocationService.ACTION_RESET_ODOMETER.equalsIgnoreCase(action)) {
             result = true;
             Bundle event = new Bundle();
             event.putString("name", action);
             event.putBoolean("request", true);
             resetOdometerCallback = callbackContext;
             EventBus.getDefault().post(event);
-        } else if (ACTION_ADD_GEOFENCE.equalsIgnoreCase(action)) {
+        } else if (BackgroundGeolocationService.ACTION_ADD_GEOFENCE.equalsIgnoreCase(action)) {
             result = onAddGeofence(data.getJSONObject(0));
             if (result) {
                 callbackContext.success();
             } else {
                 callbackContext.error("Failed to add geofence");
             }
-        } else if (ACTION_REMOVE_GEOFENCE.equalsIgnoreCase(action)) {
+        } else if (BackgroundGeolocationService.ACTION_REMOVE_GEOFENCE.equalsIgnoreCase(action)) {
             result = onRemoveGeofence(data.getString(0));
             if (result) {
                 callbackContext.success();
             }  else {
                 callbackContext.error("Failed to add geofence");
             }
-        } else if (ACTION_ON_GEOFENCE.equalsIgnoreCase(action)) {
+        } else if (BackgroundGeolocationService.ACTION_ON_GEOFENCE.equalsIgnoreCase(action)) {
             result = true;
             addGeofenceListener(callbackContext);
-        } else if (ACTION_GET_GEOFENCES.equalsIgnoreCase(action)) {
+        } else if (BackgroundGeolocationService.ACTION_GET_GEOFENCES.equalsIgnoreCase(action)) {
             result = true;
             getGeofencesCallback = callbackContext;
             Bundle event = new Bundle();
@@ -235,6 +218,10 @@ public class CDVBackgroundGeolocation extends CordovaPlugin {
             result = true;
             JSONObject options = data.getJSONObject(0);
             onGetCurrentPosition(callbackContext, options);
+        } else if (BackgroundGeolocationService.ACTION_BEGIN_BACKGROUND_TASK.equalsIgnoreCase(action)) {
+            // Android doesn't do background-tasks.  This is an iOS thing.  Just return a number.
+            result = true;
+            callbackContext.success(1);
         }
         return result;
     }
@@ -264,7 +251,7 @@ public class CDVBackgroundGeolocation extends CordovaPlugin {
     private Boolean onAddGeofence(JSONObject config) {
         try {
             Bundle event = new Bundle();
-            event.putString("name", ACTION_ADD_GEOFENCE);
+            event.putString("name", BackgroundGeolocationService.ACTION_ADD_GEOFENCE);
             event.putBoolean("request", true);
             event.putFloat("radius", (float) config.getLong("radius"));
             event.putDouble("latitude", config.getDouble("latitude"));
@@ -308,7 +295,7 @@ public class CDVBackgroundGeolocation extends CordovaPlugin {
         Intent launchIntent = activity.getIntent();
 
         if (launchIntent.hasExtra("forceReload")) {
-            if (launchIntent.getStringExtra("name").equalsIgnoreCase(ACTION_ON_MOTION_CHANGE)) {
+            if (launchIntent.getStringExtra("name").equalsIgnoreCase(BackgroundGeolocationService.ACTION_ON_MOTION_CHANGE)) {
                 Bundle event = launchIntent.getExtras();
                 this.onEventMainThread(event);
             }
@@ -316,7 +303,7 @@ public class CDVBackgroundGeolocation extends CordovaPlugin {
     }
     private Boolean onRemoveGeofence(String identifier) {
         Bundle event = new Bundle();
-        event.putString("name", ACTION_REMOVE_GEOFENCE);
+        event.putString("name", BackgroundGeolocationService.ACTION_REMOVE_GEOFENCE);
         event.putBoolean("request", true);
         event.putString("identifier", identifier);
         EventBus.getDefault().post(event);
@@ -420,7 +407,7 @@ public class CDVBackgroundGeolocation extends CordovaPlugin {
         }
         String name = event.getString("name");
 
-        if (ACTION_GET_LOCATIONS.equalsIgnoreCase(name)) {
+        if (BackgroundGeolocationService.ACTION_GET_LOCATIONS.equalsIgnoreCase(name)) {
             try {
                 JSONObject params = new JSONObject();
                 params.put("locations", new JSONArray(event.getString("data")));
@@ -433,7 +420,7 @@ public class CDVBackgroundGeolocation extends CordovaPlugin {
                 PluginResult result = new PluginResult(PluginResult.Status.JSON_EXCEPTION, e.getMessage());
                 runInBackground(getLocationsCallback, result);
             }
-        } else if (ACTION_SYNC.equalsIgnoreCase(name)) {
+        } else if (BackgroundGeolocationService.ACTION_SYNC.equalsIgnoreCase(name)) {
             Boolean success = event.getBoolean("success");
             if (success) {
                 try {
@@ -450,15 +437,15 @@ public class CDVBackgroundGeolocation extends CordovaPlugin {
                 PluginResult result = new PluginResult(PluginResult.Status.IO_EXCEPTION, event.getString("message"));
                 runInBackground(syncCallback, result);
             }
-        } else if (ACTION_GET_ODOMETER.equalsIgnoreCase(name)) {
+        } else if (BackgroundGeolocationService.ACTION_GET_ODOMETER.equalsIgnoreCase(name)) {
             PluginResult result = new PluginResult(PluginResult.Status.OK, event.getFloat("data"));
             runInBackground(getOdometerCallback, result);
-        } else if (ACTION_RESET_ODOMETER.equalsIgnoreCase(name)) {
+        } else if (BackgroundGeolocationService.ACTION_RESET_ODOMETER.equalsIgnoreCase(name)) {
             PluginResult result = new PluginResult(PluginResult.Status.OK);
             resetOdometerCallback.sendPluginResult(result);
         } else if (BackgroundGeolocationService.ACTION_CHANGE_PACE.equalsIgnoreCase(name)) {
             this.onChangePace(event);
-        } else if (ACTION_GET_GEOFENCES.equalsIgnoreCase(name)) {
+        } else if (BackgroundGeolocationService.ACTION_GET_GEOFENCES.equalsIgnoreCase(name)) {
             try {
                 JSONArray json      = new JSONArray(event.getString("data"));
                 PluginResult result = new PluginResult(PluginResult.Status.OK, json);
@@ -469,7 +456,7 @@ public class CDVBackgroundGeolocation extends CordovaPlugin {
                 PluginResult result = new PluginResult(PluginResult.Status.JSON_EXCEPTION, e.getMessage());
                 runInBackground(getGeofencesCallback, result);
             }
-        } else if (ACTION_ON_MOTION_CHANGE.equalsIgnoreCase(name)) {
+        } else if (BackgroundGeolocationService.ACTION_ON_MOTION_CHANGE.equalsIgnoreCase(name)) {
             this.onMotionChange(event);
         } else if (name.equalsIgnoreCase(BackgroundGeolocationService.ACTION_GOOGLE_PLAY_SERVICES_CONNECT_ERROR)) {
             GoogleApiAvailability.getInstance().getErrorDialog(this.cordova.getActivity(), event.getInt("errorCode"), 1001).show();
