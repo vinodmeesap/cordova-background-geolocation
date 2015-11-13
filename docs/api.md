@@ -56,6 +56,8 @@ bgGeo.setConfig(function() {
 | [`autoSync`](#param-string-autosync-true) | `Boolean` | Optional | `true` | If you've enabeld HTTP feature by configuring an `#url`, the plugin will attempt to HTTP POST each location to your server **as it is recorded**.  If you set `autoSync: false`, it's up to you to **manually** execute the `#sync` method to initate the HTTP POST (**NOTE** The plugin will continue to persist **every** recorded location in the SQLite database until you execute `#sync`). |
 | [`batchSync`](#param-string-batchsync-false) | `Boolean` | Optional | `false` | Default is `false`.  If you've enabled HTTP feature by configuring an `#url`, `batchSync: true` will POST all the locations currently stored in native SQLite datbase to your server in a single HTTP POST request.  With `batchSync: false`, an HTTP POST request will be initiated for **each** location in database. |
 | [`maxDaysToPersist`](#param-integer-maxdaystopersist) | `Integer` | Optional | `1` |  Maximum number of days to store a geolocation in plugin's SQLite database when your server fails to respond with `HTTP 200 OK`.  The plugin will continue attempting to sync with your server until `maxDaysToPersist` when it will give up and remove the location from the database. |
+| [`configureUrl`](#param-string-configureurl) | `String` | Optional | `undefined` | The Android plugin can automatically execute an url of your choice to re-configure itself at some `configureInterval (ms)`.  This can be used if you have a strict authentication service which requires a token refresh at some interval.  The returned `JSON` schema be compatible with this plugin.  If your schema is *not* compatible, the decoded `JSON` will be assumed to be a `#params` config for this plugin.  Since there's no guarantee that your fore-ground Android Activity is not killed, you cannot rely upon Javascript to perform this duty. |
+| [`configureInterval`](#param-integer-configureinterval) | `Integer ms` | Optional | `undefined` | This is the `interval` at which the plugin will auto-configure itself from the above `#configureUrl` |
 
 ## Application Options
 
@@ -281,6 +283,14 @@ If the user closes the application while the background-tracking has been starte
 ####`@param {Boolean} startOnBoot`
 
 Set to ```true``` to start the background-service whenever the device boots.  Unless you configure the plugin to ```forceReload``` (ie: boot your app), you should configure the plugin's HTTP features so it can POST to your server in "headless" mode.
+
+####`@param {String} configureUrl`
+
+The Android plugin can automatically execute an url of your choice to re-configure itself at some `configureInterval (ms)`.  This can be used if you have a strict authentication service which requires a token refresh at some interval.  The returned `JSON` schema be compatible with this plugin.  If your schema is *not* compatible, the decoded `JSON` will be assumed to be a `#params` config for this plugin.  Since there's no guarantee that your fore-ground Android Activity is not killed, you cannot rely upon Javascript to perform this duty. |
+
+####`@param {Integer} configureInterval`
+
+This is the `interval` at which the plugin will auto-configure itself from the above `#configureUrl`
 
 # Events
 
