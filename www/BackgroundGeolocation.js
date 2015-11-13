@@ -78,6 +78,16 @@ module.exports = {
             'stop',
             []);
     },
+    beginBackgroundTask: function(callback) {
+        if (typeof(callback) !== 'function') {
+            throw "beginBackgroundTask must be provided with a callbackFn to receive the returned #taskId";
+        }
+        exec(callback,
+            function() {},
+            'BackgroundGeolocation',
+            'beginBackgroundTask',
+            []);
+    },
     finish: function(taskId, success, failure) {
         if (!taskId) {
             throw "BackgroundGeolocation#finish must now be provided with a taskId as 1st param, eg: bgGeo.finish(taskId).  taskId is provided by 2nd param in callback";
