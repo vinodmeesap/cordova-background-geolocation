@@ -352,8 +352,6 @@ public class CDVBackgroundGeolocation extends CordovaPlugin {
     }
     
     private boolean applyConfig(JSONObject config) {
-        Log.i(TAG, "************* applyConfig: " + config.toString());
-
         if (config.has("stopOnTerminate")) {
             try {
                 stopOnTerminate = config.getBoolean("stopOnTerminate");
