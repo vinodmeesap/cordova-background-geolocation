@@ -267,8 +267,8 @@
 
 -(void) beginBackgroundTask:(CDVInvokedUrlCommand*)command
 {
-    UIBackgroundTaskIdentifier *taskId = [bgGeo createBackgroundTask];
-    CDVPluginResult* result = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsInt: taskId];
+    UIBackgroundTaskIdentifier taskId = [bgGeo createBackgroundTask];
+    CDVPluginResult* result = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsInt: (int)taskId];
     [self.commandDelegate sendPluginResult:result callbackId:command.callbackId];
 }
 
