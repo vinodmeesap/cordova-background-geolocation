@@ -10,7 +10,7 @@
 @property (nonatomic) CLLocationDistance odometer;
 @property (nonatomic, strong) CLLocationManager* locationManager;
 @property (nonatomic) NSDate *stoppedAt;
-@property (nonatomic) UIBackgroundTaskIdentifier motionDetectionTask;
+@property (nonatomic) UIBackgroundTaskIdentifier preventSuspendTask;
 @property (nonatomic) SOMotionType motionType;
 
 // Blocks
