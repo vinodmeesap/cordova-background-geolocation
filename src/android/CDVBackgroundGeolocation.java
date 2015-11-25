@@ -3,6 +3,7 @@ package com.transistorsoft.cordova.bggeo;
 import java.util.List;
 import java.util.ArrayList;
 import java.util.Set;
+import java.util.Iterator;
 import org.apache.cordova.CallbackContext;
 import org.apache.cordova.CordovaPlugin;
 import org.apache.cordova.CordovaWebView;
@@ -59,7 +60,8 @@ public class CDVBackgroundGeolocation extends CordovaPlugin {
     private Boolean isAcquiringCurrentPosition = false;
     private long isAcquiringCurrentPositionSince;
     private Intent backgroundServiceIntent;
-    
+    private JSONObject mConfig;
+
     private DetectedActivity currentActivity;
 
     // Geolocation callback
@@ -87,7 +89,6 @@ public class CDVBackgroundGeolocation extends CordovaPlugin {
         
         Activity activity = this.cordova.getActivity();
         backgroundServiceIntent = new Intent(activity, BackgroundGeolocationService.class);
-
         SharedPreferences settings = activity.getSharedPreferences("TSLocationManager", 0);
         Settings.init(settings);
 
@@ -117,7 +118,10 @@ public class CDVBackgroundGeolocation extends CordovaPlugin {
             this.onError(data.getString(1));
             callbackContext.success();
         } else if (ACTION_CONFIGURE.equalsIgnoreCase(action)) {
-            result = applyConfig(data.getJSONObject(0));
+            mConfig = data.getJSONObject(0);
+            result = applyConfig();
+            SharedPreferences settings = this.cordova.getActivity().getSharedPreferences("TSLocationManager", 0);
+            setEnabled(settings.getBoolean("enabled", isEnabled));
             if (result) {
                 this.locationCallback = callbackContext;
             } else {
@@ -139,10 +143,10 @@ public class CDVBackgroundGeolocation extends CordovaPlugin {
                 EventBus.getDefault().post(event);
             }
         } else if (BackgroundGeolocationService.ACTION_SET_CONFIG.equalsIgnoreCase(action)) {
-            result = applyConfig(data.getJSONObject(0));
+            result = onSetConfig(data.getJSONObject(0));
             if (result) {
                 Bundle event = new Bundle();
-                event.putString("name", action);
+                event.putString("name", BackgroundGeolocationService.ACTION_SET_CONFIG);
                 event.putBoolean("request", true);
                 EventBus.getDefault().post(event);
                 callbackContext.success();
@@ -312,10 +316,8 @@ public class CDVBackgroundGeolocation extends CordovaPlugin {
 
     private void setEnabled(boolean value) {
         // Don't set a state that we're already in.
-        Log.i(TAG, "- setEnabled:  current value: " + isEnabled);
-        if (value == isEnabled) {
-            return;
-        }
+        Log.i(TAG, "- setEnabled: " + value + ", current value: " + isEnabled);
+
         isEnabled = value;
         
         Intent launchIntent = this.cordova.getActivity().getIntent();
@@ -344,6 +346,11 @@ public class CDVBackgroundGeolocation extends CordovaPlugin {
             }
             if (!BackgroundGeolocationService.isInstanceCreated()) {
                 activity.startService(backgroundServiceIntent);
+            } else {
+                Bundle event = new Bundle();
+                event.putString("name", BackgroundGeolocationService.ACTION_GET_CURRENT_POSITION);
+                event.putBoolean("request", true);
+                EventBus.getDefault().post(event);
             }
         } else {
             EventBus.getDefault().unregister(this);
@@ -351,10 +358,28 @@ public class CDVBackgroundGeolocation extends CordovaPlugin {
         }
     }
     
-    private boolean applyConfig(JSONObject config) {
-        if (config.has("stopOnTerminate")) {
+    private boolean onSetConfig(JSONObject config) {
+        try {
+            JSONObject merged = new JSONObject();
+            JSONObject[] objs = new JSONObject[] { mConfig, config };
+            for (JSONObject obj : objs) {
+                Iterator it = obj.keys();
+                while (it.hasNext()) {
+                    String key = (String)it.next();
+                    merged.put(key, obj.get(key));
+                }
+            }
+            mConfig = merged;
+            return applyConfig();
+        } catch (JSONException e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+    private boolean applyConfig() {
+        if (mConfig.has("stopOnTerminate")) {
             try {
-                stopOnTerminate = config.getBoolean("stopOnTerminate");
+                stopOnTerminate = mConfig.getBoolean("stopOnTerminate");
             } catch (JSONException e) {
                 e.printStackTrace();
             }
@@ -364,20 +389,20 @@ public class CDVBackgroundGeolocation extends CordovaPlugin {
 
         try {
             if (preferences.contains("cordova-background-geolocation-license")) {
-                config.put("license", preferences.getString("cordova-background-geolocation-license", null));
+                mConfig.put("license", preferences.getString("cordova-background-geolocation-license", null));
             }
             if (preferences.contains("cordova-background-geolocation-orderId")) {
-                config.put("orderId", preferences.getString("cordova-background-geolocation-orderId", null));
+                mConfig.put("orderId", preferences.getString("cordova-background-geolocation-orderId", null));
             }
         } catch (JSONException e) {
             e.printStackTrace();
             Log.w(TAG, "- Failed to apply license");
         }
 
-        editor.putString("config", config.toString());
+        editor.putString("config", mConfig.toString());
         editor.putBoolean("activityIsActive", true);
-        
         editor.commit();
+
         return true;
     }    
 
@@ -458,35 +483,20 @@ public class CDVBackgroundGeolocation extends CordovaPlugin {
             this.onMotionChange(event);
         } else if (name.equalsIgnoreCase(BackgroundGeolocationService.ACTION_GOOGLE_PLAY_SERVICES_CONNECT_ERROR)) {
             GoogleApiAvailability.getInstance().getErrorDialog(this.cordova.getActivity(), event.getInt("errorCode"), 1001).show();
-        } else if (name.equalsIgnoreCase(BackgroundGeolocationService.ACTION_GET_CURRENT_POSITION)) {
-            this.onCurrentPositionTimeout(event);
         } else if (name.equalsIgnoreCase(BackgroundGeolocationService.ACTION_LOCATION_ERROR)) {
             this.onLocationError(event);
         }
     }
 
-    private void onCurrentPositionTimeout(Bundle event) {
-        this.finishAcquiringCurrentPosition(false);
-        // Execute callbacks.
-        for (CallbackContext callback : currentPositionCallbacks) {
-            Log.i(TAG, "- send callback");
-            
-            PluginResult result = new PluginResult(PluginResult.Status.ERROR);
-            result.setKeepCallback(false);
-            runInBackground(callback, result);
-        }
-        currentPositionCallbacks.clear();
-
-    }
     private void finishAcquiringCurrentPosition(boolean success) {
         // Current position has arrived:  release the hounds.
         isAcquiringCurrentPosition = false;
         // When currentPosition is explicitly requested while plugin is stopped, shut Service down again and stop listening to EventBus
+        backgroundServiceIntent.removeExtra("command");
         if (!isEnabled) {
-            backgroundServiceIntent.removeExtra("command");
             EventBus.getDefault().unregister(this);
-            this.cordova.getActivity().stopService(backgroundServiceIntent);
         }
+
     }
     private void onMotionChange(Bundle event) {
         PluginResult result;
@@ -662,7 +672,6 @@ public class CDVBackgroundGeolocation extends CordovaPlugin {
 
         if (isAcquiringCurrentPosition) {
             finishAcquiringCurrentPosition(true);
-            // Execute callbacks.
             for (CallbackContext callback : currentPositionCallbacks) {
                 result = new PluginResult(PluginResult.Status.ERROR, code);
                 result.setKeepCallback(false);
