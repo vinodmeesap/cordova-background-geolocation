@@ -226,6 +226,13 @@ public class CDVBackgroundGeolocation extends CordovaPlugin {
             // Android doesn't do background-tasks.  This is an iOS thing.  Just return a number.
             result = true;
             callbackContext.success(1);
+        } else if (BackgroundGeolocationService.ACTION_CLEAR_DATABASE.equalsIgnoreCase(action)) {
+            result = clearDatabase();
+            if (result) {
+                callbackContext.success();
+            } else {
+                callbackContext.error("failed to clear database");
+            }
         }
         return result;
     }
@@ -406,6 +413,13 @@ public class CDVBackgroundGeolocation extends CordovaPlugin {
         return true;
     }    
 
+    private boolean clearDatabase() {
+        Bundle event = new Bundle();
+        event.putString("name", BackgroundGeolocationService.ACTION_CLEAR_DATABASE);
+        event.putBoolean("request", true);
+        EventBus.getDefault().post(event);
+        return true;
+    }
     public void onPause(boolean multitasking) {
         Log.i(TAG, "- onPause");
         if (isEnabled) {
