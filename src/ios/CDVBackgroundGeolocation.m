@@ -275,26 +275,27 @@
 /**
  * location handler from BackgroundGeolocation
  */
--(void (^)(CLLocation *location, BOOL isMoving)) createLocationChangedHandler {
-    return ^(CLLocation *location, BOOL isMoving) {
-        NSDictionary *locationData = [bgGeo locationToDictionary:location];
+-(void (^)(CLLocation *location, enum tsLocationType, BOOL isMoving)) createLocationChangedHandler {
+    return ^(CLLocation *location, enum tsLocationType type, BOOL isMoving) {
+                
+        NSDictionary *locationData = [bgGeo locationToDictionary:location type:type];
         NSDictionary *params = @{
-            @"location": locationData,
-            @"taskId": @([bgGeo createBackgroundTask])
-        };
+                                 @"location": locationData,
+                                 @"taskId": @([bgGeo createBackgroundTask])
+                                 };
         CDVPluginResult* result = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsDictionary:params];
         [result setKeepCallbackAsBool:YES];
-
+        
         [self.commandDelegate runInBackground:^{
             [self.commandDelegate sendPluginResult:result callbackId:self.locationCallbackId];
         }];
-
-        if ([self.currentPositionListeners count]) {
+        
+        if (type != TS_LOCATION_TYPE_SAMPLE && [self.currentPositionListeners count]) {
             for (NSString *callbackId in self.currentPositionListeners) {
                 NSDictionary *params = @{
-                    @"location": locationData,
-                    @"taskId": @([bgGeo createBackgroundTask])
-                };
+                                         @"location": locationData,
+                                         @"taskId": @([bgGeo createBackgroundTask])
+                                         };
                 CDVPluginResult *result = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsDictionary:params];
                 [result setKeepCallbackAsBool:NO];
                 [self.commandDelegate runInBackground:^{
