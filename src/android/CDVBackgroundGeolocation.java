@@ -86,6 +86,7 @@ public class CDVBackgroundGeolocation extends CordovaPlugin {
     private CallbackContext resetOdometerCallback;
     private CallbackContext paceChangeCallback;
     private CallbackContext getGeofencesCallback;
+    private CallbackContext clearDatabaseCallback;
 
     private ToneGenerator toneGenerator;
 
@@ -127,6 +128,7 @@ public class CDVBackgroundGeolocation extends CordovaPlugin {
             // No implementation to stop background-tasks with Android.  Just say "success"
             result      = true;
             this.setEnabled(false);
+            startCallback = null;
             callbackContext.success(0);
         } else if (ACTION_FINISH.equalsIgnoreCase(action)) {
             result = true;
@@ -274,6 +276,11 @@ public class CDVBackgroundGeolocation extends CordovaPlugin {
         }
     }
 
+    private void onStarted() {
+        startCallback.success();
+        startCallback = null;
+    }
+
     private void onGetCurrentPosition(CallbackContext callbackContext, JSONObject options) {
         isAcquiringCurrentPosition = true;
         isAcquiringCurrentPositionSince = System.nanoTime();
@@ -399,6 +406,7 @@ public class CDVBackgroundGeolocation extends CordovaPlugin {
                 event.putString("name", BackgroundGeolocationService.ACTION_GET_CURRENT_POSITION);
                 event.putBoolean("request", true);
                 EventBus.getDefault().post(event);
+                onStarted();
             }
         } else {
             EventBus.getDefault().unregister(this);
@@ -486,8 +494,7 @@ public class CDVBackgroundGeolocation extends CordovaPlugin {
         String name = event.getString("name");
 
         if (BackgroundGeolocationService.ACTION_START.equalsIgnoreCase(name)) {
-            startCallback.success();
-            startCallback = null;
+            onStarted();
         } else if (BackgroundGeolocationService.ACTION_GET_LOCATIONS.equalsIgnoreCase(name)) {
             try {
                 JSONObject params = new JSONObject();
