@@ -138,15 +138,7 @@ public class CDVBackgroundGeolocation extends CordovaPlugin {
             this.onError(data.getString(1));
             callbackContext.success();
         } else if (ACTION_CONFIGURE.equalsIgnoreCase(action)) {
-            mConfig = data.getJSONObject(0);
-            result = applyConfig();
-            SharedPreferences settings = this.cordova.getActivity().getSharedPreferences("TSLocationManager", 0);
-            setEnabled(settings.getBoolean("enabled", isEnabled));
-            if (result) {
-                this.locationCallback = callbackContext;
-            } else {
-                callbackContext.error("- Configuration error!");
-            }
+            result = configure(data.getJSONObject(0), callbackContext);
         } else if (BackgroundGeolocationService.ACTION_CHANGE_PACE.equalsIgnoreCase(action)) {
             if (!isEnabled) {
                 Log.w(TAG, "- Cannot change pace while disabled");
@@ -253,6 +245,23 @@ public class CDVBackgroundGeolocation extends CordovaPlugin {
             } else {
                 callbackContext.error("failed to clear database");
             }
+        }
+        return result;
+    }
+
+    private boolean configure(JSONObject config, CallbackContext callbackContext) {
+        mConfig = config;
+        boolean result = applyConfig();
+        SharedPreferences settings = this.cordova.getActivity().getSharedPreferences("TSLocationManager", 0);
+
+        if (result) {
+            this.locationCallback = callbackContext;
+            boolean willEnable = settings.getBoolean("enabled", isEnabled);
+            if (willEnable) {
+                start(null);
+            }
+        } else {
+            callbackContext.error("- Configuration error!");
         }
         return result;
     }
@@ -415,7 +424,7 @@ public class CDVBackgroundGeolocation extends CordovaPlugin {
             activity.stopService(backgroundServiceIntent);
         }
     }
-    
+
     private boolean onSetConfig(JSONObject config) {
         try {
             JSONObject merged = new JSONObject();
