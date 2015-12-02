@@ -277,8 +277,10 @@ public class CDVBackgroundGeolocation extends CordovaPlugin {
     }
 
     private void onStarted() {
-        startCallback.success();
-        startCallback = null;
+        if (startCallback != null) {
+            startCallback.success();
+            startCallback = null;
+        }
     }
 
     private void onGetCurrentPosition(CallbackContext callbackContext, JSONObject options) {
@@ -788,8 +790,10 @@ public class CDVBackgroundGeolocation extends CordovaPlugin {
                 int errorCode = BackgroundGeolocationService.LOCATION_ERROR_DENIED;
                 PluginResult result = new PluginResult(PluginResult.Status.ERROR, errorCode);
                 if (requestCode == REQUEST_ACTION_START) {
-                    startCallback.sendPluginResult(result);
-                    startCallback = null;
+                    if (startCallback != null) {
+                        startCallback.sendPluginResult(result);
+                        startCallback = null;
+                    }
                 } else if (requestCode == REQUEST_ACTION_GET_CURRENT_POSITION) {
                     Bundle event = new Bundle();
                     event.putString("name", BackgroundGeolocationService.ACTION_GET_CURRENT_POSITION);
