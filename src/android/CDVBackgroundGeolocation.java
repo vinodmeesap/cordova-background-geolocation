@@ -183,11 +183,7 @@ public class CDVBackgroundGeolocation extends CordovaPlugin {
             EventBus.getDefault().post(event);
         } else if (BackgroundGeolocationService.ACTION_SYNC.equalsIgnoreCase(action)) {
             result = true;
-            Bundle event = new Bundle();
-            event.putString("name", action);
-            event.putBoolean("request", true);
-            syncCallback = callbackContext;
-            EventBus.getDefault().post(event);
+            sync(callbackContext);
         } else if (BackgroundGeolocationService.ACTION_GET_ODOMETER.equalsIgnoreCase(action)) {
             result = true;
             Bundle event = new Bundle();
@@ -290,6 +286,26 @@ public class CDVBackgroundGeolocation extends CordovaPlugin {
             startCallback.success();
             startCallback = null;
         }
+    }
+
+    private void sync(CallbackContext callbackContext) {
+        syncCallback = callbackContext;
+        Activity activity = this.cordova.getActivity();
+
+        EventBus eventBus = EventBus.getDefault();
+        if (!eventBus.isRegistered(this)) {
+            eventBus.register(this);
+        }
+        if (!BackgroundGeolocationService.isInstanceCreated()) {
+            Intent syncIntent = new Intent(activity, BackgroundGeolocationService.class);
+            syncIntent.putExtra("command", BackgroundGeolocationService.ACTION_SYNC);
+            activity.startService(syncIntent);
+        } else {
+            Bundle event = new Bundle();
+            event.putString("name", BackgroundGeolocationService.ACTION_SYNC);
+            event.putBoolean("request", true);
+            eventBus.post(event);
+        }    
     }
 
     private void onGetCurrentPosition(CallbackContext callbackContext, JSONObject options) {
