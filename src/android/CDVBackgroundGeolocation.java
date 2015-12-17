@@ -625,11 +625,11 @@ public class CDVBackgroundGeolocation extends CordovaPlugin {
         Set<String> keys = values.keySet();
 
         try {
-            state.put("enabled", isEnabled);
-            state.put("isMoving", isMoving);
             for (String key : keys) {
                 state.put(key, values.get(key));
             }
+            state.put("enabled", isEnabled);
+            state.put("isMoving", isMoving);
         } catch (JSONException e) {
             e.printStackTrace();
         }
