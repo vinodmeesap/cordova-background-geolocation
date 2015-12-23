@@ -16,10 +16,12 @@ public class BootReceiver extends BroadcastReceiver {
     
     @Override
     public void onReceive(Context context, Intent intent) {
-        SharedPreferences settings = context.getSharedPreferences(TAG, 0);
-        
-        boolean startOnBoot     = settings.getBoolean("startOnBoot", false);
-        boolean enabled         = settings.getBoolean("enabled", false);
+        SharedPreferences preferences = context.getSharedPreferences(TAG, 0);
+        Settings.init(context.getSharedPreferences(TAG, 0));
+        Settings.load();
+
+        boolean startOnBoot     = Settings.values.getBoolean("startOnBoot", false);
+        boolean enabled         = preferences.getBoolean("enabled", false);
 
         if (!startOnBoot || !enabled) {
             return;
