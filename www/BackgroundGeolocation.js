@@ -256,8 +256,8 @@ module.exports = {
         if (!config.radius) {
             throw "#addGeofence requires a #radius";
         }
-        if ( (typeof(config.notifyOnEnter) === 'undefined') && (typeof(config.notifyOnExit) === 'undefined') ) {
-            throw "#addGeofence requires at least notifyOnEnter {Boolean} and/or #notifyOnExit {Boolean}";
+        if ( (typeof(config.notifyOnEntry) === 'undefined') && (typeof(config.notifyOnExit) === 'undefined') ) {
+            throw "#addGeofence requires at least notifyOnEntry {Boolean} and/or #notifyOnExit {Boolean}";
         }
         exec(success || function() {},
             failure || function() {},
