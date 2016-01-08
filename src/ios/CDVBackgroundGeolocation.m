@@ -92,7 +92,9 @@
 
 - (void) resetOdometer:(CDVInvokedUrlCommand*)command
 {
-    bgGeo.odometer = 0;
+    [self.commandDelegate runInBackground:^{
+        [bgGeo resetOdometer];
+    }];
     CDVPluginResult* result = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK];
     [self.commandDelegate sendPluginResult:result callbackId:command.callbackId];
 }
