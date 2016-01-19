@@ -68,6 +68,7 @@ public class CDVBackgroundGeolocation extends CordovaPlugin {
     public static final String ACTION_PLAY_SOUND        = "playSound";
     public static final String ACTION_ACTIVITY_RELOAD   = "activityReload";
     public static final String ACTION_GET_STATE         = "getState";
+    public static final String ACTION_ADD_HTTP_LISTENER = "addHttpListener";
 
     private Boolean isEnabled           = false;
     private Boolean stopOnTerminate     = false;
@@ -96,6 +97,7 @@ public class CDVBackgroundGeolocation extends CordovaPlugin {
     private List<CallbackContext> geofenceCallbacks = new ArrayList<CallbackContext>();
     private List<CallbackContext> currentPositionCallbacks = new ArrayList<CallbackContext>();
     private Map<String, CallbackContext> addGeofenceCallbacks = new HashMap<String, CallbackContext>();
+    private List<CallbackContext> httpResponseCallbacks = new ArrayList<CallbackContext>();
 
     public static boolean isActive() {
         return gWebView != null;
@@ -215,6 +217,9 @@ public class CDVBackgroundGeolocation extends CordovaPlugin {
         } else if (BackgroundGeolocationService.ACTION_CLEAR_DATABASE.equalsIgnoreCase(action)) {
             result = true;
             clearDatabase(callbackContext);
+        } else if (ACTION_ADD_HTTP_LISTENER.equalsIgnoreCase(action)) {
+            result = true;
+            addHttpListener(callbackContext);
         }
         return result;
     }
@@ -352,6 +357,7 @@ public class CDVBackgroundGeolocation extends CordovaPlugin {
             callbackContext.error(e.getMessage());
         }
     }
+
     private void getGeofences(CallbackContext callbackContext) {
         getGeofencesCallback = callbackContext;
         Bundle event = new Bundle();
@@ -419,6 +425,10 @@ public class CDVBackgroundGeolocation extends CordovaPlugin {
                 this.onEventMainThread(event);
             }
         }
+    }
+
+    private void addHttpListener(CallbackContext callbackContext) {
+        httpResponseCallbacks.add(callbackContext);
     }
 
     private Boolean removeGeofence(String identifier) {
@@ -614,7 +624,9 @@ public class CDVBackgroundGeolocation extends CordovaPlugin {
             this.onLocationError(event);
         } else if (name.equalsIgnoreCase(BackgroundGeolocationService.ACTION_ADD_GEOFENCE)) {
             this.onAddGeofence(event);
-        }
+        } else if (name.equalsIgnoreCase(BackgroundGeolocationService.ACTION_HTTP_RESPONSE)) {
+            this.onHttpResponse(event);
+        } 
     }
 
     private void finishAcquiringCurrentPosition(boolean success) {
@@ -627,6 +639,23 @@ public class CDVBackgroundGeolocation extends CordovaPlugin {
         }
 
     }
+    public void onHttpResponse(Bundle event) {
+        PluginResult result;
+        try {
+            JSONObject params = new JSONObject();
+            params.put("status", event.getInt("status"));
+            params.put("responseText", event.getString("responseText"));
+            result = new PluginResult(PluginResult.Status.OK, params);
+        } catch (JSONException e) {
+            e.printStackTrace();
+            result = new PluginResult(PluginResult.Status.JSON_EXCEPTION, e.getMessage());
+        }
+        result.setKeepCallback(true);
+        for (CallbackContext callback : httpResponseCallbacks) {
+            callback.sendPluginResult(result);
+        }
+    }
+
     private void onMotionChange(Bundle event) {
         PluginResult result;
         isMoving = event.getBoolean("isMoving");
