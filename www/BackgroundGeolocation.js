@@ -24,6 +24,8 @@ module.exports = {
                 return this.onGeofence(success, fail);
             case 'motionchange':
                 return this.onMotionChange(success, fail);
+            case 'log':
+                return this.onLog(success, fail);
         }
     },
 
@@ -216,10 +218,17 @@ module.exports = {
             []);
     },
     onHttp: function(success, failure) {
-      exec(success || function() {},
+        exec(success || function() {},
             failure || function() {},
             'BackgroundGeolocation',
             'addHttpListener',
+            []);
+    },
+    onLog: function(success, failure) {
+        exec(success || function() {},
+            failure || function() {},
+            'BackgroundGeolocation',
+            'addLogListener',
             []);
     },
     /**
