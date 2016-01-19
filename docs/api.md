@@ -41,7 +41,7 @@ bgGeo.setConfig(function() {
 | Option | Type | Opt/Required | Default | Note |
 |---|---|---|---|---|
 | [`activityRecognitionInterval`](#param-integer-millis-10000-activityrecognitioninterval) | `Integer` | Required | `10000` | The desired time between activity detections. Larger values will result in fewer activity detections while improving battery life. A value of 0 will result in activity detections at the fastest possible rate. |
-| [`stopTimeout`](#param-integer-minutes-stoptimeout) | `Integer` | Required | `5 minutes` | The number of miutes to wait before turning off the GPS after the ActivityRecognition System (ARS) detects the device is `STILL` (**Android:** defaults to 0, no timeout, **iOS:** defaults to 5min).  If you don't set a value, the plugin is eager to turn off the GPS ASAP.  An example use-case for this configuration is to delay GPS OFF while in a car waiting at a traffic light. |
+| [`stopTimeout`](#param-integer-minutes-stoptimeout) | `Integer` | Required | `5 minutes` | The number of miutes to wait before turning off the GPS after the ActivityRecognition System (ARS) detects the device is `STILL` (**Android:** defaults to 0, no timeout, **iOS:** defaults to 5min).  If you don't set a value, the plugin is eager to turn off the GPS ASAP.  An example use-case for this configuration is to delay GPS OFF while in a car waiting at a traffic light.  **WARNING** Setting a value > 15 min is **not** recommended, particularly for Android.|
 | [`minimumActivityRecognitionConfidence`](#param-integer-millis-minimumactivityrecognitionconfidence) | `Integer` | Optional (**Android**)| `80` | Each activity-recognition-result returned by the API is tagged with a "confidence" level expressed as a %.  You can set your desired confidence to trigger a state-change.  Defaults to `80`.|
 | [`stopDetectionDelay`](#param-integer-minutes-stopdetectiondelay-0) | `Integer` | Optional (**iOS**)| 0 | Allows the stop-detection system to be delayed from activating.  When the stop-detection system is engaged, the GPS is off and only the accelerometer is monitored.  Stop-detection will only engage if this timer expires.  The timer is cancelled if any movement is detected before expiration | 
 | [`disableMotionActivityUpdates`](#param-boolean-disablemotionactivityupdates) | `Boolean` | Optional (**iOS**)| 0 | Disable iOS motion-activity updates (eg: "walking", "in_vehicle").  This feature requires a device having the **M7** co-processor (ie: iPhone 5s and up).  **NOTE** This feature will ask the user for "Health updates".  If you do not wish to ask the user for the "Health updates", set this option to `false`; However, you will no longer recieve activity data in the recorded locations. | 
@@ -68,6 +68,10 @@ bgGeo.setConfig(function() {
 | [`stopOnTerminate`](#param-boolean-stoponterminate) | `Boolean` | Optional | `true` | Enable this in order to force a stop() when the application terminated (e.g. on iOS, double-tap home button, swipe away the app). On Android, stopOnTerminate: false will cause the plugin to operate as a headless background-service (in this case, you should configure an #url in order for the background-service to send the location to your server) |
 | [`preventSuspend`](#param-boolean-preventsuspend-false) | `Boolean` | Optional **iOS** | `false` | Enable this to prevent **iOS** from suspending.  Must be used in conjunction with a `heartbeatInterval`.  **WARNING**: `preventSuspend` should only be used in **very** specific use-cases and should typically **not** be used as it will have a **very serious impact on battery performance.** |
 | [`heartbeatInterval`](#param-integer-heartbeatinterval-60) | `Integer(seconds)` | Optional **iOS** | `60` | Used in conjunction with `preventSuspend`, an **iOS** app can continue to monitor the accelerometer while in the **stationary-state**.  If the *slightest* movement is detected during a `hearbeatInterval`, the plugin will request a high-accuracy location in order to determine if the device has begun moving.  If the plugin *is* moving, it will immediately switch state to **moving-state**.|
+| [`foregroundService`](#param-boolean-foregroundservice-false) | `Boolean` | Optional **Android** | `false` | Make the Android service [run in the foreground](http://developer.android.com/intl/ru/reference/android/app/Service.html#startForeground(int, android.app.Notification)), supplying the ongoing notification to be shown to the user while in this state.  Running as a foreground-service makes the tracking-service **much** more inmmune to OS killing it due to memory/battery pressure.  By default services are background, meaning that if the system needs to kill them to reclaim more memory (such as to display a large page in a web browser).  @see `notificationTitle`, `notificationText` & `notificatinoColor`|
+| [`notificationTitle`](#param-string-notificationtitle-app-name) | `String` | Optional **Android** | App name | When running the service with `foregroundService: true`, Android requires a persistent notification in the Notification Bar.  Defaults to the application name|
+| [`notificationText`](#param-string-notificationtext-location-service-activated) | `String` | Optional **Android** | Location service activated | When running the service with `foregroundService: true`, Android requires a persistent notification in the Notification Bar.|
+| [`notificationColor`](#param-string-notificationcolor-null) | `String` | Optional **Android** | null | When running the service with `foregroundService: true`, Android requires a persistent notification in the Notification Bar.  Supported formats are: `#RRGGBB` `#AARRGGBB` or one of the following names: 'red', 'blue', 'green', 'black', 'white', 'gray', 'cyan', 'magenta', 'yellow', 'lightgray', 'darkgray', 'grey', 'lightgrey', 'darkgrey', 'aqua', 'fuchsia', 'lime', 'maroon', 'navy', 'olive', 'purple', 'silver', 'teal'.|
 
 ## Events
 
@@ -218,7 +222,9 @@ Each activity-recognition-result returned by the API is tagged with a "confidenc
 
 ####`@param {Integer minutes} stopTimeout`
 
-The number of miutes to wait before turning off the GPS after the ActivityRecognition System (ARS) detects the device is `STILL` (**Android:** defaults to 0, no timeout, **iOS:** defaults to 5min).  If you don't set a value, the plugin is eager to turn off the GPS ASAP.  An example use-case for this configuration is to delay GPS OFF while in a car waiting at a traffic light.  **iOS Stop-detection timing**
+The number of miutes to wait before turning off the GPS after the ActivityRecognition System (ARS) detects the device is `STILL` (**Android:** defaults to 0, no timeout, **iOS:** defaults to 5min).  If you don't set a value, the plugin is eager to turn off the GPS ASAP.  An example use-case for this configuration is to delay GPS OFF while in a car waiting at a traffic light.  **WARNING** Setting a value > 15 min is **not** recommended, particularly for Android.
+
+**iOS Stop-detection timing**.  
 ![](https://dl.dropboxusercontent.com/u/2319755/cordova-background-geolocaiton/ios-stop-detection-timing.png)
 
 ## iOS Options
@@ -307,6 +313,22 @@ The Android plugin can automatically execute an url of your choice to re-configu
 ####`@param {Integer} configureInterval`
 
 This is the `interval` at which the plugin will auto-configure itself from the above `#configureUrl`
+
+####`@param {Boolean} foregroundService [false]`
+
+Make the Android service [run in the foreground](http://developer.android.com/intl/ru/reference/android/app/Service.html#foregroundService(int, android.app.Notification)), supplying the ongoing notification to be shown to the user while in this state.  Running as a foreground-service makes the tracking-service **much** more inmmune to OS killing it due to memory/battery pressure.  By default services are background, meaning that if the system needs to kill them to reclaim more memory (such as to display a large page in a web browser).  @see `notificationTitle`, `notificationText` & `notificatinoColor`
+
+####`@param {String} notificationTitle [App name]`
+
+When running the service with `foregroundService: true`, Android requires a persistent notification in the Notification Bar.  This will configure the **title** of that notification.  Defaults to the application name.
+
+####`@param {String} notificationText [Location service activated]`
+
+When running the service with `foregroundService: true`, Android requires a persistent notification in the Notification Bar.  This will configure the **text** of that notification.  Defaults to "Location service activated".
+
+####`@param {String} notificationColor [null]`
+
+When running the service with `foregroundService: true`, Android requires a persistent notification in the Notification Bar.  This will configure the **color** of the notification icon (API >= 21).Supported formats are: `#RRGGBB` `#AARRGGBB` or one of the following names: 'red', 'blue', 'green', 'black', 'white', 'gray', 'cyan', 'magenta', 'yellow', 'lightgray', 'darkgray', 'grey', 'lightgrey', 'darkgrey', 'aqua', 'fuchsia', 'lime', 'maroon', 'navy', 'olive', 'purple', 'silver', 'teal'.
 
 # Events
 
