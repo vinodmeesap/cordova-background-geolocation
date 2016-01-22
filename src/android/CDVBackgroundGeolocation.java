@@ -21,7 +21,6 @@ import org.json.JSONException;
 
 import android.Manifest;
 import android.content.pm.PackageManager;
-import android.os.Build;
 import android.os.Bundle;
 import com.google.android.gms.common.GoogleApiAvailability;
 import com.google.android.gms.location.ActivityRecognitionResult;
@@ -38,13 +37,10 @@ import android.app.Activity;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.location.Location;
-import android.telecom.Call;
 import android.util.Log;
 import android.media.AudioManager;
 import android.media.ToneGenerator;
 import android.widget.Toast;
-
-import javax.security.auth.callback.Callback;
 
 public class CDVBackgroundGeolocation extends CordovaPlugin {
     private static final String TAG = "TSLocationManager";
