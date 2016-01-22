@@ -1,5 +1,8 @@
 package com.transistorsoft.cordova.bggeo;
 
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.List;
@@ -18,7 +21,6 @@ import org.json.JSONException;
 
 import android.Manifest;
 import android.content.pm.PackageManager;
-import android.os.Build;
 import android.os.Bundle;
 import com.google.android.gms.common.GoogleApiAvailability;
 import com.google.android.gms.location.ActivityRecognitionResult;
@@ -69,6 +71,7 @@ public class CDVBackgroundGeolocation extends CordovaPlugin {
     public static final String ACTION_ACTIVITY_RELOAD   = "activityReload";
     public static final String ACTION_GET_STATE         = "getState";
     public static final String ACTION_ADD_HTTP_LISTENER = "addHttpListener";
+    public static final String ACTION_GET_LOG           = "getLog";
 
     private Boolean isEnabled           = false;
     private Boolean stopOnTerminate     = false;
@@ -90,7 +93,7 @@ public class CDVBackgroundGeolocation extends CordovaPlugin {
     private CallbackContext paceChangeCallback;
     private CallbackContext getGeofencesCallback;
     private CallbackContext clearDatabaseCallback;
-
+    private CallbackContext getLogCallback;
     private ToneGenerator toneGenerator;
 
     private List<CallbackContext> motionChangeCallbacks = new ArrayList<CallbackContext>();
@@ -109,11 +112,13 @@ public class CDVBackgroundGeolocation extends CordovaPlugin {
 
         Activity activity = this.cordova.getActivity();
         backgroundServiceIntent = new Intent(activity, BackgroundGeolocationService.class);
+        
         SharedPreferences settings = activity.getSharedPreferences("TSLocationManager", 0);
         Settings.init(settings);
 
         toneGenerator = new ToneGenerator(AudioManager.STREAM_NOTIFICATION, 100);
         // Register for events fired by our IntentService "LocationService"
+
     }
 
     public boolean execute(String action, JSONArray data, CallbackContext callbackContext) throws JSONException {
@@ -220,6 +225,14 @@ public class CDVBackgroundGeolocation extends CordovaPlugin {
         } else if (ACTION_ADD_HTTP_LISTENER.equalsIgnoreCase(action)) {
             result = true;
             addHttpListener(callbackContext);
+        } else if (ACTION_GET_LOG.equalsIgnoreCase(action)) {
+            result = true;
+            getLogCallback = callbackContext;
+            cordova.getThreadPool().execute(new Runnable() {
+                public void run() {
+                    getLog();
+                }
+            });
         }
         return result;
     }
@@ -539,6 +552,24 @@ public class CDVBackgroundGeolocation extends CordovaPlugin {
         event.putBoolean("request", true);
         postEvent(event);
         callbackContext.success();
+    }
+
+    private void getLog() {
+        try {
+            Process process = Runtime.getRuntime().exec("logcat -d");
+            BufferedReader bufferedReader = new BufferedReader(
+                    new InputStreamReader(process.getInputStream()));
+
+            StringBuilder log=new StringBuilder();
+            String line = "";
+            while ((line = bufferedReader.readLine()) != null) {
+                log.append(line + "\n");
+            }
+            getLogCallback.success(log.toString());
+        }
+        catch (IOException e) {
+            getLogCallback.error(0);
+        }
     }
     public void onPause(boolean multitasking) {
         Log.i(TAG, "- onPause");

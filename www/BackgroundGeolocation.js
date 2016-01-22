@@ -343,6 +343,15 @@ module.exports = {
             'getCurrentPosition',
             [options]);
     },
+    getLog: function(success, failure) {
+        var success = success || function() {};
+        var failure = failure || function() {};
+        exec(success,
+            failure,
+            'BackgroundGeolocation',
+            'getLog',
+            []); 
+    },
     /**
     * Play a system sound.  This is totally experimental.
     * iOS http://iphonedevwiki.net/index.php/AudioServices
