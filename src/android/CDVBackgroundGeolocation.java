@@ -672,7 +672,9 @@ public class CDVBackgroundGeolocation extends CordovaPlugin {
             this.onAddGeofence(event);
         } else if (name.equalsIgnoreCase(BackgroundGeolocationService.ACTION_HTTP_RESPONSE)) {
             this.onHttpResponse(event);
-        } 
+        } else if (name.equalsIgnoreCase(BackgroundGeolocationService.ACTION_GET_CURRENT_POSITION)) {
+            this.onGetCurrentPositionFailure(event);
+        }
     }
 
     private void finishAcquiringCurrentPosition(boolean success) {
@@ -749,26 +751,6 @@ public class CDVBackgroundGeolocation extends CordovaPlugin {
     }
 
     /**
-     * EventBus listener for ARS
-     * @param {ActivityRecognitionResult} result
-     */
-    @Subscribe
-    public void onEventMainThread(ActivityRecognitionResult result) {
-        currentActivity = result.getMostProbableActivity();
-
-        if (isAcquiringCurrentPosition) {
-            long elapsedMillis = (System.nanoTime() - isAcquiringCurrentPositionSince) / 1000000;
-            if (elapsedMillis > GET_CURRENT_POSITION_TIMEOUT) {
-                isAcquiringCurrentPosition = false;
-                Log.i(TAG, "- getCurrentPosition timeout, giving up");
-                for (CallbackContext callback : currentPositionCallbacks) {
-                    callback.error(408); // aka HTTP 408 Request Timeout
-                }
-                currentPositionCallbacks.clear();
-            }
-        }
-    }
-    /**
      * EventBus listener
      * @param {Location} location
      */
@@ -795,6 +777,15 @@ public class CDVBackgroundGeolocation extends CordovaPlugin {
             currentPositionCallbacks.clear();
         }
     }
+    private void onGetCurrentPositionFailure(Bundle event) {
+        finishAcquiringCurrentPosition(false);
+        Log.i(TAG, "- getCurrentPosition timeout, giving up");
+        for (CallbackContext callback : currentPositionCallbacks) {
+            callback.error(408); // aka HTTP 408 Request Timeout
+        }
+        currentPositionCallbacks.clear();
+    }
+
     /**
      * EventBus handler for Geofencing events
      */
