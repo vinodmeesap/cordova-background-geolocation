@@ -73,6 +73,7 @@ public class CDVBackgroundGeolocation extends CordovaPlugin {
     public static final String ACTION_ADD_HTTP_LISTENER = "addHttpListener";
     public static final String ACTION_GET_LOG           = "getLog";
 
+    private SharedPreferences settings;
     private Boolean isEnabled           = false;
     private Boolean stopOnTerminate     = false;
     private Boolean isMoving            = false;
@@ -113,7 +114,7 @@ public class CDVBackgroundGeolocation extends CordovaPlugin {
         Activity activity = this.cordova.getActivity();
         backgroundServiceIntent = new Intent(activity, BackgroundGeolocationService.class);
         
-        SharedPreferences settings = activity.getSharedPreferences("TSLocationManager", 0);
+        settings = activity.getSharedPreferences("TSLocationManager", 0);
         Settings.init(settings);
 
         toneGenerator = new ToneGenerator(AudioManager.STREAM_NOTIFICATION, 100);
@@ -236,7 +237,6 @@ public class CDVBackgroundGeolocation extends CordovaPlugin {
         cordova.getThreadPool().execute(new Runnable() {
             public void run() {
                 applyConfig();
-                SharedPreferences settings = cordova.getActivity().getSharedPreferences("TSLocationManager", 0);
                 boolean willEnable = settings.getBoolean("enabled", isEnabled);
                 if (willEnable) {
                     start(null);
@@ -384,11 +384,9 @@ public class CDVBackgroundGeolocation extends CordovaPlugin {
         postEvent(event);
     }
     private void getOdometer(CallbackContext callbackContext) {
-        final Bundle event = new Bundle();
-        event.putString("name", BackgroundGeolocationService.ACTION_GET_ODOMETER);
-        event.putBoolean("request", true);
-        getOdometerCallback = callbackContext;
-        postEvent(event);
+        Float value = settings.getFloat("odometer", 0);
+        PluginResult result = new PluginResult(PluginResult.Status.OK, value);
+        callbackContext.sendPluginResult(result);
     }
 
     private void resetOdometer(CallbackContext callbackContext) {
@@ -477,7 +475,6 @@ public class CDVBackgroundGeolocation extends CordovaPlugin {
         }
 
         Activity activity = this.cordova.getActivity();
-        SharedPreferences settings = activity.getSharedPreferences("TSLocationManager", 0);
         SharedPreferences.Editor editor = settings.edit();
         editor.putBoolean("enabled", isEnabled);
         editor.apply();
@@ -539,7 +536,6 @@ public class CDVBackgroundGeolocation extends CordovaPlugin {
                 e.printStackTrace();
             }
         }
-        SharedPreferences settings = this.cordova.getActivity().getSharedPreferences("TSLocationManager", 0);
         SharedPreferences.Editor editor = settings.edit();
 
         try {
@@ -732,8 +728,6 @@ public class CDVBackgroundGeolocation extends CordovaPlugin {
         }
     }
     private JSONObject getState() {
-        SharedPreferences settings = this.cordova.getActivity().getSharedPreferences("TSLocationManager", 0);
-
         Bundle values = Settings.values;
         JSONObject state = new JSONObject();
         Set<String> keys = values.keySet();
@@ -820,7 +814,6 @@ public class CDVBackgroundGeolocation extends CordovaPlugin {
         });
     }
     private Boolean isDebugging() {
-        SharedPreferences settings = this.cordova.getActivity().getSharedPreferences("TSLocationManager", 0);
         return settings.contains("debug") && settings.getBoolean("debug", false);
     }
 
@@ -946,7 +939,6 @@ public class CDVBackgroundGeolocation extends CordovaPlugin {
 
         EventBus.getDefault().unregister(this);
 
-        SharedPreferences settings = activity.getSharedPreferences("TSLocationManager", 0);
         SharedPreferences.Editor editor = settings.edit();
         editor.putBoolean("activityIsActive", false);
         editor.commit();
