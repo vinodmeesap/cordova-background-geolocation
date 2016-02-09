@@ -3,7 +3,13 @@
 #import <CoreData/CoreData.h>
 #import <CoreLocation/CoreLocation.h>
 #import <AudioToolbox/AudioToolbox.h>
+
 #import "SOMotionDetector.h"
+#import "TSReachability.h"
+#import "LocationDAO.h"
+#import "LocationManager.h"
+#import "TSLogger.h"
+#import "Settings.h"
 
 @interface TSLocationManager : NSObject <CLLocationManagerDelegate>
 
