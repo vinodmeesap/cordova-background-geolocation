@@ -26,6 +26,8 @@ module.exports = {
                 return this.onMotionChange(success, fail);
             case 'log':
                 return this.onLog(success, fail);
+            case 'heartbeat':
+                return this.onHeartbeat(success, fail);
         }
     },
 
@@ -170,6 +172,13 @@ module.exports = {
             'addMotionChangeListener',
             []);
     },
+    onHeartbeat: function(success, failure) {
+        exec(success || function() {},
+            failure || function() {},
+            'BackgroundGeolocation',
+            'addHeartbeatListener',
+            []);
+    },
     getLocations: function(success, failure) {
         if (typeof(success) !== 'function') {
             throw "BackgroundGeolocation#getLocations requires a success callback";
@@ -194,6 +203,18 @@ module.exports = {
             'BackgroundGeolocation',
             'clearDatabase',
             []);  
+    },
+    insertLocation: function(location, success, failure) {
+        location = location || {};
+        var coords = location.coords || {};
+        if (!coords.latitude && !coords.longitude) {
+            throw "BackgroundGeolocation#insertLocation location must contain coords.latitude & coords.longitude";
+        }
+        exec(success || function() {},
+            failure || function() {},
+            'BackgroundGeolocation',
+            'insertLocation',
+            [location]);
     },
     /**
     * Signal native plugin to sync locations queue to HTTP
