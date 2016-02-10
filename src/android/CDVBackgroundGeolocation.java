@@ -102,6 +102,7 @@ public class CDVBackgroundGeolocation extends CordovaPlugin {
     private List<CallbackContext> currentPositionCallbacks = new ArrayList<CallbackContext>();
     private Map<String, CallbackContext> addGeofenceCallbacks = new HashMap<String, CallbackContext>();
     private List<CallbackContext> httpResponseCallbacks = new ArrayList<CallbackContext>();
+    private Map<String, CallbackContext> insertLocationCallbacks = new HashMap<String, CallbackContext>();
 
     public static boolean isActive() {
         return gWebView != null;
@@ -226,6 +227,9 @@ public class CDVBackgroundGeolocation extends CordovaPlugin {
                     getLog();
                 }
             });
+        } else if (BackgroundGeolocationService.ACTION_INSERT_LOCATION.equalsIgnoreCase(action)) {
+            result = true;
+            insertLocation(data.getJSONObject(0), callbackContext);
         }
         return result;
     }
@@ -456,6 +460,36 @@ public class CDVBackgroundGeolocation extends CordovaPlugin {
         return true;
     }
 
+    private void insertLocation(JSONObject params, CallbackContext callbackContext) {
+        if (!BackgroundGeolocationService.isInstanceCreated()) {
+            Log.i(TAG, "Cannot insertLocation when the BackgroundGeolocationService is not running.  Plugin must be started first");
+            return;
+        }
+        if (!params.has("uuid")) {
+            callbackContext.error("insertLocation params must contain uuid");
+            return;
+        }
+        if (!params.has("timestamp")) {
+            callbackContext.error("insertLocation params must contain timestamp");
+            return;
+        }
+        if (!params.has("coords")) {
+            callbackContext.error("insertLocation params must contains a coords {}");
+            return;
+        }
+        Bundle event = new Bundle();
+        event.putString("name", BackgroundGeolocationService.ACTION_INSERT_LOCATION);
+        event.putBoolean("request", true);
+
+        try {
+            String uuid = params.getString("uuid");
+            event.putString("location", params.toString());
+            insertLocationCallbacks.put(uuid, callbackContext);
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+        postEvent(event);
+    }
     private void setEnabled(boolean value) {
         // Don't set a state that we're already in.
         Log.i(TAG, "- setEnabled: " + value + ", current value: " + isEnabled);
@@ -670,6 +704,8 @@ public class CDVBackgroundGeolocation extends CordovaPlugin {
             this.onHttpResponse(event);
         } else if (name.equalsIgnoreCase(BackgroundGeolocationService.ACTION_GET_CURRENT_POSITION)) {
             this.onGetCurrentPositionFailure(event);
+        } else if (name.equalsIgnoreCase(BackgroundGeolocationService.ACTION_INSERT_LOCATION)) {
+            this.onInsertLocation(event);
         }
     }
 
@@ -697,6 +733,17 @@ public class CDVBackgroundGeolocation extends CordovaPlugin {
         result.setKeepCallback(true);
         for (CallbackContext callback : httpResponseCallbacks) {
             callback.sendPluginResult(result);
+        }
+    }
+
+    private void onInsertLocation(Bundle event) {
+        String uuid = event.getString("uuid");
+        Log.i(TAG, "- Cordova plugin: onInsertLocation: " + uuid);
+        if (insertLocationCallbacks.containsKey(uuid)) {
+            CallbackContext callback = insertLocationCallbacks.get(uuid);
+            callback.success();
+        } else {
+            Log.i(TAG, "- onInsertLocation failed to find its success-callback for " + uuid);
         }
     }
 
