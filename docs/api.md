@@ -57,8 +57,6 @@ bgGeo.setConfig(function() {
 | [`autoSync`](#param-string-autosync-true) | `Boolean` | Optional | `true` | If you've enabeld HTTP feature by configuring an `#url`, the plugin will attempt to HTTP POST each location to your server **as it is recorded**.  If you set `autoSync: false`, it's up to you to **manually** execute the `#sync` method to initate the HTTP POST (**NOTE** The plugin will continue to persist **every** recorded location in the SQLite database until you execute `#sync`). |
 | [`batchSync`](#param-string-batchsync-false) | `Boolean` | Optional | `false` | Default is `false`.  If you've enabled HTTP feature by configuring an `#url`, `batchSync: true` will POST all the locations currently stored in native SQLite datbase to your server in a single HTTP POST request.  With `batchSync: false`, an HTTP POST request will be initiated for **each** location in database. |
 | [`maxDaysToPersist`](#param-integer-maxdaystopersist) | `Integer` | Optional | `1` |  Maximum number of days to store a geolocation in plugin's SQLite database when your server fails to respond with `HTTP 200 OK`.  The plugin will continue attempting to sync with your server until `maxDaysToPersist` when it will give up and remove the location from the database. |
-| [`configureUrl`](#param-string-configureurl) | `String` | Optional | `undefined` | The Android plugin can automatically execute an url of your choice to re-configure itself at some `configureInterval (ms)`.  This can be used if you have a strict authentication service which requires a token refresh at some interval.  The returned `JSON` schema be compatible with this plugin.  If your schema is *not* compatible, the decoded `JSON` will be assumed to be a `#params` config for this plugin.  Since there's no guarantee that your fore-ground Android Activity is not killed, you cannot rely upon Javascript to perform this duty. |
-| [`configureInterval`](#param-integer-configureinterval) | `Integer ms` | Optional | `undefined` | This is the `interval` at which the plugin will auto-configure itself from the above `#configureUrl` |
 
 ## Application Options
 
@@ -80,6 +78,7 @@ bgGeo.setConfig(function() {
 | [`onMotionChange`](#onmotionchangecallbackfn-failurefn) | Fired when the device changes stationary / moving state. |
 | [`onGeofence`](#ongeofencecallbackfn) | Fired when a geofence crossing event occurs |
 | [`onHttp`](#onhttpsuccessfn-failurefn) | Fired after a successful HTTP response. `response` object is provided with `status` and `responseText`|
+| ['onHeartbeat'](onheartbeatsuccessfn-failurefn) | **iOS only** Fired each `heartbeatInterval` while the plugin is in the **stationary** state with `preventSuspend: true`.  Your callback will be provided with a `params {}` containing the parameters `shakes {Integer}` as well as the current `location {Object}` |
 
 ## Methods
 
@@ -101,6 +100,7 @@ bgGeo.setConfig(function() {
 | [`addGeofence`](#addgeofenceconfig-callbackfn-failurefn) | `{config}` | Adds a geofence to be monitored by the native plugin. Monitoring of a geofence is halted after a crossing occurs.|
 | [`removeGeofence`](#removegeofenceidentifier-callbackfn-failurefn) | `identifier` | Removes a geofence identified by the provided `identifier` |
 | [`getGeofences`](#getgeofencescallbackfn-failurefn) | `callbackFn` | Fetch the list of monitored geofences. Your callbackFn will be provided with an Array of geofences. If there are no geofences being monitored, you'll receive an empty `Array []`.|
+| [`getLog`](#getlog-callbackfn) | `callbackFn` | **Android ONLY**.  Fetch the entire contents of the current Android circular log and return it as a String.|
 
 # Geolocation Options
 
@@ -400,6 +400,37 @@ bgGeo.onHttp(function(response) {
 })
 ```
 
+####`onHeartbeat(successFn, failureFn)`
+
+The `successFn` will be executed for each `heartbeatInterval` while the **iOS** app is in **stationary** mode with `{preventSuspend: true}`.  `failureFn` will be executed on HTTP failure.  **NOTE** The plugin will not record **any** data while in `preventSuspend` mode -- if you wish to record any data during, you have to do so manually using the `insertLocation` method.  The `successFn` will be provided a single `params {Object}` parameter with the following properties:
+
+######@param {Integer} shakes.  A measure of the device movement.  Shakes is a measure of accelerometer data crossing over a threshold where the device is decided to be moving.  The higher the shakes, the more the device is moving.  When shakes is **0**, the device is completely still.
+######@param {Object} location.  When the plugin detects `shakes > 0`, it will always request a new high-accuracy location in order to determine if the device has moved beyond `stationaryRadius` and if the location has `speed > 0`.  This fresh location will be provided to your `successFn`.  If `shakes == 0`, the current **stationary location** will be provided.
+
+Example:
+```
+bgGeo.onHeartbeat(function(params) {
+	var shakes = params.shakes;
+	var location = params.location;
+
+	// Attach some arbitrary data to the location extras.
+	location.extras = {
+		foo: 'bar',
+		shakes: shakes
+	};
+
+	// You can manually insert a location if you wish.
+	bgGeo.insertLocation(location, function() {
+    	console.log('- inserted location during heartbeat');
+	});
+
+}, function(response) {
+	var status = response.status;
+	var responseText = response.responseText;
+	console.log("- HTTP failure: ", status, responseText);
+})
+```
+
 # Methods
 
 ####`configure(locationCallback, failureCallback, config)`
@@ -667,6 +698,43 @@ The `callbackFn` will be executed with following params:
         bgGeo.finish(taskId);
     });
 ```
+
+####`insertLocation(params, callbackFn, failureFn)`
+Manually insert a location into the native plugin's SQLite database.  Your ```callbackFn`` will be executed if the operation was successful.  The inserted location's schema must match this plugin's published [Location Data Schema](wiki/Location-Data-Schema).  The plugin will have no problem inserting a location retrieved from the plugin itself.
+
+######@param {Object} params.  The location params/object matching the [Location Data Schema](wiki/Location-Data-Schema).
+
+```
+    bgGeo.insertLocation({
+		"uuid": "f8424926-ff3e-46f3-bd48-2ec788c9e761",	// <-- required
+		"coords": {										// <-- required
+			"latitude": 45.5192746,
+			"longitude": -73.616909,
+			"accuracy": 22.531999588012695,
+			"speed": 0,
+			"heading": 0,
+			"altitude": 0
+		},
+		"timestamp": "2016-02-10T22:25:54.905Z"			// <-- required
+    }, function() {
+        console.log('- Inserted location success');
+    }, function(error) {
+    	console.warn('- Failed to insert location: ', error);
+    });
+
+    // insertLocation can easily consume any location which it returned.  Note that #getCurrentPosition ALWAYS persists so this example
+    // will manually persist a 2nd version of the same location.  The purpose here is to show that the plugin can consume any location object which it generated.
+    bgGeo.getCurrentPosition(function(location, taskId) {
+    	location.extras = {foo: 'bar'};	// <-- add some arbitrary extras-data
+
+    	// Insert it.
+    	bgGeo.insertLocation(location, function() {
+    		bgGeo.finish(taskId);
+    	});
+    });
+```
+
+
 ####`clearDatabase(callbackFn, failureFn)`
 Remove all records in plugin's SQLite database.
 
@@ -728,4 +796,13 @@ Here's a fun one.  The plugin can play a number of OS system sounds for each pla
     bgGeo.playSound(90);
 ```
 
+####`getLog(callbackFn)`
+
+**Android ONLY**.  Fetches the entire contents of the current Android circular-log and return it as a String.
+
+```
+	bgGeo.getLog(function(log) {
+		console.log(log);
+	});
+```
 
