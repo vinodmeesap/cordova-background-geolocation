@@ -78,7 +78,7 @@ bgGeo.setConfig(function() {
 | [`onMotionChange`](#onmotionchangecallbackfn-failurefn) | Fired when the device changes stationary / moving state. |
 | [`onGeofence`](#ongeofencecallbackfn) | Fired when a geofence crossing event occurs |
 | [`onHttp`](#onhttpsuccessfn-failurefn) | Fired after a successful HTTP response. `response` object is provided with `status` and `responseText`|
-| ['onHeartbeat'](onheartbeatsuccessfn-failurefn) | **iOS only** Fired each `heartbeatInterval` while the plugin is in the **stationary** state with `preventSuspend: true`.  Your callback will be provided with a `params {}` containing the parameters `shakes {Integer}` as well as the current `location {Object}` |
+| [`onHeartbeat`](#onheartbeatsuccessfn-failurefn) | **iOS only** Fired each `heartbeatInterval` while the plugin is in the **stationary** state with `preventSuspend: true`.  Your callback will be provided with a `params {}` containing the parameters `shakes {Integer}` as well as the current `location {Object}` |
 
 ## Methods
 
@@ -100,7 +100,7 @@ bgGeo.setConfig(function() {
 | [`addGeofence`](#addgeofenceconfig-callbackfn-failurefn) | `{config}` | Adds a geofence to be monitored by the native plugin. Monitoring of a geofence is halted after a crossing occurs.|
 | [`removeGeofence`](#removegeofenceidentifier-callbackfn-failurefn) | `identifier` | Removes a geofence identified by the provided `identifier` |
 | [`getGeofences`](#getgeofencescallbackfn-failurefn) | `callbackFn` | Fetch the list of monitored geofences. Your callbackFn will be provided with an Array of geofences. If there are no geofences being monitored, you'll receive an empty `Array []`.|
-| [`getLog`](#getlog-callbackfn) | `callbackFn` | **Android ONLY**.  Fetch the entire contents of the current Android circular log and return it as a String.|
+| [`getLog`](#getlogcallbackfn) | `callbackFn` | **Android ONLY**.  Fetch the entire contents of the current Android circular log and return it as a String.|
 
 # Geolocation Options
 
@@ -402,7 +402,7 @@ bgGeo.onHttp(function(response) {
 
 ####`onHeartbeat(successFn, failureFn)`
 
-The `successFn` will be executed for each `heartbeatInterval` while the **iOS** app is in **stationary** mode with `{preventSuspend: true}`.  `failureFn` will be executed on HTTP failure.  **NOTE** The plugin will not record **any** data while in `preventSuspend` mode -- if you wish to record any data during, you have to do so manually using the `insertLocation` method.  The `successFn` will be provided a single `params {Object}` parameter with the following properties:
+The `successFn` will be executed for each `heartbeatInterval` while the **iOS** app is in **stationary** mode with `{preventSuspend: true}`.  **NOTE** The plugin will **not record any data** while in `preventSuspend` mode -- if you wish to record any data during, you have to do so manually using the `insertLocation` method.  The `successFn` will be provided a single `params {Object}` parameter with the following properties:
 
 ######@param {Integer} shakes.  A measure of the device movement.  Shakes is a measure of accelerometer data crossing over a threshold where the device is decided to be moving.  The higher the shakes, the more the device is moving.  When shakes is **0**, the device is completely still.
 ######@param {Object} location.  When the plugin detects `shakes > 0`, it will always request a new high-accuracy location in order to determine if the device has moved beyond `stationaryRadius` and if the location has `speed > 0`.  This fresh location will be provided to your `successFn`.  If `shakes == 0`, the current **stationary location** will be provided.
@@ -410,6 +410,8 @@ The `successFn` will be executed for each `heartbeatInterval` while the **iOS** 
 Example:
 ```
 bgGeo.onHeartbeat(function(params) {
+	console.log('- hearbeat');
+
 	var shakes = params.shakes;
 	var location = params.location;
 
