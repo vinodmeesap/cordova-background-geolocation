@@ -6,7 +6,7 @@
 	<dict>
 		<key>Headers/LocationDAO.h</key>
 		<data>
-		OxK6wy8qLTu+YGB7KULMC5N+fFg=
+		Bx6i90dHM1oAN1msJCz/zcEb9MQ=
 		</data>
 		<key>Headers/LocationManager.h</key>
 		<data>
@@ -22,7 +22,7 @@
 		</data>
 		<key>Headers/TSLocationManager.h</key>
 		<data>
-		e5so5SaYntIrIc03eVL5cCXtRxI=
+		/jObRbWd3pAtWIu/kGZTBcqxH4A=
 		</data>
 		<key>Headers/TSLogger.h</key>
 		<data>
@@ -34,7 +34,7 @@
 		</data>
 		<key>Info.plist</key>
 		<data>
-		DFt1OWTawcyI11ctxui1xfxu7zg=
+		wS+b5jv4of4t8eOe8F9o3Bz3Oog=
 		</data>
 		<key>Modules/module.modulemap</key>
 		<data>
@@ -45,7 +45,7 @@
 	<dict>
 		<key>Headers/LocationDAO.h</key>
 		<data>
-		OxK6wy8qLTu+YGB7KULMC5N+fFg=
+		Bx6i90dHM1oAN1msJCz/zcEb9MQ=
 		</data>
 		<key>Headers/LocationManager.h</key>
 		<data>
@@ -61,7 +61,7 @@
 		</data>
 		<key>Headers/TSLocationManager.h</key>
 		<data>
-		e5so5SaYntIrIc03eVL5cCXtRxI=
+		/jObRbWd3pAtWIu/kGZTBcqxH4A=
 		</data>
 		<key>Headers/TSLogger.h</key>
 		<data>
