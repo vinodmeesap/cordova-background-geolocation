@@ -197,6 +197,13 @@ module.exports = {
             'getLocations',
             []);
     },
+    getCount: function(success, failure) {
+        exec(success||function(){},
+            failure || function() {},
+            'BackgroundGeolocation',
+            'getCount',
+            []);  
+    },
     clearDatabase: function(success, failure) {
         exec(success||function(){},
             failure || function() {},

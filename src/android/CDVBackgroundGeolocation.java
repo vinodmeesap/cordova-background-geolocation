@@ -103,6 +103,7 @@ public class CDVBackgroundGeolocation extends CordovaPlugin {
     private Map<String, CallbackContext> addGeofenceCallbacks = new HashMap<String, CallbackContext>();
     private List<CallbackContext> httpResponseCallbacks = new ArrayList<CallbackContext>();
     private Map<String, CallbackContext> insertLocationCallbacks = new HashMap<String, CallbackContext>();
+    private List<CallbackContext> getCountCallbacks = new ArrayList<CallbackContext>();
 
     public static boolean isActive() {
         return gWebView != null;
@@ -230,6 +231,9 @@ public class CDVBackgroundGeolocation extends CordovaPlugin {
         } else if (BackgroundGeolocationService.ACTION_INSERT_LOCATION.equalsIgnoreCase(action)) {
             result = true;
             insertLocation(data.getJSONObject(0), callbackContext);
+        } else if (BackgroundGeolocationService.ACTION_GET_COUNT.equalsIgnoreCase(action)) {
+            result = true;
+            getCount(callbackContext);
         }
         return result;
     }
@@ -304,6 +308,15 @@ public class CDVBackgroundGeolocation extends CordovaPlugin {
         getLocationsCallback = callbackContext;
         postEvent(event);
     }
+
+    private void getCount(CallbackContext callbackContext) {
+        final Bundle event = new Bundle();
+        event.putString("name", BackgroundGeolocationService.ACTION_GET_COUNT);
+        event.putBoolean("request", true);
+        getCountCallbacks.add(callbackContext);
+        postEvent(event);
+    }
+
     private void sync(CallbackContext callbackContext) {
         syncCallback = callbackContext;
         Activity activity = this.cordova.getActivity();
@@ -706,6 +719,8 @@ public class CDVBackgroundGeolocation extends CordovaPlugin {
             this.onGetCurrentPositionFailure(event);
         } else if (name.equalsIgnoreCase(BackgroundGeolocationService.ACTION_INSERT_LOCATION)) {
             this.onInsertLocation(event);
+        } else if (name.equalsIgnoreCase(BackgroundGeolocationService.ACTION_GET_COUNT)) {
+            this.onGetCount(event);
         }
     }
 
@@ -745,6 +760,16 @@ public class CDVBackgroundGeolocation extends CordovaPlugin {
         } else {
             Log.i(TAG, "- onInsertLocation failed to find its success-callback for " + uuid);
         }
+    }
+
+    private void onGetCount(Bundle event) {
+        int count = event.getInt("count");
+        Log.i(TAG, "- Cordova plugin: getCount: " + count);
+
+        for (CallbackContext callback : getCountCallbacks) {
+            callback.success(count);
+        }
+        getCountCallbacks.clear();
     }
 
     private void onMotionChange(Bundle event) {

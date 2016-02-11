@@ -332,6 +332,21 @@
     }];
 }
 
+-(void) getCount:(CDVInvokedUrlCommand*)command
+{
+    NSLog(@"- CDVBackgroundGeolocation getCount");
+    [self.commandDelegate runInBackground:^{
+        int count = [bgGeo getCount];
+        CDVPluginResult* result;
+        if (count >= 0) {
+            result = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsInt: count];
+        } else {
+            result = [CDVPluginResult resultWithStatus:CDVCommandStatus_ERROR];
+        }
+        [self.commandDelegate sendPluginResult:result callbackId:command.callbackId];
+    }];
+}
+
 /**
  * location handler from BackgroundGeolocation
  */

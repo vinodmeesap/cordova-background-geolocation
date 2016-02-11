@@ -23,6 +23,7 @@
 - (BOOL) destroyAll:(NSArray*)records;
 - (BOOL) unlock:(NSNumber*)id;
 - (BOOL) unlockAll:(NSArray*)records;
+- (int) getCount;
 - (NSArray*) all;
 - (NSArray*) allWithLocking;
 
