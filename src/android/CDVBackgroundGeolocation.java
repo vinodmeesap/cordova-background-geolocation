@@ -800,13 +800,10 @@ public class CDVBackgroundGeolocation extends CordovaPlugin {
         }
     }
     private JSONObject getState() {
-        Bundle values = Settings.values;
         JSONObject state = new JSONObject();
-        Set<String> keys = values.keySet();
-
         try {
-            for (String key : keys) {
-                state.put(key, values.get(key));
+            if (settings.contains("config")) {
+                state = new JSONObject(settings.getString("config", "{}"));
             }
             state.put("enabled", isEnabled);
             state.put("isMoving", isMoving);
