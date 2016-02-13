@@ -1,6 +1,7 @@
 package com.transistorsoft.cordova.bggeo;
 
 import java.io.BufferedReader;
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.lang.reflect.InvocationTargetException;
@@ -72,13 +73,13 @@ public class CDVBackgroundGeolocation extends CordovaPlugin {
     public static final String ACTION_GET_STATE         = "getState";
     public static final String ACTION_ADD_HTTP_LISTENER = "addHttpListener";
     public static final String ACTION_GET_LOG           = "getLog";
+    public static final String ACTION_EMAIL_LOG         = "emailLog";
 
     private SharedPreferences settings;
     private Boolean isEnabled           = false;
     private Boolean stopOnTerminate     = false;
     private Boolean isMoving            = false;
     private Boolean isAcquiringCurrentPosition = false;
-    private long isAcquiringCurrentPositionSince;
     private Intent backgroundServiceIntent;
     private JSONObject mConfig;
 
@@ -89,12 +90,10 @@ public class CDVBackgroundGeolocation extends CordovaPlugin {
     private CallbackContext locationCallback;
     private CallbackContext getLocationsCallback;
     private CallbackContext syncCallback;
-    private CallbackContext getOdometerCallback;
     private CallbackContext resetOdometerCallback;
     private CallbackContext paceChangeCallback;
     private CallbackContext getGeofencesCallback;
-    private CallbackContext clearDatabaseCallback;
-    private CallbackContext getLogCallback;
+    private CallbackContext getOdometerCallback;
     private ToneGenerator toneGenerator;
 
     private List<CallbackContext> motionChangeCallbacks = new ArrayList<CallbackContext>();
@@ -222,12 +221,10 @@ public class CDVBackgroundGeolocation extends CordovaPlugin {
             addHttpListener(callbackContext);
         } else if (ACTION_GET_LOG.equalsIgnoreCase(action)) {
             result = true;
-            getLogCallback = callbackContext;
-            cordova.getThreadPool().execute(new Runnable() {
-                public void run() {
-                    getLog();
-                }
-            });
+            getLog(callbackContext);
+        } else if (ACTION_EMAIL_LOG.equalsIgnoreCase(action)) {
+            result = true;
+            emailLog(callbackContext, data.getString(0));
         } else if (BackgroundGeolocationService.ACTION_INSERT_LOCATION.equalsIgnoreCase(action)) {
             result = true;
             insertLocation(data.getJSONObject(0), callbackContext);
@@ -339,7 +336,6 @@ public class CDVBackgroundGeolocation extends CordovaPlugin {
 
     private void getCurrentPosition(CallbackContext callbackContext, JSONObject options) {
         isAcquiringCurrentPosition = true;
-        isAcquiringCurrentPositionSince = System.nanoTime();
         addCurrentPositionListener(callbackContext);
 
         if (!isEnabled) {
@@ -612,22 +608,57 @@ public class CDVBackgroundGeolocation extends CordovaPlugin {
         callbackContext.success();
     }
 
-    private void getLog() {
+    private String readLog() {
         try {
             Process process = Runtime.getRuntime().exec("logcat -d");
-            BufferedReader bufferedReader = new BufferedReader(
-                    new InputStreamReader(process.getInputStream()));
+            BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(process.getInputStream()));
 
-            StringBuilder log=new StringBuilder();
+            StringBuilder log = new StringBuilder();
             String line = "";
             while ((line = bufferedReader.readLine()) != null) {
                 log.append(line + "\n");
             }
-            getLogCallback.success(log.toString());
+            return log.toString();
         }
         catch (IOException e) {
-            getLogCallback.error(0);
+            e.printStackTrace();
+            return null;
         }
+    }
+    private void getLog(final CallbackContext callback) {
+        cordova.getThreadPool().execute(new Runnable() {
+            public void run() {
+                String log = readLog();
+                if (log != null) {
+                    callback.success(log);
+                } else {
+                    callback.error("Failed to read logs");
+                }
+            }
+        });
+    }
+    private void emailLog(final CallbackContext callback, final String email) {
+        cordova.getThreadPool().execute(new Runnable() {
+            public void run() {
+                String log = readLog();
+                if (log == null) {
+                    callback.error(500);
+                    return;
+                }
+                Intent mailer = new Intent(Intent.ACTION_SEND);
+                mailer.setType("message/rfc822");
+                mailer.putExtra(Intent.EXTRA_EMAIL, new String[]{email});
+                mailer.putExtra(Intent.EXTRA_SUBJECT, "BackgroundGeolocation log");
+                mailer.putExtra(Intent.EXTRA_TEXT, log);
+                try {
+                    cordova.getActivity().startActivity(Intent.createChooser(mailer, "Send log: " + email + "..."));
+                    callback.success();
+                } catch (android.content.ActivityNotFoundException ex) {
+                    Toast.makeText(cordova.getActivity(), "There are no email clients installed.", Toast.LENGTH_SHORT).show();
+                    callback.error("There are no email clients installed");
+                }
+            }
+        });
     }
     public void onPause(boolean multitasking) {
         Log.i(TAG, "- onPause");
