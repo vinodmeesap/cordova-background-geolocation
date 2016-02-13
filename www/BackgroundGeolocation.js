@@ -380,6 +380,16 @@ module.exports = {
             'getLog',
             []); 
     },
+    emailLog: function(email, success, failure) {
+        var success = success || function() {};
+        var failure = failure || function() {};
+        exec(success,
+            failure,
+            'BackgroundGeolocation',
+            'emailLog',
+            [email]); 
+    },
+
     /**
     * Play a system sound.  This is totally experimental.
     * iOS http://iphonedevwiki.net/index.php/AudioServices

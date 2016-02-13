@@ -42,6 +42,7 @@
 - (void) insertLocation:(CDVInvokedUrlCommand *) command;
 - (void) getCount:(CDVInvokedUrlCommand *) command;
 - (void) getLog:(CDVInvokedUrlCommand *) command;
+- (void) emailLog:(CDVInvokedUrlCommand*) command;
 - (void) playSound:(CDVInvokedUrlCommand *)command;
 @end
 

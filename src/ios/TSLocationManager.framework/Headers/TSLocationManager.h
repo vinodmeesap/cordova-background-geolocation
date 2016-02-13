@@ -69,6 +69,7 @@ typedef enum tsLocationError : NSInteger {
 - (BOOL) insertLocation:(NSDictionary*)params;
 - (int) getCount;
 - (NSString*) getLog;
+- (void) emailLog:(NSString*)to;
 - (void) resetOdometer;
 
 @end
