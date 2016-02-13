@@ -355,6 +355,15 @@
     }];    
 }
 
+-(void) emailLog:(CDVInvokedUrlCommand*)command
+{
+    [self.commandDelegate runInBackground:^{
+        NSString *email = [command.arguments objectAtIndex:0];
+        [bgGeo emailLog:email];
+        CDVPluginResult* result = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK];
+        [self.commandDelegate sendPluginResult:result callbackId:command.callbackId];
+    }];
+}
 
 /**
  * location handler from BackgroundGeolocation
