@@ -41,6 +41,7 @@
 - (void) clearDatabase:(CDVInvokedUrlCommand *) command;
 - (void) insertLocation:(CDVInvokedUrlCommand *) command;
 - (void) getCount:(CDVInvokedUrlCommand *) command;
+- (void) getLog:(CDVInvokedUrlCommand *) command;
 - (void) playSound:(CDVInvokedUrlCommand *)command;
 @end
 
