@@ -102,7 +102,7 @@ bgGeo.setConfig(function() {
 | [`addGeofence`](#addgeofenceconfig-callbackfn-failurefn) | `{config}` | Adds a geofence to be monitored by the native plugin. Monitoring of a geofence is halted after a crossing occurs.|
 | [`removeGeofence`](#removegeofenceidentifier-callbackfn-failurefn) | `identifier` | Removes a geofence identified by the provided `identifier` |
 | [`getGeofences`](#getgeofencescallbackfn-failurefn) | `callbackFn` | Fetch the list of monitored geofences. Your callbackFn will be provided with an Array of geofences. If there are no geofences being monitored, you'll receive an empty `Array []`.|
-| [`getLog`](#getlogcallbackfn) | `callbackFn` | **Android ONLY**.  Fetch the entire contents of the current Android circular log and return it as a String.|
+| [`getLog`](#getlogcallbackfn) | `callbackFn` | Fetch the entire contents of the current circular log and return it as a String.|
 
 # Geolocation Options
 
@@ -817,7 +817,7 @@ Here's a fun one.  The plugin can play a number of OS system sounds for each pla
 
 ####`getLog(callbackFn)`
 
-**Android ONLY**.  Fetches the entire contents of the current Android circular-log and return it as a String.
+Fetches the entire contents of the current circular-log and return it as a String.
 
 ```
 	bgGeo.getLog(function(log) {
