@@ -347,6 +347,15 @@
     }];
 }
 
+-(void) getLog:(CDVInvokedUrlCommand*)command
+{
+    [self.commandDelegate runInBackground:^{
+        CDVPluginResult* result = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsString:[bgGeo getLog]];
+        [self.commandDelegate sendPluginResult:result callbackId:command.callbackId];
+    }];    
+}
+
+
 /**
  * location handler from BackgroundGeolocation
  */
