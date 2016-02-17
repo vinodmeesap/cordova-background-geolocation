@@ -2,15 +2,18 @@ package com.transistorsoft.cordova.bggeo;
 
 import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.List;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.ArrayList;
-import java.util.Set;
 import java.util.Iterator;
 import org.apache.cordova.CallbackContext;
 import org.apache.cordova.CordovaPlugin;
@@ -22,9 +25,9 @@ import org.json.JSONException;
 
 import android.Manifest;
 import android.content.pm.PackageManager;
+import android.net.Uri;
 import android.os.Bundle;
 import com.google.android.gms.common.GoogleApiAvailability;
-import com.google.android.gms.location.ActivityRecognitionResult;
 import com.google.android.gms.location.DetectedActivity;
 import com.transistorsoft.locationmanager.BackgroundGeolocationService;
 import com.transistorsoft.locationmanager.Settings;
@@ -38,6 +41,7 @@ import android.app.Activity;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.location.Location;
+import android.os.Environment;
 import android.util.Log;
 import android.media.AudioManager;
 import android.media.ToneGenerator;
@@ -645,13 +649,43 @@ public class CDVBackgroundGeolocation extends CordovaPlugin {
                     callback.error(500);
                     return;
                 }
+
                 Intent mailer = new Intent(Intent.ACTION_SEND);
                 mailer.setType("message/rfc822");
                 mailer.putExtra(Intent.EXTRA_EMAIL, new String[]{email});
                 mailer.putExtra(Intent.EXTRA_SUBJECT, "BackgroundGeolocation log");
-                mailer.putExtra(Intent.EXTRA_TEXT, log);
+
                 try {
-                    cordova.getActivity().startActivity(Intent.createChooser(mailer, "Send log: " + email + "..."));
+                    JSONObject state = getState();
+                    if (state.has("license")) {
+                        state.put("license", "<SECRET>");
+                    }
+                    if (state.has("orderId")) {
+                        state.put("orderId", "<SECRET>");
+                    }
+                    mailer.putExtra(Intent.EXTRA_TEXT, state.toString(4));
+                } catch (JSONException e) {
+                    Log.w(TAG, "- Failed to write state to email body");
+                    e.printStackTrace();
+                }
+                File file = new File(Environment.getExternalStorageDirectory(), "background-geolocation.log");
+                try {
+                    FileOutputStream stream = new FileOutputStream(file);
+                    try {
+                        stream.write(log.getBytes());
+                        stream.close();
+                        mailer.putExtra(Intent.EXTRA_STREAM, Uri.fromFile(file));
+                        file.deleteOnExit();
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                } catch (FileNotFoundException e) {
+                    Log.i(TAG, "FileNotFound");
+                    e.printStackTrace();
+                }
+
+                try {
+                    cordova.getActivity().startActivityForResult(Intent.createChooser(mailer, "Send log: " + email + "..."), 1);
                     callback.success();
                 } catch (android.content.ActivityNotFoundException ex) {
                     Toast.makeText(cordova.getActivity(), "There are no email clients installed.", Toast.LENGTH_SHORT).show();
