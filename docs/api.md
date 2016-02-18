@@ -849,6 +849,6 @@ Fetch the entire contents of the current circular log and email it to a recipien
 </manifest>
 ```
 
-2. Grant "Storage" permission `Settings->Apps->[Your App]->Permissions: (o) Storage
+2. Grant "Storage" permission `Settings->Apps->[Your App]->Permissions: (o) Storage`
 
 ![](https://dl.dropboxusercontent.com/u/2319755/cordova-background-geolocaiton/Screenshot_20160218-183345.png)
