@@ -833,4 +833,18 @@ Fetch the entire contents of the current circular log and email it to a recipien
 ```
     bgGeo.emailLog("foo@bar.com");
 ```
-  
+
+**Android:**  
+
+The following permissions are required in your `AndroidManifest.xml` in order to attach the `.log` file to the email:
+
+```
+<manifest>
+  <application>
+  ...
+  </application>
+
+  <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+  <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
+</manifest>
+```
