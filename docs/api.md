@@ -836,7 +836,7 @@ Fetch the entire contents of the current circular log and email it to a recipien
 
 **Android:**  
 
-The following permissions are required in your `AndroidManifest.xml` in order to attach the `.log` file to the email:
+1. The following permissions are required in your `AndroidManifest.xml` in order to attach the `.log` file to the email:
 
 ```
 <manifest>
@@ -848,3 +848,7 @@ The following permissions are required in your `AndroidManifest.xml` in order to
   <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
 </manifest>
 ```
+
+2. Grant "Storage" permission `Settings->Apps->[Your App]->Permissions: (o) Storage
+
+![](https://dl.dropboxusercontent.com/u/2319755/cordova-background-geolocaiton/Screenshot_20160218-183345.png)
