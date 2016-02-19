@@ -6,7 +6,7 @@
 	<dict>
 		<key>Headers/LocationDAO.h</key>
 		<data>
-		LYiQ06+eOOXnOQvCu4+EsKkHcJk=
+		Bx6i90dHM1oAN1msJCz/zcEb9MQ=
 		</data>
 		<key>Headers/LocationManager.h</key>
 		<data>
@@ -30,7 +30,7 @@
 		</data>
 		<key>Headers/TSReachability.h</key>
 		<data>
-		2zFtsJ03VWrQRVOqKA3Y87cFSUA=
+		phX1PXfcvLUrjOWfyEn2tQCkxnM=
 		</data>
 		<key>Info.plist</key>
 		<data>
@@ -45,7 +45,7 @@
 	<dict>
 		<key>Headers/LocationDAO.h</key>
 		<data>
-		LYiQ06+eOOXnOQvCu4+EsKkHcJk=
+		Bx6i90dHM1oAN1msJCz/zcEb9MQ=
 		</data>
 		<key>Headers/LocationManager.h</key>
 		<data>
@@ -69,7 +69,7 @@
 		</data>
 		<key>Headers/TSReachability.h</key>
 		<data>
-		2zFtsJ03VWrQRVOqKA3Y87cFSUA=
+		phX1PXfcvLUrjOWfyEn2tQCkxnM=
 		</data>
 		<key>Modules/module.modulemap</key>
 		<data>

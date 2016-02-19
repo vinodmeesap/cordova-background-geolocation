@@ -11,10 +11,9 @@
 
 @interface LocationDAO : NSObject
 {
+    sqlite3 *dbh;
     NSString *databasePath;
 }
-
-@property (nonatomic) sqlite3 *dbh;
 
 + (LocationDAO *)getInstance;
 - (BOOL) persist:(NSDictionary*)data timestamp:(NSDate*)timestamp;
