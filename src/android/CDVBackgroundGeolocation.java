@@ -238,27 +238,22 @@ public class CDVBackgroundGeolocation extends CordovaPlugin {
 
     private void configure(JSONObject config, CallbackContext callbackContext) {
         mConfig = config;
-        this.locationCallback = callbackContext;
-
-        cordova.getThreadPool().execute(new Runnable() {
-            public void run() {
-                applyConfig();
-                boolean willEnable = settings.getBoolean("enabled", isEnabled);
-                if (willEnable) {
-                    start(null);
-                }
+        boolean result = applyConfig();
+        if (result) {
+            this.locationCallback = callbackContext;
+            boolean willEnable = settings.getBoolean("enabled", isEnabled);
+            if (willEnable) {
+                start(null);
             }
-        });
+        } else {
+            callbackContext.error("- Configuration error!");
+        }
     }
 
     private void start(CallbackContext callback) {
         startCallback = callback;
         if (hasPermission(ACCESS_COARSE_LOCATION) && hasPermission(ACCESS_FINE_LOCATION)) {
-            cordova.getThreadPool().execute(new Runnable() {
-                public void run() {
-                    setEnabled(true);
-                }
-            });
+            setEnabled(true);
         } else {
             String[] permissions = {ACCESS_COARSE_LOCATION, ACCESS_FINE_LOCATION};
             requestPermissions(REQUEST_ACTION_START, permissions);
@@ -267,11 +262,7 @@ public class CDVBackgroundGeolocation extends CordovaPlugin {
 
     private void stop() {
         startCallback = null;
-        cordova.getThreadPool().execute(new Runnable() {
-            public void run() {
-                setEnabled(false);
-            }
-        });
+        setEnabled(false);
     }
 
     private void changePace(CallbackContext callbackContext, JSONArray data) throws JSONException {
