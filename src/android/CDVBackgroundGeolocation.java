@@ -80,6 +80,7 @@ public class CDVBackgroundGeolocation extends CordovaPlugin {
     public static final String ACTION_EMAIL_LOG         = "emailLog";
 
     private SharedPreferences settings;
+    private Boolean isStarting          = false;
     private Boolean isEnabled           = false;
     private Boolean stopOnTerminate     = false;
     private Boolean isMoving;
@@ -131,11 +132,10 @@ public class CDVBackgroundGeolocation extends CordovaPlugin {
 
         if (BackgroundGeolocationService.ACTION_START.equalsIgnoreCase(action)) {
             result      = true;
-            if (startCallback == null) {
+            if (!isStarting) {
                 this.start(callbackContext);
             } else {
-                result = false;
-                callbackContext.error("waiting for previous start to finish");
+                callbackContext.error("waiting for previous start action to complete");
             }
         } else if (BackgroundGeolocationService.ACTION_STOP.equalsIgnoreCase(action)) {
             // No implementation to stop background-tasks with Android.  Just say "success"
@@ -251,6 +251,7 @@ public class CDVBackgroundGeolocation extends CordovaPlugin {
     }
 
     private void start(CallbackContext callback) {
+        isStarting = true;
         startCallback = callback;
         if (hasPermission(ACCESS_COARSE_LOCATION) && hasPermission(ACCESS_FINE_LOCATION)) {
             setEnabled(true);
@@ -283,6 +284,7 @@ public class CDVBackgroundGeolocation extends CordovaPlugin {
     }
 
     private void onStarted() {
+        isStarting = false;
         if (startCallback != null) {
             startCallback.success();
             startCallback = null;
