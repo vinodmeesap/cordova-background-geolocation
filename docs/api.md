@@ -36,8 +36,9 @@ bgGeo.setConfig(function() {
 | [`activityType`](#param-string-activitytype-automotivenavigation-othernavigation-fitness-other) | `String` | Required (**iOS**)| `Other` | Presumably, this affects ios GPS algorithm.  See [Apple docs](https://developer.apple.com/library/ios/documentation/CoreLocation/Reference/CLLocationManager_Class/CLLocationManager/CLLocationManager.html#//apple_ref/occ/instp/CLLocationManager/activityType) for more information | Set the desired interval for active location updates, in milliseconds. |
 | [`useSignificantChangesOnly`](#param-boolean-usesignificantchangesonly-false) | `Boolean` | Optional (**iOS**)| `false` | Defaults to `false`.  Set `true` in order to disable constant background-tracking and use only the iOS [Significant Changes API](https://developer.apple.com/library/ios/documentation/CoreLocation/Reference/CLLocationManager_Class/index.html#//apple_ref/occ/instm/CLLocationManager/startMonitoringSignificantLocationChanges).  If Apple has denied your application due to background-tracking, this can be a solution.  **NOTE** The Significant Changes API will report a location only when a significant change from the last location has occurred.  Many of the configuration parameters **will be ignored**, such as `#distanceFilter`, `#stationaryRadius`, `#activityType`, etc. |
 | [`deferTime`](#param-integer-deferTime) | `Integer` | Optional (**Android**)| `0` | Sets the maximum wait time in milliseconds for location updates.  If you pass a value at least 2x larger than the interval specified with `locationUpdateInterval`, then location delivery may be delayed and multiple locations can be delivered at once. Locations are determined at the `locationUpdateInterval` rate, but can be delivered in batch after the interval you set in this method. This can consume less battery and give more accurate locations, depending on the device's hardware capabilities. You should set this value to be as large as possible for your needs if you don't need immediate location delivery. |
-
+| [`pausesLocationUpdatesAutomatically`](#param-boolean-pauseslocationupdatesautomatically) | `Boolean` | Optional (**iOS**)| `true` | The default behaviour of the plugin is to turn off location-services automatically when the device is detected to be stationary.  When set to `false`, location-services will **never** be turned off (and `disableStopDetection` will automatically be set to `true`) -- it's your responsibility to turn them off when you no longer need to track the device.  This feature should **not** generally be used.  `preventSuspend` will no longer work either.| 
 ## Activity Recognition Options
+| [`locationAuthorizationRequest`](#param-boolean-locationauthorizationrequest) | `Always`|`WhenInUse` | Optional (**iOS**)| `Always` | The desired iOS location-authorization request, either `Always` or `WhenInUse`.  You'll have to edit the corresponding key in your app's `Info.plist`, `NSLocationAlwaysUsageDescription` or `NSWhenInUseUsageDescription`.  `WhenInUse` will display a **blue bar** at top-of-screen informing user that location-services are on.
 
 | Option | Type | Opt/Required | Default | Note |
 |---|---|---|---|---|
@@ -46,6 +47,8 @@ bgGeo.setConfig(function() {
 | [`minimumActivityRecognitionConfidence`](#param-integer-millis-minimumactivityrecognitionconfidence) | `Integer` | Optional (**Android**)| `80` | Each activity-recognition-result returned by the API is tagged with a "confidence" level expressed as a %.  You can set your desired confidence to trigger a state-change.  Defaults to `80`.|
 | [`stopDetectionDelay`](#param-integer-minutes-stopdetectiondelay-0) | `Integer` | Optional (**iOS**)| 0 | Allows the stop-detection system to be delayed from activating.  When the stop-detection system is engaged, the GPS is off and only the accelerometer is monitored.  Stop-detection will only engage if this timer expires.  The timer is cancelled if any movement is detected before expiration | 
 | [`disableMotionActivityUpdates`](#param-boolean-disablemotionactivityupdates) | `Boolean` | Optional (**iOS**)| 0 | Disable iOS motion-activity updates (eg: "walking", "in_vehicle").  This feature requires a device having the **M7** co-processor (ie: iPhone 5s and up).  **NOTE** This feature will ask the user for "Health updates".  If you do not wish to ask the user for the "Health updates", set this option to `false`; However, you will no longer recieve activity data in the recorded locations. | 
+| [`disableStopDetection`](#param-boolean-disablestopdetection) | `Boolean` | Optional (**iOS**)| `false` | Disable iOS accelerometer-based **Stop-detection System**.  When disabled, the plugin will use the default iOS behaviour of automatically turning off location-services when the device has stopped for exactly 15 minutes.  When disabled, you will no longer have control over `stopTimeout`| 
+
 
 ## HTTP / Persistence Options
 
@@ -177,6 +180,15 @@ Defaults to `false`.  Set `true` in order to disable constant background-trackin
 
 Set `true` to isable iOS `CMMotionActivity` updates (eg: "walking", "in_vehicle").  This feature requires a device having the **M7** co-processor (ie: iPhone 5s and up).  **NOTE** This feature will ask the user for "Health updates".  If you do not wish to ask the user for the "Health updates", set this option to `false`; However, you will no longer recieve activity data in the recorded locations.
 
+####`@param {Boolean} pausesLocationUpdatesAutomatically [true]`
+
+The default behaviour of the plugin is to turn **off** location-services *automatically* when the device is detected to be stationary.  When set to `false`, location-services will **never** be turned off (and `disableStopDetection` will automatically be set to `true`) -- it's your responsibility to turn them off when you no longer need to track the device.  This feature should **not** generally be used.  `preventSuspend` will no longer work either.
+
+####`@param {String} locationAuthorizationRequest [Always]`
+
+The desired iOS location-authorization request, either `Always` or `WhenInUse`.  Defaults to `Always`.  You'll have to edit the corresponding key in your app's `Info.plist`, `NSLocationAlwaysUsageDescription` or `NSWhenInUseUsageDescription`.  `WhenInUse` will display a **blue bar** at top-of-screen informing user that location-services are on.
+
+
 ## Android Options
 
 ####`@param {Integer millis} locationUpdateInterval`
@@ -244,6 +256,10 @@ Allows the stop-detection system to be delayed from activating.  When the stop-d
 ####`@param {Boolan} disableMotionActivityUpdates [false]`
 
 Prevent iOS Motion Activity updates.  If you're seeing your app request permission to see "Fitness Data", this is why.  The **iOS** plugin will no longer record `activity` data in the recorded locations.
+
+####`@param {Boolean} disableStopDetection [false]`
+
+Disable iOS accelerometer-based **Stop-detection System**.  When disabled, the plugin will use the default iOS behaviour of automatically turning off location-services when the device has stopped for exactly 15 minutes.  When disabled, you will no longer have control over `stopTimeout`.
 
 # HTTP / Persistence Options
 
