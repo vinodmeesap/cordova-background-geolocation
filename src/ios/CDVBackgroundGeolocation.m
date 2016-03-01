@@ -15,7 +15,7 @@
 - (void)pluginInitialize
 {
     bgGeo = [[TSLocationManager alloc] init];
-    
+    bgGeo.viewController = self.viewController;
     // New style:  Use blocks instead of NSNotificationCenter
     bgGeo.locationChangedBlock  = [self createLocationChangedHandler];
     bgGeo.motionChangedBlock    = [self createMotionChangedHandler];
@@ -518,6 +518,10 @@
     };
 }
 
+- (void)runInMain:(void (^)())block
+{
+    dispatch_async(dispatch_get_main_queue(), block);
+}
 /**
  * If you don't stopMonitoring when application terminates, the app will be awoken still when a
  * new location arrives, essentially monitoring the user's location even when they've killed the app.
