@@ -525,8 +525,10 @@ public class CDVBackgroundGeolocation extends CordovaPlugin {
 
         EventBus eventBus = EventBus.getDefault();
         if (isEnabled) {
-            if (!eventBus.isRegistered(this)) {
-                eventBus.register(this);
+            synchronized(eventBus) {
+                if (!eventBus.isRegistered(this)) {
+                    eventBus.register(this);
+                }
             }
             if (!BackgroundGeolocationService.isInstanceCreated()) {
                 activity.startService(backgroundServiceIntent);
@@ -538,8 +540,10 @@ public class CDVBackgroundGeolocation extends CordovaPlugin {
                 onStarted();
             }
         } else {
-            if (eventBus.isRegistered(this)) {
-                eventBus.unregister(this);
+            synchronized(eventBus) {
+                if (eventBus.isRegistered(this)) {
+                    eventBus.unregister(this);
+                }
             }
             activity.stopService(backgroundServiceIntent);
             backgroundServiceIntent = null;
@@ -790,8 +794,10 @@ public class CDVBackgroundGeolocation extends CordovaPlugin {
 
         if (!isEnabled) {
             EventBus eventBus = EventBus.getDefault();
-            if (eventBus.isRegistered(this)) {
-                eventBus.unregister(this);
+            synchronized(eventBus) {
+                if (eventBus.isRegistered(this)) {
+                    eventBus.unregister(this);
+                }
             }
         }
     }
@@ -1076,8 +1082,10 @@ public class CDVBackgroundGeolocation extends CordovaPlugin {
         Activity activity = this.cordova.getActivity();
 
         EventBus eventBus = EventBus.getDefault();
-        if (eventBus.isRegistered(this)) {
-            eventBus.unregister(this);
+        synchronized(eventBus) {
+            if (eventBus.isRegistered(this)) {
+                eventBus.unregister(this);
+            }
         }
         SharedPreferences.Editor editor = settings.edit();
         editor.putBoolean("activityIsActive", false);
