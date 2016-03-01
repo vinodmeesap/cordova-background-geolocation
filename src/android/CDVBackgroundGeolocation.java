@@ -596,11 +596,13 @@ public class CDVBackgroundGeolocation extends CordovaPlugin {
             if (preferences.contains("cordova-background-geolocation-orderId")) {
                 mConfig.put("orderId", preferences.getString("cordova-background-geolocation-orderId", null));
             }
+            if (mConfig.has("isMoving")) {
+                editor.putBoolean("isMoving", mConfig.getBoolean("isMoving"));
+            }
         } catch (JSONException e) {
             e.printStackTrace();
             Log.w(TAG, "- Failed to apply license");
         }
-
         editor.putString("config", mConfig.toString());
         editor.putBoolean("activityIsActive", true);
         editor.apply();
