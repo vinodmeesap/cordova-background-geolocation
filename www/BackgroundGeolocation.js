@@ -161,6 +161,11 @@ module.exports = {
             if (!isMoving) {
                 me.stationaryLocation = location;
             }
+			
+			// Transform timestamp to Date instance.
+            if (location.timestamp) {
+                location.timestamp = new Date(location.timestamp);
+            }
 
             me._runBackgroundTask(taskId, function() {
                 success.call(me, isMoving, location, taskId);
