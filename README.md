@@ -23,7 +23,7 @@ The plugin creates the object `window.BackgroundGeolocation`.  See [API Document
 This plugin has tagged stable versions.  To install a particular version, append a version code to the github url prefixed by `#`.
 
 ```
-    cordova plugin add <git.url>#0.6.0
+    cordova plugin add <git.url>#1.4.0
 ```
 
 ![](https://dl.dropboxusercontent.com/u/2319755/cordova-background-geolocaiton/screenshot-github-tagged-branches.png)
