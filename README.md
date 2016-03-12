@@ -45,6 +45,7 @@ This plugin has tagged stable versions.  To install a particular version, append
   .
   .
 </widget>
+```
 
 ## Android SDK
 
