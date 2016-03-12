@@ -30,23 +30,21 @@ This plugin has tagged stable versions.  To install a particular version, append
 
 #### Configure your license
 
-Edit your application's `config.xml` and add the following `<preference>`s.  Enter the values you received in the "Product Registration" email:
+1. Login to Customer Dashboard to generate an application key:
+[www.transistorsoft.com/shop/customers](http://www.transistorsoft.com/shop/customers)
+![](https://gallery.mailchimp.com/e932ea68a1cb31b9ce2608656/images/b2696718-a77e-4f50-96a8-0b61d8019bac.png)
 
+2. Edit your application's `config.xml` and add the following `<preference>`:
 ```
-<widget id="com.yourcompany.appname" version="0.0.4" xmlns="http://www.w3.org/ns/widgets" xmlns:cdv="http://cordova.apache.org/ns/1.0">
-  <name>Application Name</name>
+<widget id="com.your.company.app.id">
   .
   .
   .
-  <!-- Cordova Background Geolocation License -->
-  <preference name="cordova-background-geolocation-license" value="<your License>" />
-  <preference name="cordova-background-geolocation-orderId" value="<your Order ID>" />
+  <preference name="cordova-background-geolocation-license" value="<YOUR LICENSE KEY>" />
   .
   .
   .
 </widget>
-
-```
 
 ## Android SDK
 
