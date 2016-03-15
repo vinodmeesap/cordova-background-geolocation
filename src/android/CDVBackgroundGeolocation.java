@@ -345,6 +345,7 @@ public class CDVBackgroundGeolocation extends CordovaPlugin {
                 Activity activity = cordova.getActivity();
                 backgroundServiceIntent = new Intent(activity, BackgroundGeolocationService.class);
                 backgroundServiceIntent.putExtra("command", BackgroundGeolocationService.ACTION_GET_CURRENT_POSITION);
+                backgroundServiceIntent.putExtra("options", options.toString());
                 startService(REQUEST_ACTION_GET_CURRENT_POSITION);
             }
         } else {
@@ -504,6 +505,7 @@ public class CDVBackgroundGeolocation extends CordovaPlugin {
         Log.i(TAG, "- Enable: " + isEnabled + " → " + value);
 
         Activity activity = cordova.getActivity();
+        boolean wasEnabled = isEnabled;
         isEnabled = value;
         isMoving = null;
 
@@ -534,7 +536,11 @@ public class CDVBackgroundGeolocation extends CordovaPlugin {
                 activity.startService(backgroundServiceIntent);
             } else {
                 final Bundle event = new Bundle();
-                event.putString("name", BackgroundGeolocationService.ACTION_GET_CURRENT_POSITION);
+                if (!wasEnabled) {
+                    event.putString("name", BackgroundGeolocationService.ACTION_START);
+                } else {
+                    event.putString("name", BackgroundGeolocationService.ACTION_GET_CURRENT_POSITION);
+                }
                 event.putBoolean("request", true);
                 postEvent(event);
                 onStarted();
