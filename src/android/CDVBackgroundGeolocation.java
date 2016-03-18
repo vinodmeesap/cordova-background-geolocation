@@ -546,12 +546,17 @@ public class CDVBackgroundGeolocation extends CordovaPlugin {
                 onStarted();
             }
         } else {
+            Bundle event = new Bundle();
+            event.putString("name", BackgroundGeolocationService.ACTION_STOP);
+            event.putBoolean("request", true);
+            postEvent(event);
+
             synchronized(eventBus) {
                 if (eventBus.isRegistered(this)) {
                     eventBus.unregister(this);
                 }
             }
-            activity.stopService(backgroundServiceIntent);
+            //activity.stopService(backgroundServiceIntent);
             backgroundServiceIntent = null;
         }
     }
