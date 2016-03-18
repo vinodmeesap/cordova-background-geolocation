@@ -792,7 +792,7 @@ public class CDVBackgroundGeolocation extends CordovaPlugin {
         } else if (name.equalsIgnoreCase(BackgroundGeolocationService.ACTION_HTTP_RESPONSE)) {
             this.onHttpResponse(event);
         } else if (name.equalsIgnoreCase(BackgroundGeolocationService.ACTION_GET_CURRENT_POSITION)) {
-            this.onGetCurrentPositionFailure(event);
+            this.onLocationError(event);
         } else if (name.equalsIgnoreCase(BackgroundGeolocationService.ACTION_INSERT_LOCATION)) {
             this.onInsertLocation(event);
         } else if (name.equalsIgnoreCase(BackgroundGeolocationService.ACTION_GET_COUNT)) {
@@ -929,14 +929,7 @@ public class CDVBackgroundGeolocation extends CordovaPlugin {
             currentPositionCallbacks.clear();
         }
     }
-    private void onGetCurrentPositionFailure(Bundle event) {
-        finishAcquiringCurrentPosition(false);
-        for (CallbackContext callback : currentPositionCallbacks) {
-            callback.error(408); // aka HTTP 408 Request Timeout
-        }
-        currentPositionCallbacks.clear();
-    }
-
+    
     /**
      * EventBus handler for Geofencing events
      */
@@ -994,6 +987,14 @@ public class CDVBackgroundGeolocation extends CordovaPlugin {
         }
     }
 
+    private void onGetCurrentPositionFailure(Bundle event) {
+        finishAcquiringCurrentPosition(false);
+        for (CallbackContext callback : currentPositionCallbacks) {
+            callback.error(408); // aka HTTP 408 Request Timeout
+        }
+        currentPositionCallbacks.clear();
+    }
+
     private void onLocationError(Bundle event) {
         Integer code = event.getInt("code");
         if (code == BackgroundGeolocationService.LOCATION_ERROR_DENIED) {
@@ -1003,15 +1004,12 @@ public class CDVBackgroundGeolocation extends CordovaPlugin {
         }
         PluginResult result = new PluginResult(PluginResult.Status.ERROR, code);
         result.setKeepCallback(true);
-
         locationCallback.sendPluginResult(result);
 
         if (isAcquiringCurrentPosition) {
-            finishAcquiringCurrentPosition(true);
+            finishAcquiringCurrentPosition(false);
             for (CallbackContext callback : currentPositionCallbacks) {
-                result = new PluginResult(PluginResult.Status.ERROR, code);
-                result.setKeepCallback(false);
-                callback.sendPluginResult(result);
+                callback.error(code);
             }
             currentPositionCallbacks.clear();
         }
