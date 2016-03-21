@@ -11,6 +11,9 @@
 - [Fixed] iOS Removed some log messages appearing when `{debug: false}`
 - [Fixed] Android 5 geofence limit.  Refactored Geofence system.  Was using a `PendingIntent` per geofence; now uses a single `PendingIntent` for all geofences.
 - [Fixed] Edge-case issue #540 when executing `#getCurrentPosition` followed immediately by `#start` in cases where location-timeout occurs.
+- [Changed] Update Android Volley dependency to official version
+- [Changed] When Android #stop is called, update `isMoving` state to `false`
+
 
 ## [1.4.0] - 2016-03-08
 - [Changed] Introduce new per-app licensing scheme.  I'm phasing out the unlimited 'god-mode' license in favour of generating a distinct license-key for each bundle ID.  This cooresponds with new Customer Dashboard for generating application keys and managing team-members.
