@@ -13,7 +13,7 @@
 - [Fixed] Edge-case issue #540 when executing `#getCurrentPosition` followed immediately by `#start` in cases where location-timeout occurs.
 - [Changed] Update Android Volley dependency to official version
 - [Changed] When Android #stop is called, update `isMoving` state to `false`
-
+- [Fixed] ios `stopOnTerminate` was defaulting to `false`.  Docs say default is `true`.
 
 ## [1.4.0] - 2016-03-08
 - [Changed] Introduce new per-app licensing scheme.  I'm phasing out the unlimited 'god-mode' license in favour of generating a distinct license-key for each bundle ID.  This cooresponds with new Customer Dashboard for generating application keys and managing team-members.
