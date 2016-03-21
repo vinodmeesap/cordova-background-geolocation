@@ -1,3 +1,24 @@
+
+# Change Log
+
+## [Unreleased]
+- [Added] Intelligence for `stopTimeout`.  When stop-timer is initiated, save a reference to the current-location.  If another location is recorded while during stop-timer, calculate the distance from location when stop-timer initiated:  if `distance > stationaryRadius`, cancel the stop-timer and stay in "moving" state.
+- [Added] New debug sound **"booooop"**:  Signals the initiation of stop-timer of `stopTimeout` minutes.
+- [Added] New debug sound **"boop-boop-boop"**: Signals the cancelation of stop-timer due to movement beyond `stationaryRadius`.
+- [Fixed] When using setConfig to change `distanceFilter` while location-updates are already engaged, was mistakenly using value for `desiredAccuracy`!
+- [Fixed] iOS Issue with timers not running on main-thread.
+- [Fixed] iOS Issue with acquriring stationary-location on a stale location.  Ensure the selected stationary-location is no older than 1s.
+- [Fixed] iOS Removed some log messages appearing when `{debug: false}`
+- [Fixed] Android 5 geofence limit.  Refactored Geofence system.  Was using a `PendingIntent` per geofence; now uses a single `PendingIntent` for all geofences.
+- [Fixed] Edge-case issue #540 when executing `#getCurrentPosition` followed immediately by `#start` in cases where location-timeout occurs.
+
+## [1.4.0] - 2016-03-08
+- [Changed] Introduce new per-app licensing scheme.  I'm phasing out the unlimited 'god-mode' license in favour of generating a distinct license-key for each bundle ID.  This cooresponds with new Customer Dashboard for generating application keys and managing team-members.
+
+## [1.3.0]
+
+- [Changed] Upgrade `emailLog` method to attach log as email-attachment rather than rendering to email-body.  The result of `#getState` is now rendered to the 
+
 ##0.6.4
 
 - pin google-play-services at 7.5.0 to help people suffering from Google Play Services bug
