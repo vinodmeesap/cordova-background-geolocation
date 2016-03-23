@@ -16,6 +16,7 @@
 - [Fixed] ios `stopOnTerminate` was defaulting to `false`.  Docs say default is `true`.
 - [Fixed] ios `useSignificantChangesOnly` was broken.
 - [Fixed] If location-request times-out while acquiring stationary-location, try to use last-known-location
+- [Added] Add odometer to ios location JSON schema
 
 ## [1.4.0] - 2016-03-08
 - [Changed] Introduce new per-app licensing scheme.  I'm phasing out the unlimited 'god-mode' license in favour of generating a distinct license-key for each bundle ID.  This cooresponds with new Customer Dashboard for generating application keys and managing team-members.
