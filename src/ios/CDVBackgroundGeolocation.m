@@ -211,6 +211,23 @@
     }];
 }
 
+- (void) addGeofences:(CDVInvokedUrlCommand*)command
+{
+    NSArray *geofences  = [command.arguments objectAtIndex:0];
+    
+    //NSString *notifyOnExit = [cfg objectForKey:@"notifyOnExit"];
+    //NSString *notifyOnEntry = [cfg objectForKey:@"notifyOnEntry"];
+
+    [self.commandDelegate runInBackground:^{
+        [bgGeo addGeofences:geofences];
+        CDVPluginResult *result = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK];
+
+        dispatch_sync(dispatch_get_main_queue(), ^{
+            [self.commandDelegate sendPluginResult:result callbackId:command.callbackId];
+        });
+    }];
+}
+
 - (void) removeGeofence:(CDVInvokedUrlCommand*)command
 {
     NSString *identifier  = [command.arguments objectAtIndex:0];
@@ -221,6 +238,21 @@
             result = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK];
         } else {
             result = [CDVPluginResult resultWithStatus:CDVCommandStatus_ERROR messageAsString:@"Failed to locate geofence"];
+        }
+        dispatch_sync(dispatch_get_main_queue(), ^{
+            [self.commandDelegate sendPluginResult:result callbackId:command.callbackId];
+        });
+    }];
+}
+
+- (void) removeGeofences:(CDVInvokedUrlCommand*)command
+{
+    [self.commandDelegate runInBackground:^{
+        CDVPluginResult *result;
+        if ([bgGeo removeGeofences]) {
+            result = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK];
+        } else {
+            result = [CDVPluginResult resultWithStatus:CDVCommandStatus_ERROR messageAsString:@"Failed to remove geofences"];
         }
         dispatch_sync(dispatch_get_main_queue(), ^{
             [self.commandDelegate sendPluginResult:result callbackId:command.callbackId];

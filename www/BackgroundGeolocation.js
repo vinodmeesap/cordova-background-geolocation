@@ -308,6 +308,27 @@ module.exports = {
             [config]);
     },
     /**
+    * add a list of geofences
+    */
+    addGeofences: function(geofences, success, failure) {
+        geofences = geofences || [];
+        exec(success || function() {},
+            failure || function() {},
+            'BackgroundGeolocation',
+            'addGeofences',
+            [geofences]);
+    },
+    /**
+    * Remove all geofences
+    */
+    removeGeofences: function(success, failure) {
+        exec(success || function() {},
+            failure || function() {},
+            'BackgroundGeolocation',
+            'removeGeofences',
+            []);  
+    },
+    /**
     * remove a geofence
     * @param {String} identifier
     */

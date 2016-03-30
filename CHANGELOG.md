@@ -19,6 +19,8 @@
 - [Added] Add odometer to ios location JSON schema
 - [Added] ios Log network reachability flags on connection-type changes.
 - [Added] `maxRecordsToPersist` to limit the max number of records persisted in plugin's SQLite database.
+- [Added] API methods `#addGeofences` (for adding a list-of-geofences), `#removeGeofences`
+- [Changed] The plugin will no longer delete geofences when `#stop` is called; it will merely stop monitoring them.  When the plugin is `#start`ed again, it will start monitoringt any geofences it holds in memory.  To completely delete geofences, use new method `#removeGeofences`.
 
 ## [1.4.0] - 2016-03-08
 - [Changed] Introduce new per-app licensing scheme.  I'm phasing out the unlimited 'god-mode' license in favour of generating a distinct license-key for each bundle ID.  This cooresponds with new Customer Dashboard for generating application keys and managing team-members.
