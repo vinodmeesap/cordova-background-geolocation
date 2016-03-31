@@ -38,10 +38,7 @@
     self.locationCallbackId = command.callbackId;
     
     config = [command.arguments objectAtIndex:0];
-
-    [self.commandDelegate runInBackground:^{
-        [bgGeo configure:config];
-    }];
+    [bgGeo configure:config];
 }
 
 - (void) setConfig:(CDVInvokedUrlCommand*)command
