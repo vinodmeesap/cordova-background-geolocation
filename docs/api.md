@@ -734,12 +734,12 @@ bgGeo.removeGeofence("Home", function() {
 ####`removeGeofences(callbackFn, failureFn)`
 Removes all geofences.
 
-######@config {Function} callbackFn successfully removed geofence.
-######@config {Function} failureFn failed to remove geofence
+######@config {Function} callbackFn successfully removed geofences.
+######@config {Function} failureFn failed to remove geofences
 
 ```
-bgGeo.removeGeofence("Home", function() {
-    console.log("Successfully removed geofence");
+bgGeo.removeGeofences(function() {
+    console.log("Successfully removed alll geofences");
 }, function(error) {
     console.warn("Failed to remove geofence", error);
 });
