@@ -212,9 +212,6 @@
 {
     NSArray *geofences  = [command.arguments objectAtIndex:0];
     
-    //NSString *notifyOnExit = [cfg objectForKey:@"notifyOnExit"];
-    //NSString *notifyOnEntry = [cfg objectForKey:@"notifyOnEntry"];
-
     [self.commandDelegate runInBackground:^{
         [bgGeo addGeofences:geofences];
         CDVPluginResult *result = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK];
