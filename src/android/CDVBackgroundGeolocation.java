@@ -645,7 +645,6 @@ public class CDVBackgroundGeolocation extends CordovaPlugin {
             Log.w(TAG, "- Failed to apply license");
         }
         editor.putString("config", mConfig.toString());
-        editor.putBoolean("activityIsActive", true);
         editor.apply();
 
         return true;
@@ -1133,10 +1132,6 @@ public class CDVBackgroundGeolocation extends CordovaPlugin {
                 eventBus.unregister(this);
             }
         }
-        SharedPreferences.Editor editor = settings.edit();
-        editor.putBoolean("activityIsActive", false);
-        editor.commit();
-
         if(isEnabled && stopOnTerminate) {
             this.cordova.getActivity().stopService(backgroundServiceIntent);
         }
