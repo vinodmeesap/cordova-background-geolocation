@@ -95,7 +95,6 @@ public class CDVBackgroundGeolocation extends CordovaPlugin {
     private CallbackContext locationCallback;
     private CallbackContext getLocationsCallback;
     private CallbackContext syncCallback;
-    private CallbackContext resetOdometerCallback;
     private CallbackContext paceChangeCallback;
     private CallbackContext getGeofencesCallback;
     private ToneGenerator toneGenerator;
@@ -122,6 +121,12 @@ public class CDVBackgroundGeolocation extends CordovaPlugin {
         Settings.init(settings);
 
         toneGenerator = new ToneGenerator(AudioManager.STREAM_NOTIFICATION, 100);
+
+        Intent launchIntent = activity.getIntent();
+        if (launchIntent.hasExtra("forceReload")) {
+            // When Activity is launched due to forceReload, minimize the app.
+            activity.moveTaskToBack(true);
+        }
     }
 
     public boolean execute(String action, JSONArray data, CallbackContext callbackContext) throws JSONException {
@@ -283,7 +288,7 @@ public class CDVBackgroundGeolocation extends CordovaPlugin {
         event.putString("name", BackgroundGeolocationService.ACTION_CHANGE_PACE);
         event.putBoolean("request", true);
         event.putBoolean("isMoving", data.getBoolean(0));
-        postEventInBackground(event);
+        postEvent(event);
     }
     private void startService(int requestCode) {
         if (hasPermission(ACCESS_FINE_LOCATION) && hasPermission(ACCESS_COARSE_LOCATION)) {
@@ -426,12 +431,22 @@ public class CDVBackgroundGeolocation extends CordovaPlugin {
     }
 
     private void resetOdometer(CallbackContext callbackContext) {
-        Bundle event = new Bundle();
-        event.putString("name", BackgroundGeolocationService.ACTION_RESET_ODOMETER);
-        event.putBoolean("request", true);
-        resetOdometerCallback = callbackContext;
-        postEventInBackground(event);
+        SharedPreferences.Editor editor = settings.edit();
+        editor.putFloat("odometer", 0);
+        editor.apply();
+
+        if (BackgroundGeolocationService.isInstanceCreated()) {
+            Bundle event = new Bundle();
+            event.putString("name", BackgroundGeolocationService.ACTION_RESET_ODOMETER);
+            event.putBoolean("request", true);
+            postEventInBackground(event);
+        }
+        callbackContext.success();
     }
+    private void onResetOdometer(Bundle event) {
+        // Received event from BackgroundService.  Do Nothing.  Callback already callced in #resetOdometer.
+    }
+
     private void onAddGeofence(Bundle event) {
         boolean success = event.getBoolean("success");
         String identifier = event.getString("identifier");
@@ -540,14 +555,17 @@ public class CDVBackgroundGeolocation extends CordovaPlugin {
         isMoving = null;
 
         Intent launchIntent = activity.getIntent();
-        if (launchIntent.hasExtra("forceReload") && launchIntent.hasExtra("location")) {
-            try {
-                JSONObject location = new JSONObject(launchIntent.getStringExtra("location"));
-                onLocationChange(location);
-                launchIntent.removeExtra("forceReload");
-                launchIntent.removeExtra("location");
-            } catch (JSONException e) {
-                Log.w(TAG, e);
+
+        if (launchIntent.hasExtra("forceReload")) {
+            if (launchIntent.hasExtra("location")) {
+                try {
+                    JSONObject location = new JSONObject(launchIntent.getStringExtra("location"));
+                    onLocationChange(location);
+                    launchIntent.removeExtra("forceReload");
+                    launchIntent.removeExtra("location");
+                } catch (JSONException e) {
+                    Log.w(TAG, e);
+                }
             }
         }
 
@@ -797,8 +815,7 @@ public class CDVBackgroundGeolocation extends CordovaPlugin {
                 syncCallback.sendPluginResult(result);
             }
         } else if (BackgroundGeolocationService.ACTION_RESET_ODOMETER.equalsIgnoreCase(name)) {
-            PluginResult result = new PluginResult(PluginResult.Status.OK);
-            resetOdometerCallback.sendPluginResult(result);
+            this.onResetOdometer(event);
         } else if (BackgroundGeolocationService.ACTION_CHANGE_PACE.equalsIgnoreCase(name)) {
             this.onChangePace(event);
         } else if (BackgroundGeolocationService.ACTION_GET_GEOFENCES.equalsIgnoreCase(name)) {
