@@ -23,6 +23,8 @@
 - [Changed] The plugin will no longer delete geofences when `#stop` is called; it will merely stop monitoring them.  When the plugin is `#start`ed again, it will start monitoringt any geofences it holds in memory.  To completely delete geofences, use new method `#removeGeofences`.
 - [Fixed] iOS battery `is_charging` was rendering as `1/0` instead of boolean `true/false`
 - [Fixed] Issue with `forceReloadOnX` params. These were not forcing the activity to reload on device reboot when configured with `startOnBoot: true`.  Implemented a better method for detecting when main Activity is active.
+- [Fixed] `getOdometer` callabck wasn't running if BackgroundGeolocationService wasn't running.
+- [Changed] When Activity is `forceReload`ed (eg: via `forceReloadOnLocationChange`), the Activity will automatically be minimized when launched now!
 
 ## [1.4.0] - 2016-03-08
 - [Changed] Introduce new per-app licensing scheme.  I'm phasing out the unlimited 'god-mode' license in favour of generating a distinct license-key for each bundle ID.  This cooresponds with new Customer Dashboard for generating application keys and managing team-members.
