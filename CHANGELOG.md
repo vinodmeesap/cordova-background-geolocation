@@ -2,7 +2,9 @@
 # Change Log
 
 ## [Unreleased]
-
+- [Fixed] Fixed issue #597, `NullPointerException` after `startOnBoot`
+- [Fixed] Refactor `startOnBoot` system.  Moved `BootReceiver` to `com.transistorsoft.cordova.bggeo` namespace.
+- [Added] New config option `#forceReloadOnBoot` for specifying the MainActivity should launch after a `startOnBoot` occurs.
 ## [1.5.0] - 2016-04-04
 - [Added] Intelligence for `stopTimeout`.  When stop-timer is initiated, save a reference to the current-location.  If another location is recorded while during stop-timer, calculate the distance from location when stop-timer initiated:  if `distance > stationaryRadius`, cancel the stop-timer and stay in "moving" state.
 - [Added] New debug sound **"booooop"**:  Signals the initiation of stop-timer of `stopTimeout` minutes.
