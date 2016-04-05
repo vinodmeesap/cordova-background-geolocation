@@ -2,7 +2,6 @@
 # Change Log
 
 ## [Unreleased]
-- [Changed] test
 
 ## [1.5.0] - 2016-04-04
 - [Added] Intelligence for `stopTimeout`.  When stop-timer is initiated, save a reference to the current-location.  If another location is recorded while during stop-timer, calculate the distance from location when stop-timer initiated:  if `distance > stationaryRadius`, cancel the stop-timer and stay in "moving" state.
