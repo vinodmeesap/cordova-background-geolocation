@@ -8,8 +8,6 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-import java.text.SimpleDateFormat;
-import java.util.Date;
 import java.util.List;
 import java.util.HashMap;
 import java.util.Map;
@@ -443,6 +441,7 @@ public class CDVBackgroundGeolocation extends CordovaPlugin {
         }
         callbackContext.success();
     }
+
     private void onResetOdometer(Bundle event) {
         // Received event from BackgroundService.  Do Nothing.  Callback already callced in #resetOdometer.
     }
@@ -491,6 +490,8 @@ public class CDVBackgroundGeolocation extends CordovaPlugin {
                 Bundle event = launchIntent.getExtras();
                 this.onEventMainThread(event);
             }
+            launchIntent.removeExtra("forceReload");
+            launchIntent.removeExtra("location");
         }
     }
 
@@ -561,8 +562,6 @@ public class CDVBackgroundGeolocation extends CordovaPlugin {
                 try {
                     JSONObject location = new JSONObject(launchIntent.getStringExtra("location"));
                     onLocationChange(location);
-                    launchIntent.removeExtra("forceReload");
-                    launchIntent.removeExtra("location");
                 } catch (JSONException e) {
                     Log.w(TAG, e);
                 }
@@ -784,6 +783,15 @@ public class CDVBackgroundGeolocation extends CordovaPlugin {
 
         if (BackgroundGeolocationService.ACTION_START.equalsIgnoreCase(name)) {
             onStarted();
+        } else if (BackgroundGeolocationService.ACTION_ON_MOTION_CHANGE.equalsIgnoreCase(name)) {
+            boolean nowMoving = event.getBoolean("isMoving");
+            try {
+                JSONObject locationData = new JSONObject(event.getString("location"));
+                onMotionChange(nowMoving, locationData);
+            } catch (JSONException e) {
+                Log.e(TAG, "Error decoding JSON");
+                e.printStackTrace();
+            }
         } else if (BackgroundGeolocationService.ACTION_GET_LOCATIONS.equalsIgnoreCase(name)) {
             try {
                 JSONObject params = new JSONObject();
