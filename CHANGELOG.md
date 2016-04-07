@@ -3,8 +3,10 @@
 
 ## [Unreleased]
 - [Added] ios logic to handle being launched in the background (by a background-fetch event, for example).  When launched in the background, iOS will essentially do a `changePace(true)` upon itself and let the stop-detection system determine engage stationary-mode as detected.
-
-- [Changed] ios lalt stop-detection distance was using `distanceFilter`; changed to use `stationaryRadius`.  This effects users using the accelerometer-based stop-detection system:  after stop is detected, the device must move `stationaryRadius` meters away from location where stop was detected.
+- [Changed] ios halt stop-detection distance was using `distanceFilter`; changed to use `stationaryRadius`.  This effects users using the accelerometer-based stop-detection system:  after stop is detected, the device must move `stationaryRadius` meters away from location where stop was detected.
+- [Fixed] Android `addGeofences` callbacks not being called.
+- [Changed] When `maxRecordsToPersist == 0`, don't persist any record.
+- [Added] Implement `startOnBoot` param for iOS.  iOS always ignored `startOnBoot`.  If you set `startOnBoot: false` now, iOS will not begin tracking when launched in background after device is rebooted (eg: from a background-fetch event, geofence exit or significant-change event)
 
 ## [1.5.0] - 2016-04-04
 - [Fixed] Fixed issue #597, `NullPointerException` after `startOnBoot`
