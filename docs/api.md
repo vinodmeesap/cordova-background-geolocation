@@ -270,7 +270,7 @@ Disable iOS accelerometer-based **Stop-detection System**.  When disabled, the p
 
 # HTTP / Persistence Options
 
-####`@param {String} url`
+####`@param {String} url [undefined]`
 
 Your server url where you wish to HTTP POST location data to.
 
@@ -312,24 +312,33 @@ bgGeo.configure(success, fail, {
 });
 ```
 
-####`@param {Integer} maxDaysToPersist`
+####`@param {Integer} maxDaysToPersist [1]`
 
 Maximum number of days to store a geolocation in plugin's SQLite database when your server fails to respond with ```HTTP 200 OK```.  The plugin will continue attempting to sync with your server until ```maxDaysToPersist``` when it will give up and remove the location from the database.
 
-####`@param {Integer} maxRecordsToPersist`
+####`@param {Integer} maxRecordsToPersist [-1]`
 
-Maximum number of records to persist in plugin's SQLite database.
+Maximum number of records to persist in plugin's SQLite database.  Default `-1` means no limit.
 
 # Application Options
 
 ## Common Options
 
-####`@param {Boolean} debug`
+####`@param {Boolean} debug [false]`
 
 When enabled, the plugin will emit sounds for life-cycle events of background-geolocation!  **NOTE iOS**:  In addition, you must manually enable the *Audio and Airplay* background mode in *Background Capabilities* to hear these [debugging sounds](../../../wiki/Debug-Sounds).  See the ../../../wiki [Debug Sounds](wiki/Debug-Sounds) for a detailed description of these sounds.
 
-####`@param {Boolean} stopOnTerminate`
+####`@param {Boolean} stopOnTerminate [true]`
 Enable this in order to force a stop() when the application terminated (e.g. on iOS, double-tap home button, swipe away the app).  On Android, ```stopOnTerminate: false``` will cause the plugin to operate as a headless background-service (in this case, you should configure an #url in order for the background-service to send the location to your server)
+
+####`@param {Boolean} startOnBoot [false]`
+
+Set to `true` to enable background-tracking after the device reboots.
+
+**iOS** 
+iOS cannot immediately engage tracking after a device reboot since it requires either a "significant-change" event or geofence exit before iOS will awaken your app.  One can also use the [background-fetch plugin](https://github.com/christocracy/cordova-plugin-background-fetch) to *at least* awaken your app within 15 min of being rebooted.
+**Android**
+Unless you configure the plugin to `forceReload` (ie: boot your app), you should configure the plugin's HTTP features so it can POST to your server in "headless" mode.
 
 ## iOS Options
 
@@ -343,33 +352,21 @@ Used in conjunction with `preventSuspend`, an **iOS** app can continue to monito
 
 ## Android Options
 
-####`@param {Boolean} forceReloadOnMotionChange`
+####`@param {Boolean} forceReloadOnMotionChange [false]`
 
 If the user closes the application while the background-tracking has been started,  location-tracking will continue on if `stopOnTerminate: false`.  You may choose to force the foreground application to reload (since this is where your Javascript runs).  `forceReloadOnMotionChange: true` will reload the app only when a state-change occurs from **stationary -> moving** or vice-versa. (**WARNING** possibly disruptive to user).
 
-####`@param {Boolean} forceReloadOnLocationChange`
+####`@param {Boolean} forceReloadOnLocationChange [false]`
 
 If the user closes the application while the background-tracking has been started,  location-tracking will continue on if `stopOnTerminate: false`.  You may choose to force the foreground application to reload (since this is where your Javascript runs).  `forceReloadOnLocationChange: true` will reload the app when a new location is recorded.
 
-####`@param {Boolean} forceReloadOnGeofence`
+####`@param {Boolean} forceReloadOnGeofence [false]`
 
 If the user closes the application while the background-tracking has been started,  location-tracking will continue on if `stopOnTerminate: false`.  You may choose to force the foreground application to reload (since this is where your Javascript runs).  `forceReloadOnGeolocation: true` will reload the app only when a geofence crossing event has occurred.
 
-####`@param {Boolean} forceReloadOnBoot`
+####`@param {Boolean} forceReloadOnBoot [false]`
 
 If the user reboots the device, setting `forceReloadOnBoot: true` will cause the foreground application (where your Javascript lives) to reload after the device is rebooted.  This option should be used in conjunction with `forceReloadOnLocationChange: true` or `forceReloadOnMotionChange: true`.
-
-####`@param {Boolean} startOnBoot`
-
-Set to `true` to start the background-service whenever the device boots.  Unless you configure the plugin to `forceReload` (ie: boot your app), you should configure the plugin's HTTP features so it can POST to your server in "headless" mode.
-
-####`@param {String} configureUrl`
-
-The Android plugin can automatically execute an url of your choice to re-configure itself at some `configureInterval (ms)`.  This can be used if you have a strict authentication service which requires a token refresh at some interval.  The returned `JSON` schema be compatible with this plugin.  If your schema is *not* compatible, the decoded `JSON` will be assumed to be a `#params` config for this plugin.  Since there's no guarantee that your fore-ground Android Activity is not killed, you cannot rely upon Javascript to perform this duty. |
-
-####`@param {Integer} configureInterval`
-
-This is the `interval` at which the plugin will auto-configure itself from the above `#configureUrl`
 
 ####`@param {Boolean} foregroundService [false]`
 

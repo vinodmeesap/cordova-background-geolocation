@@ -2,6 +2,11 @@
 # Change Log
 
 ## [Unreleased]
+- [Added] ios logic to handle being launched in the background (by a background-fetch event, for example).  When launched in the background, iOS will essentially do a `changePace(true)` upon itself and let the stop-detection system determine engage stationary-mode as detected.
+
+- [Changed] ios lalt stop-detection distance was using `distanceFilter`; changed to use `stationaryRadius`.  This effects users using the accelerometer-based stop-detection system:  after stop is detected, the device must move `stationaryRadius` meters away from location where stop was detected.
+
+## [1.5.0] - 2016-04-04
 - [Fixed] Fixed issue #597, `NullPointerException` after `startOnBoot`
 - [Fixed] Refactor `startOnBoot` system.  Moved `BootReceiver` to `com.transistorsoft.cordova.bggeo` namespace.
 - [Added] New config option `#forceReloadOnBoot` for specifying the MainActivity should launch after a `startOnBoot` occurs.
