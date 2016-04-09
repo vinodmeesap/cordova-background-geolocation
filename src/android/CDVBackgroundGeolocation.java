@@ -449,12 +449,13 @@ public class CDVBackgroundGeolocation extends CordovaPlugin {
     private void onAddGeofence(Bundle event) {
         boolean success = event.getBoolean("success");
         String identifier = event.getString("identifier");
+
         if (addGeofenceCallbacks.containsKey(identifier)) {
             CallbackContext callbackContext = addGeofenceCallbacks.get(identifier);
             if (success) {
                 callbackContext.success();
             } else {
-                callbackContext.error(event.getString("message"));
+                callbackContext.error(event.getString("error"));
             }
             addGeofenceCallbacks.remove(identifier);
         }
@@ -842,6 +843,8 @@ public class CDVBackgroundGeolocation extends CordovaPlugin {
         } else if (name.equalsIgnoreCase(BackgroundGeolocationService.ACTION_LOCATION_ERROR)) {
             this.onLocationError(event);
         } else if (name.equalsIgnoreCase(BackgroundGeolocationService.ACTION_ADD_GEOFENCE)) {
+            this.onAddGeofence(event);
+        } else if (name.equalsIgnoreCase(BackgroundGeolocationService.ACTION_ADD_GEOFENCES)) {
             this.onAddGeofence(event);
         } else if (name.equalsIgnoreCase(BackgroundGeolocationService.ACTION_HTTP_RESPONSE)) {
             this.onHttpResponse(event);
