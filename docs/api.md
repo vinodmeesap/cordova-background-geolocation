@@ -5,23 +5,23 @@
 The following **Options** can all be provided to the plugin's `#configure` method:
 
 ```
-bgGeo.configure(successFn, failureFn, {
+bgGeo.configure({
 	desiredAccuracy: 0,
 	distanceFilter: 50,
 	.
 	.
 	.
-});
+}, success, fail);
 
 // Use #setConfig if you need to change options after you've executed #configure
 
-bgGeo.setConfig(function() {
+bgGeo.setConfig({
+    desiredAccuracy: 10,
+    distanceFilter: 10
+}, function() {
 	console.log('set config success');
 }, {
 	console.log('failed to setConfig');
-}, {
-	desiredAccuracy: 10,
-	distanceFilter: 10
 });
 
 ```
@@ -86,6 +86,7 @@ bgGeo.setConfig(function() {
 
 | Event Name | Notes
 |---|---|
+| [`onLocation`](#onlocationsuccessfn-failurefn) | Fired whenever a new location is recorded or an error occurs |
 | [`onMotionChange`](#onmotionchangecallbackfn-failurefn) | Fired when the device changes stationary / moving state. |
 | [`onGeofence`](#ongeofencecallbackfn) | Fired when a geofence crossing event occurs |
 | [`onHttp`](#onhttpsuccessfn-failurefn) | Fired after a successful HTTP response. `response` object is provided with `status` and `responseText`|
@@ -95,8 +96,8 @@ bgGeo.setConfig(function() {
 
 | Method Name | Arguments | Notes
 |---|---|---|
-| [`configure`](#configurelocationcallback-failurecallback-config) | `successFn`, `failureFn`, `{config}` | Configures the plugin's parameters (@see following Config section for accepted config params. The locationCallback will be executed each time a new Geolocation is recorded and provided with the following parameters |
-| [`setConfig`](#setconfigsuccessfn-failurefn-config) | `successFn`, `failureFn`, `{config}` | Re-configure the plugin with new values |
+| [`configure`](#configurelocationcallback-failurecallback-config) | `successFn`, `failureFn`, `{config}` | Configures the plugin's parameters (@see following Config section for accepted config params. The `success` callback will be executed after the plugin has successfully configured and provided with the current `state` object. |
+| [`setConfig`](#setconfigconfig-successfn-failurefn) | `{config}`, `successFn`, `failureFn` | Re-configure the plugin with new values |
 | [`start`](#startsuccessfn-failurefn) | `callbackFn`| Enable location tracking.  Supplied `callbackFn` will be executed when tracking is successfully engaged.  This is the plugin's power **ON** button.  The plugin will initially start into its **stationary** state, fetching an initial location before turning off location services.  Android will be monitoring its **Activity Recognition System** while iOS will create a stationary geofence around the current location. |
 | [`stop`](#stopsuccessfn-failurefn) | `callbackFn` | Disable location tracking.  Supplied `callbackFn` will be executed when tracking is successfully halted.  This is the plugin's power **OFF** button. |
 | [`getState`](#getstatesuccessfn) | `callbackFn` | Fetch the current-state of the plugin, including `enabled`, `isMoving`, as well as all other config params |
@@ -305,12 +306,12 @@ Optional arbitrary key/value `{}` to attach to each recorded location
 
 Eg: Every recorded location will have the following `extras` appended:
 ```
-bgGeo.configure(success, fail, {
-  .
-  .
-  .
-  extras: {route_id: 1234}
-});
+bgGeo.configure({
+    .
+    .
+    .
+    extras: {route_id: 1234}
+}, success, fail);
 ```
 
 ####`@param {Integer} maxDaysToPersist [1]`
@@ -386,6 +387,41 @@ When running the service with `foregroundService: true`, Android requires a pers
 When running the service with `foregroundService: true`, Android requires a persistent notification in the Notification Bar.  This will configure the **color** of the notification icon (API >= 21).Supported formats are: `#RRGGBB` `#AARRGGBB` or one of the following names: 'red', 'blue', 'green', 'black', 'white', 'gray', 'cyan', 'magenta', 'yellow', 'lightgray', 'darkgray', 'grey', 'lightgrey', 'darkgrey', 'aqua', 'fuchsia', 'lime', 'maroon', 'navy', 'olive', 'purple', 'silver', 'teal'.
 
 # Events
+
+####`onLocation(successFn, failureFn)`
+Your `successFn` will be called with the following signature whenever a new location is recorded:
+
+######@param {Object} location The Location data (@see Wiki for [Location Data Schema](../../../wiki/Location-Data-Schema))
+######@param {Integer} taskId The taskId used to send to bgGeo.finish(taskId) in order to signal completion of your callbackFn
+
+```
+bgGeo.onLocation(function(location, taskId) {
+    
+    var coords      = location.coords,
+        timestamp   = location.timestamp
+        latitude    = coords.latitude,
+        longitude   = coords.longitude,
+        speed       = coords.speed;
+
+    console.log("A location has arrived:", timestamp, latitude, longitude, speed);
+    
+    // The plugin runs your callback in a background-thread:  
+    // you MUST signal to the native plugin when your callback is finished so it can halt the thread.
+    // IF YOU DON'T, iOS WILL KILL YOUR APP
+    bgGeo.finish(taskId);
+}, function(errorCode) {
+    console.warn("- Location error: ", errorCode);
+});
+```
+
+If an error occurs while fetching the location, the `failureFn` will be executed with an `Integer` [Error Code](../../../wiki/Location-Error-Codes) as the first argument.  Ie:
+
+| Code | Error |
+|-------|-----|
+| 0 | Location unknown |
+| 1 | Location permission denied |
+| 2 | Network error |
+| 408 | Location timeout |
 
 ####`onMotionChange(callbackFn, failureFn)`
 Your ```callbackFn``` will be executed each time the device has changed-state between **MOVING** or **STATIONARY**.  The ```callbackFn``` will be provided with a ```Location``` object as the 1st param, with the usual params (```latitude, longitude, accuracy, speed, bearing, altitude```), in addition to a ```taskId``` used to signal that your callback is finished.
@@ -490,46 +526,35 @@ bgGeo.onHeartbeat(function(params) {
 
 # Methods
 
-####`configure(locationCallback, failureCallback, config)`
+####`configure(config, success, failure)`
 
-Configures the plugin's parameters (@see following [Config](https://github.com/transistorsoft/cordova-background-geolocation/blob/edge/README.md#config) section for accepted ```config``` params.  The ```locationCallback``` will be executed each time a new Geolocation is recorded and provided with the following parameters:
-
-######@param {Object} location The Location data
-######@param {Integer} taskId The taskId used to send to bgGeo.finish(taskId) in order to signal completion of your callbackFn
+Configures the plugin's parameters.  The `success` callback will be executed after the plugin has successfully configured.  The `success` callback will be provided with the current `state` Object as the 1st parameter.
 
 ```
-bgGeo.configure(function(location, taskId) {
-    try {
-        var coords      = location.coords,
-            timestamp   = location.timestamp
-            latitude    = coords.latitude,
-            longitude   = coords.longitude,
-            speed       = coords.speed;
-
-        console.log("A location has arrived:", timestamp, latitude, longitude, speed);
-    } catch(e) {
-        console.error("An error occurred in my application code", e);
-    }
-    // The plugin runs your callback in a background-thread:  
-    // you MUST signal to the native plugin when your callback is finished so it can halt the thread.
-    // IF YOU DON'T, iOS WILL KILL YOUR APP
-    bgGeo.finish(taskId);
-}, failureFn, {
-    distanceFilter: 50,
-    desiredAccuracy: 0,
-    stationaryRadius: 25
-});
+bgGeo.configure({
+  desiredAccuracy: 0,
+  distanceFilter: 50,
+  stationaryRadius: 25,
+  locationUpdateInterval: 1000,
+  foregroundService: true
+}, function(state) {
+    console.log("Background Geolocation started.  Current state: ", state.enabled);
+}, function(error) {
+    console.warn("Background Geolocation failed to configure");
+})
 ```
 
-If an error occurs while fetching the location, the `failureFn` will be executed with an `Integer` [Error Code](../../../wiki/Location-Error-Codes) as the first argument.
-
-####`setConfig(successFn, failureFn, config)`
-Reconfigure plugin's configuration (@see followign ##Config## section for accepted ```config``` params.  **NOTE** The plugin will continue to send recorded Geolocation to the ```locationCallback``` you provided to ```configure``` method -- use this method only to change configuration params (eg: ```distanceFilter```, ```stationaryRadius```, etc).
+####`setConfig(config, successFn, failureFn)`
+Re-configure plugin's configuration parameters.
 
 ```
-bgGeo.setConfig(function(){}, function(){}, {
+bgGeo.setConfig({
     desiredAccuracy: 10,
     distanceFilter: 100
+}, function(){
+    console.log("- setConfig success");
+}, function(){
+    console.warn("- Failed to setConfig");
 });
 ```
 

@@ -10,7 +10,7 @@
     NSDictionary *config;
 }
 
-@synthesize syncCallbackId, syncTaskId, locationCallbackId, geofenceListeners, motionChangeListeners, currentPositionListeners, httpListeners, heartbeatListeners;
+@synthesize syncCallbackId, syncTaskId, locationListeners, geofenceListeners, motionChangeListeners, currentPositionListeners, httpListeners, heartbeatListeners;
 
 - (void)pluginInitialize
 {
@@ -24,6 +24,8 @@
     bgGeo.syncCompleteBlock     = [self createSyncCompleteHandler];
     bgGeo.httpResponseBlock     = [self createHttpResponseHandler];
     bgGeo.errorBlock            = [self createErrorHandler];
+    
+    locationListeners   = [NSMutableArray new];
 }
 
 /**
@@ -35,10 +37,15 @@
  */
 - (void) configure:(CDVInvokedUrlCommand*)command
 {
-    self.locationCallbackId = command.callbackId;
+    //self.locationCallbackId = command.callbackId;
+    [self.locationListeners addObject:command.callbackId];
     
     config = [command.arguments objectAtIndex:0];
     [bgGeo configure:config];
+    
+    CDVPluginResult* result = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsDictionary:[bgGeo getState]];
+    
+    [self.commandDelegate sendPluginResult:result callbackId:command.callbackId];
 }
 
 - (void) setConfig:(CDVInvokedUrlCommand*)command
@@ -160,6 +167,11 @@
             [self.commandDelegate sendPluginResult:result callbackId:command.callbackId];
         }
     }];
+}
+
+- (void) addLocationListener:(CDVInvokedUrlCommand*) command
+{
+    [self.locationListeners addObject:command.callbackId];
 }
 
 - (void) addHttpListener:(CDVInvokedUrlCommand*)command
@@ -345,7 +357,6 @@
 -(void) insertLocation:(CDVInvokedUrlCommand*)command
 {
     NSDictionary *params = [command.arguments objectAtIndex: 0];
-    NSLog(@"- CDVBackgroundGeolocation insertLocation %@", params);
     [self.commandDelegate runInBackground:^{
         BOOL success = [bgGeo insertLocation: params];
         CDVPluginResult* result;
@@ -360,7 +371,6 @@
 
 -(void) getCount:(CDVInvokedUrlCommand*)command
 {
-    NSLog(@"- CDVBackgroundGeolocation getCount");
     [self.commandDelegate runInBackground:^{
         int count = [bgGeo getCount];
         CDVPluginResult* result;
@@ -398,15 +408,15 @@
     return ^(CLLocation *location, enum tsLocationType type, BOOL isMoving) {
                 
         NSDictionary *locationData = [bgGeo locationToDictionary:location type:type];
-        NSDictionary *params = @{
-                                 @"location": locationData,
-                                 @"taskId": @([bgGeo createBackgroundTask])
-                                 };
-        CDVPluginResult* result = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsDictionary:params];
-        [result setKeepCallbackAsBool:YES];
         
         [self.commandDelegate runInBackground:^{
-            [self.commandDelegate sendPluginResult:result callbackId:self.locationCallbackId];
+            NSDictionary *params = @{@"location": locationData, @"taskId": @([bgGeo createBackgroundTask])};
+            CDVPluginResult* result = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsDictionary:params];
+            [result setKeepCallbackAsBool:YES];
+            
+            for (NSString *callbackId in self.locationListeners) {
+                [self.commandDelegate sendPluginResult:result callbackId:callbackId];
+            }
         }];
         
         if (type != TS_LOCATION_TYPE_SAMPLE && [self.currentPositionListeners count]) {
@@ -539,7 +549,10 @@
             }
 
             [result setKeepCallbackAsBool:YES];
-            [self.commandDelegate sendPluginResult:result callbackId:locationCallbackId];
+            
+            for (NSString *callbackId in self.locationListeners) {
+                [self.commandDelegate sendPluginResult:result callbackId:callbackId];
+            }
         }
     };
 }
