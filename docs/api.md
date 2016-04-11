@@ -545,7 +545,7 @@ bgGeo.configure({
 ```
 
 ####`setConfig(config, successFn, failureFn)`
-Reconfigure plugin's configuration (@see followign ##Config## section for accepted `config` params.
+Re-configure plugin's configuration parameters.
 
 ```
 bgGeo.setConfig({
