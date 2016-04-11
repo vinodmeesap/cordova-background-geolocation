@@ -112,13 +112,13 @@ module.exports = {
             'changePace',
             [isMoving]);
     },
-    /**
-    * @param {Integer} stationaryRadius
-    * @param {Integer} desiredAccuracy
-    * @param {Integer} distanceFilter
-    * @param {Integer} timeout
-    */
-    setConfig: function(success, failure, config) {
+    setConfig: function(config, success, failure) {
+        if (typeof(config) === 'function') {
+            console.warn('The signature for #setConfig has changed:  You now provide the {} as the 1st parameter.  ie: setConfig(config, success, failure');
+            config = arguments[2] || {};
+            success = arguments[0] || function() {};
+            failure = arguments[1] || function() {};
+        }
         this._apply(this.config, config);
         exec(success || function() {},
             failure || function() {},

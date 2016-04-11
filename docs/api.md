@@ -5,23 +5,23 @@
 The following **Options** can all be provided to the plugin's `#configure` method:
 
 ```
-bgGeo.configure(successFn, failureFn, {
+bgGeo.configure({
 	desiredAccuracy: 0,
 	distanceFilter: 50,
 	.
 	.
 	.
-});
+}, success, fail);
 
 // Use #setConfig if you need to change options after you've executed #configure
 
-bgGeo.setConfig(function() {
+bgGeo.setConfig({
+    desiredAccuracy: 10,
+    distanceFilter: 10
+}, function() {
 	console.log('set config success');
 }, {
 	console.log('failed to setConfig');
-}, {
-	desiredAccuracy: 10,
-	distanceFilter: 10
 });
 
 ```
@@ -86,6 +86,7 @@ bgGeo.setConfig(function() {
 
 | Event Name | Notes
 |---|---|
+| [`onLocation`](#onlocationcallbackfn-failurefn) | Fired whenever a new location is recorded or an error occurs |
 | [`onMotionChange`](#onmotionchangecallbackfn-failurefn) | Fired when the device changes stationary / moving state. |
 | [`onGeofence`](#ongeofencecallbackfn) | Fired when a geofence crossing event occurs |
 | [`onHttp`](#onhttpsuccessfn-failurefn) | Fired after a successful HTTP response. `response` object is provided with `status` and `responseText`|
