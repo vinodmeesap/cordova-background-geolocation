@@ -391,7 +391,7 @@ When running the service with `foregroundService: true`, Android requires a pers
 ####`onLocation(successFn, failureFn)`
 Your `successFn` will be called with the following signature whenever a new location is recorded:
 
-######@param {Object} location The Location data
+######@param {Object} location The Location data (@see Wiki for [Schema](../../../wiki/Location-Data-Schema))
 ######@param {Integer} taskId The taskId used to send to bgGeo.finish(taskId) in order to signal completion of your callbackFn
 
 ```
