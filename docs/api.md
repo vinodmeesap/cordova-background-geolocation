@@ -391,7 +391,7 @@ When running the service with `foregroundService: true`, Android requires a pers
 ####`onLocation(successFn, failureFn)`
 Your `successFn` will be called with the following signature whenever a new location is recorded:
 
-######@param {Object} location The Location data (@see Wiki for [Schema](../../../wiki/Location-Data-Schema))
+######@param {Object} location The Location data (@see Wiki for [Location Data Schema](../../../wiki/Location-Data-Schema))
 ######@param {Integer} taskId The taskId used to send to bgGeo.finish(taskId) in order to signal completion of your callbackFn
 
 ```
@@ -414,7 +414,15 @@ bgGeo.onLocation(function(location, taskId) {
 });
 ```
 
-If an error occurs while fetching the location, the `failureFn` will be executed with an `Integer` [Error Code](../../../wiki/Location-Error-Codes) as the first argument.
+If an error occurs while fetching the location, the `failureFn` will be executed with an `Integer` [Error Code](../../../wiki/Location-Error-Codes) as the first argument.  Ie:
+
+| Code | Error |
+|-------|-----|
+| 0 | Location unknown |
+| 1 | Location permission denied |
+| 2 | Network error |
+| 408 | Location timeout |
+
 
 ####`onMotionChange(callbackFn, failureFn)`
 Your ```callbackFn``` will be executed each time the device has changed-state between **MOVING** or **STATIONARY**.  The ```callbackFn``` will be provided with a ```Location``` object as the 1st param, with the usual params (```latitude, longitude, accuracy, speed, bearing, altitude```), in addition to a ```taskId``` used to signal that your callback is finished.
