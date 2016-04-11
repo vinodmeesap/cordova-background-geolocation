@@ -423,7 +423,6 @@ If an error occurs while fetching the location, the `failureFn` will be executed
 | 2 | Network error |
 | 408 | Location timeout |
 
-
 ####`onMotionChange(callbackFn, failureFn)`
 Your ```callbackFn``` will be executed each time the device has changed-state between **MOVING** or **STATIONARY**.  The ```callbackFn``` will be provided with a ```Location``` object as the 1st param, with the usual params (```latitude, longitude, accuracy, speed, bearing, altitude```), in addition to a ```taskId``` used to signal that your callback is finished.
 

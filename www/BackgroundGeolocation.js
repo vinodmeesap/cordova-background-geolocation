@@ -115,9 +115,10 @@ module.exports = {
     setConfig: function(config, success, failure) {
         if (typeof(config) === 'function') {
             console.warn('The signature for #setConfig has changed:  You now provide the {} as the 1st parameter.  ie: setConfig(config, success, failure');
-            config = arguments[2] || {};
-            success = arguments[0] || function() {};
-            failure = arguments[1] || function() {};
+            var _config = failure, _success = config, _failure = success;
+            config  = _config;
+            success = _success;
+            failure = _failure;
         }
         this._apply(this.config, config);
         exec(success || function() {},
