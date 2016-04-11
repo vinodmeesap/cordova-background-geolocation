@@ -69,6 +69,7 @@ public class CDVBackgroundGeolocation extends CordovaPlugin {
     public static final String ACTION_CONFIGURE         = "configure";
     public static final String ACTION_SET_CONFIG        = "setConfig";
     public static final String ACTION_ADD_MOTION_CHANGE_LISTENER    = "addMotionChangeListener";
+    public static final String ACTION_ADD_LOCATION_LISTENER = "addLocationListener";
     public static final String ACTION_ON_GEOFENCE       = "onGeofence";
     public static final String ACTION_PLAY_SOUND        = "playSound";
     public static final String ACTION_ACTIVITY_RELOAD   = "activityReload";
@@ -90,13 +91,13 @@ public class CDVBackgroundGeolocation extends CordovaPlugin {
 
     private CallbackContext startCallback;
     // Geolocation callback
-    private CallbackContext locationCallback;
     private CallbackContext getLocationsCallback;
     private CallbackContext syncCallback;
     private CallbackContext paceChangeCallback;
     private CallbackContext getGeofencesCallback;
     private ToneGenerator toneGenerator;
 
+    private List<CallbackContext> locationCallbacks = new ArrayList<CallbackContext>();
     private List<CallbackContext> motionChangeCallbacks = new ArrayList<CallbackContext>();
     private List<CallbackContext> geofenceCallbacks = new ArrayList<CallbackContext>();
     private List<CallbackContext> currentPositionCallbacks = new ArrayList<CallbackContext>();
@@ -154,6 +155,9 @@ public class CDVBackgroundGeolocation extends CordovaPlugin {
         } else if (ACTION_CONFIGURE.equalsIgnoreCase(action)) {
             result = true;
             configure(data.getJSONObject(0), callbackContext);
+        } else if (ACTION_ADD_LOCATION_LISTENER.equalsIgnoreCase(action)) {
+            result = true;
+            addLocationListener(callbackContext);
         } else if (BackgroundGeolocationService.ACTION_CHANGE_PACE.equalsIgnoreCase(action)) {
             result = true;
             if (!isEnabled) {
@@ -252,11 +256,13 @@ public class CDVBackgroundGeolocation extends CordovaPlugin {
         mConfig = config;
         boolean result = applyConfig();
         if (result) {
-            this.locationCallback = callbackContext;
             boolean willEnable = settings.getBoolean("enabled", isEnabled);
             if (willEnable) {
                 start(null);
             }
+            PluginResult response = new PluginResult(PluginResult.Status.OK, this.getState());
+            response.setKeepCallback(false);
+            callbackContext.sendPluginResult(response);
         } else {
             callbackContext.error("- Configuration error!");
         }
@@ -478,6 +484,10 @@ public class CDVBackgroundGeolocation extends CordovaPlugin {
 
     private void addCurrentPositionListener(CallbackContext callbackContext) {
         currentPositionCallbacks.add(callbackContext);
+    }
+
+    private void addLocationListener(CallbackContext callbackContext) {
+        locationCallbacks.add(callbackContext);
     }
 
     private void addMotionChangeListener(CallbackContext callbackContext) {
@@ -974,7 +984,10 @@ public class CDVBackgroundGeolocation extends CordovaPlugin {
         PluginResult result = new PluginResult(PluginResult.Status.OK, location);
         result.setKeepCallback(true);
 
-        locationCallback.sendPluginResult(result);
+        for (CallbackContext callback : locationCallbacks) {
+            result = new PluginResult(PluginResult.Status.OK, location);
+            callback.sendPluginResult(result);
+        }
         if (isAcquiringCurrentPosition) {
             finishAcquiringCurrentPosition(true);
             // Execute callbacks.
@@ -1066,7 +1079,9 @@ public class CDVBackgroundGeolocation extends CordovaPlugin {
         }
         PluginResult result = new PluginResult(PluginResult.Status.ERROR, code);
         result.setKeepCallback(true);
-        locationCallback.sendPluginResult(result);
+        for (CallbackContext callback : locationCallbacks) {
+            callback.sendPluginResult(result);
+        }
 
         if (isAcquiringCurrentPosition) {
             finishAcquiringCurrentPosition(false);
