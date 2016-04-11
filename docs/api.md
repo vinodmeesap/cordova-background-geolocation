@@ -86,7 +86,7 @@ bgGeo.setConfig({
 
 | Event Name | Notes
 |---|---|
-| [`onLocation`](#onlocationcallbackfn-failurefn) | Fired whenever a new location is recorded or an error occurs |
+| [`onLocation`](#onlocationsuccessfn-failurefn) | Fired whenever a new location is recorded or an error occurs |
 | [`onMotionChange`](#onmotionchangecallbackfn-failurefn) | Fired when the device changes stationary / moving state. |
 | [`onGeofence`](#ongeofencecallbackfn) | Fired when a geofence crossing event occurs |
 | [`onHttp`](#onhttpsuccessfn-failurefn) | Fired after a successful HTTP response. `response` object is provided with `status` and `responseText`|
@@ -97,7 +97,7 @@ bgGeo.setConfig({
 | Method Name | Arguments | Notes
 |---|---|---|
 | [`configure`](#configurelocationcallback-failurecallback-config) | `successFn`, `failureFn`, `{config}` | Configures the plugin's parameters (@see following Config section for accepted config params. The `success` callback will be executed after the plugin has successfully configured and provided with the current `state` object. |
-| [`setConfig`](#setconfigsuccessfn-failurefn-config) | `successFn`, `failureFn`, `{config}` | Re-configure the plugin with new values |
+| [`setConfig`](#setconfigconfig-successfn-failurefn) | `{config}`, `successFn`, `failureFn` | Re-configure the plugin with new values |
 | [`start`](#startsuccessfn-failurefn) | `callbackFn`| Enable location tracking.  Supplied `callbackFn` will be executed when tracking is successfully engaged.  This is the plugin's power **ON** button.  The plugin will initially start into its **stationary** state, fetching an initial location before turning off location services.  Android will be monitoring its **Activity Recognition System** while iOS will create a stationary geofence around the current location. |
 | [`stop`](#stopsuccessfn-failurefn) | `callbackFn` | Disable location tracking.  Supplied `callbackFn` will be executed when tracking is successfully halted.  This is the plugin's power **OFF** button. |
 | [`getState`](#getstatesuccessfn) | `callbackFn` | Fetch the current-state of the plugin, including `enabled`, `isMoving`, as well as all other config params |
@@ -521,7 +521,7 @@ bgGeo.onHeartbeat(function(params) {
 
 ####`configure(config, success, failure)`
 
-Configures the plugin's parameters (@see following [Config](https://github.com/transistorsoft/cordova-background-geolocation/blob/edge/README.md#config) section for accepted `config` params.  The `success` callback will be executed after the plugin has successfully configured.  The `success` callback will be provided with the current `state` Object as the 1st parameter.
+Configures the plugin's parameters.  The `success` callback will be executed after the plugin has successfully configured.  The `success` callback will be provided with the current `state` Object as the 1st parameter.
 
 ```
 bgGeo.configure({
@@ -537,13 +537,17 @@ bgGeo.configure({
 })
 ```
 
-####`setConfig(successFn, failureFn, config)`
-Reconfigure plugin's configuration (@see followign ##Config## section for accepted ```config``` params.  **NOTE** The plugin will continue to send recorded Geolocation to the ```locationCallback``` you provided to ```configure``` method -- use this method only to change configuration params (eg: ```distanceFilter```, ```stationaryRadius```, etc).
+####`setConfig(config, successFn, failureFn)`
+Reconfigure plugin's configuration (@see followign ##Config## section for accepted `config` params.
 
 ```
-bgGeo.setConfig(function(){}, function(){}, {
+bgGeo.setConfig({
     desiredAccuracy: 10,
     distanceFilter: 100
+}, function(){
+    console.log("- setConfig success");
+}, function(){
+    console.warn("- Failed to setConfig");
 });
 ```
 
