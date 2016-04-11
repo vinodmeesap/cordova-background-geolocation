@@ -7,7 +7,7 @@
 - [Fixed] Android `addGeofences` callbacks not being called.
 - [Changed] When `maxRecordsToPersist == 0`, don't persist any record.
 - [Added] Implement `startOnBoot` param for iOS.  iOS always ignored `startOnBoot`.  If you set `startOnBoot: false` now, iOS will not begin tracking when launched in background after device is rebooted (eg: from a background-fetch event, geofence exit or significant-change event)
-
+- [Changed] Modified the method signature of `#configure`.  The config `{}` will now be the 1st param and the `callbackFn` will now signal successful configuration.  The `locationCallback` and `locationErrorCallback` must now be provided with a separate event-listener `#onLocation`.
 ## [1.5.0] - 2016-04-04
 - [Fixed] Fixed issue #597, `NullPointerException` after `startOnBoot`
 - [Fixed] Refactor `startOnBoot` system.  Moved `BootReceiver` to `com.transistorsoft.cordova.bggeo` namespace.
