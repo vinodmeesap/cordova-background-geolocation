@@ -983,7 +983,6 @@ public class CDVBackgroundGeolocation extends CordovaPlugin {
     private void onLocationChange(JSONObject location) {
         PluginResult result = new PluginResult(PluginResult.Status.OK, location);
         result.setKeepCallback(true);
-
         for (CallbackContext callback : locationCallbacks) {
             callback.sendPluginResult(result);
         }
