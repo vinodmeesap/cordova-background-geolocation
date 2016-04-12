@@ -307,12 +307,17 @@ public class CDVBackgroundGeolocation extends CordovaPlugin {
         }
     }
 
-    private void onStarted() {
+    private void onStarted(Bundle event) {
         isStarting = false;
-        if (startCallback != null) {
+        if (event.getBoolean("response") && !event.getBoolean("success")) {
+            Toast.makeText(cordova.getActivity(), event.getString("message"), Toast.LENGTH_LONG).show();
+            if (startCallback != null) {
+                startCallback.error(event.getString("message"));
+            }
+        } else if (startCallback != null) {
             startCallback.success();
-            startCallback = null;
         }
+        startCallback = null;
     }
 
     private void getLocations(CallbackContext callbackContext) {
@@ -601,7 +606,7 @@ public class CDVBackgroundGeolocation extends CordovaPlugin {
                 }
                 event.putBoolean("request", true);
                 postEvent(event);
-                onStarted();
+                onStarted(event);
             }
         } else {
             Bundle event = new Bundle();
@@ -793,7 +798,7 @@ public class CDVBackgroundGeolocation extends CordovaPlugin {
         String name = event.getString("name");
 
         if (BackgroundGeolocationService.ACTION_START.equalsIgnoreCase(name)) {
-            onStarted();
+            onStarted(event);
         } else if (BackgroundGeolocationService.ACTION_ON_MOTION_CHANGE.equalsIgnoreCase(name)) {
             boolean nowMoving = event.getBoolean("isMoving");
             try {
