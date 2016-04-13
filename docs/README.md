@@ -76,7 +76,7 @@ bgGeo.setConfig({
 | [`stopOnTerminate`](#param-boolean-stoponterminate-true) | `Boolean` | Optional | `true` | Enable this in order to force a stop() when the application is terminated |
 | [`startOnBoot`](#param-boolean-startonboot-false) | `Boolean` | Optional | `true` | Set to `true` to enable background-tracking after the device reboots. |
 | [`preventSuspend`](#param-boolean-preventsuspend-false) | `Boolean` | Optional **iOS** | `false` | Enable this to prevent **iOS** from suspending.  Must be used in conjunction with a `heartbeatInterval`.  **WARNING**: `preventSuspend` should only be used in **very** specific use-cases and should typically **not** be used as it will have a **very serious impact on battery performance.** |
-| [`heartbeatInterval`](#param-integer-heartbeatinterval-60) | `Integer(seconds)` | Optional **iOS** | `60` | Used in conjunction with `preventSuspend`, an **iOS** app can continue to monitor the accelerometer while in the **stationary-state**.  If the *slightest* movement is detected during a `hearbeatInterval`, the plugin will request a high-accuracy location in order to determine if the device has begun moving.  If the plugin *is* moving, it will immediately switch state to **moving-state**.|
+| [`heartbeatInterval`](#param-integer-heartbeatinterval-60) | `Integer(seconds)` | Optional | `undefined` | Used in conjunction with `preventSuspend`, an **iOS** app can continue to monitor the accelerometer while in the **stationary-state**.  If the *slightest* movement is detected during a `hearbeatInterval`, the plugin will request a high-accuracy location in order to determine if the device has begun moving.  If the plugin *is* moving, it will immediately switch state to **moving-state**.|
 | [`foregroundService`](#param-boolean-foregroundservice-false) | `Boolean` | Optional **Android** | `false` | Make the Android service [run in the foreground](http://developer.android.com/intl/ru/reference/android/app/Service.html#startForeground(int, android.app.Notification)), supplying the ongoing notification to be shown to the user while in this state.  Running as a foreground-service makes the tracking-service **much** more inmmune to OS killing it due to memory/battery pressure.  By default services are background, meaning that if the system needs to kill them to reclaim more memory (such as to display a large page in a web browser).  @see `notificationTitle`, `notificationText` & `notificatinoColor`|
 | [`notificationTitle`](#param-string-notificationtitle-app-name) | `String` | Optional **Android** | App name | When running the service with `foregroundService: true`, Android requires a persistent notification in the Notification Bar.  Defaults to the application name|
 | [`notificationText`](#param-string-notificationtext-location-service-activated) | `String` | Optional **Android** | Location service activated | When running the service with `foregroundService: true`, Android requires a persistent notification in the Notification Bar.|
@@ -90,7 +90,7 @@ bgGeo.setConfig({
 | [`onMotionChange`](#onmotionchangecallbackfn-failurefn) | Fired when the device changes stationary / moving state. |
 | [`onGeofence`](#ongeofencecallbackfn) | Fired when a geofence crossing event occurs |
 | [`onHttp`](#onhttpsuccessfn-failurefn) | Fired after a successful HTTP response. `response` object is provided with `status` and `responseText`|
-| [`onHeartbeat`](#onheartbeatsuccessfn-failurefn) | **iOS only** Fired each `heartbeatInterval` while the plugin is in the **stationary** state with `preventSuspend: true`.  Your callback will be provided with a `params {}` containing the parameters `shakes {Integer}` as well as the current `location {Object}` |
+| [`onHeartbeat`](#onheartbeatsuccessfn-failurefn) | Fired each `heartbeatInterval` while the plugin is in the **stationary** state with (iOS requires `preventSuspend: true` in addition).  Your callback will be provided with a `params {}` containing the parameters `shakes {Integer}` as well as the current `location {Object}` |
 
 ## Methods
 
@@ -342,15 +342,15 @@ iOS cannot immediately engage tracking after a device reboot since it requires e
 **Android**
 Unless you configure the plugin to `forceReload` (ie: boot your app), you should configure the plugin's HTTP features so it can POST to your server in "headless" mode.
 
+####`@param {Integer} heartbeatInterval [undefined]`
+
+Causes a `heartbeat` event to fire each `heartbeatInterval` seconds.  For **iOS**, this must be used in conjunction with `preventSuspend: true`.  **NOTE** The `heartbeat` event will only fire when the device is in the **STATIONARY** state -- it will not fire when the device is moving.
+
 ## iOS Options
 
 ####`@param {Boolean} preventSuspend [false]`
 
 Enable this to prevent **iOS** from suspending after location-services have been switch off.  Must be used in conjunction with a `heartbeatInterval`.  **WARNING**: `preventSuspend` should **only** be used in **very** specific use-cases and should typically **not** be used as it will have a **very serious impact on battery performance.**
-
-####`@param {Integer} heartbeatInterval [60]`
-
-Used in conjunction with `preventSuspend`, an **iOS** app can continue to monitor the accelerometer while in the **stationary-state** (ie: after location-services have been turned off).  If the *slightest* movement is detected during a `hearbeatInterval`, the plugin will request a high-accuracy location in order to determine if the device has begun moving.  If the device *is* moving, it will immediately switch state to **moving-state**.
 
 ## Android Options
 
@@ -365,6 +365,10 @@ If the user closes the application while the background-tracking has been starte
 ####`@param {Boolean} forceReloadOnGeofence [false]`
 
 If the user closes the application while the background-tracking has been started,  location-tracking will continue on if `stopOnTerminate: false`.  You may choose to force the foreground application to reload (since this is where your Javascript runs).  `forceReloadOnGeolocation: true` will reload the app only when a geofence crossing event has occurred.
+
+####`@param {Boolean} forceReloadOnHeartbeat [false]`
+
+If the closes the app with a configured `heartbeatInterval`, `forceReloadOnHeartbeat: true` will cause the foreground application (where your Javascript lives) to reload at the next `heartbeatInterval`.
 
 ####`@param {Boolean} forceReloadOnBoot [false]`
 
@@ -493,10 +497,10 @@ bgGeo.onHttp(function(response) {
 
 ####`onHeartbeat(successFn, failureFn)`
 
-The `successFn` will be executed for each `heartbeatInterval` while the **iOS** app is in **stationary** mode with `{preventSuspend: true}`.  **NOTE** The plugin will **not record any data** while in `preventSuspend` mode -- if you wish to record any data during, you have to do so manually using the `insertLocation` method.  The `successFn` will be provided a single `params {Object}` parameter with the following properties:
+The `successFn` will be executed for each `heartbeatInterval` while the device is in **stationary** state (**iOS** requires `{preventSuspend: true}` as well).  The `successFn` will be provided a single `params {Object}` parameter with the following properties:
 
-######@param {Integer} shakes.  A measure of the device movement.  Shakes is a measure of accelerometer data crossing over a threshold where the device is decided to be moving.  The higher the shakes, the more the device is moving.  When shakes is **0**, the device is completely still.
-######@param {Object} location.  When the plugin detects `shakes > 0`, it will always request a new high-accuracy location in order to determine if the device has moved beyond `stationaryRadius` and if the location has `speed > 0`.  This fresh location will be provided to your `successFn`.  If `shakes == 0`, the current **stationary location** will be provided.
+######@param {Integer} shakes (iOS only).  A measure of the device movement.  Shakes is a measure of accelerometer data crossing over a threshold where the device is decided to be moving.  The higher the shakes, the more the device is moving.  When shakes is **0**, the device is completely still.
+######@param {Object} location.  When the plugin detects `shakes > 0` (iOS only), it will always request a new high-accuracy location in order to determine if the device has moved beyond `stationaryRadius` and if the location has `speed > 0`.  This fresh location will be provided to your `successFn`.  If `shakes == 0`, the current **stationary location** will be provided.  Android will simply return the "last known location"
 
 Example:
 ```
@@ -517,6 +521,11 @@ bgGeo.onHeartbeat(function(params) {
     	console.log('- inserted location during heartbeat');
 	});
 
+    // OR you could request a new location:
+    bgGeo.getCurrentPosition(function(location, taskId) {
+        console.log('- current location: ', location);
+        bgGeo.finish(taskId);
+    });
 }, function(response) {
 	var status = response.status;
 	var responseText = response.responseText;
@@ -629,9 +638,6 @@ An optional location-timeout.  If the timeout expires before a location is retri
 
 ######@param {Integer millis} maximumAge [0]
 Accept the last-recorded-location if no older than supplied value in milliseconds.
-
-######@param {Integer} minimumAccuracy
-Attempt to fetch a location with the supplied minimum accuracy
 
 ######@param {Object} extras
 Optional extra-data to attach to the location.  These `extras {Object}` will be merged to the recorded `location` and persisted / POSTed to your server (if you've configured the HTTP Layer).
