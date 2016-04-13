@@ -346,6 +346,18 @@ Unless you configure the plugin to `forceReload` (ie: boot your app), you should
 
 Causes a `heartbeat` event to fire each `heartbeatInterval` seconds.  For **iOS**, this must be used in conjunction with `preventSuspend: true`.  **NOTE** The `heartbeat` event will only fire when the device is in the **STATIONARY** state -- it will not fire when the device is moving.
 
+```
+bgGeo.onHeartbeat(function(params) {
+    var lastKnownLocation = params.location;
+    console.log('- heartbeat: ', lastKnownLocation);
+    // Or you could request a new location
+    bgGeo.getCurrentPosition(function(location, taskId) {
+        console.log('- current position: ', location);
+        bgGeo.finish(taskId);
+    });
+});
+```
+
 ## iOS Options
 
 ####`@param {Boolean} preventSuspend [false]`
