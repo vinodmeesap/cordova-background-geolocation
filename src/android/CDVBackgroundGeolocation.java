@@ -70,6 +70,7 @@ public class CDVBackgroundGeolocation extends CordovaPlugin {
     public static final String ACTION_SET_CONFIG        = "setConfig";
     public static final String ACTION_ADD_MOTION_CHANGE_LISTENER    = "addMotionChangeListener";
     public static final String ACTION_ADD_LOCATION_LISTENER = "addLocationListener";
+    public static final String ACTION_ADD_HEARTBEAT_LISTENER = "addHeartbeatListener";
     public static final String ACTION_ON_GEOFENCE       = "onGeofence";
     public static final String ACTION_PLAY_SOUND        = "playSound";
     public static final String ACTION_ACTIVITY_RELOAD   = "activityReload";
@@ -105,6 +106,7 @@ public class CDVBackgroundGeolocation extends CordovaPlugin {
     private List<CallbackContext> httpResponseCallbacks = new ArrayList<CallbackContext>();
     private Map<String, CallbackContext> insertLocationCallbacks = new HashMap<String, CallbackContext>();
     private List<CallbackContext> getCountCallbacks = new ArrayList<CallbackContext>();
+    private List<CallbackContext> heartbeatCallbacks = new ArrayList<CallbackContext>();
 
     public static boolean isActive() {
         return gWebView != null;
@@ -123,6 +125,7 @@ public class CDVBackgroundGeolocation extends CordovaPlugin {
 
         Intent launchIntent = activity.getIntent();
         if (launchIntent.hasExtra("forceReload")) {
+            forceReload = true;
             // When Activity is launched due to forceReload, minimize the app.
             activity.moveTaskToBack(true);
         }
@@ -236,6 +239,9 @@ public class CDVBackgroundGeolocation extends CordovaPlugin {
         } else if (ACTION_ADD_HTTP_LISTENER.equalsIgnoreCase(action)) {
             result = true;
             addHttpListener(callbackContext);
+        } else if (ACTION_ADD_HEARTBEAT_LISTENER.equalsIgnoreCase(action)) {
+            result = true;
+            addHeartbeatListener(callbackContext);
         } else if (ACTION_GET_LOG.equalsIgnoreCase(action)) {
             result = true;
             getLog(callbackContext);
@@ -316,6 +322,10 @@ public class CDVBackgroundGeolocation extends CordovaPlugin {
             }
         } else if (startCallback != null) {
             startCallback.success();
+        }
+
+        if (forceReload) {
+            forceReload = false;
         }
         startCallback = null;
     }
@@ -476,17 +486,32 @@ public class CDVBackgroundGeolocation extends CordovaPlugin {
         geofenceCallbacks.add(callbackContext);
 
         Activity activity   = this.cordova.getActivity();
-        Intent launchIntent = activity.getIntent();
-        if (launchIntent.hasExtra("forceReload") && launchIntent.hasExtra("geofencingEvent")) {
-            try {
-                JSONObject geofencingEvent  = new JSONObject(launchIntent.getStringExtra("geofencingEvent"));
-                handleGeofencingEvent(geofencingEvent);
-            } catch (JSONException e) {
-                Log.w(TAG, e);
+
+        if (forceReload) {
+            Intent launchIntent = activity.getIntent();
+            if (launchIntent.hasExtra("geofencingEvent")) {
+                try {
+                    JSONObject geofencingEvent = new JSONObject(launchIntent.getStringExtra("geofencingEvent"));
+                    handleGeofencingEvent(geofencingEvent);
+                } catch (JSONException e) {
+                    Log.w(TAG, e);
+                }
             }
         }
     }
 
+    private void addHeartbeatListener(CallbackContext callbackContext) {
+        heartbeatCallbacks.add(callbackContext);
+
+        if (forceReload) {
+            Intent launchIntent = this.cordova.getActivity().getIntent();
+            Integer eventCode = launchIntent.getIntExtra("eventCode", -1);
+            if (eventCode == BackgroundGeolocationService.FORCE_RELOAD_HEARTBEAT) {
+                onHeartbeat(launchIntent.getExtras());
+            }
+        }           
+    }
+    
     private void addCurrentPositionListener(CallbackContext callbackContext) {
         currentPositionCallbacks.add(callbackContext);
     }
@@ -498,16 +523,12 @@ public class CDVBackgroundGeolocation extends CordovaPlugin {
     private void addMotionChangeListener(CallbackContext callbackContext) {
         motionChangeCallbacks.add(callbackContext);
 
-        Activity activity = this.cordova.getActivity();
-        Intent launchIntent = activity.getIntent();
-
-        if (launchIntent.hasExtra("forceReload")) {
+        if (forceReload) {
+            Intent launchIntent = this.cordova.getActivity().getIntent();
             if (launchIntent.getStringExtra("name").equalsIgnoreCase(BackgroundGeolocationService.ACTION_ON_MOTION_CHANGE)) {
                 Bundle event = launchIntent.getExtras();
                 this.onEventMainThread(event);
             }
-            launchIntent.removeExtra("forceReload");
-            launchIntent.removeExtra("location");
         }
     }
 
@@ -571,9 +592,9 @@ public class CDVBackgroundGeolocation extends CordovaPlugin {
         isEnabled = value;
         isMoving = null;
 
-        Intent launchIntent = activity.getIntent();
 
-        if (launchIntent.hasExtra("forceReload")) {
+        if (forceReload) {
+            Intent launchIntent = activity.getIntent();
             if (launchIntent.hasExtra("location")) {
                 try {
                     JSONObject location = new JSONObject(launchIntent.getStringExtra("location"));
@@ -869,6 +890,8 @@ public class CDVBackgroundGeolocation extends CordovaPlugin {
             this.onInsertLocation(event);
         } else if (name.equalsIgnoreCase(BackgroundGeolocationService.ACTION_GET_COUNT)) {
             this.onGetCount(event);
+        } else if (name.equalsIgnoreCase(BackgroundGeolocationService.ACTION_HEARTBEAT)) {
+            this.onHeartbeat(event);
         }
     }
 
@@ -922,6 +945,26 @@ public class CDVBackgroundGeolocation extends CordovaPlugin {
             callback.success(count);
         }
         getCountCallbacks.clear();
+    }
+
+    private void onHeartbeat(Bundle event) {
+
+        JSONObject params = new JSONObject();
+        try {
+            params.put("shakes", -1);
+            if (event.containsKey("location")) {
+                params.put("location", event.getString("location"));
+            } else {
+                params.put("location", null);
+            }
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+        PluginResult result = new PluginResult(PluginResult.Status.OK, params);
+        result.setKeepCallback(true);
+        for (CallbackContext callback : heartbeatCallbacks) {
+            callback.sendPluginResult(result);
+        }
     }
 
     private void onMotionChange(boolean nowMoving, JSONObject location) {
