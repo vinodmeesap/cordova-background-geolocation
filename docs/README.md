@@ -19,9 +19,9 @@ bgGeo.setConfig({
     desiredAccuracy: 10,
     distanceFilter: 10
 }, function() {
-	console.log('set config success');
-}, {
-	console.log('failed to setConfig');
+    console.log('set config success');
+}, function() {
+    console.log('failed to setConfig');
 });
 
 ```
