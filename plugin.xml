@@ -3,7 +3,7 @@
 <plugin xmlns="http://www.phonegap.com/ns/plugins/1.0"
     xmlns:android="http://schemas.android.com/apk/res/android"
     id="com.transistorsoft.cordova.background-geolocation"
-    version="1.5.1">
+    version="1.6.0">
 
     <name>BackgroundGeolocation</name>
     <description>Sophisticated, battery-efficient background-geolocation plugin for Cordova</description>
@@ -21,6 +21,7 @@
 
     <!-- Cordova 5 npm-style plugin referernce.  Comment this out if you're not using Cordova 5 -->
     <dependency id="cordova-plugin-dialogs" />
+    <dependency id="cordova-plugin-background-fetch" />
 
     <js-module src="www/BackgroundGeolocation.js" name="BackgroundGeolocation">
         <clobbers target="window.BackgroundGeolocation" />
@@ -33,12 +34,14 @@
 
         <source-file src="src/android/CDVBackgroundGeolocation.java" target-dir="src/com/transistorsoft/cordova/bggeo" />
         <source-file src="src/android/BootReceiver.java" target-dir="src/com/transistorsoft/cordova/bggeo" />
-
+        
         <config-file target="AndroidManifest.xml" parent="/manifest/application">
             <service android:name="com.transistorsoft.locationmanager.BackgroundGeolocationService" />
             <service android:name="com.transistorsoft.locationmanager.LocationService" />
             <service android:name="com.transistorsoft.locationmanager.ActivityRecognitionService" />
             <service android:name="com.transistorsoft.locationmanager.GeofenceService" />
+            <service android:name="com.transistorsoft.locationmanager.scheduler.ScheduleService" />
+            <service android:name="com.transistorsoft.locationmanager.scheduler.ScheduleAlarmService" />
             <receiver android:name="com.transistorsoft.cordova.bggeo.BootReceiver">
                 <intent-filter>
                     <action android:name="android.intent.action.BOOT_COMPLETED"/>
@@ -66,8 +69,7 @@
      </platform>          
 
      <platform name="ios">
-        <!-- required background modes:  App registers for location updates -->
-        
+        <!-- required background modes:  App registers for location updates -->        
         <config-file target="*-Info.plist" parent="NSLocationAlwaysUsageDescription">
             <string>App requires background location tracking</string>
         </config-file>

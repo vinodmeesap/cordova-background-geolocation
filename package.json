@@ -1,6 +1,6 @@
 {
   "name": "cordova-background-geolocation",
-  "version": "1.5.1",
+  "version": "1.6.0",
   "description": "Cordova Background Geolocation.  Sophisticated, cross-platform location-tracking plugin.",
   "cordova": {
     "id": "cordova-background-geolocation",
@@ -10,7 +10,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/transistorsoft/cordova-background-geolocation"
+    "url": "https://github.com/transistorsoft/cordova-background-geolocation"
   },
   "keywords": [
     "gps",

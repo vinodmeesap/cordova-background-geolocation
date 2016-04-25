@@ -28,6 +28,8 @@ module.exports = {
                 return this.onMotionChange(success, fail);
             case 'heartbeat':
                 return this.onHeartbeat(success, fail);
+            case 'schedule':
+                return this.onSchedule(success, fail);
         }
     },
 
@@ -66,6 +68,20 @@ module.exports = {
              failure || function() {},
              'BackgroundGeolocation',
              'start',
+             []);
+    },
+    startSchedule: function(success, failure) {
+        exec(success || function() {},
+             failure || function() {},
+             'BackgroundGeolocation',
+             'startSchedule',
+             []);
+    },
+    stopSchedule: function(success, failure) {
+        exec(success || function() {},
+             failure || function() {},
+             'BackgroundGeolocation',
+             'stopSchedule',
              []);
     },
     stop: function(success, failure, config) {
@@ -200,6 +216,13 @@ module.exports = {
             failure || function() {},
             'BackgroundGeolocation',
             'addHeartbeatListener',
+            []);
+    },
+    onSchedule: function(success, failure) {
+        exec(success || function() {},
+            failure || function() {},
+            'BackgroundGeolocation',
+            'addScheduleListener',
             []);
     },
     getLocations: function(success, failure) {
