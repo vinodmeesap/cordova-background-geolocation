@@ -695,13 +695,6 @@ public class CDVBackgroundGeolocation extends CordovaPlugin {
             event.putString("name", BackgroundGeolocationService.ACTION_STOP);
             event.putBoolean("request", true);
             postEvent(event);
-
-            synchronized(eventBus) {
-                if (eventBus.isRegistered(this)) {
-                    eventBus.unregister(this);
-                }
-            }
-            //activity.stopService(backgroundServiceIntent);
             backgroundServiceIntent = null;
         }
     }
@@ -983,15 +976,6 @@ public class CDVBackgroundGeolocation extends CordovaPlugin {
         // Current position has arrived:  release the hounds.
         isAcquiringCurrentPosition = false;
         // When currentPosition is explicitly requested while plugin is stopped, shut Service down again and stop listening to EventBus
-
-        if (!isEnabled) {
-            EventBus eventBus = EventBus.getDefault();
-            synchronized(eventBus) {
-                if (eventBus.isRegistered(this)) {
-                    eventBus.unregister(this);
-                }
-            }
-        }
     }
 
     public void onHttpResponse(Bundle event) {
