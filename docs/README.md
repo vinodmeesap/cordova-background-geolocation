@@ -101,6 +101,8 @@ bgGeo.setConfig({
 | [`setConfig`](#setconfigconfig-successfn-failurefn) | `{config}`, `successFn`, `failureFn` | Re-configure the plugin with new values |
 | [`start`](#startsuccessfn-failurefn) | `callbackFn`| Enable location tracking.  Supplied `callbackFn` will be executed when tracking is successfully engaged.  This is the plugin's power **ON** button.  The plugin will initially start into its **stationary** state, fetching an initial location before turning off location services.  Android will be monitoring its **Activity Recognition System** while iOS will create a stationary geofence around the current location. |
 | [`stop`](#stopsuccessfn-failurefn) | `callbackFn` | Disable location tracking.  Supplied `callbackFn` will be executed when tracking is successfully halted.  This is the plugin's power **OFF** button. |
+| [`startSchedule`](#stopschedulesuccessfn) | `callbackFn` | If a `schedule` was configured, this method will initiate that schedule.  The plugin will automatically be started or stopped according to the configured `schedule`.    Supplied `callbackFn` will be executed once the Scheduler has parsed and initiated your `schedule` |
+| [`stopSchedule`](#stopschedulesuccessfn) | `callbackFn` | This method will stop the Scheduler service.  It will also execute the `#stop` method and **cease all tracking**.  Your `callbackFn` will be executed after the Scheduler has stopped |
 | [`getState`](#getstatesuccessfn) | `callbackFn` | Fetch the current-state of the plugin, including `enabled`, `isMoving`, as well as all other config params |
 | [`getCurrentPosition`](#getcurrentpositionsuccessfn-failurefn-options) | `successFn`, `failureFn`, `{options} | Retrieves the current position. This method instructs the native code to fetch exactly one location using maximum power & accuracy. |
 | [`changePace`](#changepaceenabled-successfn-failurefn) | `isMoving` | Initiate or cancel immediate background tracking. When set to true, the plugin will begin aggressively tracking the devices Geolocation, bypassing stationary monitoring. If you were making a "Jogging" application, this would be your [Start Workout] button to immediately begin GPS tracking. Send false to disable aggressive GPS monitoring and return to stationary-monitoring mode. |
@@ -633,7 +635,7 @@ Disable location tracking.  Supplied `callbackFn` will be executed when tracking
 bgGeo.stop();
 ```
 
-####`startSchedule(successFn, failureFn)`
+####`startSchedule(callbackFn)`
 
 If a `schedule` was configured, this method will initiate that schedule.  The plugin will automatically be started or stopped according to the configured `schedule`.  
 
@@ -643,7 +645,7 @@ bgGeo.startSchedule(function() {
 });
 ```
 
-####`stopSchedule(successFn, failureFn)`
+####`stopSchedule(callbackFn)`
 
 This method will stop the Scheduler service.  It will also execute the `#stop` method and **cease all tracking**.
 
