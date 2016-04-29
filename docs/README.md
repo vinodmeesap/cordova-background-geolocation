@@ -4,7 +4,7 @@
 
 The following **Options** can all be provided to the plugin's `#configure` method:
 
-```
+```Javascript
 bgGeo.configure({
 	desiredAccuracy: 0,
 	distanceFilter: 50,
@@ -76,12 +76,12 @@ bgGeo.setConfig({
 | [`stopOnTerminate`](#param-boolean-stoponterminate-true) | `Boolean` | Optional | `true` | Enable this in order to force a stop() when the application is terminated |
 | [`startOnBoot`](#param-boolean-startonboot-false) | `Boolean` | Optional | `true` | Set to `true` to enable background-tracking after the device reboots. |
 | [`preventSuspend`](#param-boolean-preventsuspend-false) | `Boolean` | Optional **iOS** | `false` | Enable this to prevent **iOS** from suspending.  Must be used in conjunction with a `heartbeatInterval`.  **WARNING**: `preventSuspend` should only be used in **very** specific use-cases and should typically **not** be used as it will have a **very serious impact on battery performance.** |
-| [`heartbeatInterval`](#param-integer-heartbeatinterval-60) | `Integer(seconds)` | Optional **iOS** | `60` | Used in conjunction with `preventSuspend`, an **iOS** app can continue to monitor the accelerometer while in the **stationary-state**.  If the *slightest* movement is detected during a `hearbeatInterval`, the plugin will request a high-accuracy location in order to determine if the device has begun moving.  If the plugin *is* moving, it will immediately switch state to **moving-state**.|
+| [`heartbeatInterval`](#param-integer-heartbeatinterval-undefined) | `Integer(seconds)` | Optional | `undefined` | Causes a `heartbeat` event to fire each `heartbeatInterval` seconds.  For **iOS**, this must be used in conjunction with `preventSuspend: true`.  **NOTE** The `heartbeat` event will only fire when the device is in the **STATIONARY** state -- it will not fire when the device is moving.|
 | [`foregroundService`](#param-boolean-foregroundservice-false) | `Boolean` | Optional **Android** | `false` | Make the Android service [run in the foreground](http://developer.android.com/intl/ru/reference/android/app/Service.html#startForeground(int, android.app.Notification)), supplying the ongoing notification to be shown to the user while in this state.  Running as a foreground-service makes the tracking-service **much** more inmmune to OS killing it due to memory/battery pressure.  By default services are background, meaning that if the system needs to kill them to reclaim more memory (such as to display a large page in a web browser).  @see `notificationTitle`, `notificationText` & `notificatinoColor`|
 | [`notificationTitle`](#param-string-notificationtitle-app-name) | `String` | Optional **Android** | App name | When running the service with `foregroundService: true`, Android requires a persistent notification in the Notification Bar.  Defaults to the application name|
 | [`notificationText`](#param-string-notificationtext-location-service-activated) | `String` | Optional **Android** | Location service activated | When running the service with `foregroundService: true`, Android requires a persistent notification in the Notification Bar.|
 | [`notificationColor`](#param-string-notificationcolor-null) | `String` | Optional **Android** | null | When running the service with `foregroundService: true`, Android requires a persistent notification in the Notification Bar.  Supported formats are: `#RRGGBB` `#AARRGGBB` or one of the following names: 'red', 'blue', 'green', 'black', 'white', 'gray', 'cyan', 'magenta', 'yellow', 'lightgray', 'darkgray', 'grey', 'lightgrey', 'darkgrey', 'aqua', 'fuchsia', 'lime', 'maroon', 'navy', 'olive', 'purple', 'silver', 'teal'.|
-
+| [`schedule`](#param-array-schedule-undefined) | `Array` | Optional | `undefined` | Defines a schedule to automatically start/stop tracking at configured times |
 ## Events
 
 | Event Name | Notes
@@ -90,7 +90,8 @@ bgGeo.setConfig({
 | [`onMotionChange`](#onmotionchangecallbackfn-failurefn) | Fired when the device changes stationary / moving state. |
 | [`onGeofence`](#ongeofencecallbackfn) | Fired when a geofence crossing event occurs |
 | [`onHttp`](#onhttpsuccessfn-failurefn) | Fired after a successful HTTP response. `response` object is provided with `status` and `responseText`|
-| [`onHeartbeat`](#onheartbeatsuccessfn-failurefn) | **iOS only** Fired each `heartbeatInterval` while the plugin is in the **stationary** state with `preventSuspend: true`.  Your callback will be provided with a `params {}` containing the parameters `shakes {Integer}` as well as the current `location {Object}` |
+| [`onHeartbeat`](#onheartbeatsuccessfn-failurefn) | Fired each `heartbeatInterval` while the plugin is in the **stationary** state with (iOS requires `preventSuspend: true` in addition).  Your callback will be provided with a `params {}` containing the parameters `shakes {Integer}` as well as the current `location {Object}` |
+| [`onSchedule`](#onschedulecallbackFn) | Fired when a schedule event occurs.  Your `callbackFn` will be provided with the current `state` Object. | 
 
 ## Methods
 
@@ -305,7 +306,7 @@ Optional HTTP params sent along in HTTP request to above `#url`.
 Optional arbitrary key/value `{}` to attach to each recorded location
 
 Eg: Every recorded location will have the following `extras` appended:
-```
+```Javascript
 bgGeo.configure({
     .
     .
@@ -342,15 +343,27 @@ iOS cannot immediately engage tracking after a device reboot since it requires e
 **Android**
 Unless you configure the plugin to `forceReload` (ie: boot your app), you should configure the plugin's HTTP features so it can POST to your server in "headless" mode.
 
+####`@param {Integer} heartbeatInterval [undefined]`
+
+Causes a `heartbeat` event to fire each `heartbeatInterval` seconds.  For **iOS**, this must be used in conjunction with `preventSuspend: true`.  **NOTE** The `heartbeat` event will only fire when the device is in the **STATIONARY** state -- it will not fire when the device is moving.
+
+```Javascript
+bgGeo.onHeartbeat(function(params) {
+    var lastKnownLocation = params.location;
+    console.log('- heartbeat: ', lastKnownLocation);
+    // Or you could request a new location
+    bgGeo.getCurrentPosition(function(location, taskId) {
+        console.log('- current position: ', location);
+        bgGeo.finish(taskId);
+    });
+});
+```
+
 ## iOS Options
 
 ####`@param {Boolean} preventSuspend [false]`
 
 Enable this to prevent **iOS** from suspending after location-services have been switch off.  Must be used in conjunction with a `heartbeatInterval`.  **WARNING**: `preventSuspend` should **only** be used in **very** specific use-cases and should typically **not** be used as it will have a **very serious impact on battery performance.**
-
-####`@param {Integer} heartbeatInterval [60]`
-
-Used in conjunction with `preventSuspend`, an **iOS** app can continue to monitor the accelerometer while in the **stationary-state** (ie: after location-services have been turned off).  If the *slightest* movement is detected during a `hearbeatInterval`, the plugin will request a high-accuracy location in order to determine if the device has begun moving.  If the device *is* moving, it will immediately switch state to **moving-state**.
 
 ## Android Options
 
@@ -365,6 +378,10 @@ If the user closes the application while the background-tracking has been starte
 ####`@param {Boolean} forceReloadOnGeofence [false]`
 
 If the user closes the application while the background-tracking has been started,  location-tracking will continue on if `stopOnTerminate: false`.  You may choose to force the foreground application to reload (since this is where your Javascript runs).  `forceReloadOnGeolocation: true` will reload the app only when a geofence crossing event has occurred.
+
+####`@param {Boolean} forceReloadOnHeartbeat [false]`
+
+If the closes the app with a configured `heartbeatInterval`, `forceReloadOnHeartbeat: true` will cause the foreground application (where your Javascript lives) to reload at the next `heartbeatInterval`.
 
 ####`@param {Boolean} forceReloadOnBoot [false]`
 
@@ -386,6 +403,29 @@ When running the service with `foregroundService: true`, Android requires a pers
 
 When running the service with `foregroundService: true`, Android requires a persistent notification in the Notification Bar.  This will configure the **color** of the notification icon (API >= 21).Supported formats are: `#RRGGBB` `#AARRGGBB` or one of the following names: 'red', 'blue', 'green', 'black', 'white', 'gray', 'cyan', 'magenta', 'yellow', 'lightgray', 'darkgray', 'grey', 'lightgrey', 'darkgrey', 'aqua', 'fuchsia', 'lime', 'maroon', 'navy', 'olive', 'purple', 'silver', 'teal'.
 
+####`@param {Array} schedule [undefined]`
+
+Provides an automated schedule for the plugin to start/stop tracking at pre-defined times.  The format is cron-like:
+
+```Javascript
+  "{DAY(s)} {START_TIME}-{END_TIME}"
+```
+
+The `DAY` param *should* respect your current Locale (eg: Sunday: 1; Saturday: 7).  You may configure a single day (eg: `1`), a comma-separated list-of-days (eg: `2,4,6`) or a range (eg: `2-6`).
+
+Eg:
+```Javascript
+bgGeo.configure({
+  schedule: [
+    '1 10:00-15:00',      // Sun, 10am-3pm
+    '2-6 9:00-17:00',     // Mon-Fri, 9am-5pm
+    '2,4,6 20:00-21:00',  // Multiple schedules in a day (must not overlap)
+    '7 16:45-1:00'        // Can run into following day: 4:45pm-1am
+  ];
+})
+
+```
+
 # Events
 
 ####`onLocation(successFn, failureFn)`
@@ -394,7 +434,7 @@ Your `successFn` will be called with the following signature whenever a new loca
 ######@param {Object} location The Location data (@see Wiki for [Location Data Schema](../../../wiki/Location-Data-Schema))
 ######@param {Integer} taskId The taskId used to send to bgGeo.finish(taskId) in order to signal completion of your callbackFn
 
-```
+```Javascript
 bgGeo.onLocation(function(location, taskId) {
     
     var coords      = location.coords,
@@ -430,7 +470,7 @@ Your ```callbackFn``` will be executed each time the device has changed-state be
 ######@param {Object} location The location at the state-change.
 ######@param {Integer} taskId The taskId used to send to bgGeo.finish(taskId) in order to signal completion of your callbackFn
 
-```
+```Javascript
 bgGeo.onMotionChange(function(isMoving, location, taskId) {
     if (isMoving) {
         console.log('Device has just started MOVING', location);
@@ -448,7 +488,7 @@ Adds a geofence event-listener.  Your supplied callback will be called when any 
 ######@param {Object} params.  This object contains 2 keys: `@param {String} identifier`, `@param {String} action [ENTER|EXIT]` and `@param {Object} location`.
 ######@param {Integer} taskId The background taskId which you must send back to the native plugin via `bgGeo.finish(taskId)` in order to signal that your callback is complete.
 
-```
+```Javascript
 bgGeo.onGeofence(function(params, taskId) {
     try {
         var location = params.location;
@@ -476,7 +516,7 @@ The `successFn` will be executed for each successful HTTP request.  `failureFn` 
 ######@param {String} responseText The HTTP response as text.
 
 Example:
-```
+```Javascript
 bgGeo.onHttp(function(response) {
 	var status = response.status;
 	var responseText = response.responseText;
@@ -493,13 +533,13 @@ bgGeo.onHttp(function(response) {
 
 ####`onHeartbeat(successFn, failureFn)`
 
-The `successFn` will be executed for each `heartbeatInterval` while the **iOS** app is in **stationary** mode with `{preventSuspend: true}`.  **NOTE** The plugin will **not record any data** while in `preventSuspend` mode -- if you wish to record any data during, you have to do so manually using the `insertLocation` method.  The `successFn` will be provided a single `params {Object}` parameter with the following properties:
+The `successFn` will be executed for each `heartbeatInterval` while the device is in **stationary** state (**iOS** requires `{preventSuspend: true}` as well).  The `successFn` will be provided a single `params {Object}` parameter with the following properties:
 
-######@param {Integer} shakes.  A measure of the device movement.  Shakes is a measure of accelerometer data crossing over a threshold where the device is decided to be moving.  The higher the shakes, the more the device is moving.  When shakes is **0**, the device is completely still.
-######@param {Object} location.  When the plugin detects `shakes > 0`, it will always request a new high-accuracy location in order to determine if the device has moved beyond `stationaryRadius` and if the location has `speed > 0`.  This fresh location will be provided to your `successFn`.  If `shakes == 0`, the current **stationary location** will be provided.
+######@param {Integer} shakes (iOS only).  A measure of the device movement.  Shakes is a measure of accelerometer data crossing over a threshold where the device is decided to be moving.  The higher the shakes, the more the device is moving.  When shakes is **0**, the device is completely still.
+######@param {Object} location.  When the plugin detects `shakes > 0` (iOS only), it will always request a new high-accuracy location in order to determine if the device has moved beyond `stationaryRadius` and if the location has `speed > 0`.  This fresh location will be provided to your `successFn`.  If `shakes == 0`, the current **stationary location** will be provided.  Android will simply return the "last known location"
 
 Example:
-```
+```Javascript
 bgGeo.onHeartbeat(function(params) {
 	console.log('- hearbeat');
 
@@ -517,10 +557,29 @@ bgGeo.onHeartbeat(function(params) {
     	console.log('- inserted location during heartbeat');
 	});
 
+    // OR you could request a new location:
+    bgGeo.getCurrentPosition(function(location, taskId) {
+        console.log('- current location: ', location);
+        bgGeo.finish(taskId);
+    });
 }, function(response) {
 	var status = response.status;
 	var responseText = response.responseText;
 	console.log("- HTTP failure: ", status, responseText);
+})
+```
+
+####`onSchedule(successFn, failureFn)`
+
+The `successFn` will be executed for each time a `schedule` event occurs.  Your `successFn` will be provided with the current `state` object (@see `#getState`).  `state.enabled` will reflect the state according to your configured `schedule`.
+
+######@param {Object} State
+
+Example:
+```Javascript
+bgGeo.onSchedule(function(state) {
+    console.log('- A schedule event fired: ', state.enabled);
+    console.log('- Current state: ', state);
 })
 ```
 
@@ -530,7 +589,7 @@ bgGeo.onHeartbeat(function(params) {
 
 Configures the plugin's parameters.  The `success` callback will be executed after the plugin has successfully configured.  The `success` callback will be provided with the current `state` Object as the 1st parameter.
 
-```
+```Javascript
 bgGeo.configure({
   desiredAccuracy: 0,
   distanceFilter: 50,
@@ -547,7 +606,7 @@ bgGeo.configure({
 ####`setConfig(config, successFn, failureFn)`
 Re-configure plugin's configuration parameters.
 
-```
+```Javascript
 bgGeo.setConfig({
     desiredAccuracy: 10,
     distanceFilter: 100
@@ -560,25 +619,45 @@ bgGeo.setConfig({
 
 ####`start(successFn, failureFn)`
 
-Enable location tracking.  Supplied `callbackFn` will be executed when tracking is successfully engaged.  This is the plugin's power **ON** button.  The plugin will initially start into its **stationary** state, fetching an initial location before turning off location services.  Android will be monitoring its **Activity Recognition System** while iOS will create a stationary geofence around the current location.
+Enable location tracking.  Supplied `callbackFn` will be executed when tracking is successfully engaged.  This is the plugin's power **ON** button.  The plugin will initially start into its **stationary** state, fetching an initial location before turning off location services.  Android will be monitoring its **Activity Recognition System** while iOS will create a stationary geofence around the current location.  **NOTE** If you've configured a `schedule`, this method will override that schedule and engage tracking immediately.
 
-```
+```Javascript
 bgGeo.start()
 ```
 
 ####`stop(successFn, failureFn)`
 
-Disable location tracking.  Supplied `callbackFn` will be executed when tracking is successfully halted.  This is the plugin's power **OFF** button. |
+Disable location tracking.  Supplied `callbackFn` will be executed when tracking is successfully halted.  This is the plugin's power **OFF** button.  **NOTE** If you've configured a `schedule`, this method will cease that schedule as well.
 
-```
+```Javascript
 bgGeo.stop();
+```
+
+####`startSchedule(successFn, failureFn)`
+
+If a `schedule` was configured, this method will initiate that schedule.  The plugin will automatically be started or stopped according to the configured `schedule`.  
+
+```Javascript
+bgGeo.startSchedule(function() {
+    console.log('- Scheduler started');
+});
+```
+
+####`stopSchedule(successFn, failureFn)`
+
+This method will stop the Scheduler service.  It will also execute the `#stop` method and **cease all tracking**.
+
+```Javascript
+bgGeo.stopSchedule(function() {
+    console.log('- Scheduler stopped');
+});
 ```
 
 ####`getState(successFn)`
 
 Fetch the current-state of the plugin, including all configuration parameters.
 
-```
+```Javascript
 bgGeo.getState(function(state) {
   console.log(JSON.stringify(state));
 });
@@ -630,9 +709,6 @@ An optional location-timeout.  If the timeout expires before a location is retri
 ######@param {Integer millis} maximumAge [0]
 Accept the last-recorded-location if no older than supplied value in milliseconds.
 
-######@param {Integer} minimumAccuracy
-Attempt to fetch a location with the supplied minimum accuracy
-
 ######@param {Object} extras
 Optional extra-data to attach to the location.  These `extras {Object}` will be merged to the recorded `location` and persisted / POSTed to your server (if you've configured the HTTP Layer).
 
@@ -641,7 +717,7 @@ Optional extra-data to attach to the location.  These `extras {Object}` will be 
 ######@param {Object} location The Location data
 ######@param {Integer} taskId The taskId used to send to bgGeo.finish(taskId) in order to signal completion of your callbackFn
 
-```
+```Javascript
 bgGeo.getCurrentPosition(function(location, taskId) {
     // This location is already persisted to plugin’s SQLite db.  
     // If you’ve configured #autoSync: true, the HTTP POST has already started.
@@ -681,7 +757,7 @@ If a location failed to be retrieved, you `failureFn` will be executed with an e
 
 Eg:
 
-```
+```Javascript
 bgGeo.getLocation(succesFn, function(errorCode) {
 	switch (errorCode) {
 		case 0:
@@ -715,7 +791,7 @@ Adds a geofence to be monitored by the native plugin.  Monitoring of a geofence 
 ######@config {Boolean} notifyOnDwell (Android only) Whether to listen to DWELL events
 ######@config {Integer milliseconds} loiteringDelay (Android only) When `notifyOnDwell` is `true`, the delay before DWELL event is fired after entering a geofence.
 
-```
+```Javascript
 bgGeo.addGeofence({
     identifier: "Home",
     radius: 150,
@@ -744,7 +820,7 @@ Adds a list of geofences to be monitored by the native plugin.  Monitoring of a 
 ######@config {Boolean} notifyOnDwell (Android only) Whether to listen to DWELL events
 ######@config {Integer milliseconds} loiteringDelay (Android only) When `notifyOnDwell` is `true`, the delay before DWELL event is fired after entering a geofence.
 
-```
+```Javascript
 bgGeo.addGeofences([{
     identifier: "Home",
     radius: 150,
@@ -768,7 +844,7 @@ Removes a geofence having the given `{String} identifier`.
 ######@config {Function} callbackFn successfully removed geofence.
 ######@config {Function} failureFn failed to remove geofence
 
-```
+```Javascript
 bgGeo.removeGeofence("Home", function() {
     console.log("Successfully removed geofence");
 }, function(error) {
@@ -782,7 +858,7 @@ Removes all geofences.
 ######@config {Function} callbackFn successfully removed geofences.
 ######@config {Function} failureFn failed to remove geofences
 
-```
+```Javascript
 bgGeo.removeGeofences(function() {
     console.log("Successfully removed alll geofences");
 }, function(error) {
@@ -794,7 +870,7 @@ bgGeo.removeGeofences(function() {
 
 Fetch the list of monitored geofences.  Your `callbackFn` will be provided with an `Array` of geofences.  If there are no geofences being monitored, you'll receive an empty Array `[]`.
 
-```
+```Javascript
 bgGeo.getGeofences(function(geofences) {
     for (var n=0,len=geofences.length;n<len;n++) {
         console.log("Geofence: ", geofence.identifier, geofence.radius, geofence.latitude, geofence.longitude);
@@ -813,7 +889,7 @@ The `callbackFn` will be executed with following params:
 ######@param {Integer} taskId The background taskId which you must send back to the native plugin via `bgGeo.finish(taskId)` in order to signal the end of your background thread.
 
 
-```
+```Javascript
     bgGeo.getLocations(function(locations, taskId) {
         try {
             console.log("locations: ", locations);
@@ -829,7 +905,7 @@ Fetches count of SQLite locations table `SELECT count(*) from locations`.  The `
 
 ######@param {Integer} count
 
-```
+```Javascript
     bgGeo.getCount(function(count) {
         console.log('- count: ', count);
     });
@@ -840,7 +916,7 @@ Manually insert a location into the native plugin's SQLite database.  Your ```ca
 
 ######@param {Object} params.  The location params/object matching the [Location Data Schema](wiki/Location-Data-Schema).
 
-```
+```Javascript
     bgGeo.insertLocation({
 		"uuid": "f8424926-ff3e-46f3-bd48-2ec788c9e761",	// <-- required
 		"coords": {										// <-- required
@@ -874,7 +950,7 @@ Manually insert a location into the native plugin's SQLite database.  Your ```ca
 ####`clearDatabase(callbackFn, failureFn)`
 Remove all records in plugin's SQLite database.
 
-```
+```Javascript
     bgGeo.clearDatabase(function() {
       console.log('- cleared database'); 
     });
@@ -889,7 +965,7 @@ Your callback will be provided with the following params
 ######@param {Array} locations.  The list of locations stored in SQLite database.
 ######@param {Integer} taskId The background taskId which you must send back to the native plugin via `bgGeo.finish(taskId)` in order to signal the end of your background thread.
 
-```
+```Javascript
     bgGeo.sync(function(locations, taskId) {
         try {
         	// Here are all the locations from the database.  The database is now EMPTY.
@@ -910,7 +986,7 @@ Your callback will be provided with the following params
 
 The plugin constantly tracks distance travelled.  To fetch the current **odometer** reading:
 
-```
+```Javascript
     bgGeo.getOdometer(function(distance) {
         console.log("Distance travelled: ", distance);
     });
@@ -924,7 +1000,7 @@ Reset the **odometer** to zero.  The plugin never automatically resets the odome
 
 Here's a fun one.  The plugin can play a number of OS system sounds for each platform.  For [IOS](http://iphonedevwiki.net/index.php/AudioServices) and [Android](http://developer.android.com/reference/android/media/ToneGenerator.html).  I offer this API as-is, it's up to you to figure out how this works.
 
-```
+```Javascript
     // A soundId iOS recognizes
     bgGeo.playSound(1303);
     
@@ -936,7 +1012,7 @@ Here's a fun one.  The plugin can play a number of OS system sounds for each pla
 
 Fetches the entire contents of the current circular-log and return it as a String.
 
-```
+```Javascript
     bgGeo.getLog(function(log) {
         console.log(log);
     });
@@ -946,7 +1022,7 @@ Fetches the entire contents of the current circular-log and return it as a Strin
 
 Fetch the entire contents of the current circular log and email it to a recipient using the device's native email client.
 
-```
+```Javascript
     bgGeo.emailLog("foo@bar.com");
 ```
 
@@ -954,7 +1030,7 @@ Fetch the entire contents of the current circular log and email it to a recipien
 
 1. The following permissions are required in your `AndroidManifest.xml` in order to attach the `.log` file to the email:
 
-```
+```xml
 <manifest>
   <application>
   ...
