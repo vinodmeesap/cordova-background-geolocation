@@ -1303,14 +1303,18 @@ public class CDVBackgroundGeolocation extends CordovaPlugin {
 
         Activity activity = this.cordova.getActivity();
 
+        if(stopOnTerminate) {
+            if (isEnabled) {
+                Intent intent = new Intent(activity, BackgroundGeolocationService.class);
+                activity.stopService(intent);
+            }
+            stopScheduleService();
+        }
         EventBus eventBus = EventBus.getDefault();
         synchronized(eventBus) {
             if (eventBus.isRegistered(this)) {
                 eventBus.unregister(this);
             }
-        }
-        if(isEnabled && stopOnTerminate) {
-            this.cordova.getActivity().stopService(backgroundServiceIntent);
         }
     }
 }
