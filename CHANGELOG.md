@@ -2,6 +2,7 @@
 # Change Log
 
 ## [Unreleased]
+- Implement new Scheduling feature for iOS and Android.
 
 ## [1.5.1] - 2016-04-12
 - [Added] ios logic to handle being launched in the background (by a background-fetch event, for example).  When launched in the background, iOS will essentially do a `changePace(true)` upon itself and let the stop-detection system determine engage stationary-mode as detected.

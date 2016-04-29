@@ -10,7 +10,7 @@
     NSDictionary *config;
 }
 
-@synthesize syncCallbackId, syncTaskId, locationListeners, geofenceListeners, motionChangeListeners, currentPositionListeners, httpListeners, heartbeatListeners;
+@synthesize syncCallbackId, syncTaskId, locationListeners, geofenceListeners, motionChangeListeners, currentPositionListeners, httpListeners, heartbeatListeners, scheduleListeners;
 
 - (void)pluginInitialize
 {
@@ -24,6 +24,7 @@
     bgGeo.syncCompleteBlock     = [self createSyncCompleteHandler];
     bgGeo.httpResponseBlock     = [self createHttpResponseHandler];
     bgGeo.errorBlock            = [self createErrorHandler];
+    bgGeo.scheduleBlock         = [self createScheduleHandler];
     
     locationListeners   = [NSMutableArray new];
 }
@@ -89,6 +90,22 @@
     CDVPluginResult* result = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsBool: false];
     [self.commandDelegate sendPluginResult:result callbackId:command.callbackId];
 }
+
+- (void) startSchedule:(CDVInvokedUrlCommand*)command
+{
+    [bgGeo startSchedule];
+    CDVPluginResult* result = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsBool: false];
+    [self.commandDelegate sendPluginResult:result callbackId:command.callbackId];
+}
+
+- (void) stopSchedule:(CDVInvokedUrlCommand*)command
+{
+    [bgGeo stopSchedule];
+    CDVPluginResult* result = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsBool: false];
+    [self.commandDelegate sendPluginResult:result callbackId:command.callbackId];
+}
+
+
 - (void) getOdometer:(CDVInvokedUrlCommand*)command
 {
     CDVPluginResult* result = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsDouble: bgGeo.odometer];
@@ -196,6 +213,14 @@
         heartbeatListeners = [[NSMutableArray alloc] init];
     }
     [heartbeatListeners addObject:command.callbackId];
+}
+
+- (void) addScheduleListener:(CDVInvokedUrlCommand*)command
+{
+    if (scheduleListeners == nil) {
+        scheduleListeners = [[NSMutableArray alloc] init];
+    }
+    [scheduleListeners addObject:command.callbackId];
 }
 
 - (void) addGeofence:(CDVInvokedUrlCommand*)command
@@ -553,6 +578,18 @@
             for (NSString *callbackId in self.locationListeners) {
                 [self.commandDelegate sendPluginResult:result callbackId:callbackId];
             }
+        }
+    };
+}
+
+-(void (^)(TSSchedule *schedule)) createScheduleHandler {
+    return ^(TSSchedule *schedule) {
+        NSLog(@" - CDVBackgroundGeolocation captured Schedule event: %@", schedule);
+        NSDictionary *state = [bgGeo getState];
+        CDVPluginResult *result = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsDictionary:state];
+        [result setKeepCallbackAsBool:YES];
+        for (NSString *callbackId in self.scheduleListeners) {
+            [self.commandDelegate sendPluginResult:result callbackId:callbackId];
         }
     };
 }
