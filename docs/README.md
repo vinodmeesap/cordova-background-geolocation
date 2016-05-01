@@ -369,19 +369,53 @@ Provides an automated schedule for the plugin to start/stop tracking at pre-defi
   "{DAY(s)} {START_TIME}-{END_TIME}"
 ```
 
-The `DAY` param *should* respect your current Locale (eg: Sunday: 1; Saturday: 7).  You may configure a single day (eg: `1`), a comma-separated list-of-days (eg: `2,4,6`) or a range (eg: `2-6`).
+The `DAY` param *should* respect your current Locale (eg: Sunday: 1; Saturday: 7).  You may configure a single day (eg: `1`), a comma-separated list-of-days (eg: `2,4,6`) or a range (eg: `2-6`), eg:
 
-Eg:
 ```Javascript
 bgGeo.configure({
+  .
+  .
+  .
   schedule: [
-    '1 10:00-15:00',      // Sun, 10am-3pm
-    '2-6 9:00-17:00',     // Mon-Fri, 9am-5pm
-    '2,4,6 20:00-21:00',  // Multiple schedules in a day (must not overlap)
-    '7 16:45-1:00'        // Can run into following day: 4:45pm-1am
-  ];
-})
+    '1 17:30-21:00',   // Sunday: 5:30-9:00
+    '2-6 9:00-17:00',  // Mon-Fri: 9am to 5pm
+    '2,4,6 20:00-12:00',// Mon, Web, Fri: 8pm to midnight (next day)
+    '7 10:00-19:00'    // Sun: 10am-7pm
+  ]
+}, function(state) {
+    // Start the Scheduler
+    bgGeo.startSchedule(function() {
+        console.info('- Scheduler started');
+    });
+});
 
+// Listen to "schedule" events:
+bgGeo.on('schedule', function(state) {
+  console.log('- Schedule event, enabled:', state.enabled);
+  
+  if (state.enabled) {
+    // tracking started!
+  } else {
+    // tracking stopped
+  }
+});
+
+// Later when you want to stop the Scheduler (eg: user logout)
+bgGeo.stopSchedule(function() {
+  console.info('- Scheduler stopped');
+});
+
+// Or modify the schedule with usual #setConfig method
+bgGeo.setConfig({
+  schedule: [
+    '1-7 9:00-10:00',
+    '1-7 11:00-12:00',
+    '1-7 13:00-14:00',
+    '1-7 15:00-16:00',
+    '1-7 17:00-18:00',
+    '2,4,6 19:00-22:00'
+  ]
+});
 ```
 
 ## iOS Options
