@@ -33,6 +33,7 @@ import android.os.Bundle;
 import com.google.android.gms.common.GoogleApiAvailability;
 import com.google.android.gms.location.DetectedActivity;
 import com.google.android.gms.location.GeofencingEvent;
+import com.google.android.gms.location.ActivityRecognitionResult;
 
 import android.app.AlertDialog;
 import android.content.DialogInterface;
@@ -1095,6 +1096,16 @@ public class CDVBackgroundGeolocation extends CordovaPlugin {
         for (CallbackContext callback : scheduleCallbacks) {
             callback.sendPluginResult(result);
         }
+    }
+
+    /**
+     * EventBus listener for ARS
+     * @param {ActivityRecognitionResult} result
+     */
+    @Subscribe
+    public void onEventMainThread(ActivityRecognitionResult result) {
+        currentActivity = result.getMostProbableActivity();
+        // TODO Could add a new event here #activity and send ActivityRecognitionResult info to Javascript.
     }
 
     /**
