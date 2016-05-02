@@ -285,10 +285,16 @@ public class CDVBackgroundGeolocation extends CordovaPlugin {
 
     private void configure(JSONObject config, CallbackContext callbackContext) {
         mConfig = config;
+        Settings.reset();
         boolean result = applyConfig();
         if (result) {
-
-            boolean willEnable = Settings.getEnabled() && !Settings.getSchedulerEnabled();
+            Boolean willEnable = false;
+            if (Settings.values.containsKey("schedule")) {
+                willEnable = Settings.getEnabled() && Settings.getSchedulerEnabled();
+            } else {
+                Settings.setSchedulerEnabled(false);
+                willEnable = Settings.getEnabled();
+            }
             if (willEnable) {
                 start(null);
             }
@@ -776,6 +782,7 @@ public class CDVBackgroundGeolocation extends CordovaPlugin {
         }
         editor.putString("config", mConfig.toString());
         editor.apply();
+        Settings.load();
 
         return true;
     }
