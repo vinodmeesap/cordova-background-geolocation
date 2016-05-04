@@ -1,8 +1,8 @@
 package com.transistorsoft.cordova.bggeo;
 
 import com.transistorsoft.locationmanager.*;
-import com.transistorsoft.locationmanager.scheduler.ScheduleService;
-import com.transistorsoft.locationmanager.scheduler.ScheduleEvent;
+import com.transistorsoft.locationmanager.scheduler.*;
+import com.transistorsoft.locationmanager.settings.*;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -1033,7 +1033,7 @@ public class CDVBackgroundGeolocation extends CordovaPlugin {
         try {
             params.put("shakes", -1);
             if (event.containsKey("location")) {
-                params.put("location", event.getString("location"));
+                params.put("location", new JSONObject(event.getString("location")));
             } else {
                 params.put("location", null);
             }
