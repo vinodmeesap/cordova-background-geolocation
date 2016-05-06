@@ -2,7 +2,12 @@
 # Change Log
 
 ## [Unreleased]
-- Implement new Scheduling feature for iOS and Android.
+- [Added] Implement new Scheduling feature for iOS and Android.
+- [Fixed] Bugs in iOS option `useSignificantChangesOnly`
+- [Changed] Refactor HTTP Layer for both iOS and Android to stop spamming server when it returns an error (used to keep iterating through the entire queue).  It will now stop syncing as soon as server returns an error (good for throttling servers).
+- [Added] Migrate iOS settings-management to new Settings service
+- [Fixed] bugs in Scheduler
+- [Fixed] Fix bug where Android was not JSON decoding the location object sent to heartbeat event #646
 
 ## [1.5.1] - 2016-04-12
 - [Added] ios logic to handle being launched in the background (by a background-fetch event, for example).  When launched in the background, iOS will essentially do a `changePace(true)` upon itself and let the stop-detection system determine engage stationary-mode as detected.
