@@ -1,6 +1,7 @@
 package com.transistorsoft.cordova.bggeo;
 import com.transistorsoft.locationmanager.*;
-import com.transistorsoft.locationmanager.scheduler.*;
+import com.transistorsoft.locationmanager.settings.*; 
+import com.transistorsoft.locationmanager.scheduler.*; 
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;

@@ -108,7 +108,7 @@
 
 - (void) getOdometer:(CDVInvokedUrlCommand*)command
 {
-    CDVPluginResult* result = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsDouble: bgGeo.odometer];
+    CDVPluginResult* result = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsDouble: [bgGeo getOdometer]];
     [self.commandDelegate sendPluginResult:result callbackId:command.callbackId];
 }
 
