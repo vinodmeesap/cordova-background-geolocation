@@ -8,6 +8,7 @@
 - [Added] Migrate iOS settings-management to new Settings service
 - [Fixed] bugs in Scheduler
 - [Fixed] Fix bug where Android was not JSON decoding the location object sent to heartbeat event #646
+- [Added] Better BackgroundFetch plugin integration.  Background-fetch will perform fetch the location-state when a fetch event fires.  This may help to trigger stationary-exit
 
 ## [1.5.1] - 2016-04-12
 - [Added] ios logic to handle being launched in the background (by a background-fetch event, for example).  When launched in the background, iOS will essentially do a `changePace(true)` upon itself and let the stop-detection system determine engage stationary-mode as detected.
