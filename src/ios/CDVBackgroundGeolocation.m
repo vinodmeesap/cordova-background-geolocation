@@ -42,9 +42,9 @@
     [self.locationListeners addObject:command.callbackId];
     
     config = [command.arguments objectAtIndex:0];
-    [bgGeo configure:config];
+    NSDictionary *state = [bgGeo configure:config];
     
-    CDVPluginResult* result = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsDictionary:[bgGeo getState]];
+    CDVPluginResult* result = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsDictionary:state];
     
     [self.commandDelegate sendPluginResult:result callbackId:command.callbackId];
 }
