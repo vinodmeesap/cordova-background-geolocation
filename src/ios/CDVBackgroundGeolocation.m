@@ -502,11 +502,12 @@
     };
 }
 
--(void (^)(int shakeCount, CLLocation *location)) createHeartbeatHandler {
-    return ^(int shakeCount, CLLocation *location) {
+-(void (^)(int shakeCount, NSString* motionType, CLLocation *location)) createHeartbeatHandler {
+    return ^(int shakeCount, NSString* motionType, CLLocation *location) {
 
         NSDictionary *params = @{
             @"shakes": @(shakeCount),
+            @"motionType": motionType,
             @"location": [bgGeo locationToDictionary:location]
         };
 
