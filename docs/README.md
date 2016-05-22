@@ -90,7 +90,7 @@ bgGeo.setConfig({
 | [`onMotionChange`](#onmotionchangecallbackfn-failurefn) | Fired when the device changes stationary / moving state. |
 | [`onGeofence`](#ongeofencecallbackfn) | Fired when a geofence crossing event occurs |
 | [`onHttp`](#onhttpsuccessfn-failurefn) | Fired after a successful HTTP response. `response` object is provided with `status` and `responseText`|
-| [`onHeartbeat`](#onheartbeatsuccessfn-failurefn) | Fired each `heartbeatInterval` while the plugin is in the **stationary** state with (iOS requires `preventSuspend: true` in addition).  Your callback will be provided with a `params {}` containing the parameters `shakes {Integer}` as well as the current `location {Object}` |
+| [`onHeartbeat`](#onheartbeatsuccessfn-failurefn) | Fired each `heartbeatInterval` while the plugin is in the **stationary** state with (iOS requires `preventSuspend: true` in addition).  Your callback will be provided with a `params {}` containing the parameters `shakes {Integer}`, `motionType {String}` and current location object `location {Object}` |
 | [`onSchedule`](#onschedulecallbackFn) | Fired when a schedule event occurs.  Your `callbackFn` will be provided with the current `state` Object. | 
 
 ## Methods
@@ -572,6 +572,7 @@ bgGeo.onHttp(function(response) {
 The `successFn` will be executed for each `heartbeatInterval` while the device is in **stationary** state (**iOS** requires `{preventSuspend: true}` as well).  The `successFn` will be provided a single `params {Object}` parameter with the following properties:
 
 ######@param {Integer} shakes (iOS only).  A measure of the device movement.  Shakes is a measure of accelerometer data crossing over a threshold where the device is decided to be moving.  The higher the shakes, the more the device is moving.  When shakes is **0**, the device is completely still.
+######@param {String} motionType.  The current motion-type `still, on_foot, running, on_bicycle, in_vehicle, shaking, unknown`
 ######@param {Object} location.  When the plugin detects `shakes > 0` (iOS only), it will always request a new high-accuracy location in order to determine if the device has moved beyond `stationaryRadius` and if the location has `speed > 0`.  This fresh location will be provided to your `successFn`.  If `shakes == 0`, the current **stationary location** will be provided.  Android will simply return the "last known location"
 
 Example:
@@ -741,10 +742,10 @@ If an error occurs while fetching the location, the `failureFn` will be executed
 
 ######@param {Integer} timeout [30]
 An optional location-timeout.  If the timeout expires before a location is retrieved, the `failureFn` will be executed.
-
 ######@param {Integer millis} maximumAge [0]
 Accept the last-recorded-location if no older than supplied value in milliseconds.
-
+######@param {Boolean} persist [true]
+Defaults to `true`.  Set `false` to disable persisting the retrieved location in the plugin's SQLite database.
 ######@param {Object} extras
 Optional extra-data to attach to the location.  These `extras {Object}` will be merged to the recorded `location` and persisted / POSTed to your server (if you've configured the HTTP Layer).
 
