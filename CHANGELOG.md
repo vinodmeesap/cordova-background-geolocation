@@ -3,6 +3,9 @@
 
 ## [Unreleased]
 
+## [1.6.2] - 2016-05-24
+- [Fixed] Android `GeofenceService` namespace was changed but the `plugin.xml` file was not updated with the new namespace.
+
 ## [1.6.1] - 2016-05-22
 - [Changed] Refactor iOS motion-detection system.  When not set to `disableMotionActivityUpdates` (default), the  plugin will not activate the accelerometer and will rely instead purely upon updates from the **M7** chip.  When `disableMotionActivityUpdates` **is** set to `false`, the pure acceleromoeter based activity-detection has been improved to give more accurate results of the detected activity (ie: `on_foot, walking, stationary`)
 - [Fixed] Fixed configuration bug which could incorrectly set `pausesLocationUpdatesAutomatically` to false, preventing the plugin from automatically turning off location-updates.
