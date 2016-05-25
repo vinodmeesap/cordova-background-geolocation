@@ -3,7 +3,7 @@
 <plugin xmlns="http://www.phonegap.com/ns/plugins/1.0"
     xmlns:android="http://schemas.android.com/apk/res/android"
     id="com.transistorsoft.cordova.background-geolocation"
-    version="1.6.1">
+    version="1.6.3">
 
     <name>BackgroundGeolocation</name>
     <description>Sophisticated, battery-efficient background-geolocation plugin for Cordova</description>
@@ -39,7 +39,7 @@
             <service android:name="com.transistorsoft.locationmanager.BackgroundGeolocationService" />
             <service android:name="com.transistorsoft.locationmanager.LocationService" />
             <service android:name="com.transistorsoft.locationmanager.ActivityRecognitionService" />
-            <service android:name="com.transistorsoft.locationmanager.GeofenceService" />
+            <service android:name="com.transistorsoft.locationmanager.geofence.GeofenceService" />
             <service android:name="com.transistorsoft.locationmanager.scheduler.ScheduleService" />
             <service android:name="com.transistorsoft.locationmanager.scheduler.ScheduleAlarmService" />
             <receiver android:name="com.transistorsoft.cordova.bggeo.BootReceiver">

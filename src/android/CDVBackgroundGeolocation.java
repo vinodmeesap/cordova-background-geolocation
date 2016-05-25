@@ -593,7 +593,7 @@ public class CDVBackgroundGeolocation extends CordovaPlugin {
 
         if (forceReload) {
             Intent launchIntent = this.cordova.getActivity().getIntent();
-            if (launchIntent.getStringExtra("name").equalsIgnoreCase(BackgroundGeolocationService.ACTION_ON_MOTION_CHANGE)) {
+            if (launchIntent.hasExtra("name") && launchIntent.getStringExtra("name").equalsIgnoreCase(BackgroundGeolocationService.ACTION_ON_MOTION_CHANGE)) {
                 Bundle event = launchIntent.getExtras();
                 this.onEventMainThread(event);
             }
@@ -659,7 +659,6 @@ public class CDVBackgroundGeolocation extends CordovaPlugin {
         boolean wasEnabled = isEnabled;
         isEnabled = value;
         isMoving = null;
-
 
         if (forceReload) {
             Intent launchIntent = activity.getIntent();
@@ -1174,6 +1173,7 @@ public class CDVBackgroundGeolocation extends CordovaPlugin {
 
     private void playSound(int soundId) {
         int duration = 1000;
+        toneGenerator.release();
         toneGenerator = new ToneGenerator(AudioManager.STREAM_NOTIFICATION, 100);
         toneGenerator.startTone(soundId, duration);
     }
@@ -1321,6 +1321,8 @@ public class CDVBackgroundGeolocation extends CordovaPlugin {
 
         Activity activity = this.cordova.getActivity();
 
+        toneGenerator.release();
+        
         if(stopOnTerminate) {
             if (isEnabled) {
                 Intent intent = new Intent(activity, BackgroundGeolocationService.class);
