@@ -2,6 +2,8 @@
 # Change Log
 
 ## [Unreleased]
+## [1.6.3] - 2016-05-25
+- [Fixed] Rebuild binary `tslocationmanager.aar` excluding dependencies `appcompat-v7` and `play-services`.  I was experiencing build-failures with react-native since other libs may include these dependencies:
 
 ## [1.6.2] - 2016-05-24
 - [Fixed] Android `GeofenceService` namespace was changed but the `plugin.xml` file was not updated with the new namespace.
