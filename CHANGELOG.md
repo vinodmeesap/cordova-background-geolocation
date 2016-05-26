@@ -2,6 +2,8 @@
 # Change Log
 
 ## [Unreleased]
+- [Changed] `Scheduler` will use `Locale.US` in its Calendar operations, such that the days-of-week correspond to Sunday=1..Saturday=7.  Fixes issue #659
+
 ## [1.6.3] - 2016-05-25
 - [Fixed] Rebuild binary `tslocationmanager.aar` excluding dependencies `appcompat-v7` and `play-services`.  I was experiencing build-failures with react-native since other libs may include these dependencies:
 
