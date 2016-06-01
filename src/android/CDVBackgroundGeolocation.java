@@ -17,6 +17,8 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.Set;
+
 import org.apache.cordova.CallbackContext;
 import org.apache.cordova.CordovaPlugin;
 import org.apache.cordova.CordovaWebView;
@@ -58,7 +60,7 @@ public class CDVBackgroundGeolocation extends CordovaPlugin {
 
     public static final int REQUEST_ACTION_START = 1;
     public static final int REQUEST_ACTION_GET_CURRENT_POSITION = 2;
-
+    public static final int REQUEST_ACTION_START_GEOFENCES = 3;
 
     private static CordovaWebView gWebView;
     public static Boolean forceReload = false;
@@ -165,6 +167,9 @@ public class CDVBackgroundGeolocation extends CordovaPlugin {
         } else if (ACTION_STOP_SCHEDULE.equalsIgnoreCase(action)) {
             result = true;
             this.stopSchedule(callbackContext);
+        } else if (BackgroundGeolocationService.ACTION_START_GEOFENCES.equalsIgnoreCase(action)) {
+            result = true;
+            this.startGeofences(callbackContext);
         } else if (BackgroundGeolocationService.ACTION_STOP.equalsIgnoreCase(action)) {
             // No implementation to stop background-tasks with Android.  Just say "success"
             result      = true;
@@ -310,6 +315,12 @@ public class CDVBackgroundGeolocation extends CordovaPlugin {
         isStarting = true;
         startCallback = callback;
         backgroundServiceIntent = new Intent(cordova.getActivity(), BackgroundGeolocationService.class);
+
+        String command = BackgroundGeolocationService.ACTION_START;
+        if (callback == null && Settings.getTrackingMode().equalsIgnoreCase(Settings.TRACKING_MODE_GEOFENCES)) {
+            command = BackgroundGeolocationService.ACTION_START_GEOFENCES;
+        }
+        backgroundServiceIntent.putExtra("command", command);
         if (hasPermission(ACCESS_COARSE_LOCATION) && hasPermission(ACCESS_FINE_LOCATION)) {
             setEnabled(true);
         } else {
@@ -339,6 +350,19 @@ public class CDVBackgroundGeolocation extends CordovaPlugin {
         stop();
         stopScheduleService();
         callback.success();
+    }
+
+    private void startGeofences(CallbackContext callback) {
+        isStarting = true;
+        startCallback = callback;
+        backgroundServiceIntent = new Intent(cordova.getActivity(), BackgroundGeolocationService.class);
+        backgroundServiceIntent.putExtra("command", BackgroundGeolocationService.ACTION_START_GEOFENCES);
+        if (hasPermission(ACCESS_COARSE_LOCATION) && hasPermission(ACCESS_FINE_LOCATION)) {
+            setEnabled(true);
+        } else {
+            String[] permissions = {ACCESS_COARSE_LOCATION, ACCESS_FINE_LOCATION};
+            requestPermissions(REQUEST_ACTION_START_GEOFENCES, permissions);
+        }
     }
 
     private void stop() {
@@ -686,10 +710,13 @@ public class CDVBackgroundGeolocation extends CordovaPlugin {
             if (!BackgroundGeolocationService.isInstanceCreated()) {
                 activity.startService(backgroundServiceIntent);
             } else {
+                String command = backgroundServiceIntent.getStringExtra("command");
                 final Bundle event = new Bundle();
-                if (!wasEnabled) {
-                    event.putString("name", BackgroundGeolocationService.ACTION_START);
+                // If not currently enabled or start() was called while currently in "geofences" trackingMode, change mode to regular "location" mode.
+                if (!wasEnabled || (command.equalsIgnoreCase(BackgroundGeolocationService.ACTION_START) && Settings.getTrackingMode().equalsIgnoreCase(Settings.TRACKING_MODE_GEOFENCES))) {
+                    event.putString("name", command);
                 } else {
+                    // Already started.  Just fetch the current-position.
                     event.putString("name", BackgroundGeolocationService.ACTION_GET_CURRENT_POSITION);
                 }
                 event.putBoolean("request", true);
@@ -902,6 +929,8 @@ public class CDVBackgroundGeolocation extends CordovaPlugin {
 
         if (BackgroundGeolocationService.ACTION_START.equalsIgnoreCase(name)) {
             onStarted(event);
+        } else if (BackgroundGeolocationService.ACTION_START_GEOFENCES.equalsIgnoreCase(name)) {
+            onStarted(event);
         } else if (BackgroundGeolocationService.ACTION_SET_CONFIG.equalsIgnoreCase(name)) {
             onSetConfig(event);
         } else if (BackgroundGeolocationService.ACTION_ON_MOTION_CHANGE.equalsIgnoreCase(name)) {
@@ -1076,17 +1105,7 @@ public class CDVBackgroundGeolocation extends CordovaPlugin {
         }
     }
     private JSONObject getState() {
-        JSONObject state = new JSONObject();
-        try {
-            if (settings.contains("config")) {
-                state = new JSONObject(settings.getString("config", "{}"));
-            }
-            state.put("enabled", isEnabled);
-            state.put("isMoving", isMoving);
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
-        return state;
+        return Settings.getState();
     }
 
     @Subscribe

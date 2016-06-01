@@ -90,6 +90,13 @@ module.exports = {
              'start',
              []);
     },
+    stop: function(success, failure, config) {
+        exec(success || function() {},
+            failure || function() {},
+            'BackgroundGeolocation',
+            'stop',
+            []);
+    },
     startSchedule: function(success, failure) {
         exec(success || function() {},
              failure || function() {},
@@ -104,12 +111,12 @@ module.exports = {
              'stopSchedule',
              []);
     },
-    stop: function(success, failure, config) {
+    startGeofences: function(success, failure) {
         exec(success || function() {},
-            failure || function() {},
-            'BackgroundGeolocation',
-            'stop',
-            []);
+             failure || function() {},
+             'BackgroundGeolocation',
+             'startGeofences',
+             []);
     },
     beginBackgroundTask: function(callback) {
         if (typeof(callback) !== 'function') {
