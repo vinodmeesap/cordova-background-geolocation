@@ -1143,11 +1143,13 @@ public class CDVBackgroundGeolocation extends CordovaPlugin {
 
         Bundle meta = location.getExtras();
         if (meta != null) {
-            String action = meta.getString("action");
-            boolean motionChanged = action.equalsIgnoreCase(BackgroundGeolocationService.ACTION_ON_MOTION_CHANGE);
-            if (motionChanged) {
-                boolean nowMoving = meta.getBoolean("isMoving");
-                onMotionChange(nowMoving, locationData);
+            if (meta.containsKey("action")) {
+                String action = meta.getString("action");
+                boolean motionChanged = action.equalsIgnoreCase(BackgroundGeolocationService.ACTION_ON_MOTION_CHANGE);
+                if (motionChanged) {
+                    boolean nowMoving = meta.getBoolean("isMoving");
+                    onMotionChange(nowMoving, locationData);
+                }
             }
         }
         this.onLocationChange(locationData);
@@ -1158,7 +1160,7 @@ public class CDVBackgroundGeolocation extends CordovaPlugin {
         for (CallbackContext callback : locationCallbacks) {
             callback.sendPluginResult(result);
         }
-        if (isAcquiringCurrentPosition) {
+        if (isAcquiringCurrentPosition && !location.has("sample")) {
             finishAcquiringCurrentPosition(true);
             // Execute callbacks.
             result = new PluginResult(PluginResult.Status.OK, location);
@@ -1254,6 +1256,9 @@ public class CDVBackgroundGeolocation extends CordovaPlugin {
             callback.sendPluginResult(result);
         }
 
+        if (paceChangeCallback != null) {
+            paceChangeCallback.error(code);
+        }
         if (isAcquiringCurrentPosition) {
             finishAcquiringCurrentPosition(false);
             for (CallbackContext callback : currentPositionCallbacks) {
