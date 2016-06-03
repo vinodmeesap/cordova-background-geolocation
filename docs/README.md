@@ -103,6 +103,7 @@ bgGeo.setConfig({
 | [`stop`](#stopsuccessfn-failurefn) | `callbackFn` | Disable location tracking.  Supplied `callbackFn` will be executed when tracking is successfully halted.  This is the plugin's power **OFF** button. |
 | [`startSchedule`](#stopschedulecallbackfn) | `callbackFn` | If a `schedule` was configured, this method will initiate that schedule.  The plugin will automatically be started or stopped according to the configured `schedule`.    Supplied `callbackFn` will be executed once the Scheduler has parsed and initiated your `schedule` |
 | [`stopSchedule`](#stopschedulecallbackfn) | `callbackFn` | This method will stop the Scheduler service.  It will also execute the `#stop` method and **cease all tracking**.  Your `callbackFn` will be executed after the Scheduler has stopped |
+| [`startGeofences`](#startgeofencescallbackfn) | `callbackFn` | Engages the geofences-only `trackingMode`.  In this mode, no active location-tracking will occur -- only geofences will be monitored|
 | [`getState`](#getstatesuccessfn) | `callbackFn` | Fetch the current-state of the plugin, including `enabled`, `isMoving`, as well as all other config params |
 | [`getCurrentPosition`](#getcurrentpositionsuccessfn-failurefn-options) | `successFn`, `failureFn`, `{options} | Retrieves the current position. This method instructs the native code to fetch exactly one location using maximum power & accuracy. |
 | [`changePace`](#changepaceenabled-successfn-failurefn) | `isMoving` | Initiate or cancel immediate background tracking. When set to true, the plugin will begin aggressively tracking the devices Geolocation, bypassing stationary monitoring. If you were making a "Jogging" application, this would be your [Start Workout] button to immediately begin GPS tracking. Send false to disable aggressive GPS monitoring and return to stationary-monitoring mode. |
@@ -692,6 +693,40 @@ bgGeo.stopSchedule(function() {
 });
 ```
 
+####`startGeofences(callbackFn)`
+
+Engages the geofences-only `trackingMode`.  In this mode, no active location-tracking will occur -- only geofences will be monitored.  To stop monitoring "geofences" `trackingMode`, simply use the usual `#stop` method.  The `state` object now contains the new key `trackingMode [location|geofences]`.
+
+```Javascript
+
+bgGeo.configure(config, function(state) {
+    // Add some geofences.
+    bgGeo.addGeofences([
+        notifyOnExit: true,
+        radius: 200,
+        identifier: 'ZONE_OF_INTEREST',
+        latitude: 37.234232,
+        longitude: 42.234234 
+    ]);
+
+    if (!state.enabled) {
+        bgGeo.startGeofences(function() {
+            console.log('- Geofence-only monitoring started');
+        });
+    }
+});
+
+// Listen to geofences
+bgGeo.onGeofence(function(params, taskId) {
+    if (params.identifier == 'ZONE_OF_INTEREST') {
+        // If you wish, you can choose to engage location-tracking mode when a 
+        // particular geofence event occurs.
+        bgGeo.start();
+    }
+    bgGeo.finish();
+});
+```
+
 ####`getState(successFn)`
 
 Fetch the current-state of the plugin, including all configuration parameters.
@@ -748,6 +783,10 @@ An optional location-timeout.  If the timeout expires before a location is retri
 Accept the last-recorded-location if no older than supplied value in milliseconds.
 ######@param {Boolean} persist [true]
 Defaults to `true`.  Set `false` to disable persisting the retrieved location in the plugin's SQLite database.
+######@param {Integer} samples [3]
+Sets the maximum number of location-samples to fetch.  The plugin will return the location having the best accuracy to your `successFn`.  Defaults to `3`.  Only the final location will be persisted.
+######@param {Integer} desiredAccuracy [stationaryRadius]
+Sets the desired accuracy of location you're attempting to fetch.  When a location having `accuracy <= desiredAccuracy` is retrieved, the plugin will stop sampling and immediately return that location.  Defaults to your configured `stationaryRadius`.
 ######@param {Object} extras
 Optional extra-data to attach to the location.  These `extras {Object}` will be merged to the recorded `location` and persisted / POSTed to your server (if you've configured the HTTP Layer).
 
