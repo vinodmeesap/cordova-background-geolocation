@@ -50,7 +50,7 @@ bgGeo.setConfig({
 | [`minimumActivityRecognitionConfidence`](#param-integer-millis-minimumactivityrecognitionconfidence) | `Integer` | Optional (**Android**)| `80` | Each activity-recognition-result returned by the API is tagged with a "confidence" level expressed as a %.  You can set your desired confidence to trigger a state-change.  Defaults to `80`.|
 | [`stopDetectionDelay`](#param-integer-minutes-stopdetectiondelay-0) | `Integer` | Optional (**iOS**)| 0 | Allows the stop-detection system to be delayed from activating.  When the stop-detection system is engaged, the GPS is off and only the accelerometer is monitored.  Stop-detection will only engage if this timer expires.  The timer is cancelled if any movement is detected before expiration | 
 | [`disableMotionActivityUpdates`](#param-boolean-disablemotionactivityupdates-false) | `Boolean` | Optional (**iOS**)| 0 | Disable iOS motion-activity updates (eg: "walking", "in_vehicle").  This feature requires a device having the **M7** co-processor (ie: iPhone 5s and up).  **NOTE** This feature will ask the user for "Health updates".  If you do not wish to ask the user for the "Health updates", set this option to `false`; However, you will no longer recieve activity data in the recorded locations. | 
-| [`disableStopDetection`](#param-boolean-disablestopdetection-false) | `Boolean` | Optional (**iOS**)| `false` | Disable iOS accelerometer-based **Stop-detection System**.  When disabled, the plugin will use the default iOS behaviour of automatically turning off location-services when the device has stopped for exactly 15 minutes.  When disabled, you will no longer have control over `stopTimeout`| 
+| [`disableStopDetection`](#param-boolean-disablestopdetection-false) | `Boolean` | Optional | `false` | Disable iOS accelerometer-based **Stop-detection System**.  When disabled, the plugin will use the default iOS behaviour of automatically turning off location-services when the device has stopped for exactly 15 minutes.  When disabled, you will no longer have control over `stopTimeout`| 
 
 
 ## HTTP / Persistence Options
@@ -259,6 +259,12 @@ Each activity-recognition-result returned by the API is tagged with a "confidenc
 
 The number of miutes to wait before turning off the GPS after the ActivityRecognition System (ARS) detects the device is `STILL` (**Android:** defaults to 0, no timeout, **iOS:** defaults to 5min).  If you don't set a value, the plugin is eager to turn off the GPS ASAP.  An example use-case for this configuration is to delay GPS OFF while in a car waiting at a traffic light.  **WARNING** Setting a value > 15 min is **not** recommended, particularly for Android.
 
+####`@param {Boolean} disableStopDetection [false]`
+
+For iOS, disables the accelerometer-based **Stop-detection System**.  When disabled, the plugin will use the default iOS behaviour of automatically turning off location-services when the device has stopped for exactly 15 minutes.  When disabled, you will no longer have control over `stopTimeout`.  
+
+For Android, location-services **will never turn OFF** if you set this to `true`!  It will be purely up to you or the user to execute `#changePace(false)` or `#stop` to turn off location-services.
+
 **iOS Stop-detection timing**.  
 ![](https://dl.dropboxusercontent.com/u/2319755/cordova-background-geolocaiton/ios-stop-detection-timing.png)
 
@@ -271,10 +277,6 @@ Allows the stop-detection system to be delayed from activating.  When the stop-d
 ####`@param {Boolan} disableMotionActivityUpdates [false]`
 
 Prevent iOS Motion Activity updates.  If you're seeing your app request permission to see "Fitness Data", this is why.  The **iOS** plugin will no longer record `activity` data in the recorded locations.
-
-####`@param {Boolean} disableStopDetection [false]`
-
-Disable iOS accelerometer-based **Stop-detection System**.  When disabled, the plugin will use the default iOS behaviour of automatically turning off location-services when the device has stopped for exactly 15 minutes.  When disabled, you will no longer have control over `stopTimeout`.
 
 # HTTP / Persistence Options
 
