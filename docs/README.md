@@ -816,7 +816,8 @@ bgGeo.getCurrentPosition(function(location, taskId) {
 }, {
   timeout: 30,    // 30 second timeout to fetch location
   maximumAge: 5000,	// Accept the last-known-location if not older than 5000 ms.
-  minimumAccuracy: 10,	// Fetch a location with a minimum accuracy of `10` meters.
+  desiredAccuracy: 10,	// Fetch a location with a minimum accuracy of `10` meters.
+  samples: 3,
   extras: {       // [Optional] Attach your own custom `metaData` to this location.  This metaData will be persisted to SQLite and POSTed to your server
     foo: "bar"  
   }
