@@ -14,7 +14,7 @@
 - [Fixed] error-callback incorrectly fired when `getCurrentPosition` is called while service is stopped (Fixes issue #691)
 - [Added] Implement `disableStopDetection` for Android (Fixes issue #692)
 - [Changed] `android.permission.GET_TASKS` changed to `android.permission.GET_REAL_TASKS`.  Hoping this removes deprecation warning.  This permission is required for Android `#forceReload` configs.
-
+- [Added] New Anddroid config `#notificationIcon`, allowing you to customize the icon shown on notification when using `foregroundServcie: true`.
 ## [1.6.3] - 2016-05-25
 - [Fixed] Rebuild binary `tslocationmanager.aar` excluding dependencies `appcompat-v7` and `play-services`.  I was experiencing build-failures with react-native since other libs may include these dependencies:
 
