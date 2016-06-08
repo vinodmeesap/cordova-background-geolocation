@@ -471,8 +471,8 @@ When running the service with `foregroundService: true`, Android requires a pers
 ####`@param {String} notificationIcon [app icon]`
 
 When running the service with `foregroundService: true`, Android requires a persistent notification in the Notification Bar.  This allows you customize that icon.  Defaults to your application icon.  **NOTE** You must specify the `type` of resource you wish to use in following for `{type}/icon_name`, eg:
-- `drawable/my_custom_notification_icon`
-- `mipmap/my_custom_notification_icon`
+- `notificationIcon: "drawable/my_custom_notification_icon"`
+- `notificationIcon: "mipmap/my_custom_notification_icon"`
 
 # Events
 
