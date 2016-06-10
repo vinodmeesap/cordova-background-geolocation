@@ -85,14 +85,26 @@ bgGeo.setConfig({
 | [`schedule`](#param-array-schedule-undefined) | `Array` | Optional | `undefined` | Defines a schedule to automatically start/stop tracking at configured times |
 ## Events
 
-| Event Name | Notes
+Event-listeners can be attached using the following methods, or alternatively using the `#on` method, supplying the **Event Name** in the following table. `#on` accepts both a `successFn` and `failureFn`.
+
+The `#on` method does not accept an `{}` -- you **must** specify each listener with a distinct call to `#on`:
+
+```Javascript
+bgGeo.onLocation(onLocation, onLocationError);
+// or use the #on method:
+bgGeo.on("location", onLocation, onLocationError);
+
+```
+
+| Method | Event Name | Notes
 |---|---|
-| [`onLocation`](#onlocationsuccessfn-failurefn) | Fired whenever a new location is recorded or an error occurs |
-| [`onMotionChange`](#onmotionchangecallbackfn-failurefn) | Fired when the device changes stationary / moving state. |
-| [`onGeofence`](#ongeofencecallbackfn) | Fired when a geofence crossing event occurs |
-| [`onHttp`](#onhttpsuccessfn-failurefn) | Fired after a successful HTTP response. `response` object is provided with `status` and `responseText`|
-| [`onHeartbeat`](#onheartbeatsuccessfn-failurefn) | Fired each `heartbeatInterval` while the plugin is in the **stationary** state with (iOS requires `preventSuspend: true` in addition).  Your callback will be provided with a `params {}` containing the parameters `shakes {Integer}`, `motionType {String}` and current location object `location {Object}` |
-| [`onSchedule`](#onschedulecallbackFn) | Fired when a schedule event occurs.  Your `callbackFn` will be provided with the current `state` Object. | 
+| [`onLocation`](#onlocationsuccessfn-failurefn) | `location` | Fired whenever a new location is recorded or an error occurs |
+| [`onMotionChange`](#onmotionchangecallbackfn-failurefn) | `motionchange` | Fired when the device changes stationary / moving state. |
+| [`onActivityChange`](#onactivitychangecallbackfn-failurefn) | `activitychange` | Fired when the activity-recognition system detects a *change* in detected-activity (`still, on_foot, in_vehicle, on_bicycle, running`)|
+| [`onGeofence`](#ongeofencecallbackfn) | `geofence` | Fired when a geofence crossing event occurs |
+| [`onHttp`](#onhttpsuccessfn-failurefn) | `http` | Fired after a successful HTTP response. `response` object is provided with `status` and `responseText`|
+| [`onHeartbeat`](#onheartbeatsuccessfn-failurefn) | `heartbeat` | Fired each `heartbeatInterval` while the plugin is in the **stationary** state with (iOS requires `preventSuspend: true` in addition).  Your callback will be provided with a `params {}` containing the parameters `shakes {Integer}`, `motionType {String}` and current location object `location {Object}` |
+| [`onSchedule`](#onschedulecallbackFn) | `schedule` | Fired when a schedule event occurs.  Your `callbackFn` will be provided with the current `state` Object. | 
 
 ## Methods
 
@@ -530,6 +542,17 @@ bgGeo.onMotionChange(function(isMoving, location, taskId) {
 
 ```
 
+####`onActivityChange(callbackFn, failureFn)`
+Your `callbackFn` will be executed each time the activity-recognition system detects a *change* in detected-activity (`still, on_foot, in_vehicle, on_bicycle, running`).
+
+######@param {String still|on_foot|in_vehicle|on_bicycle|running|unknown} activityName 
+
+```Javascript
+bgGeo.onActivityChange(function(activityName) {
+    console.log('- Activity changed: ', activityName);
+});
+```
+
 ####`onGeofence(callbackFn)`
 Adds a geofence event-listener.  Your supplied callback will be called when any monitored geofence crossing occurs.  The `callbackFn` will be provided the following parameters:
 
@@ -816,8 +839,7 @@ bgGeo.getCurrentPosition(function(location, taskId) {
 }, {
   timeout: 30,    // 30 second timeout to fetch location
   maximumAge: 5000,	// Accept the last-known-location if not older than 5000 ms.
-  desiredAccuracy: 10,	// Fetch a location with a minimum accuracy of `10` meters.
-  samples: 3,
+  minimumAccuracy: 10,	// Fetch a location with a minimum accuracy of `10` meters.
   extras: {       // [Optional] Attach your own custom `metaData` to this location.  This metaData will be persisted to SQLite and POSTed to your server
     foo: "bar"  
   }

@@ -78,6 +78,7 @@ public class CDVBackgroundGeolocation extends CordovaPlugin {
     public static final String ACTION_ADD_MOTION_CHANGE_LISTENER    = "addMotionChangeListener";
     public static final String ACTION_ADD_LOCATION_LISTENER = "addLocationListener";
     public static final String ACTION_ADD_HEARTBEAT_LISTENER = "addHeartbeatListener";
+    public static final String ACTION_ADD_ACTIVITY_CHANGE_LISTENER = "addActivityChangeListener";
     public static final String ACTION_ADD_SCHEDULE_LISTENER = "addScheduleListener";
     public static final String ACTION_ON_GEOFENCE       = "onGeofence";
     public static final String ACTION_PLAY_SOUND        = "playSound";
@@ -116,6 +117,7 @@ public class CDVBackgroundGeolocation extends CordovaPlugin {
     private Map<String, CallbackContext> insertLocationCallbacks = new HashMap<String, CallbackContext>();
     private List<CallbackContext> getCountCallbacks = new ArrayList<CallbackContext>();
     private List<CallbackContext> heartbeatCallbacks = new ArrayList<CallbackContext>();
+    private List<CallbackContext> activityChangeCallbacks = new ArrayList<CallbackContext>();
     private List<CallbackContext> scheduleCallbacks = new ArrayList<CallbackContext>();
 
     public static boolean isActive() {
@@ -268,7 +270,11 @@ public class CDVBackgroundGeolocation extends CordovaPlugin {
         } else if (ACTION_ADD_HEARTBEAT_LISTENER.equalsIgnoreCase(action)) {
             result = true;
             addHeartbeatListener(callbackContext);
-        } else if (ACTION_ADD_SCHEDULE_LISTENER.equalsIgnoreCase(action)) {
+        }  else if (ACTION_ADD_ACTIVITY_CHANGE_LISTENER.equalsIgnoreCase(action)) {
+            result = true;
+            addActivityChangeListener(callbackContext);
+        }
+        else if (ACTION_ADD_SCHEDULE_LISTENER.equalsIgnoreCase(action)) {
             result = true;
             addScheduleListener(callbackContext);
         } else if (ACTION_GET_LOG.equalsIgnoreCase(action)) {
@@ -587,6 +593,10 @@ public class CDVBackgroundGeolocation extends CordovaPlugin {
                 onHeartbeat(launchIntent.getExtras());
             }
         }
+    }
+
+    private void addActivityChangeListener(CallbackContext callbackContext) {
+        activityChangeCallbacks.add(callbackContext);
     }
 
     private void addScheduleListener(CallbackContext callbackContext) {
@@ -1120,9 +1130,16 @@ public class CDVBackgroundGeolocation extends CordovaPlugin {
      * @param {ActivityRecognitionResult} result
      */
     @Subscribe
-    public void onEventMainThread(ActivityRecognitionResult result) {
-        currentActivity = result.getMostProbableActivity();
-        // TODO Could add a new event here #activity and send ActivityRecognitionResult info to Javascript.
+    public void onEventMainThread(ActivityRecognitionResult activityResult) {
+        DetectedActivity activity = activityResult.getMostProbableActivity();
+        if ((currentActivity == null) || (currentActivity.getType() != activity.getType())) {
+            PluginResult result = new PluginResult(PluginResult.Status.OK, BackgroundGeolocationService.getActivityName(activity.getType()));
+            result.setKeepCallback(true);
+            for (CallbackContext callback : activityChangeCallbacks) {
+                callback.sendPluginResult(result);
+            }
+        }
+        currentActivity = activity;
     }
 
     /**
