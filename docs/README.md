@@ -869,7 +869,7 @@ If a location failed to be retrieved, you `failureFn` will be executed with an e
 Eg:
 
 ```Javascript
-bgGeo.getLocation(succesFn, function(errorCode) {
+bgGeo.getCurrentPosition(succesFn, function(errorCode) {
 	switch (errorCode) {
 		case 0:
 			alert('Failed to retrieve location');
