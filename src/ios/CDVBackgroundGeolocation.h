@@ -11,13 +11,6 @@
 
 @property (nonatomic, strong) NSString* syncCallbackId;
 @property (nonatomic) UIBackgroundTaskIdentifier syncTaskId;
-@property (nonatomic, strong) NSMutableArray* locationListeners;
-@property (nonatomic, strong) NSMutableArray* currentPositionListeners;
-@property (nonatomic, strong) NSMutableArray* geofenceListeners;
-@property (nonatomic, strong) NSMutableArray* motionChangeListeners;
-@property (nonatomic, strong) NSMutableArray* httpListeners;
-@property (nonatomic, strong) NSMutableArray* heartbeatListeners;
-@property (nonatomic, strong) NSMutableArray* scheduleListeners;
 
 - (void) configure:(CDVInvokedUrlCommand*)command;
 - (void) start:(CDVInvokedUrlCommand*)command;

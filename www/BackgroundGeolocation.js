@@ -30,6 +30,8 @@ module.exports = {
                 return this.onHeartbeat(success, fail);
             case 'schedule':
                 return this.onSchedule(success, fail);
+            case 'activitychange':
+                return this.onActivityChange(success, fail);
         }
     },
 
@@ -236,6 +238,13 @@ module.exports = {
             failure || function() {},
             'BackgroundGeolocation',
             'addMotionChangeListener',
+            []);
+    },
+    onActivityChange: function(success) {
+        exec(success || function() {},
+            function() {},
+            'BackgroundGeolocation',
+            'addActivityChangeListener',
             []);
     },
     onHeartbeat: function(success, failure) {
