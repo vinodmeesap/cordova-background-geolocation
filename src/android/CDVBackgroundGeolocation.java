@@ -92,7 +92,6 @@ public class CDVBackgroundGeolocation extends CordovaPlugin {
     private SharedPreferences settings;
     private Boolean isStarting          = false;
     private Boolean isEnabled           = false;
-    private Boolean stopOnTerminate     = false;
     private Boolean isMoving;
     private Boolean isAcquiringCurrentPosition = false;
     private Intent backgroundServiceIntent;
@@ -783,13 +782,6 @@ public class CDVBackgroundGeolocation extends CordovaPlugin {
         }
     }
     private boolean applyConfig() {
-        if (mConfig.has("stopOnTerminate")) {
-            try {
-                stopOnTerminate = mConfig.getBoolean("stopOnTerminate");
-            } catch (JSONException e) {
-                e.printStackTrace();
-            }
-        }
         SharedPreferences.Editor editor = settings.edit();
 
         try {
@@ -1339,6 +1331,7 @@ public class CDVBackgroundGeolocation extends CordovaPlugin {
      * Checks to see if it should turn off
      */
     public void onDestroy() {
+        boolean stopOnTerminate = Settings.getStopOnTerminate();
         Log.i(TAG, "- onDestroy");
         Log.i(TAG, "  stopOnTerminate: " + stopOnTerminate);
         Log.i(TAG, "  isEnabled: " + isEnabled);
