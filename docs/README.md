@@ -97,7 +97,7 @@ bgGeo.on("location", onLocation, onLocationError);
 ```
 
 | Method | Event Name | Notes
-|---|---|
+|---|---|---|
 | [`onLocation`](#onlocationsuccessfn-failurefn) | `location` | Fired whenever a new location is recorded or an error occurs |
 | [`onMotionChange`](#onmotionchangecallbackfn-failurefn) | `motionchange` | Fired when the device changes stationary / moving state. |
 | [`onActivityChange`](#onactivitychangecallbackfn-failurefn) | `activitychange` | Fired when the activity-recognition system detects a *change* in detected-activity (`still, on_foot, in_vehicle, on_bicycle, running`)|
