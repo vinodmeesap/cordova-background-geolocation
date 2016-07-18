@@ -10,6 +10,7 @@
     NSDictionary *config;
     
     NSMutableArray *activityChangeListeners;
+    NSMutableArray *providerChangeListeners;
     NSMutableArray *locationListeners;
     NSMutableArray *geofenceListeners;
     NSMutableArray *motionChangeListeners;
@@ -23,12 +24,13 @@
 
 - (void)pluginInitialize
 {
-    bgGeo = [[TSLocationManager alloc] init];
+    bgGeo = [TSLocationManager sharedInstance];
     bgGeo.viewController = self.viewController;
     // New style:  Use blocks instead of NSNotificationCenter
     bgGeo.locationChangedBlock  = [self createLocationChangedHandler];
     bgGeo.motionChangedBlock    = [self createMotionChangedHandler];
     bgGeo.activityChangedBlock  = [self createActivityChangedHandler];
+    bgGeo.authorizationChangedBlock  = [self createAuthorizationChangedHandler];
     bgGeo.heartbeatBlock        = [self createHeartbeatHandler];
     bgGeo.geofenceBlock         = [self createGeofenceHandler];
     bgGeo.syncCompleteBlock     = [self createSyncCompleteHandler];
@@ -233,6 +235,15 @@
     [activityChangeListeners addObject:command.callbackId];
 }
 
+- (void) addProviderChangeListener:(CDVInvokedUrlCommand*)command
+{
+    if (providerChangeListeners == nil) {
+        providerChangeListeners = [[NSMutableArray alloc] init];
+    }
+    [providerChangeListeners addObject:command.callbackId];
+}
+
+
 - (void) addScheduleListener:(CDVInvokedUrlCommand*)command
 {
     if (scheduleListeners == nil) {
@@ -347,6 +358,21 @@
     [self.commandDelegate runInBackground:^{
         [bgGeo updateCurrentPosition:options];
     }];
+}
+
+- (void) watchPosition:(CDVInvokedUrlCommand*)command
+{
+    //NSDictionary *options  = [command.arguments objectAtIndex:0];
+    NSLog(@"watchPosition is not yet implemented for ios");
+    CDVPluginResult *result = [CDVPluginResult resultWithStatus:CDVCommandStatus_ERROR messageAsString:@"watchPosition is not yet implemented for ios"];
+    [self.commandDelegate sendPluginResult:result callbackId:command.callbackId];
+}
+- (void) stopWatchPosition:(CDVInvokedUrlCommand*)command
+{
+    //NSDictionary *options  = [command.arguments objectAtIndex:0];
+    NSLog(@"watchPosition is not yet implemented for ios");
+    CDVPluginResult *result = [CDVPluginResult resultWithStatus:CDVCommandStatus_ERROR messageAsString:@"watchPosition is not yet implemented for ios"];
+    [self.commandDelegate sendPluginResult:result callbackId:command.callbackId];
 }
 
 - (void) playSound:(CDVInvokedUrlCommand*)command
@@ -514,6 +540,22 @@
     };
 }
 
+-(void (^)(CLAuthorizationStatus status)) createAuthorizationChangedHandler {
+    return ^(CLAuthorizationStatus status) {
+        if (![providerChangeListeners count]) {
+            return;
+        }
+        BOOL enabled = (status == kCLAuthorizationStatusAuthorizedAlways);
+        NSDictionary *provider = @{@"enabled":@(enabled), @"network":@(YES), @"gps":@(YES)};
+        for (NSString *callbackId in providerChangeListeners) {
+            CDVPluginResult *result = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsDictionary:provider];
+            [result setKeepCallbackAsBool:YES];
+            [self.commandDelegate runInBackground:^{
+                [self.commandDelegate sendPluginResult:result callbackId:callbackId];
+            }];
+        }
+    };
+}
 
 -(void (^)(CLCircularRegion *region, CLLocation *location, NSString *action)) createGeofenceHandler {
     return ^(CLCircularRegion *region, CLLocation *location, NSString *action) {
@@ -637,6 +679,7 @@
  * Might be desirable in certain apps.
  */
 - (void)applicationWillTerminate:(UIApplication *)application {
+    bgGeo = nil;
 }
 
 @end

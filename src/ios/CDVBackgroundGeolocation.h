@@ -22,6 +22,8 @@
 - (void) changePace:(CDVInvokedUrlCommand*)command;
 - (void) setConfig:(CDVInvokedUrlCommand*)command;
 - (void) addMotionChangeListener:(CDVInvokedUrlCommand*)command;
+- (void) addActivityChangeListener:(CDVInvokedUrlCommand*)command;
+- (void) addProviderChangeListener:(CDVInvokedUrlCommand*)command;
 - (void) addHeartbeatListener:(CDVInvokedUrlCommand*)command;
 - (void) getStationaryLocation:(CDVInvokedUrlCommand *)command;
 - (void) getLocations:(CDVInvokedUrlCommand *)command;
@@ -37,6 +39,8 @@
 - (void) getGeofences:(CDVInvokedUrlCommand *)command;
 - (void) onGeofence:(CDVInvokedUrlCommand *)command;
 - (void) getCurrentPosition:(CDVInvokedUrlCommand *)command;
+- (void) watchPosition:(CDVInvokedUrlCommand *)command;
+- (void) stopWatchPosition:(CDVInvokedUrlCommand *)command;
 - (void) clearDatabase:(CDVInvokedUrlCommand *) command;
 - (void) insertLocation:(CDVInvokedUrlCommand *) command;
 - (void) getCount:(CDVInvokedUrlCommand *) command;

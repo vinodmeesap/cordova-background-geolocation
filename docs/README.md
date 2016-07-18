@@ -101,6 +101,7 @@ bgGeo.on("location", onLocation, onLocationError);
 | [`onLocation`](#onlocationsuccessfn-failurefn) | `location` | Fired whenever a new location is recorded or an error occurs |
 | [`onMotionChange`](#onmotionchangecallbackfn-failurefn) | `motionchange` | Fired when the device changes stationary / moving state. |
 | [`onActivityChange`](#onactivitychangecallbackfn-failurefn) | `activitychange` | Fired when the activity-recognition system detects a *change* in detected-activity (`still, on_foot, in_vehicle, on_bicycle, running`)|
+| [`onProviderChange`](#onproviderchangecallbackfn-failurefn) | `providerchange` | Fired when the state of device's **Location Services** changes|
 | [`onGeofence`](#ongeofencecallbackfn) | `geofence` | Fired when a geofence crossing event occurs |
 | [`onHttp`](#onhttpsuccessfn-failurefn) | `http` | Fired after a successful HTTP response. `response` object is provided with `status` and `responseText`|
 | [`onHeartbeat`](#onheartbeatsuccessfn-failurefn) | `heartbeat` | Fired each `heartbeatInterval` while the plugin is in the **stationary** state with (iOS requires `preventSuspend: true` in addition).  Your callback will be provided with a `params {}` containing the parameters `shakes {Integer}`, `motionType {String}` and current location object `location {Object}` |
@@ -118,7 +119,9 @@ bgGeo.on("location", onLocation, onLocationError);
 | [`stopSchedule`](#stopschedulecallbackfn) | `callbackFn` | This method will stop the Scheduler service.  It will also execute the `#stop` method and **cease all tracking**.  Your `callbackFn` will be executed after the Scheduler has stopped |
 | [`startGeofences`](#startgeofencescallbackfn) | `callbackFn` | Engages the geofences-only `trackingMode`.  In this mode, no active location-tracking will occur -- only geofences will be monitored|
 | [`getState`](#getstatesuccessfn) | `callbackFn` | Fetch the current-state of the plugin, including `enabled`, `isMoving`, as well as all other config params |
-| [`getCurrentPosition`](#getcurrentpositionsuccessfn-failurefn-options) | `successFn`, `failureFn`, `{options} | Retrieves the current position. This method instructs the native code to fetch exactly one location using maximum power & accuracy. |
+| [`getCurrentPosition`](#getcurrentpositionsuccessfn-failurefn-options) | `successFn`, `failureFn`, `{options}` | Retrieves the current position. This method instructs the native code to fetch exactly one location using maximum power & accuracy. |
+| [`watchPosition`](#watchpositionsuccessfn-failurefn-options) | `successFn`, `failureFn`, `{options}` | **Android only** Start a stream of continuous location-updates.  The native code will persist the fetched location to its SQLite database just as any other location in addition to POSTing to your configured `#url` (if you've enabled the HTTP features).   |
+| [`stopWatchPosition`](#stopwatchpositionsuccessfn-failurefn-options) | `successFn`, `failureFn`, `{options}` | Halt `watchPosition` updates. |
 | [`changePace`](#changepaceenabled-successfn-failurefn) | `isMoving` | Initiate or cancel immediate background tracking. When set to true, the plugin will begin aggressively tracking the devices Geolocation, bypassing stationary monitoring. If you were making a "Jogging" application, this would be your [Start Workout] button to immediately begin GPS tracking. Send false to disable aggressive GPS monitoring and return to stationary-monitoring mode. |
 | [`getLocations`](#getlocationscallbackfn-failurefn) | `callbackFn` | Fetch all the locations currently stored in native plugin's SQLite database. Your callbackFn`` will receive an `Array` of locations in the 1st parameter |
 | [`getCount`](#getcountcallbackfn-failurefn) | `callbackFn` | Fetches count of SQLite locations table `SELECT count(*) from locations` |
@@ -553,6 +556,22 @@ bgGeo.onActivityChange(function(activityName) {
 });
 ```
 
+####`onProviderChange(callbackFn, failureFn)`
+Your `callbackFn` fill be executed when a change in the state of the device's **Location Services** has been detected.  eg: "GPS ON", "Wifi only".  Your `callbackFn` will be provided with an `{Object} provider` containing the following properties
+
+######@param {Boolean} enabled Whether location-services is enabled
+######@param {Boolean} gps Whether gps is enabled
+######@param {Boolean} wifi Whether wifi geolocation is enabled.
+
+```Javascript
+bgGeo.on('providerchange', function(provider) {
+    console.log('- Provider Change: ', provider);
+    console.log('  enabled: ', provider.enabled);
+    console.log('  gps: ', provider.gps);
+    console.log('  wifi: ', provider.wifi);
+});
+```
+
 ####`onGeofence(callbackFn)`
 Adds a geofence event-listener.  Your supplied callback will be called when any monitored geofence crossing occurs.  The `callbackFn` will be provided the following parameters:
 
@@ -880,6 +899,36 @@ bgGeo.getCurrentPosition(succesFn, function(errorCode) {
 
 	}
 })
+```
+
+####`watchPosition(successFn, failureFn, options)`
+Start a stream of continuous location-updates.  The native code will persist the fetched location to its SQLite database just as any other location in addition to POSTing to your configured `#url` (if you've enabled the HTTP features).  
+
+#### Options
+######@param {Integer} locationUpdateInterval
+######@param {Integer} desiredAccuracy
+
+#### Callback
+
+######@param {Object} location The Location data
+
+```Javascript
+bgGeo.watchPosition(function(location) {
+    console.log(“- Watch position: “, location);
+}, function(errorCode) {
+    alert('An location error occurred: ' + errorCode);
+}, {
+    locationUpdateInterval: 5000    // <-- retrieve a location every 5s.
+});
+
+```
+
+####`stopWatchPosition(successFn, failureFn)`
+
+Halt `watchPosition` updates.
+
+```Javascript
+bgGeo.stopWatchPosition();  // <-- callbacks are optional
 ```
 
 ####`changePace(enabled, successFn, failureFn)`
