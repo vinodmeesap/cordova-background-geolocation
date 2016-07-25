@@ -183,7 +183,8 @@ public class CDVBackgroundGeolocation extends CordovaPlugin {
             result = true;
             addGeofences(callbackContext, data.getJSONArray(0));
         } else if (BackgroundGeolocation.ACTION_REMOVE_GEOFENCE.equalsIgnoreCase(action)) {
-            this.removeGeofence(data.getString(0), callbackContext);
+            result = true;
+            removeGeofence(data.getString(0), callbackContext);
         } else if (BackgroundGeolocation.ACTION_REMOVE_GEOFENCES.equalsIgnoreCase(action)) {
             result = true;
             removeGeofences(callbackContext);
