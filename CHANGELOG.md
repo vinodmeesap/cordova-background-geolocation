@@ -21,7 +21,7 @@
 - [Added] New event `activitychange` for listening to changes from the Activit Recognition system.  See **Events** section in API docs for details.  Fixes issue #703.
 - [Added] Allow Android `foregroundService` config to be changed dynamically with `#setConfig` (used to have to restart the start to apply this).
 - [Added] Implement the new `#getCurrentPosition` options `#samples` and `#desiredAccuracy` for iOS.
-
+- [Changed] Revert GET_REAL_TASKS back to GET_TASKS
 ## [1.6.3] - 2016-05-25
 - [Fixed] Rebuild binary `tslocationmanager.aar` excluding dependencies `appcompat-v7` and `play-services`.  I was experiencing build-failures with react-native since other libs may include these dependencies:
 
