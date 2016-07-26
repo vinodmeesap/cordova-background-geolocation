@@ -132,13 +132,12 @@ function onDeviceReady() {
         params: {
             "auth_token": "maybe_your_server_authenticates_via_token_YES?"
         }
+    }, function(state) {
+      // Plugin is configured and ready to use.
+      if (!state.enabled) {
+        bgGeo.start();  // <-- start-tracking
+      }
     });
-
-    // Turn ON the background-geolocation system.  The user will be tracked whenever they suspend the app.
-    bgGeo.start();
-
-    // If you wish to turn OFF background-tracking, call the #stop method.
-    // bgGeo.stop()
 }
 
 
