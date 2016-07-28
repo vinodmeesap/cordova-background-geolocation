@@ -40,6 +40,7 @@ bgGeo.setConfig({
 | [`deferTime`](#param-integer-defertime) | `Integer` | Optional (**Android**)| `0` | Sets the maximum wait time in milliseconds for location updates.  If you pass a value at least 2x larger than the interval specified with `locationUpdateInterval`, then location delivery may be delayed and multiple locations can be delivered at once. Locations are determined at the `locationUpdateInterval` rate, but can be delivered in batch after the interval you set in this method. This can consume less battery and give more accurate locations, depending on the device's hardware capabilities. You should set this value to be as large as possible for your needs if you don't need immediate location delivery. |
 | [`pausesLocationUpdatesAutomatically`](#param-boolean-pauseslocationupdatesautomatically-true) | `Boolean` | Optional (**iOS**)| `true` | The default behaviour of the plugin is to turn off location-services automatically when the device is detected to be stationary.  When set to `false`, location-services will **never** be turned off (and `disableStopDetection` will automatically be set to `true`) -- it's your responsibility to turn them off when you no longer need to track the device.  This feature should **not** generally be used.  `preventSuspend` will no longer work either.| 
 | [`locationAuthorizationRequest`](#param-boolean-locationauthorizationrequest-always) | `Always`,`WhenInUse` | Optional (**iOS**)| `Always` | The desired iOS location-authorization request, either `Always` or `WhenInUse`.  You'll have to edit the corresponding key in your app's `Info.plist`, `NSLocationAlwaysUsageDescription` or `NSWhenInUseUsageDescription`.  `WhenInUse` will display a **blue bar** at top-of-screen informing user that location-services are on. |
+| [`locationAuthorizationAlert`](#param-object-locationauthorizationalert) | `{}` | Optional (**iOS**)| `{}` | When you configure the plugin location-authorization `Always` or `WhenInUse` and the user changes the value in the app's location-services settings or disabled location-services, the plugin will display an Alert directing the user to the **Settings** screen.  This config allows you to configure all the Strings for that Alert popup. |
 
 ## Activity Recognition Options
 
@@ -101,6 +102,7 @@ bgGeo.on("location", onLocation, onLocationError);
 | [`onLocation`](#onlocationsuccessfn-failurefn) | `location` | Fired whenever a new location is recorded or an error occurs |
 | [`onMotionChange`](#onmotionchangecallbackfn-failurefn) | `motionchange` | Fired when the device changes stationary / moving state. |
 | [`onActivityChange`](#onactivitychangecallbackfn-failurefn) | `activitychange` | Fired when the activity-recognition system detects a *change* in detected-activity (`still, on_foot, in_vehicle, on_bicycle, running`)|
+| [`onProviderChange`](#onproviderchangecallbackfn-failurefn) | `providerchange` | Fired when the state of device's **Location Services** changes|
 | [`onGeofence`](#ongeofencecallbackfn) | `geofence` | Fired when a geofence crossing event occurs |
 | [`onHttp`](#onhttpsuccessfn-failurefn) | `http` | Fired after a successful HTTP response. `response` object is provided with `status` and `responseText`|
 | [`onHeartbeat`](#onheartbeatsuccessfn-failurefn) | `heartbeat` | Fired each `heartbeatInterval` while the plugin is in the **stationary** state with (iOS requires `preventSuspend: true` in addition).  Your callback will be provided with a `params {}` containing the parameters `shakes {Integer}`, `motionType {String}` and current location object `location {Object}` |
@@ -118,7 +120,9 @@ bgGeo.on("location", onLocation, onLocationError);
 | [`stopSchedule`](#stopschedulecallbackfn) | `callbackFn` | This method will stop the Scheduler service.  It will also execute the `#stop` method and **cease all tracking**.  Your `callbackFn` will be executed after the Scheduler has stopped |
 | [`startGeofences`](#startgeofencescallbackfn) | `callbackFn` | Engages the geofences-only `trackingMode`.  In this mode, no active location-tracking will occur -- only geofences will be monitored|
 | [`getState`](#getstatesuccessfn) | `callbackFn` | Fetch the current-state of the plugin, including `enabled`, `isMoving`, as well as all other config params |
-| [`getCurrentPosition`](#getcurrentpositionsuccessfn-failurefn-options) | `successFn`, `failureFn`, `{options} | Retrieves the current position. This method instructs the native code to fetch exactly one location using maximum power & accuracy. |
+| [`getCurrentPosition`](#getcurrentpositionsuccessfn-failurefn-options) | `successFn`, `failureFn`, `{options}` | Retrieves the current position. This method instructs the native code to fetch exactly one location using maximum power & accuracy. |
+| [`watchPosition`](#watchpositionsuccessfn-failurefn-options) | `successFn`, `failureFn`, `{options}` | **Android only** Start a stream of continuous location-updates.  The native code will persist the fetched location to its SQLite database just as any other location in addition to POSTing to your configured `#url` (if you've enabled the HTTP features).   |
+| [`stopWatchPosition`](#stopwatchpositionsuccessfn-failurefn-options) | `successFn`, `failureFn`, `{options}` | Halt `watchPosition` updates. |
 | [`changePace`](#changepaceenabled-successfn-failurefn) | `isMoving` | Initiate or cancel immediate background tracking. When set to true, the plugin will begin aggressively tracking the devices Geolocation, bypassing stationary monitoring. If you were making a "Jogging" application, this would be your [Start Workout] button to immediately begin GPS tracking. Send false to disable aggressive GPS monitoring and return to stationary-monitoring mode. |
 | [`getLocations`](#getlocationscallbackfn-failurefn) | `callbackFn` | Fetch all the locations currently stored in native plugin's SQLite database. Your callbackFn`` will receive an `Array` of locations in the 1st parameter |
 | [`getCount`](#getcountcallbackfn-failurefn) | `callbackFn` | Fetches count of SQLite locations table `SELECT count(*) from locations` |
@@ -216,6 +220,31 @@ The default behaviour of the plugin is to turn **off** location-services *automa
 
 The desired iOS location-authorization request, either `Always` or `WhenInUse`.  Defaults to `Always`.  You'll have to edit the corresponding key in your app's `Info.plist`, `NSLocationAlwaysUsageDescription` or `NSWhenInUseUsageDescription`.  `WhenInUse` will display a **blue bar** at top-of-screen informing user that location-services are on.
 
+####`@param {Object} locationAuthorizationAlert`
+When you configure the plugin location-authorization `Always` or `WhenInUse` and the user changes the value in the app's location-services settings or disabled location-services, the plugin will display an Alert directing the user to the **Settings** screen.  This config allows you to configure all the Strings for that Alert popup and accepts an `{Object}` containing the following keys:
+
+######@param {String} titleWhenOff [Location services are off] 
+The title of the alert if user changes, for example, the location-request to `WhenInUse` when you requested `Always`.
+######@param {String} titleWhenNotEnabled [Background location is not enabled] 
+The title of the alert when user disables location-services or changes the authorization request to `Never`
+######@param {String} instructions [To use background location, you must enable '{locationAuthorizationRequest}' in the Location Services settings]
+The body text of the alert.
+######@param {String} cancelButton [Cancel]
+######@param {String} settingsButton [Settings]
+
+![](https://dl.dropboxusercontent.com/u/2319755/cordova-background-geolocaiton/docs-locationAuthorizationAlert.jpg)
+
+```Javascript
+bgGeo.configure({
+  locationAuthorizationAlert: {
+    titleWhenNotEnabled: "Yo, location-services not enabled",
+    titleWhenOff: "Yo, location-services OFF",
+    instructions: "You must enable 'Always' in location-services, buddy",
+    cancelButton: "Cancel",
+    settingsButton: "Settings"
+  }
+})
+```
 
 ## Android Options
 
@@ -553,6 +582,22 @@ bgGeo.onActivityChange(function(activityName) {
 });
 ```
 
+####`onProviderChange(callbackFn, failureFn)`
+Your `callbackFn` fill be executed when a change in the state of the device's **Location Services** has been detected.  eg: "GPS ON", "Wifi only".  Your `callbackFn` will be provided with an `{Object} provider` containing the following properties
+
+######@param {Boolean} enabled Whether location-services is enabled
+######@param {Boolean} gps Whether gps is enabled
+######@param {Boolean} wifi Whether wifi geolocation is enabled.
+
+```Javascript
+bgGeo.on('providerchange', function(provider) {
+    console.log('- Provider Change: ', provider);
+    console.log('  enabled: ', provider.enabled);
+    console.log('  gps: ', provider.gps);
+    console.log('  wifi: ', provider.wifi);
+});
+```
+
 ####`onGeofence(callbackFn)`
 Adds a geofence event-listener.  Your supplied callback will be called when any monitored geofence crossing occurs.  The `callbackFn` will be provided the following parameters:
 
@@ -880,6 +925,36 @@ bgGeo.getCurrentPosition(succesFn, function(errorCode) {
 
 	}
 })
+```
+
+####`watchPosition(successFn, failureFn, options)`
+Start a stream of continuous location-updates.  The native code will persist the fetched location to its SQLite database just as any other location in addition to POSTing to your configured `#url` (if you've enabled the HTTP features).  
+
+#### Options
+######@param {Integer} locationUpdateInterval
+######@param {Integer} desiredAccuracy
+
+#### Callback
+
+######@param {Object} location The Location data
+
+```Javascript
+bgGeo.watchPosition(function(location) {
+    console.log(“- Watch position: “, location);
+}, function(errorCode) {
+    alert('An location error occurred: ' + errorCode);
+}, {
+    locationUpdateInterval: 5000    // <-- retrieve a location every 5s.
+});
+
+```
+
+####`stopWatchPosition(successFn, failureFn)`
+
+Halt `watchPosition` updates.
+
+```Javascript
+bgGeo.stopWatchPosition();  // <-- callbacks are optional
 ```
 
 ####`changePace(enabled, successFn, failureFn)`
