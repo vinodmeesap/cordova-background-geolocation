@@ -9,6 +9,7 @@
 - [Changed] Significantly simplified Cordova plugin (CDVBackgroundGeolocation.java) by moving boiler-plate code into the Proxy object.  This significantly simplifies the Cordova plugin, making it much easier to support all the different frameworks the plugin has been ported to (ie: React Native, NativeScript).
 - [Changed] Disable iOS start-detection system when no accelerometer detected (ie: when running in simulator, fixes issue #767)
 - [Changed] Refactor iOS location-authorization request system.  The plugin will now constantly check the status of location-authorization and show an Alert popup directing the user to the **Settings** screen if the user changes the state to anything other than what you requested (eg: user changes authorization-request to `WhenInUse` or `Never` when you requestd `Always`)
+- [Fixed] `stopOnTerminate` on iOS was broken when app is closed while in background.  
 
 ## [1.7.0] - 2016-07-18
 - [Changed] `Scheduler` will use `Locale.US` in its Calendar operations, such that the days-of-week correspond to Sunday=1..Saturday=7.  Fixes issue #659
