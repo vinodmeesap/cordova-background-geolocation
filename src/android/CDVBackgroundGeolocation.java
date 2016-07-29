@@ -458,7 +458,7 @@ public class CDVBackgroundGeolocation extends CordovaPlugin {
     private void addGeofences(final CallbackContext callbackContext, JSONArray geofences) {
         TSCallback callback = new TSCallback() {
             public void success(Object result) {
-                callbackContext.success((String) result);
+                callbackContext.success();
             }
             public void error(Object result) {
                 callbackContext.error((String) result);
