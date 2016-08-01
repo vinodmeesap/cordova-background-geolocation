@@ -2,6 +2,7 @@
 # Change Log
 ## [Unreleased]
 - [Fixed] `addGeofences` issue #778
+- [Fixed] iOS setting `method` not being respected (was always doing `POST`).  Issue #770
 
 ## [2.0.4] - 2016-07-28
 - [Changed] Major Android refactor with significant architectural changes.  Introduce new `adapter.BackgroundGeolocation`, a proxy between the Cordova plugin and `BackgroundGeolocationService`.  Up until now, the functionality of the plugin has been contained within a large, monolithic Android Service class.  This monolithic functionality has mostly been moved into the proxy object now, in addition to spreading among a number of new Helper classes.  The functionality of the HTTP, SQLite, Location and ActivityRecognition layers are largely unchanged, just re-orgnanized.  This new structure will make it much easier going forward with adding new features.
