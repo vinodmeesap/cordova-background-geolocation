@@ -2,7 +2,11 @@
 # Change Log
 ## [Unreleased]
 
-## [2.0.5] -- 2016-08-07
+## [2.0.7] - 2016-08-08
+- [Fixed] Scheduler parsing issue #785.
+
+## [2.0.6] Skipped to sync version with Lite version
+## [2.0.5] - 2016-08-07
 - [Fixed] `addGeofences` issue #778
 - [Fixed] iOS setting `method` not being respected (was always doing `POST`).  Issue #770
 - [Changed] Implement latest version of `cordova-plugin-background-fetch` dependency (v4.0.0)
