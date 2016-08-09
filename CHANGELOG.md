@@ -1,6 +1,7 @@
 
 # Change Log
 ## [Unreleased]
+- [Fixed] Issue #804, null pointer exeception on mGoogleApiClient
 
 ## [2.0.7] - 2016-08-08
 - [Fixed] Scheduler parsing issue #785.
