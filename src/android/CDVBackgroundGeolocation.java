@@ -612,9 +612,9 @@ public class CDVBackgroundGeolocation extends CordovaPlugin {
             }
             @Override
             public void error(Object error) {
-                PluginResult result = new PluginResult(PluginResult.Status.OK, (String) error);
+                PluginResult result = new PluginResult(PluginResult.Status.ERROR, (JSONObject) error);
                 result.setKeepCallback(true);
-                callbackContext.error((String) error);
+                callbackContext.sendPluginResult(result);
             }
         }));
     }

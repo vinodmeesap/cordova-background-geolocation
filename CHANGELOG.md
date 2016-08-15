@@ -4,6 +4,9 @@
 - [Fixed] Issue #804, null pointer exeception on mGoogleApiClient
 - [Fixed] Issue #806.  PlayServices connect error event was fired before listeners arrive; Dialog to fix problem was never shown.
 - [Changed] Removed `app-compat` from Gradle dependencies.
+- [Changed] Fire http error callback when HTTP request is not 200ish (ie: 200, 201, 204).  Fixes issue #819.  Contradicts #774.
+- [Changed] Remove `play-services:app-compat-v7` from Gradle dependencies
+
 
 ## [2.0.7] - 2016-08-08
 - [Fixed] Scheduler parsing issue #785.
