@@ -626,7 +626,7 @@ bgGeo.onGeofence(function(params, taskId) {
 
 ####`onHttp(successFn, failureFn)`
 
-The `successFn` will be executed for each successful HTTP request.  `failureFn` will be executed on HTTP failure.  The `successFn` and `failureFn` will be provided a single `response {Object}` parameter with the following properties:
+The `successFn` will be executed for each successful HTTP request where the response-code is one of `200`, `201` or `204`.  `failureFn` will be executed for all other HTTP response codes.  The `successFn` and `failureFn` will be provided a single `response {Object}` parameter with the following properties:
 
 ######@param {Integer} status.  The HTTP status
 ######@param {String} responseText The HTTP response as text.
