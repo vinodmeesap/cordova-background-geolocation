@@ -1,6 +1,8 @@
 
 # Change Log
 ## [Unreleased]
+
+## [2.0.8] - 2016-08-17
 - [Fixed] Issue #804, null pointer exeception on mGoogleApiClient
 - [Fixed] Issue #806.  PlayServices connect error event was fired before listeners arrive; Dialog to fix problem was never shown.
 - [Changed] Removed `app-compat` from Gradle dependencies.
