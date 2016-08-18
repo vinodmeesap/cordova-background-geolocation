@@ -2,6 +2,7 @@
 # Change Log
 ## [Unreleased]
 - [Fixed] `removeGeofences` was removing stationary-region.  This would prevent stationary-exit if called while device is in stationary-mode
+- [Fixed] Issue #830 Android pukes when it receives an empty schedule `[]`.
 
 ## [2.0.8] - 2016-08-17
 - [Fixed] Issue #804, null pointer exeception on mGoogleApiClient
