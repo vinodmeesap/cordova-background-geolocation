@@ -1,5 +1,9 @@
 
 # Change Log
+
+## [Unreleased]
+- [Fixed] Issue where iOS crashes when configured with null url.
+
 ## [2.0.9] - 2016-08-29
 - [Fixed] `removeGeofences` was removing stationary-region.  This would prevent stationary-exit if called while device is in stationary-mode
 - [Fixed] Issue #830 Android pukes when it receives an empty schedule `[]`.
