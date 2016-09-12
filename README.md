@@ -58,10 +58,10 @@ If building from your local machine (as you should be), ensure you have the foll
 
 ## Documentation
 - [API Documentation](./docs/README.md)
-- [Location Data Schema](./wiki/Location-Data-Schema)
-- [Debugging Sounds](./wiki/Debug-Sounds)
-- [Geofence Features](./wiki/Geofence-Features)
-- [Background Tasks](./wiki/Background-Tasks)
+- [Location Data Schema](../../wiki/Location-Data-Schema)
+- [Debugging Sounds](../../wiki/Debug-Sounds)
+- [Geofence Features](../../wiki/Geofence-Features)
+- [Background Tasks](../../wiki/Background-Tasks)
 
 ## Help
 
