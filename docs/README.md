@@ -940,9 +940,10 @@ Start a stream of continuous location-updates.  The native code will persist the
 - There is no `bgTask` provided to the callback.
 
 #### Options
-######@param {Integer milliseconds} interval
-######@param {Integer} desiredAccuracy
-######@param {Boolean} persist
+######@param {Integer millis} `[1000]` Location update interval
+######@param {Integer} `[0]` desiredAccuracy
+######@param {Boolean} `[true]` persist 
+######@param {Object} `[undefined]` extras Optional extras to append to each location
 
 #### Callback
 
@@ -954,7 +955,8 @@ bgGeo.watchPosition(function(location) {
 }, function(errorCode) {
     alert('An location error occurred: ' + errorCode);
 }, {
-    locationUpdateInterval: 5000    // <-- retrieve a location every 5s.
+    interval: 5000,    // <-- retrieve a location every 5s.
+    persist: false,    // <-- default is true
 });
 
 ```
