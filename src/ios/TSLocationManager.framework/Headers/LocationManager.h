@@ -26,6 +26,7 @@
 @property (copy) void (^errorBlock) (LocationManager* manager, NSError* error);
 
 -(void)watchPosition:(NSDictionary*)options;
+-(void)requestLocation;
 -(void)stopWatchPosition;
 -(void)startUpdatingLocation;
 -(void)startUpdatingLocation:(NSInteger)samples;
