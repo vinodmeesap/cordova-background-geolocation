@@ -3,6 +3,11 @@
 
 ## [Unreleased]
 - [Fixed] Issue where iOS crashes when configured with null url.
+- [Added] iOS `watchPosition` mechanism.
+- [Changed] Refactored iOS motion-detection system.  Improved iOS motion-triggering when using `CMMotionActivityManager` (ie: when not using `disableMotionActivityUpdates: true`).  iOS can now trigger out of stationary-mode just like android, where it sees a 'moving-type' motion-activity (eg: 'on_foot', 'in_vehicle', etc).  Note: this will still occur only when your app isn't suspended (eg: app is in foreground, `preventSuspend: true`, or `#watchPosition` is engaged).
+- [Changed] Refactored iOS "prevent suspend" system to be more robust.
+- [Fixed] iOS locations sent to Javascript client had a different `uuid` than the one persisted to database (and synced to server).
+-[Added] new iOS .plist required key for accelerometer updates 'NSMmotionUsageDescription` to `config.xml`.  Fixes #880
 
 ## [2.0.9] - 2016-08-29
 - [Fixed] `removeGeofences` was removing stationary-region.  This would prevent stationary-exit if called while device is in stationary-mode
