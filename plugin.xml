@@ -23,14 +23,16 @@
 
      <platform name="ios">
         <!-- required background modes:  App registers for location updates -->        
+        <config-file target="*-Info.plist" parent="UIBackgroundModes">
+            <array>
+                <string>location</string>
+            </array>
+        </config-file>
+
         <config-file target="*-Info.plist" parent="NSLocationAlwaysUsageDescription">
             <string>App requires background location tracking</string>
         </config-file>
-
-        <config-file target="*-Info.plist" parent="NSLocationWhenInUseUsageDescription">
-            <string>App requires background location tracking</string>
-        </config-file>
-
+        
         <config-file target="*-Info.plist" parent="NSLocationWhenInUseUsageDescription">
             <string>App requires background location tracking</string>
         </config-file>
@@ -44,6 +46,7 @@
                 <param name="ios-package" value="CDVBackgroundGeolocation"/>
             </feature>
         </config-file>
+        
         <framework src="AudioToolbox.framework" weak="true" />
         <framework src="SystemConfiguration.framework" weak="true" />
         <framework src="AVFoundation.framework" weak="true" />
