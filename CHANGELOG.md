@@ -1,5 +1,7 @@
 
 # Change Log
+## [2.0.12] - 2016-09-25
+- [Fixed] Bug in prevent-suspend where background-fetch operation where plugin was left in preventSuspend mode when not configured to do do
 
 ## [2.0.11] - 2016-09-22
 - [Fixed] Bug in prevent-suspend where the plugin failed to re-start its prevent-suspend timer if no MotionActivity event occurred during that interval.  Prevent-suspend system should now operate completely independently of MotionDetector.
