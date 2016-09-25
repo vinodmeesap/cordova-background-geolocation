@@ -1,5 +1,9 @@
 
 # Change Log
+
+## [2.0.13] - 2016-09-25
+- [Fixed] Background-fetch event when causing app to boot in background, left plugin in preventSuspend mode when not configured to do so.
+
 ## [2.0.12] - 2016-09-25
 - [Fixed] Bug in prevent-suspend where background-fetch operation where plugin was left in preventSuspend mode when not configured to do do
 
