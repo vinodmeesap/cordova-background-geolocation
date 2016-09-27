@@ -69,6 +69,7 @@ typedef enum
  * Available only on devices that have M7 chip. At this time only the iPhone 5S, iPhone6/6plus, the iPad Air and iPad mini with retina display have the M7 coprocessor.
  */
 @property (nonatomic) BOOL useM7IfAvailable NS_AVAILABLE_IOS(7_0);
+@property (nonatomic, readonly) BOOL M7Authorized;
 
 // For debug/diagnostics mode
 @property (nonatomic) BOOL debug;

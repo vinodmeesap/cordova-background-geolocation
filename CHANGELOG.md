@@ -1,5 +1,7 @@
 
 # Change Log
+## [Unreleased]
+- [Fixed] If user declines "Motion Activity" permission, plugin failed to detect this authorization failure and fallback to the accelerometer-based motion-detection system.
 
 ## [2.0.13] - 2016-09-25
 - [Fixed] Background-fetch event when causing app to boot in background, left plugin in preventSuspend mode when not configured to do so.
