@@ -68,13 +68,15 @@ bgGeo.setConfig({
 | [`batchSync`](#param-string-batchsync-false) | `Boolean` | Optional | `false` | Default is `false`.  If you've enabled HTTP feature by configuring an `#url`, `batchSync: true` will POST all the locations currently stored in native SQLite datbase to your server in a single HTTP POST request.  With `batchSync: false`, an HTTP POST request will be initiated for **each** location in database. |
 | [`maxBatchSize`](#param-integer-maxbatchsize-undefined) | `Integer` | Optional | `-1` | If you've enabled HTTP feature by configuring an `#url` and `batchSync: true`, this parameter will limit the number of records attached to each batch.  If the current number of records exceeds the `maxBatchSize`, multiple HTTP requests will be generated until the location queue is empty. |
 | [`maxDaysToPersist`](#param-integer-maxdaystopersist-1) | `Integer` | Optional | `1` |  Maximum number of days to store a geolocation in plugin's SQLite database when your server fails to respond with `HTTP 200 OK`.  The plugin will continue attempting to sync with your server until `maxDaysToPersist` when it will give up and remove the location from the database. |
-| [`maxRecordsToPersist`](#param-integer-maxrecordstopersist--1) | `Integer` | Optional | `-1` |  Maximum number of records to persist in plugin's SQLite database.|
+| [`maxRecordsToPersist`](#param-integer-maxrecordstopersist--1) | `Integer` | Optional | `-1` |  Maximum number of records to persist in plugin's SQLite database.  Defaults to `-1` (no limit)|
 
 ## Application Options
 
 | Option | Type | Opt/Required | Default | Note |
 |---|---|---|---|---|
 | [`debug`](#param-boolean-debug-false) | `Boolean` | Optional | `false` | When enabled, the plugin will emit sounds for life-cycle events of background-geolocation!  **NOTE iOS**:  In addition, you must manually enable the *Audio and Airplay* background mode in *Background Capabilities* to hear these debugging sounds. |
+| [`logLevel`](#param-integer-loglevel-5) | `Integer` | Optional **iOS** | `5` **VERBOSE** | Filters the logs by `logLevel`: `0`:**NONE**, `1`:**ERROR** , `2`:**WARNING** , `3`:**INFO**, `4`:**DEBUG**, `5`:**VERBOSE** |
+| [`logMaxDays`](#param-integer-logmaxdays-3) | `Integer` | Optional **iOS** | `3` | Maximum days to persist a log-entry in database. |
 | [`stopOnTerminate`](#param-boolean-stoponterminate-true) | `Boolean` | Optional | `true` | Enable this in order to force a stop() when the application is terminated |
 | [`startOnBoot`](#param-boolean-startonboot-false) | `Boolean` | Optional | `false` | Set to `true` to enable background-tracking after the device reboots. |
 | [`preventSuspend`](#param-boolean-preventsuspend-false) | `Boolean` | Optional **iOS** | `false` | Enable this to prevent **iOS** from suspending.  Must be used in conjunction with a `heartbeatInterval`.  **WARNING**: `preventSuspend` should only be used in **very** specific use-cases and should typically **not** be used as it will have a **very serious impact on battery performance.** |
@@ -107,7 +109,7 @@ bgGeo.on("location", onLocation, onLocationError);
 | [`onGeofence`](#ongeofencecallbackfn) | `geofence` | Fired when a geofence crossing event occurs |
 | [`onHttp`](#onhttpsuccessfn-failurefn) | `http` | Fired after a successful HTTP response. `response` object is provided with `status` and `responseText`|
 | [`onHeartbeat`](#onheartbeatsuccessfn-failurefn) | `heartbeat` | Fired each `heartbeatInterval` while the plugin is in the **stationary** state with (iOS requires `preventSuspend: true` in addition).  Your callback will be provided with a `params {}` containing the parameters `shakes {Integer}`, `motionType {String}` and current location object `location {Object}` |
-| [`onSchedule`](#onschedulecallbackFn) | `schedule` | Fired when a schedule event occurs.  Your `callbackFn` will be provided with the current `state` Object. | 
+| [`onSchedule`](#onschedulesuccessfn-failurefn) | `schedule` | Fired when a schedule event occurs.  Your `callbackFn` will be provided with the current `state` Object. | 
 
 ## Methods
 
@@ -127,7 +129,8 @@ bgGeo.on("location", onLocation, onLocationError);
 | [`changePace`](#changepaceenabled-successfn-failurefn) | `isMoving` | Initiate or cancel immediate background tracking. When set to true, the plugin will begin aggressively tracking the devices Geolocation, bypassing stationary monitoring. If you were making a "Jogging" application, this would be your [Start Workout] button to immediately begin GPS tracking. Send false to disable aggressive GPS monitoring and return to stationary-monitoring mode. |
 | [`getLocations`](#getlocationscallbackfn-failurefn) | `callbackFn` | Fetch all the locations currently stored in native plugin's SQLite database. Your callbackFn`` will receive an `Array` of locations in the 1st parameter |
 | [`getCount`](#getcountcallbackfn-failurefn) | `callbackFn` | Fetches count of SQLite locations table `SELECT count(*) from locations` |
-| [`clearDatabase`](#cleardatabasecallbackfn-failurefn) | `callbackFn` | Delete all records in plugin's SQLite database |
+| [`clearDatabase`](#destroylocationscallbackfn-failurefn) | `callbackFn` | **DEPRECATED** use `#destroyLocations` |
+| [`destroyLocations`](#destroylocationscallbackfn-failurefn) | `callbackFn` | Delete all records in plugin's SQLite database |
 | [`sync`](#synccallbackfn-failurefn) | - | If the plugin is configured for HTTP with an `#url` and `#autoSync: false`, this method will initiate POSTing the locations currently stored in the native SQLite database to your configured `#url`|
 | [`getOdometer`](#getodometercallbackfn-failurefn) | `callbackFn` | The plugin constantly tracks distance travelled. The supplied callback will be executed and provided with a `distance` as the 1st parameter.|
 | [`resetOdometer`](#resetodometercallbackfn-failurefn) | `callbackFn` | Reset the **odometer** to `0`.  The plugin never automatically resets the odometer -- this is **up to you** |
@@ -137,7 +140,9 @@ bgGeo.on("location", onLocation, onLocationError);
 | [`removeGeofence`](#removegeofenceidentifier-callbackfn-failurefn) | `identifier` | Removes a geofence identified by the provided `identifier` |
 | [`removeGeofences`](#removegeofences-callbackfn-failurefn) |  | Removes all geofences |
 | [`getGeofences`](#getgeofencescallbackfn-failurefn) | `callbackFn` | Fetch the list of monitored geofences. Your callbackFn will be provided with an Array of geofences. If there are no geofences being monitored, you'll receive an empty `Array []`.|
-| [`getLog`](#getlogcallbackfn) | `calbackFn` | Fetch the entire contents of the current circular log and return it as a String.|
+| [`setLogLevel`](#setloglevelcallbackfn) | `calbackFn` | Set the Log filter:  `0` (no logs), `1` (error), `2` (warning), `3` (info), `4` (debug), `5` (verbose)|
+| [`getLog`](#getlogcallbackfn) | `calbackFn` | Fetch the entire contents of the current log database as a `String`.|
+| [`destroyLog`](#destroylogcallbackfnfailurefn) | `calbackFn`,`failureFn` | Destroy the contents of the Log database. |
 | [`emailLog`](#emaillogemail-callbackfn) | `email`, `callbackFn` | Fetch the entire contents of the current circular log and email it to a recipient using the device's native email client.|
 
 # Geolocation Options
@@ -375,7 +380,7 @@ Maximum number of days to store a geolocation in plugin's SQLite database when y
 
 ####`@param {Integer} maxRecordsToPersist [-1]`
 
-Maximum number of records to persist in plugin's SQLite database.  Default `-1` means no limit.
+Maximum number of records to persist in plugin's SQLite database.  Default `-1` means **no limit**.
 
 # Application Options
 
@@ -471,6 +476,23 @@ bgGeo.setConfig({
 ```
 
 ## iOS Options
+
+####`@param {Integer} logLevel [5]`
+
+Set the log-filter `logLevel`.  @see [`getLog`](#getlogcallbackfn) / [`emailLog`](#emaillogemail-callbackfn).
+
+| logLevel | Label |
+|---|---|
+|`0`|`OFF`|
+|`1`|`ERROR`|
+|`2`|`WARNING`|
+|`3`|`INFO`|
+|`4`|`DEBUG`|
+|`5`|`VERBOSE`|
+
+####`@param {Integer} logMaxDays [3]`
+
+Maximum number of days to persist a log-entry in database.  Defaults to `3` days.
 
 ####`@param {Boolean} preventSuspend [false]`
 
@@ -592,14 +614,14 @@ Your `callbackFn` fill be executed when a change in the state of the device's **
 
 ######@param {Boolean} enabled Whether location-services is enabled
 ######@param {Boolean} gps Whether gps is enabled
-######@param {Boolean} wifi Whether wifi geolocation is enabled.
+######@param {Boolean} network Whether wifi geolocation is enabled.
 
 ```Javascript
 bgGeo.on('providerchange', function(provider) {
     console.log('- Provider Change: ', provider);
     console.log('  enabled: ', provider.enabled);
     console.log('  gps: ', provider.gps);
-    console.log('  wifi: ', provider.wifi);
+    console.log('  network: ', provider.network);
 });
 ```
 
@@ -1144,12 +1166,14 @@ Manually insert a location into the native plugin's SQLite database.  Your ```ca
     });
 ```
 
-
 ####`clearDatabase(callbackFn, failureFn)`
+**DEPRECATED**.  Use `#destroyLocations`.
+
+####`destroyLocations(callbackFn, failureFn)`
 Remove all records in plugin's SQLite database.
 
 ```Javascript
-    bgGeo.clearDatabase(function() {
+    bgGeo.destroyLocations(function() {
       console.log('- cleared database'); 
     });
 ```
@@ -1206,6 +1230,24 @@ Here's a fun one.  The plugin can play a number of OS system sounds for each pla
     bgGeo.playSound(90);
 ```
 
+####`setLogLevel(callbackFn)`
+
+Set the log filter `logLevel`
+| logLevel | Label |
+|---|---|
+|`0`|`OFF`|
+|`1`|`ERROR`|
+|`2`|`WARNING`|
+|`3`|`INFO`|
+|`4`|`DEBUG`|
+|`5`|`ALL`|
+
+```Javascript
+    bgGeo.setLogLevel(5, function() {
+        console.log("Changed logLevel success");
+    });
+```
+
 ####`getLog(callbackFn)`
 
 Fetches the entire contents of the current circular-log and return it as a String.
@@ -1213,6 +1255,18 @@ Fetches the entire contents of the current circular-log and return it as a Strin
 ```Javascript
     bgGeo.getLog(function(log) {
         console.log(log);
+    });
+```
+
+####`destroyLog(callbackFn, failureFn)`
+
+Destory the entire contents of Log database.
+
+```Javascript
+    bgGeo.destroyLog(function() {
+        console.log('- Destroyed log');
+    }, function() {
+        console.log('- Destroy log failure');
     });
 ```
 

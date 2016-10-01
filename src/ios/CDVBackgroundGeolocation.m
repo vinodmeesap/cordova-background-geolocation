@@ -8,7 +8,7 @@
 @implementation CDVBackgroundGeolocation {
     TSLocationManager *bgGeo;
     NSDictionary *config;
-    
+
     NSMutableArray *activityChangeListeners;
     NSMutableArray *providerChangeListeners;
     NSMutableArray *locationListeners;
@@ -38,7 +38,7 @@
     bgGeo.httpResponseBlock     = [self createHttpResponseHandler];
     bgGeo.errorBlock            = [self createErrorHandler];
     bgGeo.scheduleBlock         = [self createScheduleHandler];
-    
+
     locationListeners   = [NSMutableArray new];
 }
 
@@ -53,19 +53,19 @@
 {
     //self.locationCallbackId = command.callbackId;
     [locationListeners addObject:command.callbackId];
-    
+
     config = [command.arguments objectAtIndex:0];
     NSDictionary *state = [bgGeo configure:config];
-    
+
     CDVPluginResult* result = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsDictionary:state];
-    
+
     [self.commandDelegate sendPluginResult:result callbackId:command.callbackId];
 }
 
 - (void) setConfig:(CDVInvokedUrlCommand*)command
 {
     NSDictionary *cfg  = [command.arguments objectAtIndex:0];
-    
+
     [self.commandDelegate runInBackground:^{
         [bgGeo setConfig:cfg];
         CDVPluginResult* result = nil;
@@ -92,7 +92,7 @@
             [self.commandDelegate sendPluginResult:result callbackId:command.callbackId];
         });
     }];
-    
+
 }
 /**
  * Turn it off
@@ -140,7 +140,7 @@
 - (void) getStationaryLocation:(CDVInvokedUrlCommand *)command
 {
     NSDictionary* location = [bgGeo getStationaryLocation];
-    
+
     CDVPluginResult *result = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsDictionary:location];
     [self.commandDelegate sendPluginResult:result callbackId:command.callbackId];
 }
@@ -149,7 +149,7 @@
  * Fetches current stationaryLocation
  */
 - (void) getLocations:(CDVInvokedUrlCommand *)command
-{   
+{
     [self.commandDelegate runInBackground:^{
         NSDictionary *params = @{
             @"locations": [bgGeo getLocations],
@@ -161,8 +161,15 @@
         });
     }];
 }
-
+/**
+* @deprecated
+*/
 - (void) clearDatabase:(CDVInvokedUrlCommand*)command
+{
+    [self destroyLocations:command];
+}
+
+- (void) destroyLocations:(CDVInvokedUrlCommand*)command
 {
     [self.commandDelegate runInBackground:^{
         BOOL success = [bgGeo clearDatabase];
@@ -170,6 +177,7 @@
         [self.commandDelegate sendPluginResult:result callbackId:command.callbackId];
     }];
 }
+
 /**
  * Fetches current stationaryLocation
  */
@@ -259,9 +267,9 @@
     NSString *notifyOnEntry = [cfg objectForKey:@"notifyOnEntry"];
 
     [self.commandDelegate runInBackground:^{
-        [bgGeo addGeofence:[cfg objectForKey:@"identifier"] 
-            radius:[[cfg objectForKey:@"radius"] doubleValue] 
-            latitude:[[cfg objectForKey:@"latitude"] doubleValue] 
+        [bgGeo addGeofence:[cfg objectForKey:@"identifier"]
+            radius:[[cfg objectForKey:@"radius"] doubleValue]
+            latitude:[[cfg objectForKey:@"latitude"] doubleValue]
             longitude:[[cfg objectForKey:@"longitude"] doubleValue]
             notifyOnEntry: (notifyOnEntry) ? [notifyOnEntry boolValue] : NO
             notifyOnExit: (notifyOnExit) ? [notifyOnExit boolValue] : NO
@@ -277,7 +285,7 @@
 - (void) addGeofences:(CDVInvokedUrlCommand*)command
 {
     NSArray *geofences  = [command.arguments objectAtIndex:0];
-    
+
     [self.commandDelegate runInBackground:^{
         [bgGeo addGeofences:geofences];
         CDVPluginResult *result = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK];
@@ -291,7 +299,7 @@
 - (void) removeGeofence:(CDVInvokedUrlCommand*)command
 {
     NSString *identifier  = [command.arguments objectAtIndex:0];
-    
+
     [self.commandDelegate runInBackground:^{
         CDVPluginResult *result;
         if ([bgGeo removeGeofence:identifier]) {
@@ -472,9 +480,24 @@
     [self.commandDelegate runInBackground:^{
         CDVPluginResult* result = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsString:[bgGeo getLog]];
         [self.commandDelegate sendPluginResult:result callbackId:command.callbackId];
-    }];    
+    }];
 }
 
+-(void) destroyLog:(CDVInvokedUrlCommand*)command
+{
+    [self.commandDelegate runInBackground:^{
+        CDVPluginResult *result = ([bgGeo destroyLog]) ? [CDVPluginResult resultWithStatus:CDVCommandStatus_OK] : [CDVPluginResult resultWithStatus:CDVCommandStatus_ERROR];
+        [self.commandDelegate sendPluginResult:result callbackId:command.callbackId];
+    }];
+}
+
+- (void) setLogLevel:(CDVInvokedUrlCommand *) command
+{
+    NSInteger logLevel = [[command.arguments objectAtIndex:0] integerValue];
+    [bgGeo setLogLevel:logLevel];
+    CDVPluginResult* result = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK];
+    [self.commandDelegate sendPluginResult:result callbackId:command.callbackId];
+}
 -(void) emailLog:(CDVInvokedUrlCommand*)command
 {
     NSString *email = [command.arguments objectAtIndex:0];
@@ -491,11 +514,11 @@
         NSDictionary *params = @{@"location": locationData, @"taskId": @([bgGeo createBackgroundTask])};
         CDVPluginResult* result = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsDictionary:params];
         [result setKeepCallbackAsBool:YES];
-        
+
         for (NSString *callbackId in locationListeners) {
             [self.commandDelegate sendPluginResult:result callbackId:callbackId];
         }
-        
+
         if (type == TS_LOCATION_TYPE_WATCH) {
             @synchronized(watchPositionListeners) {
                 for (NSString *callbackId in watchPositionListeners) {
@@ -589,7 +612,7 @@
             [result setKeepCallbackAsBool:YES];
             [self.commandDelegate runInBackground:^{
                 [self.commandDelegate sendPluginResult:result callbackId:callbackId];
-            }];       
+            }];
         }
     };
 }
@@ -627,7 +650,7 @@
         };
         CDVPluginResult *result = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsDictionary:params];
         [self.commandDelegate sendPluginResult:result callbackId:syncCallbackId];
-        
+
         // Ready for another sync task.
         syncCallbackId  = nil;
         syncTaskId      = UIBackgroundTaskInvalid;
@@ -662,9 +685,9 @@
                 }
                 [currentPositionListeners removeAllObjects];
             }
-            
+
             [result setKeepCallbackAsBool:YES];
-            
+
             for (NSString *callbackId in locationListeners) {
                 [self.commandDelegate sendPluginResult:result callbackId:callbackId];
             }
