@@ -69,7 +69,7 @@ If building from your local machine (as you should be), ensure you have the foll
 
 ## Example
 
-```
+```Javascript
 
 ////
 // As with all Cordova plugins, you must configure within an #deviceready callback.
@@ -82,15 +82,26 @@ function onDeviceReady() {
     * This callback will be executed every time a geolocation is recorded in the background.
     */
     var callbackFn = function(location, taskId) {
-        var coords = location.coords;
-        var lat    = coords.latitude;
-        var lng    = coords.longitude;
-        
-        // Simulate doing some extra work with a bogus setTimeout.  This could perhaps be an Ajax request to your server.
-        // The point here is that you must execute bgGeo.finish after all asynchronous operations within the callback are complete.
-        setTimeout(function() {
-          bgGeo.finish(taskId); // <-- execute #finish when your work in callbackFn is complete
-        }, 1000);
+        console.log('- Location', location);
+
+        myUpdatePositionOnMapMethod(location);
+
+        // The plugin records multiple samples when doing motionchange events.
+        // It sends these to the location callback for you convenience.
+        // You might uses these to "progressively" update user's current
+        // position on a map, for example.
+        if (location.sample) {
+            console.log('- Ignore samples');
+
+            // IMPORTANT:  send signal to native code that your callback is complete.
+            bgGeo.finish();
+            return;
+        }
+
+        myCustommProcessingMethod(function() {
+            // IMPORTANT:  send signal to native code that your callback is 
+            bgGeo.finish();
+        });
     };
 
     var failureFn = function(error) {
@@ -106,35 +117,22 @@ function onDeviceReady() {
         desiredAccuracy: 0,
         stationaryRadius: 50,
         distanceFilter: 50,
-        disableElasticity: false, // <-- [iOS] Default is 'false'.  Set true to disable speed-based distanceFilter elasticity
-        locationUpdateInterval: 5000,
-        minimumActivityRecognitionConfidence: 80,   // 0-100%.  Minimum activity-confidence for a state-change 
-        fastestLocationUpdateInterval: 5000,
-        activityRecognitionInterval: 10000,
-        stopDetectionDelay: 1,   // [iOS] delay x minutes before entering stop-detection mode
-        stopTimeout: 2,	 // Stop-detection timeout minutes (wait x minutes to turn off tracking)
-        activityType: 'AutomotiveNavigation',
 
+        // Activity recognition config
+        activityRecognitionInterval: 10000,
+        stopTimeout: 5,	 // Stop-detection timeout minutes (wait x minutes to turn off tracking)
+        
         // Application config
         debug: true, // <-- enable this hear sounds for background-geolocation life-cycle.
-        forceReloadOnLocationChange: false,  // <-- [Android] If the user closes the app **while location-tracking is started** , reboot app when a new location is recorded (WARNING: possibly distruptive to user) 
-        forceReloadOnMotionChange: false,    // <-- [Android] If the user closes the app **while location-tracking is started** , reboot app when device changes stationary-state (stationary->moving or vice-versa) --WARNING: possibly distruptive to user) 
-        forceReloadOnGeofence: false,        // <-- [Android] If the user closes the app **while location-tracking is started** , reboot app when a geofence crossing occurs --WARNING: possibly distruptive to user) 
+        logLevel: 5,    // Verbose logging.  0: NONE
         stopOnTerminate: false,              // <-- Don't stop tracking when user closes app.
         startOnBoot: true,                   // <-- [Android] Auto start background-service in headless mode when device is powered-up.
         
         // HTTP / SQLite config
         url: 'http://posttestserver.com/post.php?dir=cordova-background-geolocation',
-        method: 'POST',
-        batchSync: true,       // <-- [Default: false] Set true to sync locations to server in a single HTTP request.
+        batchSync: false,       // <-- [Default: false] Set true to sync locations to server in a single HTTP request.
         autoSync: true,         // <-- [Default: true] Set true to sync each location to server as it arrives.
         maxDaysToPersist: 1,    // <-- Maximum days to persist a location in plugin's SQLite database when HTTP fails
-        headers: {
-            "X-FOO": "bar"
-        },
-        params: {
-            "auth_token": "maybe_your_server_authenticates_via_token_YES?"
-        }
     }, function(state) {
       // Plugin is configured and ready to use.
       if (!state.enabled) {
@@ -177,26 +175,42 @@ $ cordova build ios
 
 The plugin has features allowing you to control the behaviour of background-tracking, striking a balance between accuracy and battery-usage.  In stationary-mode, the plugin attempts to descrease its power usage and accuracy by setting up a circular stationary-region of configurable #stationaryRadius.  
 
-iOS has a nice system  [Significant Changes API](https://developer.apple.com/library/ios/documentation/CoreLocation/Reference/CLLocationManager_Class/CLLocationManager/CLLocationManager.html#//apple_ref/occ/instm/CLLocationManager/startMonitoringSignificantLocationChanges), which allows the os to suspend your app until a cell-tower change is detected (typically 2-3 city-block change) 
+The plugin has two states of operation:  **MOVING** and **STATIONARY**.  The plugin *desires* to be in the **STATIONARY** state.  When the plugin is first turned on with the `#start` method, the plugin immediately fetches a high-accuracy location and enters the **STATIONARY** state, when it turns **OFF** location-services.  The plugin will stay in this state until it detects the device is moving.
 
-Android uses the Google Play Services APIs [FusedLocationProvider API](https://developer.android.com/reference/com/google/android/gms/location/FusedLocationProviderApi.html) as well as the [ActivityRecognition API](https://developer.android.com/reference/com/google/android/gms/location/ActivityRecognitionApi.html) (for movement/stationary detection). Windows Phone does not have such a API.
+When the plugin is detected to be **MOVING**, it will begin sending locations to your configured `location` listener:
 
-The plugin will execute your configured ```callback``` provided to the ```#configure(callback, config)``` method.  Both iOS & Android use a SQLite database to persist **every** recorded geolocation so you don't have to worry about persistence when no network is detected.  The plugin provides a Javascript API to fetch and destroy the records in the database.  In addition, the plugin has an optional HTTP layer allowing allowing you to automatically HTTP POST recorded geolocations to your server.
+```Javascript
+bgGeo.on("motionchange", function(isMoving, location, taskId) {
+  console.log("motion state changed: ", isMoving, location);
+  bgGeo.finish(taskId);
+});
 
-The function ```changePace(isMoving, success, failure)``` is provided to force the plugin to enter "moving" or "stationary" state.
+bgGeo.on("location", function(location, taskId) {
+  console.log('- Location: ', location);
+});
+```
+
+Both iOS & Android use a SQLite database to persist **every** recorded location so you don't have to worry about persistence when no network is detected.  The plugin provides a Javascript API to fetch `#getLocations` and destroy the records in the database `#destroyLocations`.  In addition, the plugin has an optional HTTP layer allowing allowing you to automatically HTTP POST recorded geolocations to your server; the plugin will automatically keep trying to sync to your server until it receives a successful HTTP response code (`200, 201, 204`).
+
+The function [`#changePace(isMoving, success, failure)`](docs#changepaceenabled-successfn-failurefn) is provided to force the plugin to enter **MOVING** or **STATIONARY** state.
+
+When the device is determined to be stopped in the same position for `#stopTimeout` minutes, the plugin will change state to **STATIONARY**, fetch a high-accuracy location, fire the `motionchange` event and turn **OFF** location-services.
 
 ## iOS
 
-The plugin uses iOS Significant Changes API, and starts triggering your configured ```callback``` only when a cell-tower switch is detected (i.e. the device exits stationary radius). 
+While in the **STATIONARY** state, iOS monitors a geofence around the current-position of `#stationaryRadius` meters (min 25).  However, in practice, iOS won't trigger this stationary geofence until the device has moved ~100-200 meters beyond the stationary position.  Once this stationary-geofence triggers, the plugin changes state to **MOVING**, turns on location services and begins recording a location each `#distanceFilter` meters.  Your app is completely awake in the background.
 
-When the plugin detects the device has moved beyond its configured #stationaryRadius, it engages the native platform's geolocation system for aggressive monitoring according to the configured `#desiredAccuracy`, `#distanceFilter`.  The plugin attempts to intelligently scale `#distanceFilter` based upon the current reported speed.  Each time `#distanceFilter` is determined to have changed by 5m/s, it recalculates it by squaring the speed rounded-to-nearest-five and adding #distanceFilter (I arbitrarily came up with that formula.  Better ideas?).
+When the plugin detects the device has moved beyond its configured #stationaryRadius, it engages the native platform's geolocation system for aggressive monitoring according to the configured `#desiredAccuracy`, `#distanceFilter`.
 
-  `(round(speed, 5))^2 + distanceFilter`
+### [iOS `preventSuspend` mode](docs#param-boolean-preventsuspend-false)
+
+iOS has a **specialized** config-option called [`preventSuspend: true`](docs#param-boolean-preventsuspend-false).  This mode will keep your iOS app running constantly in the background, 24/7.  While in this mode, iOS does **NOT** require the "100-200" meters of movement to detect the device is moving, instead, it will constantly monitor the device movement using accelerometer/gyroscope APIs, making it highly sensitive to movement detection and `motionchange` trigger.  **NOTE** care **MUST** be taken with this mode since it *will* consume more energy.
 
 ## Android
 
-Using the [ActivityRecognition API](https://developer.android.com/reference/com/google/android/gms/location/ActivityRecognitionApi.html) provided by [Google Play Services](https://developer.android.com/google/play-services/index.html), Android will constantly monitor [the nature](https://developer.android.com/reference/com/google/android/gms/location/DetectedActivity.html) of the device's movement at a sampling-rate configured by ```#activityRecognitionRate```.  When the plugin sees a DetectedActivity of [STILL](https://developer.android.com/reference/com/google/android/gms/location/DetectedActivity.html), location-updates will be halted -- when it sees ```IN_VEHICLE, ON_BICYCLE, ON_FOOT, RUNNING, WALKING```, location-updates will be initiated.
+Android uses the Google Play Services APIs [FusedLocationProvider API](https://developer.android.com/reference/com/google/android/gms/location/FusedLocationProviderApi.html) as well as the [ActivityRecognition API](https://developer.android.com/reference/com/google/android/gms/location/ActivityRecognitionApi.html) (for movement/stationary detection). 
 
+Unlike iOS, Android does not require a stationary-geofence to determine when the device is moving.  Instead it constantly monitors the [ActivityRecognition API](https://developer.android.com/reference/com/google/android/gms/location/ActivityRecognitionApi.html) provided by [Google Play Services](https://developer.android.com/google/play-services/index.html).  Android will constantly monitor [the nature](https://developer.android.com/reference/com/google/android/gms/location/DetectedActivity.html) of the device's movement at a sampling-rate configured by `#activityRecognitionRate`.  When the plugin sees a DetectedActivity of [STILL](https://developer.android.com/reference/com/google/android/gms/location/DetectedActivity.html), location-updates will be halted -- when it sees `IN_VEHICLE, ON_BICYCLE, ON_FOOT, RUNNING, WALKING`, location-updates will be initiated.
 
 ## Licence ##
 ```

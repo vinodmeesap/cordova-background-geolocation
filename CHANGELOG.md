@@ -1,6 +1,18 @@
 
 # Change Log
-## [Unreleased]
+## [2.1.0]
+- [Changed] Refactor iOS Logging system to use popular CocoaLumberjack library.  iOS logs are now stored in the database!  By default, logs are stored for 3 days, but is configurable with `logMaxDays`.  Logs can now be filtered by logLevel:
+| logLevel | Label |
+|---|---|
+|`0`|`LOG_LEVEL_OFF`|
+|`1`|`LOG_LEVEL_ERROR`|
+|`2`|`LOG_LEVEL_WARNING`|
+|`3`|`LOG_LEVEL_INFO`|
+|`4`|`LOG_LEVEL_DEBUG`|
+|`5`|`LOG_LEVEL_VERBOSE`|
+
+`#getLog`, `#emailLog` operate in the same manner as before.
+
 - [Fixed] If user declines "Motion Activity" permission, plugin failed to detect this authorization failure and fallback to the accelerometer-based motion-detection system.
 
 ## [2.0.13] - 2016-09-25

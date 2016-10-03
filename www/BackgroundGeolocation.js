@@ -9,6 +9,18 @@
 */
 var exec = require("cordova/exec");
 module.exports = {
+    LOG_LEVEL_OFF: 0,
+    LOG_LEVEL_ERROR: 1,
+    LOG_LEVEL_WARNING: 2,
+    LOG_LEVEL_INFO: 3,
+    LOG_LEVEL_DEBUG: 4,
+    LOG_LEVEL_VERBOSE: 5,
+
+    DESIRED_ACCURACY_HIGH: 0,
+    DESIRED_ACCURACY_MEDIUM: 10,
+    DESIRED_ACCURACY_LOW: 100,
+    DESIRED_ACCURACY_VERY_LOW: 1000,
+
     /**
     * @property {Object} stationaryLocation
     */
@@ -52,7 +64,7 @@ module.exports = {
         }
         config = config || {};
         this.config = config;
-        
+
         exec(success || function() {},
              failure || function() {},
              'BackgroundGeolocation',
@@ -169,7 +181,7 @@ module.exports = {
         if (typeof(success) !== 'function') {
             throw "A callback must be provided";
         }
-        
+
         var me = this;
         var mySuccess = function(params) {
             var location    = params.location || params;
@@ -203,11 +215,11 @@ module.exports = {
             var isMoving    = params.isMoving;
             var location    = params.location;
             var taskId      = params.taskId || 'task-id-undefined';
-            
+
             if (!isMoving) {
                 me.stationaryLocation = location;
             }
-            
+
             // Transform timestamp to Date instance.
             if (location.timestamp) {
                 location.timestamp = new Date(location.timestamp);
@@ -274,14 +286,18 @@ module.exports = {
             failure || function() {},
             'BackgroundGeolocation',
             'getCount',
-            []);  
+            []);
     },
+    // @deprecated
     clearDatabase: function(success, failure) {
+        this.destroyLocations(success, failure);
+    },
+    destroyLocations: function(success, failure) {
         exec(success||function(){},
             failure || function() {},
             'BackgroundGeolocation',
-            'clearDatabase',
-            []);  
+            'destroyLocations',
+            []);
     },
     insertLocation: function(location, success, failure) {
         location = location || {};
@@ -361,7 +377,7 @@ module.exports = {
         }
         if (!(config.latitude && config.longitude)) {
             throw "#addGeofence requires a #latitude and #longitude";
-        } 
+        }
         if (!config.radius) {
             throw "#addGeofence requires a #radius";
         }
@@ -393,7 +409,7 @@ module.exports = {
             failure || function() {},
             'BackgroundGeolocation',
             'removeGeofences',
-            []);  
+            []);
     },
     /**
     * remove a geofence
@@ -472,7 +488,7 @@ module.exports = {
             // Transform timestamp to Date instance.
             if (location.timestamp) {
                 location.timestamp = new Date(location.timestamp);
-            }            
+            }
             success(location);
         }
         exec(mySuccess || function() {},
@@ -490,6 +506,15 @@ module.exports = {
             'stopWatchPosition',
         []);
     },
+    setLogLevel: function(logLevel, success, failure) {
+       var success = success || function() {};
+       var failure = failure || function() {};
+       exec(success,
+            failure,
+            'BackgroundGeolocation',
+            'setLogLevel',
+            [logLevel]);
+    },
     getLog: function(success, failure) {
         var success = success || function() {};
         var failure = failure || function() {};
@@ -497,7 +522,16 @@ module.exports = {
             failure,
             'BackgroundGeolocation',
             'getLog',
-            []); 
+            []);
+    },
+    destroyLog: function(success, failure) {
+        var success = success || function() {};
+        var failure = failure || function() {};
+        exec(success,
+            failure,
+            'BackgroundGeolocation',
+            'destroyLog',
+            []);
     },
     emailLog: function(email, success, failure) {
         var success = success || function() {};
@@ -506,7 +540,7 @@ module.exports = {
             failure,
             'BackgroundGeolocation',
             'emailLog',
-            [email]); 
+            [email]);
     },
 
     /**

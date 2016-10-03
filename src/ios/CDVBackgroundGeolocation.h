@@ -42,9 +42,12 @@
 - (void) watchPosition:(CDVInvokedUrlCommand *)command;
 - (void) stopWatchPosition:(CDVInvokedUrlCommand *)command;
 - (void) clearDatabase:(CDVInvokedUrlCommand *) command;
+- (void) destroyLocations:(CDVInvokedUrlCommand *) command;
 - (void) insertLocation:(CDVInvokedUrlCommand *) command;
 - (void) getCount:(CDVInvokedUrlCommand *) command;
 - (void) getLog:(CDVInvokedUrlCommand *) command;
+- (void) destroyLog:(CDVInvokedUrlCommand *) command;
+- (void) setLogLevel:(CDVInvokedUrlCommand *) command;
 - (void) emailLog:(CDVInvokedUrlCommand*) command;
 - (void) playSound:(CDVInvokedUrlCommand *)command;
 @end
