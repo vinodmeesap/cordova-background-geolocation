@@ -75,7 +75,7 @@ bgGeo.setConfig({
 | Option | Type | Opt/Required | Default | Note |
 |---|---|---|---|---|
 | [`debug`](#param-boolean-debug-false) | `Boolean` | Optional | `false` | When enabled, the plugin will emit sounds for life-cycle events of background-geolocation!  **NOTE iOS**:  In addition, you must manually enable the *Audio and Airplay* background mode in *Background Capabilities* to hear these debugging sounds. |
-| [`logLevel`](#param-integer-loglevel-5) | `Integer` | Optional **iOS** | `5` **VERBOSE** | Filters the logs by `logLevel`: `0`:**NONE**, `1`:**ERROR** , `2`:**WARNING** , `3`:**INFO**, `4`:**DEBUG**, `5`:**VERBOSE** |
+| [`logLevel`](#param-integer-loglevel-5) | `Integer` | Optional **iOS** | `LOG_LEVEL_VERBOSE` | Filters the logs by `logLevel`: `LOG_LEVEL_OFF`, `LOG_LEVEL_ERROR`, `LOG_LEVEL_WARNING`, `LOG_LEVEL_INFO`, `LOG_LEVEL_DEBUG`, `LOG_LEVEL_VERBOSE` |
 | [`logMaxDays`](#param-integer-logmaxdays-3) | `Integer` | Optional **iOS** | `3` | Maximum days to persist a log-entry in database. |
 | [`stopOnTerminate`](#param-boolean-stoponterminate-true) | `Boolean` | Optional | `true` | Enable this in order to force a stop() when the application is terminated |
 | [`startOnBoot`](#param-boolean-startonboot-false) | `Boolean` | Optional | `false` | Set to `true` to enable background-tracking after the device reboots. |
@@ -140,7 +140,7 @@ bgGeo.on("location", onLocation, onLocationError);
 | [`removeGeofence`](#removegeofenceidentifier-callbackfn-failurefn) | `identifier` | Removes a geofence identified by the provided `identifier` |
 | [`removeGeofences`](#removegeofences-callbackfn-failurefn) |  | Removes all geofences |
 | [`getGeofences`](#getgeofencescallbackfn-failurefn) | `callbackFn` | Fetch the list of monitored geofences. Your callbackFn will be provided with an Array of geofences. If there are no geofences being monitored, you'll receive an empty `Array []`.|
-| [`setLogLevel`](#setloglevelcallbackfn) | `calbackFn` | Set the Log filter:  `0` (no logs), `1` (error), `2` (warning), `3` (info), `4` (debug), `5` (verbose)|
+| [`setLogLevel`](#setloglevelcallbackfn) | `calbackFn` | Set the Log filter:  `LOG_LEVEL_OFF`, `LOG_LEVEL_ERROR`, `LOG_LEVEL_WARNING`, `LOG_LEVEL_INFO`, `LOG_LEVEL_DEBUG`, `LOG_LEVEL_VERBOSE`|
 | [`getLog`](#getlogcallbackfn) | `calbackFn` | Fetch the entire contents of the current log database as a `String`.|
 | [`destroyLog`](#destroylogcallbackfnfailurefn) | `calbackFn`,`failureFn` | Destroy the contents of the Log database. |
 | [`emailLog`](#emaillogemail-callbackfn) | `email`, `callbackFn` | Fetch the entire contents of the current circular log and email it to a recipient using the device's native email client.|
@@ -483,12 +483,20 @@ Set the log-filter `logLevel`.  @see [`getLog`](#getlogcallbackfn) / [`emailLog`
 
 | logLevel | Label |
 |---|---|
-|`0`|`OFF`|
-|`1`|`ERROR`|
-|`2`|`WARNING`|
-|`3`|`INFO`|
-|`4`|`DEBUG`|
-|`5`|`VERBOSE`|
+|`0`|`LOG_LEVEL_OFF`|
+|`1`|`LOG_LEVEL_ERROR`|
+|`2`|`LOG_LEVEL_WARNING`|
+|`3`|`LOG_LEVEL_INFO`|
+|`4`|`LOG_LEVEL_DEBUG`|
+|`5`|`LOG_LEVEL_VERBOSE`|
+
+These log-levels are defined as **constants** on the `BackgroundGeolocation` object:
+
+```Javascript
+bgGeo.configure({
+  logLevel: bgGeo.LOG_LEVEL_WARNING
+});
+```
 
 ####`@param {Integer} logMaxDays [3]`
 
@@ -1235,15 +1243,15 @@ Here's a fun one.  The plugin can play a number of OS system sounds for each pla
 Set the log filter `logLevel`
 | logLevel | Label |
 |---|---|
-|`0`|`OFF`|
-|`1`|`ERROR`|
-|`2`|`WARNING`|
-|`3`|`INFO`|
-|`4`|`DEBUG`|
-|`5`|`ALL`|
+|`0`|`LOG_LEVEL_OFF`|
+|`1`|`LOG_LEVEL_ERROR`|
+|`2`|`LOG_LEVEL_WARNING`|
+|`3`|`LOG_LEVEL_INFO`|
+|`4`|`LOG_LEVEL_DEBUG`|
+|`5`|`LOG_LEVEL_VERBOSE`|
 
 ```Javascript
-    bgGeo.setLogLevel(5, function() {
+    bgGeo.setLogLevel(bgGeo.LOG_LEVEL_VERBOSE, function() {
         console.log("Changed logLevel success");
     });
 ```

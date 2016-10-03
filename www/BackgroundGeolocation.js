@@ -9,6 +9,18 @@
 */
 var exec = require("cordova/exec");
 module.exports = {
+    LOG_LEVEL_OFF: 0,
+    LOG_LEVEL_ERROR: 1,
+    LOG_LEVEL_WARNING: 2,
+    LOG_LEVEL_INFO: 3,
+    LOG_LEVEL_DEBUG: 4,
+    LOG_LEVEL_VERBOSE: 5,
+
+    DESIRED_ACCURACY_HIGH: 0,
+    DESIRED_ACCURACY_MEDIUM: 10,
+    DESIRED_ACCURACY_LOW: 100,
+    DESIRED_ACCURACY_VERY_LOW: 1000,
+
     /**
     * @property {Object} stationaryLocation
     */
