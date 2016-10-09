@@ -47,6 +47,8 @@ module.exports = {
                 return this.onActivityChange(success, fail);
             case 'providerchange':
                 return this.onProviderChange(success, fail);
+            case 'geofenceschange':
+                return this.onGeofencesChange(success, fail);
         }
     },
 
@@ -243,12 +245,19 @@ module.exports = {
             []);
     },
     onProviderChange: function(success) {
-            exec(success || function() {},
-                function() {},
-                'BackgroundGeolocation',
-                'addProviderChangeListener',
-                []);
-        },
+        exec(success || function() {},
+            function() {},
+            'BackgroundGeolocation',
+            'addProviderChangeListener',
+            []);
+    },
+    onGeofencesChange: function(success) {
+        exec(success || function() {},
+            function() {},
+            'BackgroundGeolocation',
+            'addListener',
+            ['geofenceschange']);
+    },
     onHeartbeat: function(success, failure) {
         exec(success || function() {},
             failure || function() {},
@@ -404,12 +413,21 @@ module.exports = {
     /**
     * Remove all geofences
     */
-    removeGeofences: function(success, failure) {
+    removeGeofences: function(identifiers, success, failure) {
+        if (arguments.length === 0) {
+            identifiers = [];
+            success = function() {};
+            failure = function() {};
+        } else if (typeof(identifiers) === 'function') {
+            failure = success;
+            success = identifiers;
+            identifiers = [];
+        }
         exec(success || function() {},
             failure || function() {},
             'BackgroundGeolocation',
             'removeGeofences',
-            []);
+            [identifiers]);
     },
     /**
     * remove a geofence
