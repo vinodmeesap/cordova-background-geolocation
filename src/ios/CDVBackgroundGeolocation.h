@@ -21,9 +21,11 @@
 - (void) error:(CDVInvokedUrlCommand*)command;
 - (void) changePace:(CDVInvokedUrlCommand*)command;
 - (void) setConfig:(CDVInvokedUrlCommand*)command;
+- (void) addListener:(CDVInvokedUrlCommand*)command;
 - (void) addMotionChangeListener:(CDVInvokedUrlCommand*)command;
 - (void) addActivityChangeListener:(CDVInvokedUrlCommand*)command;
 - (void) addProviderChangeListener:(CDVInvokedUrlCommand*)command;
+- (void) addGeofencesChangeListener:(CDVInvokedUrlCommand*)command;
 - (void) addHeartbeatListener:(CDVInvokedUrlCommand*)command;
 - (void) getStationaryLocation:(CDVInvokedUrlCommand *)command;
 - (void) getLocations:(CDVInvokedUrlCommand *)command;
