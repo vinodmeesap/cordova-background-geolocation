@@ -14,7 +14,6 @@ The parameter provided to your event-handler takes the following form:
 ####@param {Array} on The list of geofences just activated.
 ####@param {Array off The list of geofences just de-activated
 
-```
 ```Javascript
 bgGeo.on('geofenceschange', function(event) {
   var on = event.on;   //<-- new geofences activiated.
