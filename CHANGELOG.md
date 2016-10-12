@@ -1,5 +1,8 @@
 
 # Change Log
+## [2.1.1] - 2016-10-12
+- [Fixed] Bug in Android geofencing
+
 ## [2.1.0] - 2016-10-10
 - [Changed] Refactor iOS Logging system to use popular CocoaLumberjack library.  iOS logs are now stored in the database!  By default, logs are stored for 3 days, but is configurable with `logMaxDays`.  Logs can now be filtered by logLevel:
 | logLevel | Label |
