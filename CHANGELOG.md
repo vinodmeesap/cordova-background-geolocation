@@ -1,5 +1,7 @@
 
 # Change Log
+- [Changed] Android will filter-out received locations detected to be same-as-last by comparing `latitude`, `longitude`, `speed` & `bearing`.
+
 ## [2.1.1] - 2016-10-12
 - [Fixed] Bug in Android geofencing
 
