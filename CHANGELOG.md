@@ -1,6 +1,10 @@
 
 # Change Log
+
+## [2.1.2] - 2016-10-17
 - [Changed] Android will filter-out received locations detected to be same-as-last by comparing `latitude`, `longitude`, `speed` & `bearing`.
+- [Fixed] Bug in `stopDetectionDelay` logic
+- [Fixed] Geofencing transistion event logging wouldn't occur when configured for `debug: false`
 
 ## [2.1.1] - 2016-10-12
 - [Fixed] Bug in Android geofencing
