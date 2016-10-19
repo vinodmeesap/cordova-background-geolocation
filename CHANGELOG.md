@@ -1,5 +1,7 @@
 
 # Change Log
+## [2.1.3] - 2016-10-19
+- [Changed] Introduce database-logging for Android with [logback-android](https://github.com/tony19/logback-android).  Same API as iOS (@see `2.1.0`)
 
 ## [2.1.2] - 2016-10-17
 - [Changed] Android will filter-out received locations detected to be same-as-last by comparing `latitude`, `longitude`, `speed` & `bearing`.
