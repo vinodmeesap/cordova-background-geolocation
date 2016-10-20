@@ -859,7 +859,7 @@ bgGeo.startSchedule(function() {
 
 ####`stopSchedule(callbackFn)`
 
-This method will stop the Scheduler service.  It will also execute the `#stop` method and **cease all tracking**.
+This method will stop the Scheduler service.
 
 ```Javascript
 bgGeo.stopSchedule(function() {
