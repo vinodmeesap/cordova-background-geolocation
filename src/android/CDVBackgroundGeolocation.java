@@ -94,11 +94,6 @@ public class CDVBackgroundGeolocation extends CordovaPlugin {
 
     @Override
     protected void pluginInitialize() {
-        Activity activity = this.cordova.getActivity();
-        Intent launchIntent = activity.getIntent();
-        if (launchIntent.hasExtra("forceReload")) {
-            activity.moveTaskToBack(true);
-        }
         initializeLocationManager();
     }
 
