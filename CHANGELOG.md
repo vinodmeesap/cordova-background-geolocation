@@ -1,7 +1,10 @@
 
 # Change Log
+
 ## [2.1.3] - 2016-10-19
 - [Changed] Introduce database-logging for Android with [logback-android](https://github.com/tony19/logback-android).  Same API as iOS (@see `2.1.0`)
+- [Fixed] iOS geofencing issue where multiple geofences trigger simultaneously, only the last geofence event would be transmitted to the client and persisted to database.
+- [Fixed] Remove iOS motion-activity-based filtering of locations.  If a location was recorded while the motion-recognition system said the device was `still`, the location was ignored.  Fixes issue #954.
 
 ## [2.1.2] - 2016-10-17
 - [Changed] Android will filter-out received locations detected to be same-as-last by comparing `latitude`, `longitude`, `speed` & `bearing`.
