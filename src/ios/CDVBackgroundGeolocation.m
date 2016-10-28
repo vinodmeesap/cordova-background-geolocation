@@ -629,14 +629,14 @@
     };
 }
 
--(void (^)(CLCircularRegion *region, NSDictionary *locationData, NSString *action)) createGeofenceHandler {
-    return ^(CLCircularRegion *region, NSDictionary *locationData, NSString *action) {
+-(void (^)(NSString *identifier, NSString *action, NSDictionary *locationData)) createGeofenceHandler {
+    return ^(NSString *identifier, NSString *action, NSDictionary *locationData) {
         if (![geofenceListeners count]) {
             return;
         }
         for (NSString *callbackId in geofenceListeners) {
             NSDictionary *params = @{
-                @"identifier": region.identifier,
+                @"identifier": identifier,
                 @"action": action,
                 @"location": locationData,
                 @"taskId": @([bgGeo createBackgroundTask])
