@@ -1,5 +1,7 @@
 
 # Change Log
+## [Unreleased]
+- [Changed] Extract CococaLumberjack from compiled binary TSLocationManager.  It causes problems if other libs also use this dependency.  Extracted CocoaLumberjack to its own distinct cordova-plugin-cocoalumberjack, which background-geolocation installs as a dependency.
 
 ## [2.1.3] - 2016-10-19
 - [Changed] Introduce database-logging for Android with [logback-android](https://github.com/tony19/logback-android).  Same API as iOS (@see `2.1.0`)
