@@ -67,9 +67,9 @@
     NSDictionary *cfg  = [command.arguments objectAtIndex:0];
 
     [self.commandDelegate runInBackground:^{
-        [bgGeo setConfig:cfg];
+        NSDictionary *state = [bgGeo setConfig:cfg];
         CDVPluginResult* result = nil;
-        result = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK];
+        result = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsDictionary:state];
         [self.commandDelegate sendPluginResult:result callbackId:command.callbackId];
     }];
 }
