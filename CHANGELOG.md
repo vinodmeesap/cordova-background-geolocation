@@ -2,6 +2,7 @@
 # Change Log
 ## [Unreleased]
 - [Fixed] Android was only handling the first geofence event when multiple geofences fire simultaneously.  Issue #1004
+- [Changed] The plugin will ignore `autoSyncThreshold` when a `motionchange` event occurs.
 
 ## [2.1.5] - 2016-11-04
 - [Fixed] Issue #998.  FMDB [has issues](https://github.com/ccgus/fmdb/pull/180) binding array arguments (eg: DELETE FROM locations WHERE id IN(?)).  Solution is to simply compose the query string with concatenation.  Sanitization isn't required here anyway, since the ids come directly from my own query.
