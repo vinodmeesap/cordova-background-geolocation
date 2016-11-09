@@ -1,5 +1,8 @@
 
 # Change Log
+## [Unreleased]
+- [Changed] Add some intelligence to iOS motion-detection system:  Use a Timer of `activityRecognitionInterval` seconds before engaging location-services after motion is detected.  This helps to reduce false-positives, particularly when using `preventSuspend` while walking around one's house or office.
+
 ## [2.1.6] - 2016-11-08
 - [Fixed] Android was only handling the first geofence event when multiple geofences fire simultaneously.  Issue #1004
 - [Changed] The plugin will ignore `autoSyncThreshold` when a `motionchange` event occurs.

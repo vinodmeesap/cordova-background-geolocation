@@ -92,7 +92,6 @@
             [self.commandDelegate sendPluginResult:result callbackId:command.callbackId];
         });
     }];
-
 }
 /**
  * Turn it off
