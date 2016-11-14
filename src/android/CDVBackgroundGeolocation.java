@@ -313,11 +313,25 @@ public class CDVBackgroundGeolocation extends CordovaPlugin {
         callback.success();
     }
 
+    private class StartGeofencesCallback implements TSCallback {
+        private CallbackContext mCallbackContext;
+        public StartGeofencesCallback(CallbackContext callbackContext) {
+            mCallbackContext = callbackContext;
+        }
+        @Override
+        public void success(Object state) {
+            mCallbackContext.success((JSONObject) state);
+        }
+        @Override
+        public void error(Object error) {
+            mCallbackContext.error((Integer) error);
+        }
+    }
     private void startGeofences(CallbackContext callback) {
-        startCallback = callback;
         if (hasPermission(ACCESS_COARSE_LOCATION) && hasPermission(ACCESS_FINE_LOCATION)) {
-            setEnabled(true);
+            getAdapter().startGeofences(new StartGeofencesCallback(callback));
         } else {
+            startCallback = callback;
             String[] permissions = {ACCESS_COARSE_LOCATION, ACCESS_FINE_LOCATION};
             requestPermissions(REQUEST_ACTION_START_GEOFENCES, permissions);
         }
@@ -981,6 +995,8 @@ public class CDVBackgroundGeolocation extends CordovaPlugin {
                 configureCallback = null;
                 configuration = null;
                 break;
+            case REQUEST_ACTION_START_GEOFENCES:
+                getAdapter().startGeofences(new StartGeofencesCallback(startCallback));
         }
     }
 

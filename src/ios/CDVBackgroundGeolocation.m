@@ -88,7 +88,7 @@
     [self.commandDelegate runInBackground:^{
         [bgGeo start];
         dispatch_sync(dispatch_get_main_queue(), ^{
-            CDVPluginResult* result = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsBool: true];
+            CDVPluginResult* result = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsDictionary:[bgGeo getState]];
             [self.commandDelegate sendPluginResult:result callbackId:command.callbackId];
         });
     }];
@@ -100,24 +100,30 @@
 - (void) stop:(CDVInvokedUrlCommand*)command
 {
     [bgGeo stop];
-    CDVPluginResult* result = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsBool: false];
+    CDVPluginResult* result = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsDictionary:[bgGeo getState]];
     [self.commandDelegate sendPluginResult:result callbackId:command.callbackId];
 }
 
 - (void) startSchedule:(CDVInvokedUrlCommand*)command
 {
     [bgGeo startSchedule];
-    CDVPluginResult* result = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsBool: false];
+    CDVPluginResult* result = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsDictionary:[bgGeo getState]];
     [self.commandDelegate sendPluginResult:result callbackId:command.callbackId];
 }
 
 - (void) stopSchedule:(CDVInvokedUrlCommand*)command
 {
     [bgGeo stopSchedule];
-    CDVPluginResult* result = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsBool: false];
+    CDVPluginResult* result = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsDictionary:[bgGeo getState]];
     [self.commandDelegate sendPluginResult:result callbackId:command.callbackId];
 }
 
+- (void) startGeofences:(CDVInvokedUrlCommand*)command
+{
+    [bgGeo startGeofences];
+    CDVPluginResult* result = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsDictionary:[bgGeo getState]];
+    [self.commandDelegate sendPluginResult:result callbackId:command.callbackId];
+}
 
 - (void) getOdometer:(CDVInvokedUrlCommand*)command
 {

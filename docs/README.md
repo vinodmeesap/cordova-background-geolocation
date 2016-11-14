@@ -880,7 +880,7 @@ bgGeo.stopSchedule(function() {
 
 ####`startGeofences(callbackFn)`
 
-Engages the geofences-only `trackingMode`.  In this mode, no active location-tracking will occur -- only geofences will be monitored.  To stop monitoring "geofences" `trackingMode`, simply use the usual `#stop` method.  The `state` object now contains the new key `trackingMode [location|geofences]`.
+Engages the geofences-only `trackingMode`.  In this mode, no active location-tracking will occur -- only geofences will be monitored.  To stop monitoring "geofences" `trackingMode`, simply use the usual `#stop` method.  The `state` object now contains the new key `trackingMode [location|geofence]`.
 
 ```Javascript
 
@@ -895,8 +895,8 @@ bgGeo.configure(config, function(state) {
     ]);
 
     if (!state.enabled) {
-        bgGeo.startGeofences(function() {
-            console.log('- Geofence-only monitoring started');
+        bgGeo.startGeofences(function(state) {
+            console.log('- Geofence-only monitoring started', state.trackingMode);
         });
     }
 });
