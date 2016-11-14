@@ -1,5 +1,10 @@
 
 # Change Log
+## [Unreleased]
+- [Fixed] Issue #1025 Bug with Android geofences not posting `event: geofence` and the actual `geofence` data was missing (The data sent to Javascript callback was ok, just the data sent to HTTP.
+- [Fixed] Issue #1023 Logic bug in `TSGeofenceManager`; was not performing geospatial query when changing state from **MOVING -> STATIONARY**.
+- [Added] Geofences-only mode for both iOS and Android **BETA**.  Start geofences-only mode with method `#startGeofences`.
+
 ## [2.1.6] - 2016-11-08
 - [Fixed] Android was only handling the first geofence event when multiple geofences fire simultaneously.  Issue #1004
 - [Changed] The plugin will ignore `autoSyncThreshold` when a `motionchange` event occurs.

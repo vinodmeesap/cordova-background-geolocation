@@ -17,6 +17,7 @@
 - (void) stop:(CDVInvokedUrlCommand*)command;
 - (void) startSchedule:(CDVInvokedUrlCommand*)command;
 - (void) stopSchedule:(CDVInvokedUrlCommand*)command;
+- (void) startGeofences:(CDVInvokedUrlCommand*)command;
 - (void) finish:(CDVInvokedUrlCommand*)command;
 - (void) error:(CDVInvokedUrlCommand*)command;
 - (void) changePace:(CDVInvokedUrlCommand*)command;
