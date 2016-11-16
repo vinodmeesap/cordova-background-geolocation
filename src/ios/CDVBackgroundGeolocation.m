@@ -51,9 +51,6 @@
  */
 - (void) configure:(CDVInvokedUrlCommand*)command
 {
-    //self.locationCallbackId = command.callbackId;
-    [locationListeners addObject:command.callbackId];
-
     config = [command.arguments objectAtIndex:0];
     NSDictionary *state = [bgGeo configure:config];
 
@@ -62,6 +59,20 @@
     [self.commandDelegate sendPluginResult:result callbackId:command.callbackId];
 }
 
+- (void) removeListeners:(CDVInvokedUrlCommand*) command
+{
+    [activityChangeListeners removeAllObjects];
+    [providerChangeListeners removeAllObjects];
+    [locationListeners removeAllObjects];
+    [geofenceListeners removeAllObjects];
+    [motionChangeListeners removeAllObjects];
+    [httpListeners removeAllObjects];
+    [heartbeatListeners removeAllObjects];
+    [scheduleListeners removeAllObjects];
+
+    CDVPluginResult* result = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK];
+    [self.commandDelegate sendPluginResult:result callbackId:command.callbackId];
+}
 - (void) setConfig:(CDVInvokedUrlCommand*)command
 {
     NSDictionary *cfg  = [command.arguments objectAtIndex:0];
