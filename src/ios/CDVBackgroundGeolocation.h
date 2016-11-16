@@ -13,6 +13,7 @@
 @property (nonatomic) UIBackgroundTaskIdentifier syncTaskId;
 
 - (void) configure:(CDVInvokedUrlCommand*)command;
+- (void) removeListeners:(CDVInvokedUrlCommand*)command;
 - (void) start:(CDVInvokedUrlCommand*)command;
 - (void) stop:(CDVInvokedUrlCommand*)command;
 - (void) startSchedule:(CDVInvokedUrlCommand*)command;

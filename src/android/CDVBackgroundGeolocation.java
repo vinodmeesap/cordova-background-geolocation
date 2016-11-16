@@ -70,6 +70,7 @@ public class CDVBackgroundGeolocation extends CordovaPlugin {
     public static final String ACTION_ADD_ACTIVITY_CHANGE_LISTENER = "addActivityChangeListener";
     public static final String ACTION_ADD_PROVIDER_CHANGE_LISTENER = "addProviderChangeListener";
     public static final String ACTION_ADD_SCHEDULE_LISTENER = "addScheduleListener";
+    public static final String ACTION_REMOVE_LISTENERS  = "removeListeners";
 
     public static final String ACTION_ON_GEOFENCE       = "onGeofence";
     public static final String ACTION_PLAY_SOUND        = "playSound";
@@ -146,6 +147,9 @@ public class CDVBackgroundGeolocation extends CordovaPlugin {
         } else if (ACTION_CONFIGURE.equalsIgnoreCase(action)) {
             result = true;
             configure(data.getJSONObject(0), callbackContext);
+        } else if (ACTION_REMOVE_LISTENERS.equalsIgnoreCase(action)) {
+            result = true;
+            removeListeners(callbackContext);
         } else if (ACTION_ADD_LISTENER.equalsIgnoreCase(action)) {
             result = true;
             addListener(data.getString(0), callbackContext);
@@ -535,12 +539,19 @@ public class CDVBackgroundGeolocation extends CordovaPlugin {
             mCallbackContext.sendPluginResult(result);
         }
     }
+
     private void addListener(String event, CallbackContext callbackContext) {
         TSCallback tsCallback = new AddListenerCallback(callbackContext);
         if (!getAdapter().on(event, tsCallback)) {
             callbackContext.error("[CDVBackgroundGeolocation addListener] Unknown event " + event);
         }
     }
+
+    private void removeListeners(CallbackContext callbackContext) {
+        getAdapter().removeListeners();
+        callbackContext.success();
+    }
+
     private void addGeofenceListener(final CallbackContext callbackContext) {
         getAdapter().on(BackgroundGeolocation.EVENT_GEOFENCE, (new TSCallback() {
             @Override
