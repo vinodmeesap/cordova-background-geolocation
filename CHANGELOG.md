@@ -8,6 +8,7 @@
 - [Changed] Add more intelligence to iOS motion-detection system:  The plugin will be **eager** to engage the stop-detection, as soon as it detects `still`, regardless of confidence.  When the plugin is currently in the **moving** state and detects `still`, it will engage a timer of `activityRecognitionInterval` milliseconds -- when this timer expires and the motion-detector still reports `still`, the stop-detection system will be engaged.  If any *moving* type activity occurs during this time, the timer will be cancelled.  References #1002.
 - [Fixed] Bug in Android Scheduler, failing to `startOnBoot`.  Issue #985
 - [Added] `#removeListeners` method.  Removes all listeners registered with plugin via `#on` method.
+- [Changed] With `preventSuspend: true`, the plugin will no longer immediately engage location-services as soon as it sees a "moving"-type motion-activity:  it will now calculate if the current position is beyond stationary geofence. This helps reduce false-positives engaging location-services while simply walking around one's home or office.
 
 ## [2.1.6] - 2016-11-08
 - [Fixed] Android was only handling the first geofence event when multiple geofences fire simultaneously.  Issue #1004
