@@ -9,7 +9,7 @@
 - [Fixed] Bug in Android Scheduler, failing to `startOnBoot`.  Issue #985
 - [Added] `#removeListeners` method.  Removes all listeners registered with plugin via `#on` method.
 - [Changed] With `preventSuspend: true`, the plugin will no longer immediately engage location-services as soon as it sees a "moving"-type motion-activity:  it will now calculate if the current position is beyond stationary geofence. This helps reduce false-positives engaging location-services while simply walking around one's home or office.
-
+- [Fixed] When iOS is configured with ``
 ## [2.1.6] - 2016-11-08
 - [Fixed] Android was only handling the first geofence event when multiple geofences fire simultaneously.  Issue #1004
 - [Changed] The plugin will ignore `autoSyncThreshold` when a `motionchange` event occurs.
@@ -17,6 +17,7 @@
 - [Fixed] Return current `state {Object}` in callback to `setConfig` (issue #985)
 - [Fixed] iOS Scheduler puked when provided with a `null` or `[]` schedule.
 - [Changed] iOS Scheduler behaviour changed to match Android, where `#stopSchedule` does **not** execute `#stop` on the plugin itself.
+- [Fixed] iOS `batchSync`: When only 1 record in batch, iOS fails to pack the records in a JSON `location: []`, appending to a `location: {}` instead.  Fixes #1042
 
 ## [2.1.5] - 2016-11-04
 - [Fixed] Issue #998.  FMDB [has issues](https://github.com/ccgus/fmdb/pull/180) binding array arguments (eg: DELETE FROM locations WHERE id IN(?)).  Solution is to simply compose the query string with concatenation.  Sanitization isn't required here anyway, since the ids come directly from my own query.
