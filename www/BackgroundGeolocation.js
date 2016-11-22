@@ -8,6 +8,8 @@
 * @see LICENSE
 */
 var exec = require("cordova/exec");
+var MODULE_NAME = "BackgroundGeolocation";
+
 module.exports = {
     LOG_LEVEL_OFF: 0,
     LOG_LEVEL_ERROR: 1,
@@ -69,7 +71,7 @@ module.exports = {
 
         exec(success || function() {},
              failure || function() {},
-             'BackgroundGeolocation',
+             MODULE_NAME,
              'configure',
              [config]
         );
@@ -89,7 +91,7 @@ module.exports = {
         }
         exec(mySuccess,
              failure,
-             'BackgroundGeolocation',
+             MODULE_NAME,
              'removeListeners',
              []
         );
@@ -97,7 +99,7 @@ module.exports = {
     getState: function(success, failure) {
         exec(success || function() {},
              failure || function() {},
-             'BackgroundGeolocation',
+             MODULE_NAME,
              'getState',
              []
         );
@@ -105,35 +107,35 @@ module.exports = {
     start: function(success, failure, config) {
         exec(success || function() {},
              failure || function() {},
-             'BackgroundGeolocation',
+             MODULE_NAME,
              'start',
              []);
     },
     stop: function(success, failure, config) {
         exec(success || function() {},
             failure || function() {},
-            'BackgroundGeolocation',
+            MODULE_NAME,
             'stop',
             []);
     },
     startSchedule: function(success, failure) {
         exec(success || function() {},
              failure || function() {},
-             'BackgroundGeolocation',
+             MODULE_NAME,
              'startSchedule',
              []);
     },
     stopSchedule: function(success, failure) {
         exec(success || function() {},
              failure || function() {},
-             'BackgroundGeolocation',
+             MODULE_NAME,
              'stopSchedule',
              []);
     },
     startGeofences: function(success, failure) {
         exec(success || function() {},
              failure || function() {},
-             'BackgroundGeolocation',
+             MODULE_NAME,
              'startGeofences',
              []);
     },
@@ -143,7 +145,7 @@ module.exports = {
         }
         exec(callback,
             function() {},
-            'BackgroundGeolocation',
+            MODULE_NAME,
             'beginBackgroundTask',
             []);
     },
@@ -153,7 +155,7 @@ module.exports = {
         }
         exec(success || function() {},
             failure || function() {},
-            'BackgroundGeolocation',
+            MODULE_NAME,
             'finish',
             [taskId]);
     },
@@ -163,14 +165,14 @@ module.exports = {
         }
         exec(function() {},
             function() {},
-            'BackgroundGeolocation',
+            MODULE_NAME,
             'error',
             [taskId, message]);
     },
     changePace: function(isMoving, success, failure) {
         exec(success || function() {},
             failure || function() {},
-            'BackgroundGeolocation',
+            MODULE_NAME,
             'changePace',
             [isMoving]);
     },
@@ -185,7 +187,7 @@ module.exports = {
         this._apply(this.config, config);
         exec(success || function() {},
             failure || function() {},
-            'BackgroundGeolocation',
+            MODULE_NAME,
             'setConfig',
             [config]);
     },
@@ -195,7 +197,7 @@ module.exports = {
     getStationaryLocation: function(success, failure) {
         exec(success || function() {},
             failure || function() {},
-            'BackgroundGeolocation',
+            MODULE_NAME,
             'getStationaryLocation',
             []);
     },
@@ -218,7 +220,7 @@ module.exports = {
         }
         exec(mySuccess,
              failure || function() {},
-             'BackgroundGeolocation',
+             MODULE_NAME,
              'addLocationListener',
              []
         );
@@ -253,42 +255,42 @@ module.exports = {
         };
         exec(callback,
             failure || function() {},
-            'BackgroundGeolocation',
+            MODULE_NAME,
             'addMotionChangeListener',
             []);
     },
     onActivityChange: function(success) {
         exec(success || function() {},
             function() {},
-            'BackgroundGeolocation',
+            MODULE_NAME,
             'addActivityChangeListener',
             []);
     },
     onProviderChange: function(success) {
         exec(success || function() {},
             function() {},
-            'BackgroundGeolocation',
+            MODULE_NAME,
             'addProviderChangeListener',
             []);
     },
     onGeofencesChange: function(success) {
         exec(success || function() {},
             function() {},
-            'BackgroundGeolocation',
+            MODULE_NAME,
             'addListener',
             ['geofenceschange']);
     },
     onHeartbeat: function(success, failure) {
         exec(success || function() {},
             failure || function() {},
-            'BackgroundGeolocation',
+            MODULE_NAME,
             'addHeartbeatListener',
             []);
     },
     onSchedule: function(success, failure) {
         exec(success || function() {},
             failure || function() {},
-            'BackgroundGeolocation',
+            MODULE_NAME,
             'addScheduleListener',
             []);
     },
@@ -306,14 +308,14 @@ module.exports = {
         }
         exec(mySuccess,
             failure || function() {},
-            'BackgroundGeolocation',
+            MODULE_NAME,
             'getLocations',
             []);
     },
     getCount: function(success, failure) {
         exec(success||function(){},
             failure || function() {},
-            'BackgroundGeolocation',
+            MODULE_NAME,
             'getCount',
             []);
     },
@@ -324,7 +326,7 @@ module.exports = {
     destroyLocations: function(success, failure) {
         exec(success||function(){},
             failure || function() {},
-            'BackgroundGeolocation',
+            MODULE_NAME,
             'destroyLocations',
             []);
     },
@@ -336,7 +338,7 @@ module.exports = {
         }
         exec(success || function() {},
             failure || function() {},
-            'BackgroundGeolocation',
+            MODULE_NAME,
             'insertLocation',
             [location]);
     },
@@ -358,21 +360,21 @@ module.exports = {
         }
         exec(mySuccess,
             failure || function() {},
-            'BackgroundGeolocation',
+            MODULE_NAME,
             'sync',
             []);
     },
     onHttp: function(success, failure) {
         exec(success || function() {},
             failure || function() {},
-            'BackgroundGeolocation',
+            MODULE_NAME,
             'addHttpListener',
             []);
     },
     onLog: function(success, failure) {
         exec(success || function() {},
             failure || function() {},
-            'BackgroundGeolocation',
+            MODULE_NAME,
             'addLogListener',
             []);
     },
@@ -382,7 +384,7 @@ module.exports = {
     getOdometer: function(success, failure) {
         exec(success || function() {},
             failure || function() {},
-            'BackgroundGeolocation',
+            MODULE_NAME,
             'getOdometer',
             []);
     },
@@ -392,7 +394,7 @@ module.exports = {
     resetOdometer: function(success, failure) {
         exec(success || function() {},
             failure || function() {},
-            'BackgroundGeolocation',
+            MODULE_NAME,
             'resetOdometer',
             []);
     },
@@ -415,7 +417,7 @@ module.exports = {
         }
         exec(success || function() {},
             failure || function() {},
-            'BackgroundGeolocation',
+            MODULE_NAME,
             'addGeofence',
             [config]);
     },
@@ -426,7 +428,7 @@ module.exports = {
         geofences = geofences || [];
         exec(success || function() {},
             failure || function() {},
-            'BackgroundGeolocation',
+            MODULE_NAME,
             'addGeofences',
             [geofences]);
     },
@@ -445,7 +447,7 @@ module.exports = {
         }
         exec(success || function() {},
             failure || function() {},
-            'BackgroundGeolocation',
+            MODULE_NAME,
             'removeGeofences',
             [identifiers]);
     },
@@ -459,7 +461,7 @@ module.exports = {
         }
         exec(success || function() {},
             failure || function() {},
-            'BackgroundGeolocation',
+            MODULE_NAME,
             'removeGeofence',
             [identifier]);
     },
@@ -478,7 +480,7 @@ module.exports = {
         };
         exec(mySuccess,
             failure || function() {},
-            'BackgroundGeolocation',
+            MODULE_NAME,
             'onGeofence',
             []);
     },
@@ -488,7 +490,7 @@ module.exports = {
     getGeofences: function(success, failure) {
         exec(success || function() {},
             failure || function() {},
-            'BackgroundGeolocation',
+            MODULE_NAME,
             'getGeofences',
             []);
     },
@@ -514,7 +516,7 @@ module.exports = {
         }
         exec(mySuccess || function() {},
             failure || function() {},
-            'BackgroundGeolocation',
+            MODULE_NAME,
             'getCurrentPosition',
             [options]);
     },
@@ -531,16 +533,29 @@ module.exports = {
         }
         exec(mySuccess || function() {},
             failure || function() {},
-            'BackgroundGeolocation',
+            MODULE_NAME,
             'watchPosition',
             [options]);
     },
     stopWatchPosition: function(success, failure, options) {
         var success = success || function() {};
         var failure = failure || function() {};
-        exec(success,
+
+        var mySuccess = function(watchCallbacks) {
+            var callbacks = window.cordova.callbacks;
+            for (var n=0,len=watchCallbacks.length;n<len;n++) {
+                var callbackId = watchCallbacks[n];
+                if (callbacks[callbackId]) {
+                    delete callbacks[callbackId];
+                } else {
+                    console.warn(MODULE_NAME + '#stopWatchPosition failed to locate callbackId: ', callbackId);
+                }
+            }
+            success();
+        };
+        exec(mySuccess,
             failure,
-            'BackgroundGeolocation',
+            MODULE_NAME,
             'stopWatchPosition',
         []);
     },
@@ -549,7 +564,7 @@ module.exports = {
        var failure = failure || function() {};
        exec(success,
             failure,
-            'BackgroundGeolocation',
+            MODULE_NAME,
             'setLogLevel',
             [logLevel]);
     },
@@ -558,7 +573,7 @@ module.exports = {
         var failure = failure || function() {};
         exec(success,
             failure,
-            'BackgroundGeolocation',
+            MODULE_NAME,
             'getLog',
             []);
     },
@@ -567,7 +582,7 @@ module.exports = {
         var failure = failure || function() {};
         exec(success,
             failure,
-            'BackgroundGeolocation',
+            MODULE_NAME,
             'destroyLog',
             []);
     },
@@ -576,7 +591,7 @@ module.exports = {
         var failure = failure || function() {};
         exec(success,
             failure,
-            'BackgroundGeolocation',
+            MODULE_NAME,
             'emailLog',
             [email]);
     },
@@ -591,7 +606,7 @@ module.exports = {
         var failure = function() {};
         exec(success,
             failure,
-            'BackgroundGeolocation',
+            MODULE_NAME,
             'playSound',
             [soundId]);
     },
