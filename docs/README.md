@@ -131,7 +131,7 @@ bgGeo.on("location", onLocation, onLocationError);
 | [`getState`](#getstatesuccessfn) | `callbackFn` | Fetch the current-state of the plugin, including `enabled`, `isMoving`, as well as all other config params |
 | [`getCurrentPosition`](#getcurrentpositionsuccessfn-failurefn-options) | `successFn`, `failureFn`, `{options}` | Retrieves the current position. This method instructs the native code to fetch exactly one location using maximum power & accuracy. |
 | [`watchPosition`](#watchpositionsuccessfn-failurefn-options) | `successFn`, `failureFn`, `{options}` | Start a stream of continuous location-updates.  The native code will persist the fetched location to its SQLite database just as any other location in addition to POSTing to your configured `#url` (if you've enabled the HTTP features).|
-| [`stopWatchPosition`](#stopwatchpositionsuccessfn-failurefn-options) | `successFn`, `failureFn`, `{options}` | Halt `watchPosition` updates. |
+| [`stopWatchPosition`](#stopwatchpositionsuccessfn-failurefn) | `successFn`, `failureFn` | Halt `watchPosition` updates. |
 | [`changePace`](#changepaceenabled-successfn-failurefn) | `isMoving` | Initiate or cancel immediate background tracking. When set to true, the plugin will begin aggressively tracking the devices Geolocation, bypassing stationary monitoring. If you were making a "Jogging" application, this would be your [Start Workout] button to immediately begin GPS tracking. Send false to disable aggressive GPS monitoring and return to stationary-monitoring mode. |
 | [`getLocations`](#getlocationscallbackfn-failurefn) | `callbackFn` | Fetch all the locations currently stored in native plugin's SQLite database. Your callbackFn`` will receive an `Array` of locations in the 1st parameter |
 | [`getCount`](#getcountcallbackfn-failurefn) | `callbackFn` | Fetches count of SQLite locations table `SELECT count(*) from locations` |
@@ -144,11 +144,11 @@ bgGeo.on("location", onLocation, onLocationError);
 | [`addGeofence`](#addgeofenceconfig-callbackfn-failurefn) | `{config}` | Adds a geofence to be monitored by the native plugin. Monitoring of a geofence is halted after a crossing occurs.|
 | [`addGeofences`](#addgeofencesgeofences-callbackfn-failurefn) | `{geofences}` | Adds a list geofences to be monitored by the native plugin. Monitoring of a geofence is halted after a crossing occurs.|
 | [`removeGeofence`](#removegeofenceidentifier-callbackfn-failurefn) | `identifier` | Removes a geofence identified by the provided `identifier` |
-| [`removeGeofences`](#removegeofences-callbackfn-failurefn) |  | Removes all geofences |
+| [`removeGeofences`](#removegeofencescallbackfn-failurefn) | `callbackFn, failureFn` | Removes all geofences |
 | [`getGeofences`](#getgeofencescallbackfn-failurefn) | `callbackFn` | Fetch the list of monitored geofences. Your callbackFn will be provided with an Array of geofences. If there are no geofences being monitored, you'll receive an empty `Array []`.|
-| [`setLogLevel`](#setloglevelcallbackfn) | `calbackFn` | Set the Log filter:  `LOG_LEVEL_OFF`, `LOG_LEVEL_ERROR`, `LOG_LEVEL_WARNING`, `LOG_LEVEL_INFO`, `LOG_LEVEL_DEBUG`, `LOG_LEVEL_VERBOSE`|
-| [`getLog`](#getlogcallbackfn) | `calbackFn` | Fetch the entire contents of the current log database as a `String`.|
-| [`destroyLog`](#destroylogcallbackfnfailurefn) | `calbackFn`,`failureFn` | Destroy the contents of the Log database. |
+| [`setLogLevel`](#setloglevelcallbackfn) | `callbackFn` | Set the Log filter:  `LOG_LEVEL_OFF`, `LOG_LEVEL_ERROR`, `LOG_LEVEL_WARNING`, `LOG_LEVEL_INFO`, `LOG_LEVEL_DEBUG`, `LOG_LEVEL_VERBOSE`|
+| [`getLog`](#getlogcallbackfn) | `callbackFn` | Fetch the entire contents of the current log database as a `String`.|
+| [`destroyLog`](#destroylogcallbackfnfailurefn) | `callbackFn`,`failureFn` | Destroy the contents of the Log database. |
 | [`emailLog`](#emaillogemail-callbackfn) | `email`, `callbackFn` | Fetch the entire contents of the current circular log and email it to a recipient using the device's native email client.|
 
 # Geolocation Options
