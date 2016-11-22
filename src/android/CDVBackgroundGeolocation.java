@@ -456,24 +456,21 @@ public class CDVBackgroundGeolocation extends CordovaPlugin {
         }
     }
 
-    private void stopWatchPosition(final CallbackContext callbackContext) {
+    private void stopWatchPosition(CallbackContext callbackContext) {
         TSCallback callback = new TSCallback() {
-            public void success(Object result) {
-                callbackContext.success();
-            }
-            public void error(Object error) {
-                callbackContext.error((Integer) error);
-            }
+            public void success(Object result) {}
+            public void error(Object error) {}
         };
-        // Call success() on all CordovaCallbacks so that client removes callback.  A bit hacky.
         getAdapter().stopWatchPosition(callback);
+
+        JSONArray callbackIds = new JSONArray();
         Iterator<CallbackContext> iterator = watchPositionCordovaCallbacks.iterator();
         while (iterator.hasNext()) {
             CallbackContext cb = iterator.next();
-            PluginResult response = new PluginResult(PluginResult.Status.OK, false);
-            cb.sendPluginResult(response);
+            callbackIds.put(cb.getCallbackId());
             iterator.remove();
         }
+        callbackContext.success(callbackIds);
     }
 
     private void addGeofence(final CallbackContext callbackContext, JSONObject config) {

@@ -1087,7 +1087,7 @@ bgGeo.watchPosition(function(location) {
 
 ####`stopWatchPosition(successFn, failureFn)`
 
-Halt `watchPosition` updates.  **NOTE** Due to the nature of Cordova callbacks, your `failureFn` provided to `#watchPosition` will be executed with a code of `-1` when you execute. `#stopWatchPosition` -- this is **normal**.  This simply provides a signal to Cordova that it can delete the `callback`, preventing a memory leak.
+Halt `watchPosition` updates.
 
 ```Javascript
 bgGeo.stopWatchPosition();  // <-- callbacks are optional

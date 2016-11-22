@@ -429,22 +429,21 @@
     [self.commandDelegate runInBackground:^{
         [bgGeo watchPosition:options];
     }];
-
-    //CDVPluginResult *result = [CDVPluginResult resultWithStatus:CDVCommandStatus_ERROR messageAsString:@"watchPosition is not yet implemented for ios"];
-    //[self.commandDelegate sendPluginResult:result callbackId:command.callbackId];
 }
 - (void) stopWatchPosition:(CDVInvokedUrlCommand*)command
 {
     [self.commandDelegate runInBackground:^{
         [bgGeo stopWatchPosition];
     }];
+
+    NSMutableArray *callbacks = [NSMutableArray new];
     if (watchPositionListeners) {
-        CDVPluginResult *result = [CDVPluginResult resultWithStatus:CDVCommandStatus_ERROR messageAsInt:-1];
-        [result setKeepCallbackAsBool:NO];
         for (NSString *callbackId in watchPositionListeners) {
-            [self.commandDelegate sendPluginResult:result callbackId:callbackId];
+            [callbacks addObject:callbackId];
         }
+        [watchPositionListeners removeAllObjects];
     }
+    [self.commandDelegate sendPluginResult:[CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsArray:callbacks] callbackId:command.callbackId];
 }
 
 - (void) playSound:(CDVInvokedUrlCommand*)command
