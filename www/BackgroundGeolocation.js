@@ -395,9 +395,17 @@ module.exports = {
         exec(success || function() {},
             failure || function() {},
             MODULE_NAME,
-            'resetOdometer',
-            []);
+            'setOdometer',
+            [0]);
     },
+    setOdometer: function(value, success, failure) {
+        exec(success || function() {},
+            failure || function() {},
+            MODULE_NAME,
+            'setOdometer',
+            [value]);
+    },
+
     /**
     * add geofence
     */
