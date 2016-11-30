@@ -343,10 +343,23 @@ public class CDVBackgroundGeolocation extends CordovaPlugin {
 
     private void stop(CallbackContext callbackContext) {
         startCallback = null;
-        setEnabled(false);
-        callbackContext.success();
+        getAdapter().stop(new StopCallback(callbackContext));
     }
 
+    private class StopCallback implements TSCallback {
+        private CallbackContext mCallbackContext;
+        public StopCallback(CallbackContext callback) {
+            mCallbackContext = callback;
+        }
+        @Override
+        public void success(Object state) {
+            mCallbackContext.success((JSONObject) state);
+        }
+        @Override
+        public void error(Object error) {
+            mCallbackContext.error((String) error);
+        }
+    }
     private void changePace(final CallbackContext callbackContext, JSONArray data) throws JSONException {
         TSCallback callback = new TSCallback() {
             public void success(Object result) {
@@ -772,8 +785,6 @@ public class CDVBackgroundGeolocation extends CordovaPlugin {
                 }
             };
             adapter.start(callback);
-        } else {
-            adapter.stop();
         }
     }
 
