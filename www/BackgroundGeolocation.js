@@ -139,19 +139,22 @@ module.exports = {
              'startGeofences',
              []);
     },
-    beginBackgroundTask: function(callback) {
+    startBackgroundTask: function(callback) {
         if (typeof(callback) !== 'function') {
-            throw "beginBackgroundTask must be provided with a callbackFn to receive the returned #taskId";
+            throw "startBackgroundTask must be provided with a callbackFn to receive the returned #taskId";
         }
         exec(callback,
             function() {},
             MODULE_NAME,
-            'beginBackgroundTask',
+            'startBackgroundTask',
             []);
     },
     finish: function(taskId, success, failure) {
-        if (!taskId) {
+        if (typeof(taskId) !== 'number') {
             throw "BackgroundGeolocation#finish must now be provided with a taskId as 1st param, eg: bgGeo.finish(taskId).  taskId is provided by 2nd param in callback";
+        }
+        if (taskId === 0) {
+            return;
         }
         exec(success || function() {},
             failure || function() {},
@@ -160,7 +163,7 @@ module.exports = {
             [taskId]);
     },
     error: function(taskId, message) {
-        if (!taskId) {
+        if (typeof(taskId) !== 'number') {
             throw "BackgroundGeolocation#error must now be provided with a taskId as 1st param, eg: bgGeo.finish(taskId).  taskId is provided by 2nd param in callback";
         }
         exec(function() {},
@@ -209,7 +212,7 @@ module.exports = {
         var me = this;
         var mySuccess = function(params) {
             var location    = params.location || params;
-            var taskId      = params.taskId || 'task-id-undefined';
+            var taskId      = params.taskId || 0;
             // Transform timestamp to Date instance.
             if (location.timestamp) {
                 location.timestamp = new Date(location.timestamp);
@@ -238,7 +241,7 @@ module.exports = {
         var callback = function(params) {
             var isMoving    = params.isMoving;
             var location    = params.location;
-            var taskId      = params.taskId || 'task-id-undefined';
+            var taskId      = params.taskId || 0;
 
             if (!isMoving) {
                 me.stationaryLocation = location;
@@ -513,7 +516,7 @@ module.exports = {
         };
         var mySuccess = function(params) {
             var location    = params.location || params;
-            var taskId      = params.taskId || 'task-id-undefined';
+            var taskId      = params.taskId || 0;
             // Transform timestamp to Date instance.
             if (location.timestamp) {
                 location.timestamp = new Date(location.timestamp);

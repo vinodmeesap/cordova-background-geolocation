@@ -382,7 +382,7 @@ public class CDVBackgroundGeolocation extends CordovaPlugin {
                 try {
                     JSONObject params = new JSONObject();
                     params.put("locations", result);
-                    params.put("taskId", "android-bg-task-id");
+                    params.put("taskId", 0);
                     callbackContext.sendPluginResult(new PluginResult(PluginResult.Status.OK, params));
                 } catch (JSONException e) {
                     callbackContext.error(e.getMessage());
@@ -416,7 +416,7 @@ public class CDVBackgroundGeolocation extends CordovaPlugin {
                 try {
                     JSONObject params = new JSONObject();
                     params.put("locations", result);
-                    params.put("taskId", "android-bg-task-id");
+                    params.put("taskId", 0);
                     callbackContext.success(params);
                 } catch (JSONException e) {
                     e.printStackTrace();
