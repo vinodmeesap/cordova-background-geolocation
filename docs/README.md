@@ -152,6 +152,8 @@ bgGeo.on("location", onLocation, onLocationError);
 | [`getLog`](#getlogcallbackfn) | `callbackFn` | Fetch the entire contents of the current log database as a `String`.|
 | [`destroyLog`](#destroylogcallbackfnfailurefn) | `callbackFn`,`failureFn` | Destroy the contents of the Log database. |
 | [`emailLog`](#emaillogemail-callbackfn) | `email`, `callbackFn` | Fetch the entire contents of the current circular log and email it to a recipient using the device's native email client.|
+| [`startBackgroundTask`](#startbackgroundtask-callbackfn) | `callbackFn` | Sends a signal to the native OS that you wish to perform a long-running task.  The OS will not suspend your app until you signal completion with the `#finish` method.  The `callbackFn` will be provided with a single parameter `taskId` which you will send to the `#finish` method.  **NOTE** iOS provides **exactly** 180s of background-running time.  If your long-running task exceeds this time, the plugin has a fail-safe which will automatically `#finish` your `taskId` to prevent the OS from force-killing your application.|
+| [`finish`](#finishtaskid) | Sends a signal to the native OS the supplied `taskId` is complete and the OS may proceed to suspend your application if applicable.|
 
 # Geolocation Options
 
@@ -1424,3 +1426,43 @@ Fetch the entire contents of the current circular log and email it to a recipien
 2. Grant "Storage" permission `Settings->Apps->[Your App]->Permissions: (o) Storage`
 
 ![](https://dl.dropboxusercontent.com/u/2319755/cordova-background-geolocaiton/Screenshot_20160218-183345.png)
+
+####`startBackgroundTask(callbackFn)`
+
+Sends a signal to the native OS that you wish to perform a long-running task.  The OS will not suspend your app until you signal completion with the `#finish` method.  The `callbackFn` will be provided with a single parameter `taskId` which you will send to the `#finish` method.  **NOTE** iOS provides **exactly** 180s of background-running time.  If your long-running task exceeds this time, the plugin has a fail-safe which will automatically `#finish` your `taskId` to prevent the OS from force-killing your application.
+
+Eg:
+```Javascript
+  bgGeo.setOdometer(0, function(location) {
+    console.log('- setOdometer at location: ', location);
+
+    bgGeo.startBackgroundTask(function(taskId) {  // <-- taskId provided to callback
+      // Perform some long-running task (eg: HTTP request)
+      performLongRunningTask(function() {
+        // When long running task is complete, signal completion of taskId.
+        bgGeo.finish(taskId);
+      });
+    });
+  });
+```
+
+
+####`finish(taskId)`
+
+Sends a signal to the native OS that your long-running task, addressed by `taskId` is complete and the OS may proceed to suspend your application if applicable.
+
+Eg:
+```Javascript
+  bgGeo.setOdometer(0, function(location) {
+    console.log('- setOdometer at location: ', location);
+
+    bgGeo.startBackgroundTask(function(taskId) {  // <-- taskId provided to callback
+      // Perform some long-running task (eg: HTTP request)
+      performLongRunningTask(function() {
+        // When long running task is complete, signal completion of taskId.
+        bgGeo.finish(taskId);
+      });
+    });
+  });
+```
+
