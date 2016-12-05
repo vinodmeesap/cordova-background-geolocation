@@ -1,5 +1,10 @@
-<!--- Provide a general summary of the issue in the Title above -->
+<!--
+*****************************************************************
+* WARNING:  If you ignore this template, so too will your issue
+*****************************************************************
 
+  Provide a general summary of the issue in the Title above 
+-->
 ## Your Environment
 * Plugin version:
 * Platform: iOS or Android
