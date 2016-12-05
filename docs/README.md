@@ -153,7 +153,7 @@ bgGeo.on("location", onLocation, onLocationError);
 | [`destroyLog`](#destroylogcallbackfnfailurefn) | `callbackFn`,`failureFn` | Destroy the contents of the Log database. |
 | [`emailLog`](#emaillogemail-callbackfn) | `email`, `callbackFn` | Fetch the entire contents of the current circular log and email it to a recipient using the device's native email client.|
 | [`startBackgroundTask`](#startbackgroundtaskcallbackfn) | `callbackFn` | Sends a signal to the native OS that you wish to perform a long-running task.  The OS will not suspend your app until you signal completion with the `#finish` method.  The `callbackFn` will be provided with a single parameter `taskId` which you will send to the `#finish` method.  **NOTE** iOS provides **exactly** 180s of background-running time.  If your long-running task exceeds this time, the plugin has a fail-safe which will automatically `#finish` your `taskId` to prevent the OS from force-killing your application.|
-| [`finish`](#finishtaskid) | Sends a signal to the native OS the supplied `taskId` is complete and the OS may proceed to suspend your application if applicable.|
+| [`finish`](#finishtaskid) | `taskId` | Sends a signal to the native OS the supplied `taskId` is complete and the OS may proceed to suspend your application if applicable.|
 
 # Geolocation Options
 
