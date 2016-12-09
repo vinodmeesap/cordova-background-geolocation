@@ -482,7 +482,7 @@ module.exports = {
         }
         var me = this;
         var mySuccess = function(params) {
-            var taskId = params.taskId || 'task-id-undefined';
+            var taskId = params.taskId || 0;
             delete(params.taskId);
 
             me._runBackgroundTask(taskId, function() {
