@@ -53,8 +53,12 @@
     config = [command.arguments objectAtIndex:0];
     NSDictionary *state = [bgGeo configure:config];
 
-    CDVPluginResult* result = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsDictionary:state];
-
+    CDVPluginResult *result;
+    if (state != nil) {
+        result = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsDictionary:state];
+    } else {
+        result = [CDVPluginResult resultWithStatus:CDVCommandStatus_ERROR];
+    }
     [self.commandDelegate sendPluginResult:result callbackId:command.callbackId];
 }
 
