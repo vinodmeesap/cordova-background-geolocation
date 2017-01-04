@@ -1114,7 +1114,7 @@ bgGeo.changePace(false); // <-- Disable aggressive GPS monitoring.  Engages stat
 ```
 
 ####`addGeofence(config, callbackFn, failureFn)`
-Adds a geofence to be monitored by the native plugin.  The `config` object accepts the following params.  See [Geofencing](./geofencing.md) for more information.
+Adds a geofence to be monitored by the native plugin.  If a geofence *already exists* with the configured `identifier`, the previous one will be **deleted** before the new one is inserted.  The `config` object accepts the following params.  See [Geofencing](./geofencing.md) for more information.
 
 **Note**: when adding a list-of-geofences, it's about **10* faster** to use `[addGeofences](#addgeofencesgeofences-callbackfn-failurefn)` instead.
 
@@ -1126,6 +1126,7 @@ Adds a geofence to be monitored by the native plugin.  The `config` object accep
 ######@config {Boolean} notifyOnEntry Whether to listen to ENTER events
 ######@config {Boolean} notifyOnDwell (**Android only**) Whether to listen to DWELL events
 ######@config {Integer milliseconds} loiteringDelay (**Android only**) When `notifyOnDwell` is `true`, the delay before DWELL event is fired after entering a geofence (@see [Creating and Monitoring Geofences](https://developer.android.com/training/location/geofencing.html))
+######@config {Object} extras Optional arbitrary meta-data.
 
 ```Javascript
 bgGeo.addGeofence({
@@ -1136,7 +1137,10 @@ bgGeo.addGeofence({
     notifyOnEntry: true,
     notifyOnExit: false,
     notifyOnDwell: true,
-    loiteringDelay: 30000	// <-- 30 seconds
+    loiteringDelay: 30000,	// 30 seconds
+    extras: {               // Optional arbitrary meta-data
+        zone_id: 1234
+    }
 }, function() {
     console.log("Successfully added geofence");
 }, function(error) {
@@ -1145,7 +1149,7 @@ bgGeo.addGeofence({
 ```
 
 ####`addGeofences(geofences, callbackFn, failureFn)`
-Adds a list of geofences to be monitored by the native plugin.  Monitoring of a geofence is halted after a crossing occurs.  The `geofences` param is an `Array` of geofence Objects `{}` with the following params:
+Adds a list of geofences to be monitored by the native plugin.  If a geofence *already* exists with the configured `identifier`, the previous one will be **deleted** before the new one is inserted.  The `geofences` param is an `Array` of geofence Objects `{}` with the following params:
 
 ######@config {String} identifier The name of your geofence, eg: "Home", "Office"
 ######@config {Float} radius The radius (meters) of the geofence.  In practice, you should make this >= 100 meters.
@@ -1155,6 +1159,7 @@ Adds a list of geofences to be monitored by the native plugin.  Monitoring of a 
 ######@config {Boolean} notifyOnEntry Whether to listen to ENTER events
 ######@config {Boolean} notifyOnDwell (Android only) Whether to listen to DWELL events
 ######@config {Integer milliseconds} loiteringDelay (Android only) When `notifyOnDwell` is `true`, the delay before DWELL event is fired after entering a geofence.
+######@config {Object} extras Optional arbitrary meta-data.
 
 ```Javascript
 bgGeo.addGeofences([{
@@ -1165,7 +1170,10 @@ bgGeo.addGeofences([{
     notifyOnEntry: true,
     notifyOnExit: false,
     notifyOnDwell: true,
-    loiteringDelay: 30000   // <-- 30 seconds
+    loiteringDelay: 30000,   // 30 seconds
+    extras: {                // Optional arbitrary meta-data
+        zone_id: 1234
+    }
 }], function() {
     console.log("Successfully added geofence");
 }, function(error) {
