@@ -1,6 +1,10 @@
 
 # Change Log
 ## [Unreleased]
+- [Added] Ability to provide optional arbitrary meta-data `extras` on geofences.
+- [Changed] Location parameters `heading`, `accuracy`, `odometer`, `speed`, `altitude`, `altitudeAccuracy` are now fixed at 2 decimal places.
+- [Fixed] Bug reported with `EventBus already registered` error.  Found a few cases where `EventBus.isRegistered` was not being used.
+- [Added] Android will attempt to auto-sync on heartbeat events.
 - [Changed] permission `android.hardware.location.gps" **android:required="false"**` 
 - [Added] Implement `IntentFilter` to capture `MY_PACKAGE_REPLACED`, broadcast when user upgrades the app.  If you've configured `startOnBoot: true, stopOnTerminate: false` and optionally `foreceRelaodOnBoot: true`, the plugin will automatically restart when user upgrades the app.
 - [Changed] When adding a geofence (either `#addGeofence` or `#addGeofences`), if a geofence already exists with the provided `identifier`, the plugin will first destroy the existing one before creating the new one.
