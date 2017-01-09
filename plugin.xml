@@ -3,12 +3,12 @@
 <plugin xmlns="http://www.phonegap.com/ns/plugins/1.0"
     xmlns:android="http://schemas.android.com/apk/res/android"
     id="com.transistorsoft.cordova.background-geolocation"
-    version="2.2.0">
+    version="2.3.0">
 
     <name>BackgroundGeolocation</name>
     <description>Sophisticated, battery-efficient background-geolocation plugin for Cordova</description>
     <license>MIT</license>
-    <keywords>cordova, phonegap, background geolocation</keywords>
+    <keywords>cordova, phonegap, background geolocation, background, location, tracking</keywords>
 
     <engines>
         <engine name="cordova" version=">=3.4.0" />
@@ -64,7 +64,6 @@
 
         <source-file src="src/android/CDVBackgroundGeolocation.java" target-dir="src/com/transistorsoft/cordova/bggeo" />
 
-        
         <config-file target="res/xml/config.xml" parent="/*">
             <feature name="BackgroundGeolocation">
                 <param name="android-package" value="com.transistorsoft.cordova.bggeo.CDVBackgroundGeolocation"/>
