@@ -1,6 +1,6 @@
 
 # Change Log
-## [Unreleased]
+## [2.3.0] - 2017-01-09
 - [Fixed] Locale issue when formatting Floats.  Some locale use "," as decimal separator.  Force Locale -> US when performing rounding.  Proper locale will be applied during the JSON encoding.
 - [Added] Ability to provide optional arbitrary meta-data `extras` on geofences.
 - [Changed] Location parameters `heading`, `accuracy`, `odometer`, `speed`, `altitude`, `altitudeAccuracy` are now fixed at 2 decimal places.
