@@ -1,11 +1,12 @@
 {
   "name": "cordova-background-geolocation",
   "version": "2.3.0",
-  "description": "Cordova Background Geolocation.  Sophisticated, cross-platform location-tracking plugin.",
+  "description": "The most sophisticated cross-platform background location tracking & geofencing plugin with battery-conscious motion-detection",
   "cordova": {
     "id": "cordova-background-geolocation",
     "platforms": [
-      "ios"
+      "ios",
+      "android"
     ]
   },
   "repository": {
@@ -15,7 +16,10 @@
   "keywords": [
     "gps",
     "location",
+    "tracking",
     "geolocation",
+    "geofence",
+    "geofencing",
     "background",
     "ecosystem:cordova",
     "cordova-android",
