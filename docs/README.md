@@ -558,6 +558,10 @@ If the closes the app with a configured `heartbeatInterval`, `forceReloadOnHeart
 
 If the user reboots the device, setting `forceReloadOnBoot: true` will cause the foreground application (where your Javascript lives) to reload after the device is rebooted.  This option should be used in conjunction with `forceReloadOnLocationChange: true` or `forceReloadOnMotionChange: true`.
 
+####`@param {Boolean} forceReloadOnSchedule [false]`
+
+If a `schedule` event occurs after the user terminates the app with `stopOnTerminate: false`, setting `forceReloadOnSchedule: true` will cause the foreground application (where your Javascript lives) to reboot.
+
 ####`@param {Boolean} foregroundService [false]`
 
 Make the Android service [run in the foreground](http://developer.android.com/intl/ru/reference/android/app/Service.html#foregroundService(int, android.app.Notification)), supplying the ongoing notification to be shown to the user while in this state.  Running as a foreground-service makes the tracking-service **much** more inmmune to OS killing it due to memory/battery pressure.  By default services are background, meaning that if the system needs to kill them to reclaim more memory (such as to display a large page in a web browser).  @see `notificationTitle`, `notificationText` & `notificatinoColor`
