@@ -1,5 +1,9 @@
 
 # Change Log
+## Unreleased
+- [Fixed] iOS Location Authorization alert is shown multiple time.  Also discovered a bug where the `providerchange` `enabled` value was calculated based upon hard-coded `Always` where it should have compared to the configured `locationAuthorizationRequest`.
+- [Added] If plugin's `#stop` method is called, the Location Authorization Alert will be hidden (if currently visible).
+
 ## [2.3.0] - 2017-01-09
 - [Fixed] Locale issue when formatting Floats.  Some locale use "," as decimal separator.  Force Locale -> US when performing rounding.  Proper locale will be applied during the JSON encoding.
 - [Added] Ability to provide optional arbitrary meta-data `extras` on geofences.
