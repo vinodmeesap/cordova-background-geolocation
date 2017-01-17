@@ -1,6 +1,11 @@
 
 # Change Log
+
 ## Unreleased
+- [Fixed] Catch `IllegalStateException` reported when using `#getLog`
+- [Changed] With new Android "Doze-mode", override "idle" on `stopTimeout` and `schedule` alarms
+
+## [2.3.1] - 2017-01-13
 - [Fixed] iOS Location Authorization alert is shown multiple time.  Also discovered a bug where the `providerchange` `enabled` value was calculated based upon hard-coded `Always` where it should have compared to the configured `locationAuthorizationRequest`.
 - [Added] If plugin's `#stop` method is called, the Location Authorization Alert will be hidden (if currently visible).
 
