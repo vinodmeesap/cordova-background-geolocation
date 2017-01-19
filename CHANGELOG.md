@@ -4,6 +4,8 @@
 ## Unreleased
 - [Fixed] Catch `IllegalStateException` reported when using `#getLog`
 - [Changed] With new Android "Doze-mode", override "idle" on `stopTimeout` and `schedule` alarms
+- [Changed] Tweak iOS accelerometer-only motion-detection system.
+- [Fixed] Location-authorization alert being popped up after a `suspend` event because the plugin always attempts to ensure it has a stationary-region here.  Simply check current authorization-status is not == `Denied`.
 
 ## [2.3.1] - 2017-01-13
 - [Fixed] iOS Location Authorization alert is shown multiple time.  Also discovered a bug where the `providerchange` `enabled` value was calculated based upon hard-coded `Always` where it should have compared to the configured `locationAuthorizationRequest`.
