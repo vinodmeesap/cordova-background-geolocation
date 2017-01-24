@@ -659,6 +659,17 @@ Your `callbackFn` fill be executed when a change in the state of the device's **
 ######@param {Boolean} enabled Whether location-services is enabled
 ######@param {Boolean} gps Whether gps is enabled
 ######@param {Boolean} network Whether wifi geolocation is enabled.
+######@param {Integer} status Location authorization status.
+
+| Name | Value | Platform |
+|------|-------|----------|
+| `AUTHORIZATION_STATUS_NOT_DETERMINED` | `0` | iOS only |
+| `AUTHORIZATION_STATUS_RESTRICTED` | `1` | iOS only |
+| `AUTHORIZATION_STATUS_DENIED` | `2` | iOS & Android |
+| `AUTHORIZATION_STATUS_ALWAYS` | `3` | iOS & Android |
+| `AUTHORIZATION_STATUS_WHEN_IN_USE` | `4` | iOS only |
+
+**Note:** When Android location permission is **granted**, `status == AUTHORIZATION_STATUS_ALWAYS`, otherwise, `AUTHORIZATION_DENIED`.
 
 ```Javascript
 bgGeo.on('providerchange', function(provider) {
@@ -666,6 +677,22 @@ bgGeo.on('providerchange', function(provider) {
     console.log('  enabled: ', provider.enabled);
     console.log('  gps: ', provider.gps);
     console.log('  network: ', provider.network);
+    console.log('  status: ', provider.status);
+
+    switch(provider.status) {
+        case bgGeo.AUTHORIZATION_STATUS_DENIED:
+            // Android & iOS
+            console.log('- Location authorization denied');
+            break;
+        case bgGeo.AUTHORIZATION_STATUS_ALWAYS:
+            // Android & iOS
+            console.log('- Location always granted');
+            break;
+        case bgGeo.AUTHORIZATION_STATUS_WHEN_IN_USE:
+            // iOS only
+            console.log('- Location WhenInUse granted');
+            break;
+    }
 });
 ```
 
