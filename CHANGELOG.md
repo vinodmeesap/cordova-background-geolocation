@@ -2,6 +2,20 @@
 # Change Log
 
 ## Unreleased
+- [Changed] **BREAKING** I've *finally* figured out how to configure a number of key variables required by the plugin within your `config.xml` file, namely the `NSLocationAlwaysUsageDescription`, `NSLocationWhenInUseUsageDescription`, `NSMotionUsageDescription`.  The plugin now requires a `<plugin />` config within your `config.xml`.  **BREAKING:** With the introduction of this new config mechanism, I decided to use this also for the Android `license` config.  You will no longer provide the `<parameter name="cordova-background-geolocation-license" />`.  See the [README](https://github.com/transistorsoft/cordova-background-geolocation/tree/config-xml-variables#configuring-the-plugin) for details.
+
+```xml
+<widget id="com.your.company.app.id">
+  <plugin name="cordova-background-geolocation" spec="^2.4.0">
+    <variable name="LICENSE" value="YOUR_LICENSE_KEY" />
+    <variable name="LOCATION_ALWAYS_USAGE_DESCRIPTION" value="Background location-tracking is required" />
+    <variable name="LOCATION_WHEN_IN_USE_USAGE_DESCRIPTION" value="Background location-tracking is required" />
+    <variable name="MOTION_USAGE_DESCRIPTION" value="Using the accelerometer increases battery-efficiency by intelligently toggling location-tracking only when the device is detected to be moving" />
+    <variable name="BACKGROUND_MODE_LOCATION" value="location" />
+    <variable name="BACKGROUND_MODE_AUDIO" value="" />
+  </plugin>
+```
+
 - [Fixed] Migrate Android `providerchange` mechanism out of the `Service` (which only runs when the plugin is `#start`ed) to a place where it will be monitored all the time, regardless if the plugin is enabled or not.
 - [Fixed] Catch `IllegalStateException` reported when using `#getLog`
 - [Changed] With new Android "Doze-mode", override "idle" on `stopTimeout` and `schedule` alarms
