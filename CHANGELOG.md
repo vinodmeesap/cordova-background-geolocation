@@ -2,6 +2,7 @@
 # Change Log
 
 ## Unreleased
+- [Fixed] Migrate Android `providerchange` mechanism out of the `Service` (which only runs when the plugin is `#start`ed) to a place where it will be monitored all the time, regardless if the plugin is enabled or not.
 - [Fixed] Catch `IllegalStateException` reported when using `#getLog`
 - [Changed] With new Android "Doze-mode", override "idle" on `stopTimeout` and `schedule` alarms
 - [Changed] Tweak iOS accelerometer-only motion-detection system.
