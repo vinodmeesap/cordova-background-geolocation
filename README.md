@@ -28,22 +28,75 @@ This plugin has tagged stable versions.  To install a particular version, append
 
 ![](https://dl.dropboxusercontent.com/u/2319755/cordova-background-geolocaiton/screenshot-github-tagged-branches.png)
 
-#### Configure your license
+## Configuring the plugin
+
+The plugin requires configuration within your App's `config.xml`:
+
+```xml
+<widget id="com.your.company.app.id">
+  <plugin name="cordova-background-geolocation" spec="^2.4.0">
+    <variable name="LICENSE" value="YOUR_LICENSE_KEY" />
+    <variable name="LOCATION_ALWAYS_USAGE_DESCRIPTION" value="Background location-tracking is required" />
+    <variable name="LOCATION_WHEN_IN_USE_USAGE_DESCRIPTION" value="Background location-tracking is required" />
+    <variable name="MOTION_USAGE_DESCRIPTION" value="Using the accelerometer increases battery-efficiency by intelligently toggling location-tracking only when the device is detected to be moving" />
+    <variable name="BACKGROUND_MODE_LOCATION" value="location" />
+    <variable name="BACKGROUND_MODE_AUDIO" value="" />
+  </plugin>
+  .
+  .
+  .
+</widget>
+```
+
+##### `@variable LICENSE [""]` Android
+**[Android]** Your Android license key generated from [Product Dashboard](http://www.transistorsoft.com/shop/customers)
+
+##### `@variable LOCATION_ALWAYS_USAGE_DESCRIPTION ["Background location-tracking is required"]` iOS
+
+**[iOS]** Customize the message displayed to the user when `Always` location authorization is requested.  This variable is added to your iOS `.plist` in the `NSLocationAlwaysUsageDescription` key.
+
+##### `@variable LOCATION_WHEN_IN_USE_USAGE_DESCRIPTION ["Background location-tracking is required"` iOS
+
+**[iOS]** Customize the message displayed to the user when `WhenInUse` location authorization is requested.  This variable is added to your iOS `.plist` in the `NSLocationWhenInUseUsageDescription` key.
+
+##### `@variable MOTION_USAGE_DESCRIPTION ["Using the accelerometer increases battery-efficiency by..."` iOS
+
+**[iOS]** Customize the message displayed to the user when "Motion & Fitness" permission is requested.  The plugin is **highly** optimized to use iOS `CMMotionActivityManager` API for intelligently toggling location-services only when the plugin is detected to be moving.
+
+
+##### `@variable BACKGROUND_MODE_LOCATION ["location"]` iOS
+**[iOS]** Adds the iOS background-mode `location` to your iOS `.plist` file.  This is the default behaviour.  To disable this, (ie: for those using `useSignificantChangesOnly`), provide an empty-string:
+
+```xml
+  <variable name="BACKGROUND_MODE_LOCATION" value="" />
+```
+
+##### `@variable BACKGROUND_MODE_AUDIO [""]` iOS
+
+**[iOS]** Defaults to empty-string (ie: **disabled**).  Use iOS background-audio mode **only** to enable the plugin's debug SoundFX with `debug: true` while the app is in the background.  To **enable** background `audio` mode:
+
+```xml
+  <variable name="BACKGROUND_MODE_LOCATION" value="audio" />
+```
+
+### Configure your license
 
 1. Login to Customer Dashboard to generate an application key:
 [www.transistorsoft.com/shop/customers](http://www.transistorsoft.com/shop/customers)
 ![](https://gallery.mailchimp.com/e932ea68a1cb31b9ce2608656/images/b2696718-a77e-4f50-96a8-0b61d8019bac.png)
 
-2. Edit your application's `config.xml` and add the following `<preference>`:
-```
+2. Edit your application's `config.xml` and provide your `LICENSE` to the <plugin> element as follows:
+```xml
 <widget id="com.your.company.app.id">
   .
   .
   .
-  <preference name="cordova-background-geolocation-license" value="<YOUR LICENSE KEY>" />
-  .
-  .
-  .
+  <plugin name="cordova-background-geolocation" spec="^2.4.0">
+    <variable name="LICENSE" value="YOUR_LICENSE_KEY" />
+    .
+    .
+    .
+  </plugin>
 </widget>
 ```
 
