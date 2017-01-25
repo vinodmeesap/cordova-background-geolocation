@@ -48,7 +48,7 @@ The plugin requires configuration within your App's `config.xml`:
 </widget>
 ```
 ---
-:exclamation:**NOTE:**:exclamation: To apply changes to these `<variable />`, you **must** remove/re-add the plugin.
+:exclamation:**NOTE:** To apply changes to these `<variable />`, you **must** remove/re-add the plugin.
 ---
 
 ##### `@variable LICENSE [""]` Android
