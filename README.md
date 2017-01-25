@@ -48,7 +48,7 @@ The plugin requires configuration within your App's `config.xml`:
 </widget>
 ```
 
-**NOTE:** To apply changes to these `<variable />`, you **must** remove/re-add the plugin.
+:exclamation:**NOTE:** To apply changes to these `<variable />`, you **must** remove/re-add the plugin.
 
 ##### `@variable LICENSE [""]` Android
 **[Android]** Your Android license key generated from [Product Dashboard](http://www.transistorsoft.com/shop/customers)
