@@ -34,13 +34,11 @@ The plugin requires configuration within your App's `config.xml`:
 
 ```xml
 <widget id="com.your.company.app.id">
-  <plugin name="cordova-background-geolocation" spec="^2.4.0">
+  <plugin name="cordova-background-geolocation">
     <variable name="LICENSE" value="YOUR_LICENSE_KEY" />
     <variable name="LOCATION_ALWAYS_USAGE_DESCRIPTION" value="Background location-tracking is required" />
     <variable name="LOCATION_WHEN_IN_USE_USAGE_DESCRIPTION" value="Background location-tracking is required" />
     <variable name="MOTION_USAGE_DESCRIPTION" value="Using the accelerometer increases battery-efficiency by intelligently toggling location-tracking only when the device is detected to be moving" />
-    <variable name="BACKGROUND_MODE_LOCATION" value="location" />
-    <variable name="BACKGROUND_MODE_AUDIO" value="" />
   </plugin>
   .
   .
@@ -52,6 +50,20 @@ The plugin requires configuration within your App's `config.xml`:
 :exclamation:**NOTE:** To apply changes to these `<variable />`, you **must** remove/re-add the plugin.
 
 ---
+
+### Disabling Background "location"
+
+For those using `useSignificantChangesOnly: true`, possibly because Apple *denied* your use of the background `location` capability, you can disable background `location` by providing the `BACKGROUND_MODE_LOCATION` `<variable />` with an empty-string:
+
+```xml
+<plugin name="cordova-background-geolocation">
+  .
+  .
+  .
+  <!-- Disable background "location" capability with empty-string -->
+  <variable name="BACKGROUND_MODE_LOCATION" value="" />
+</plugin>
+```
 
 ##### `@variable LICENSE [""]` Android
 **[Android]** Your Android license key generated from [Product Dashboard](http://www.transistorsoft.com/shop/customers)
@@ -68,21 +80,14 @@ The plugin requires configuration within your App's `config.xml`:
 
 **[iOS]** Customize the message displayed to the user when "Motion & Fitness" permission is requested.  The plugin is **highly** optimized to use iOS `CMMotionActivityManager` API for intelligently toggling location-services only when the plugin is detected to be moving.
 
-
-##### `@variable BACKGROUND_MODE_LOCATION ["location"]` iOS
+##### `@variable BACKGROUND_MODE_LOCATION ["&lt;string&gt;location&lt;/string&gt;"]` iOS
 **[iOS]** Adds the iOS background-mode `location` to your iOS `.plist` file.  This is the default behaviour.  To disable this, (ie: for those using `useSignificantChangesOnly`), provide an empty-string:
 
 ```xml
   <variable name="BACKGROUND_MODE_LOCATION" value="" />
 ```
 
-##### `@variable BACKGROUND_MODE_AUDIO [""]` iOS
-
-**[iOS]** Defaults to empty-string (ie: **disabled**).  Use iOS background-audio mode **only** to enable the plugin's debug SoundFX with `debug: true` while the app is in the background.  To **enable** background `audio` mode:
-
-```xml
-  <variable name="BACKGROUND_MODE_LOCATION" value="audio" />
-```
+**WARNING** If you *do* want the default behaviour of background-location updates, simply **IGNORE** this variable -- Do **NOT** even provide it.  If you *do* provide it, you must provide the full escaped XML value of `&lt;string&gt;location&lt;/string&gt;` (the default value when not provided), not just `location`.
 
 ### Configure your license
 

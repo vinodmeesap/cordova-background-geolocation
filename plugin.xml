@@ -22,8 +22,7 @@
     </js-module>
 
      <platform name="ios">
-        <preference name="BACKGROUND_MODE_LOCATION" default="location" />
-        <preference name="BACKGROUND_MODE_AUDIO" default="" />
+        <preference name="BACKGROUND_MODE_LOCATION" default="&lt;string&gt;location&lt;/string&gt;" />
         <preference name="LOCATION_ALWAYS_USAGE_DESCRIPTION" default="Background location-tracking is required" />
         <preference name="LOCATION_WHEN_IN_USE_USAGE_DESCRIPTION" default="Background location-tracking is required" />
         <preference name="MOTION_USAGE_DESCRIPTION" default="Using the accelerometer increases battery-efficiency by intelligently toggling location-tracking only when the device is detected to be moving" />
@@ -32,8 +31,7 @@
         <!-- required background modes:  App registers for location updates -->
         <config-file target="*-Info.plist" parent="UIBackgroundModes">
             <array>
-                <string>$BACKGROUND_MODE_LOCATION</string>
-                <string>$BACKGROUND_MODE_AUDIO</string>
+                $BACKGROUND_MODE_LOCATION
             </array>
         </config-file>
 
