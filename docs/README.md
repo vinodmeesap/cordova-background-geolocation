@@ -65,7 +65,7 @@ bgGeo.setConfig({
 |---|---|---|---|---|
 | [`url`](#param-string-url-undefined) | `String` | Optional | `null` | Your server url where you wish to HTTP POST recorded-locations to |
 | [`params`](#param-object-params) | `Object` | Optional | `null` | Optional HTTP params sent along in HTTP request to above `#url` |
-| [`extras`](#param-object-extras) | `Object` | Optional | | Optional `null` to attach to each recorded location |
+| [`extras`](#param-object-extras) | `Object` | Optional | `null` | Optional meta-data to attach to each recorded location |
 | [`headers`](#param-object-headers) | `Object` | Optional | `null` | Optional HTTP headers sent along in HTTP request to above `#url` |
 | [`method`](#param-string-method-post) | `String` | Optional | `POST` | The HTTP method.  Defaults to `POST`.  Some servers require `PUT`.|
 | [`autoSync`](#param-string-autosync-true) | `Boolean` | Optional | `true` | If you've enabeld HTTP feature by configuring an `#url`, the plugin will attempt to HTTP POST each location to your server **as it is recorded**.  If you set `autoSync: false`, it's up to you to **manually** execute the `#sync` method to initate the HTTP POST (**NOTE** The plugin will continue to persist **every** recorded location in the SQLite database until you execute `#sync`). |
@@ -966,13 +966,13 @@ bgGeo.configure(config, function(state) {
 });
 
 // Listen to geofences
-bgGeo.onGeofence(function(params, taskId) {
+bgGeo.on('geofence', function(params, taskId) {
     if (params.identifier == 'ZONE_OF_INTEREST') {
         // If you wish, you can choose to engage location-tracking mode when a 
         // particular geofence event occurs.
         bgGeo.start();
     }
-    bgGeo.finish();
+    bgGeo.finish(taskId);
 });
 ```
 
