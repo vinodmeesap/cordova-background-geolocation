@@ -122,6 +122,7 @@ If building from your local machine (as you should be), ensure you have the foll
 ## Documentation
 - [API Documentation](./docs/README.md)
 - [Advanced Geofencing Features](./docs/geofencing.md)
+- [HTTP Features](./docs/http.md)
 - [Location Data Schema](../../wiki/Location-Data-Schema)
 - [Debugging Sounds](../../wiki/Debug-Sounds)
 - [Geofence Features](../../wiki/Geofence-Features)

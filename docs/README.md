@@ -39,7 +39,7 @@ bgGeo.setConfig({
 | [`pausesLocationUpdatesAutomatically`](#param-boolean-pauseslocationupdatesautomatically-true) | `Boolean` | Optional (**iOS**)| `true` | The default behaviour of the plugin is to turn off location-services automatically when the device is detected to be stationary.  When set to `false`, location-services will **never** be turned off (and `disableStopDetection` will automatically be set to `true`) -- it's your responsibility to turn them off when you no longer need to track the device.  This feature should **not** generally be used.  `preventSuspend` will no longer work either.| 
 | [`locationAuthorizationRequest`](#param-boolean-locationauthorizationrequest-always) | `Always`,`WhenInUse` | Optional (**iOS**)| `Always` | The desired iOS location-authorization request, either `Always` or `WhenInUse`.  You'll have to edit the corresponding key in your app's `Info.plist`, `NSLocationAlwaysUsageDescription` or `NSWhenInUseUsageDescription`.  `WhenInUse` will display a **blue bar** at top-of-screen informing user that location-services are on. |
 | [`locationAuthorizationAlert`](#param-object-locationauthorizationalert) | `{}` | Optional (**iOS**)| `{}` | When you configure the plugin location-authorization `Always` or `WhenInUse` and the user changes the value in the app's location-services settings or disabled location-services, the plugin will display an Alert directing the user to the **Settings** screen.  This config allows you to configure all the Strings for that Alert popup. |
-| [`desiredOdometerAccuracy`](#param-integer-meters-desiredodometeraccuracy) | `Integer meters`  |  Optional | `100`  | Specify an accuracy threshold for odometer calculations.  Defaults to `100`.  If a location arrives having `accuracy > desiredOdometerAccuracy`, that location will not be used to update the odometer.  If you only want to calculate odometer from GPS locations, you could set `desiredOdometerAccuracy: 10`.  This will prevent odometer updates when a device is moving around indoors, in a shopping mall, for example.|
+| [`desiredOdometerAccuracy`](#param-integer-meters-desiredodometeraccuracy-100) | `Integer meters`  |  Optional | `100`  | Specify an accuracy threshold for odometer calculations.  Defaults to `100`.  If a location arrives having `accuracy > desiredOdometerAccuracy`, that location will not be used to update the odometer.  If you only want to calculate odometer from GPS locations, you could set `desiredOdometerAccuracy: 10`.  This will prevent odometer updates when a device is moving around indoors, in a shopping mall, for example.|
 
 ## Activity Recognition Options
 
@@ -68,6 +68,9 @@ bgGeo.setConfig({
 | [`extras`](#param-object-extras) | `Object` | Optional | `null` | Optional meta-data to attach to each recorded location |
 | [`headers`](#param-object-headers) | `Object` | Optional | `null` | Optional HTTP headers sent along in HTTP request to above `#url` |
 | [`method`](#param-string-method-post) | `String` | Optional | `POST` | The HTTP method.  Defaults to `POST`.  Some servers require `PUT`.|
+| [`httpRootProperty`](#param-string-httprootproperty-location) | `String` | Optional | `location` | The root property of the JSON data where location-data will be placed eg `{"rootProperty":{Location data}}`.|
+| [`locationTemplate`](#param-string-locationtemplate-undefined) | `String` | Optional | `undefined` | Optional custom location data schema (eg: `{ "lat:{{latitude}}, "lng":{{longitude}} }`|
+| [`geofenceTemplate`](#param-string-geofencetemplate-undefined) | `String` | Optional | `undefined` | Optional custom geofence data schema (eg: `{ "lat:{{latitude}}, "lng":{{longitude}}, "geofence":"{{geofence_identifier}}:{{geofence_action}}" }`|
 | [`autoSync`](#param-string-autosync-true) | `Boolean` | Optional | `true` | If you've enabeld HTTP feature by configuring an `#url`, the plugin will attempt to HTTP POST each location to your server **as it is recorded**.  If you set `autoSync: false`, it's up to you to **manually** execute the `#sync` method to initate the HTTP POST (**NOTE** The plugin will continue to persist **every** recorded location in the SQLite database until you execute `#sync`). |
 | [`autoSyncThreshold`](#param-integer-autosyncthreshold-0) | `Integer` | Optional | `0` | The minimum number of persisted records to trigger an `autoSync` action. |
 | [`batchSync`](#param-string-batchsync-false) | `Boolean` | Optional | `false` | Default is `false`.  If you've enabled HTTP feature by configuring an `#url`, `batchSync: true` will POST all the locations currently stored in native SQLite datbase to your server in a single HTTP POST request.  With `batchSync: false`, an HTTP POST request will be initiated for **each** location in database. |
@@ -122,11 +125,11 @@ bgGeo.on("location", onLocation, onLocationError);
 | Method Name | Arguments | Notes
 |---|---|---|
 | [`configure`](#configureconfig-success-failure) | `{config}`, `successFn`, `failureFn` | Configures the plugin's parameters (@see following Config section for accepted config params. The `success` callback will be executed after the plugin has successfully configured and provided with the current `state` object. |
-| [`removeListeners`](#removelisteners-successfn-failurefn) | `none` | Remove all events-listeners registered with `#on` method |
+| [`removeListeners`](#removelistenerssuccessfn-failurefn) | `none` | Remove all events-listeners registered with `#on` method |
 | [`setConfig`](#setconfigconfig-successfn-failurefn) | `{config}`, `successFn`, `failureFn` | Re-configure the plugin with new values |
 | [`start`](#startsuccessfn-failurefn) | `callbackFn`| Enable location tracking.  Supplied `callbackFn` will be executed when tracking is successfully engaged.  This is the plugin's power **ON** button.  The plugin will initially start into its **stationary** state, fetching an initial location before turning off location services.  Android will be monitoring its **Activity Recognition System** while iOS will create a stationary geofence around the current location. |
 | [`stop`](#stopsuccessfn-failurefn) | `callbackFn` | Disable location tracking.  Supplied `callbackFn` will be executed when tracking is successfully halted.  This is the plugin's power **OFF** button. |
-| [`startSchedule`](#startchedulecallbackfn) | `callbackFn` | If a `schedule` was configured, this method will initiate that schedule.  The plugin will automatically be started or stopped according to the configured `schedule`.    Supplied `callbackFn` will be executed once the Scheduler has parsed and initiated your `schedule` |
+| [`startSchedule`](#startschedulecallbackfn) | `callbackFn` | If a `schedule` was configured, this method will initiate that schedule.  The plugin will automatically be started or stopped according to the configured `schedule`.    Supplied `callbackFn` will be executed once the Scheduler has parsed and initiated your `schedule` |
 | [`stopSchedule`](#stopschedulecallbackfn) | `callbackFn` | This method will stop the Scheduler service.  Your `callbackFn` will be executed after the Scheduler has stopped |
 | [`startGeofences`](#startgeofencescallbackfn) | `callbackFn` | Engages the geofences-only `trackingMode`.  In this mode, no active location-tracking will occur -- only geofences will be monitored|
 | [`getState`](#getstatesuccessfn) | `callbackFn` | Fetch the current-state of the plugin, including `enabled`, `isMoving`, as well as all other config params |
@@ -366,6 +369,143 @@ Your server url where you wish to HTTP POST location data to.
 
 The HTTP method to use when creating an HTTP request to your configured `#url`.  Defaults to `POST`.  Valid values are `POST`, `PUT` and `OPTIONS`.
 
+####`@param {Object} params`
+
+Optional HTTP params sent along in HTTP request to above `#url`.
+
+####`@param {Object} headers`
+
+Optional HTTP params sent along in HTTP request to above `#url`.
+
+####`@param {String} httpRootProperty [location]`
+
+See [HTTP Features](./http.md) for more information.
+
+The root property of the JSON data where location-data will be placed.  Eg:
+
+```json
+{
+    "rootProperty":{
+        "coords": {
+            "latitude":23.232323,
+            "longitude":37.373737
+        }
+    }
+}
+```
+
+You may also specify the character **`httpRootProperty:"."`** to place your data in the *root* of the JSON:
+
+```json
+{
+    "coords": {
+        "latitude":23.232323,
+        "longitude":37.373737
+    }
+}
+```
+
+####`@param {String} locationTemplate [undefined]`
+
+See [HTTP Features](./http.md) for more information.
+
+Optional custom template for rendering `location` JSON request data in HTTP requests.  Use "mutache-style" `{{tags}}`:
+
+```Javascript
+bgGeo.configure({
+  locationTemplate: '{"lat":{{latitude}},"lng":{{longitude}},"event":"{{event}}",isMoving:{{isMoving}}}'
+});
+
+// Or use a compact [Array] template!
+bgGeo.configure({
+  locationTemplate: '[{{latitude}}, {{longitude}}, "{{event}}", {{is_moving}}]'
+})
+```
+
+:exclamation: If you've configured `#extras`, these key-value pairs will be merged *directly* onto your location data.  Eg:
+
+```Javascript
+bgGeo.configure({
+  httpRootProperty: 'data',
+  locationTemplate: '{"lat":{{latitude}},"lng":{{longitude}}}',
+  extras: {
+    "foo":"bar"
+  }
+})
+```
+
+Will result in JSON:
+```json
+{
+    "data": {
+        "lat":23.23232323,
+        "lng":37.37373737,
+        "foo":"bar"
+    }
+}
+```
+
+**Template Tags**
+
+| Tag | Type | Description |
+|-----|------|-------------|
+| `{{latitude}}` | `Float` ||
+| `{{longitude}}` | `Float` ||
+| `{{speed}}` | `Float` | Meters|
+| `{{heading}}` | `Float` | Degress|
+| `{{accuracy}}` | `Float` | Meters|
+| `{{altitude}}` | `Float` | Meters|
+| `{{altitude_accuracy}}` | `Float` | Meters|
+| `{{timestamp}}` | `String` |ISO-8601|
+| `{{uuid}}` | `String` |Unique ID|
+| `{{event}}` | `String` |`motionchange|geofenee|heartbeat`
+| `{{odometer}}` | `Float` | Meters|
+| `{{activity_type}}` | `String` | `still|on_foot|running|on_bicycle|in_vehicle|unknown`|
+| `{{activity_confidence}}` | `Integer` | 0-100%|
+| `{{battery_level}}` | `Float` | 0-100%|
+| `{{battery_is_charging}}` | `Boolean` | Is device plugged in?|
+
+####`@param {String} geofenceTemplate [undefined]`
+
+See [HTTP Features](./http.md) for more information.
+
+Optional custom template for rendering `geofence` JSON request data in HTTP requests.  The `geofenceTemplate` is similar to `locationTemplate` with the addition of two extra `geofence_` tags.  Use "mutache-style" `{{tags}}`:
+
+```Javascript
+bgGeo.configure({
+  geofenceTemplate: '{ "lat":{{latitude}}, "lng":{{longitude}}, "geofence":"{{geofence_identifier}}:{{geofence_action}}" }'
+});
+
+// Or use a compact [Array] template!
+bgGeo.configure({
+  geofenceTemplate: '[{{latitude}}, {{longitude}}, "{{geofence_identifier}}", "{{geofence_action}}"]'
+})
+
+```
+
+**Template Tags**
+The tag-list is identical to `locationTemplate` with the addition of `geofence_identifier` and `geofence_action`
+
+| Tag | Type | Description |
+|-----|------|-------------|
+| **`{{geofence_identifier}}`** | `String` | Which geofence?|
+| **`{{geofence_action}}`** | `String` | `ENTER|EXIT`|
+| `{{latitude}}` | `Float` ||
+| `{{longitude}}` | `Float` ||
+| `{{speed}}` | `Float` | Meters|
+| `{{heading}}` | `Float` | Degress|
+| `{{accuracy}}` | `Float` | Meters|
+| `{{altitude}}` | `Float` | Meters|
+| `{{altitude_accuracy}}` | `Float` | Meters|
+| `{{timestamp}}` | `String` |ISO-8601|
+| `{{uuid}}` | `String` |Unique ID|
+| `{{event}}` | `String` |`motionchange|geofenee|heartbeat`
+| `{{odometer}}` | `Float` | Meters|
+| `{{activity_type}}` | `String` | `still|on_foot|running|on_bicycle|in_vehicle|unknown`
+| `{{activity_confidence}}` | `Integer` | 0-100%|
+| `{{battery_level}}` | `Float` | 0-100%|
+| `{{battery_is_charging}}` | `Boolean` | Is device plugged in?|
+
 ####`@param {String} batchSync [false]`
 
 Default is ```false```.  If you've enabled HTTP feature by configuring an ```#url```, ```batchSync: true``` will POST all the locations currently stored in native SQLite datbase to your server in a single HTTP POST request.  With ```batchSync: false```, an HTTP POST request will be initiated for **each** location in database.
@@ -381,14 +521,6 @@ Default is `true`.  If you've enabeld HTTP feature by configuring an `#url`, the
 ####`@param {Integer} autoSyncThreshold [0]`
 
 The minimum number of persisted records to trigger an `autoSync` action.  If you configure a value greater-than **`0`**, the plugin will wait until that many locations are recorded before executing HTTP requests to your server through your configured `#url`.
-
-####`@param {Object} params`
-
-Optional HTTP params sent along in HTTP request to above `#url`.
-
-####`@param {Object} headers`
-
-Optional HTTP params sent along in HTTP request to above `#url`.
 
 ####`@param {Object} extras`
 
@@ -1107,10 +1239,10 @@ Start a stream of continuous location-updates.  The native code will persist the
 - There is no `bgTask` provided to the callback.
 
 #### Options
-######@param {Integer millis} `[1000]` Location update interval
-######@param {Integer} `[0]` desiredAccuracy
-######@param {Boolean} `[true]` persist 
-######@param {Object} `[undefined]` extras Optional extras to append to each location
+######@param {Integer millis} interval [1000] Location update interval
+######@param {Integer} desiredAccuracy [0]
+######@param {Boolean} persist [true] Whether to persist location to database
+######@param {Object} extras [undefined] Optional extras to append to each location
 
 #### Callback
 
