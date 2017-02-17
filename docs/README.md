@@ -460,10 +460,10 @@ Will result in JSON:
 | `{{uuid}}` | `String` |Unique ID|
 | `{{event}}` | `String` |`motionchange|geofenee|heartbeat`
 | `{{odometer}}` | `Float` | Meters|
-| `{{activity_type}}` | `String` | `still|on_foot|running|on_bicycle|in_vehicle|unknown`|
-| `{{activity_confidence}}` | `Integer` | 0-100%|
-| `{{battery_level}}` | `Float` | 0-100%|
-| `{{battery_is_charging}}` | `Boolean` | Is device plugged in?|
+| `{{activity.type}}` | `String` | `still|on_foot|running|on_bicycle|in_vehicle|unknown`|
+| `{{activity.confidence}}` | `Integer` | 0-100%|
+| `{{battery.level}}` | `Float` | 0-100%|
+| `{{battery.is_charging}}` | `Boolean` | Is device plugged in?|
 
 ####`@param {String} geofenceTemplate [undefined]`
 
@@ -501,10 +501,10 @@ The tag-list is identical to `locationTemplate` with the addition of `geofence_i
 | `{{uuid}}` | `String` |Unique ID|
 | `{{event}}` | `String` |`motionchange|geofenee|heartbeat`
 | `{{odometer}}` | `Float` | Meters|
-| `{{activity_type}}` | `String` | `still|on_foot|running|on_bicycle|in_vehicle|unknown`
-| `{{activity_confidence}}` | `Integer` | 0-100%|
-| `{{battery_level}}` | `Float` | 0-100%|
-| `{{battery_is_charging}}` | `Boolean` | Is device plugged in?|
+| `{{activity.type}}` | `String` | `still|on_foot|running|on_bicycle|in_vehicle|unknown`
+| `{{activity.confidence}}` | `Integer` | 0-100%|
+| `{{battery.level}}` | `Float` | 0-100%|
+| `{{battery.is_charging}}` | `Boolean` | Is device plugged in?|
 
 ####`@param {String} batchSync [false]`
 
