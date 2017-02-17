@@ -251,6 +251,6 @@ The following template tags are specific to **`geofenceTemplate`** only:
 
 | Tag | Type | Description |
 |-----|------|-------------|
-| `{{geofence_identifier}}` | `String` | Which geofence?|
-| `{{geofence_action}}` | `String` | `ENTER|EXIT`|
+| `{{geofence.identifier}}` | `String` | Which geofence?|
+| `{{geofence.action}}` | `String` | `ENTER|EXIT`|
 
