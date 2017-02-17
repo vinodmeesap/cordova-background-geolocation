@@ -70,7 +70,7 @@ bgGeo.setConfig({
 | [`method`](#param-string-method-post) | `String` | Optional | `POST` | The HTTP method.  Defaults to `POST`.  Some servers require `PUT`.|
 | [`httpRootProperty`](#param-string-httprootproperty-location) | `String` | Optional | `location` | The root property of the JSON data where location-data will be placed eg `{"rootProperty":{Location data}}`.|
 | [`locationTemplate`](#param-string-locationtemplate-undefined) | `String` | Optional | `undefined` | Optional custom location data schema (eg: `{ "lat:{{latitude}}, "lng":{{longitude}} }`|
-| [`geofenceTemplate`](#param-string-geofencetemplate-undefined) | `String` | Optional | `undefined` | Optional custom geofence data schema (eg: `{ "lat:{{latitude}}, "lng":{{longitude}}, "geofence":"{{geofence_identifier}}:{{geofence_action}}" }`|
+| [`geofenceTemplate`](#param-string-geofencetemplate-undefined) | `String` | Optional | `undefined` | Optional custom geofence data schema (eg: `{ "lat:{{latitude}}, "lng":{{longitude}}, "geofence":"{{geofence.identifier}}:{{geofence.action}}" }`|
 | [`autoSync`](#param-string-autosync-true) | `Boolean` | Optional | `true` | If you've enabeld HTTP feature by configuring an `#url`, the plugin will attempt to HTTP POST each location to your server **as it is recorded**.  If you set `autoSync: false`, it's up to you to **manually** execute the `#sync` method to initate the HTTP POST (**NOTE** The plugin will continue to persist **every** recorded location in the SQLite database until you execute `#sync`). |
 | [`autoSyncThreshold`](#param-integer-autosyncthreshold-0) | `Integer` | Optional | `0` | The minimum number of persisted records to trigger an `autoSync` action. |
 | [`batchSync`](#param-string-batchsync-false) | `Boolean` | Optional | `false` | Default is `false`.  If you've enabled HTTP feature by configuring an `#url`, `batchSync: true` will POST all the locations currently stored in native SQLite datbase to your server in a single HTTP POST request.  With `batchSync: false`, an HTTP POST request will be initiated for **each** location in database. |
@@ -469,27 +469,27 @@ Will result in JSON:
 
 See [HTTP Features](./http.md) for more information.
 
-Optional custom template for rendering `geofence` JSON request data in HTTP requests.  The `geofenceTemplate` is similar to `locationTemplate` with the addition of two extra `geofence_` tags.  Use "mutache-style" `{{tags}}`:
+Optional custom template for rendering `geofence` JSON request data in HTTP requests.  The `geofenceTemplate` is similar to `locationTemplate` with the addition of two extra `geofence.*` tags.  Use "mutache-style" `{{tags}}`:
 
 ```Javascript
 bgGeo.configure({
-  geofenceTemplate: '{ "lat":{{latitude}}, "lng":{{longitude}}, "geofence":"{{geofence_identifier}}:{{geofence_action}}" }'
+  geofenceTemplate: '{ "lat":{{latitude}}, "lng":{{longitude}}, "geofence":"{{geofence.identifier}}:{{geofence.action}}" }'
 });
 
 // Or use a compact [Array] template!
 bgGeo.configure({
-  geofenceTemplate: '[{{latitude}}, {{longitude}}, "{{geofence_identifier}}", "{{geofence_action}}"]'
+  geofenceTemplate: '[{{latitude}}, {{longitude}}, "{{geofence.identifier}}", "{{geofence.action}}"]'
 })
 
 ```
 
 **Template Tags**
-The tag-list is identical to `locationTemplate` with the addition of `geofence_identifier` and `geofence_action`
+The tag-list is identical to `locationTemplate` with the addition of `geofence.identifier` and `geofence.action`
 
 | Tag | Type | Description |
 |-----|------|-------------|
-| **`{{geofence_identifier}}`** | `String` | Which geofence?|
-| **`{{geofence_action}}`** | `String` | `ENTER|EXIT`|
+| **`{{geofence.identifier}}`** | `String` | Which geofence?|
+| **`{{geofence.action}}`** | `String` | `ENTER|EXIT`|
 | `{{latitude}}` | `Float` ||
 | `{{longitude}}` | `Float` ||
 | `{{speed}}` | `Float` | Meters|
