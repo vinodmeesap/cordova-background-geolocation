@@ -7,8 +7,8 @@
   + [Activity Recognition Options](#wrench-activity-recognition-options)
     * [Common](#activity-recognition-common-options)
     * [iOS](#activity-recognition-ios-options)
-  + [Geofencing Options](#wrench-geofencing-options)
   + [HTTP & Persistence Options](#wrench-http--persistence-options)
+  + [Geofencing Options](#wrench-geofencing-options)
   + [Application Options](#wrench-application-options)
     * [Common](#application-common-options)
     * [iOS](#application-ios-options)
@@ -16,9 +16,15 @@
 - :zap: [Events](#zap-events)
 - :small_blue_diamond: [Methods](#large_blue_diamond-methods)
   + [Core API Methods](#small_blue_diamond-core-api-methods)
-  + [Geofencing Methods](#small_blue_diamond-geofencing-methods)
   + [HTTP & Persistence Methods](#small_blue_diamond-http--persistence-methods)
+  + [Geofencing Methods](#small_blue_diamond-geofencing-methods)
   + [Logging Methods](#small_blue_diamond-logging-methods)
+- :blue_book: Guides
+  + [Philosophy of Operation](../../../wiki/Philosophy-of-Operation)
+  + [Geofencing](geofencing.md)
+  + [HTTP Features](http.md)
+  + [Location Data Schema](../../../wiki/Location-Data-Schema)
+  + [Debugging](../../../wiki/Debugging)
 
 # :wrench: Configuration Options
 
@@ -54,112 +60,127 @@ BackgroundGeolocation.setConfig({
 
 ## :wrench: Geolocation Options
 
-#### [Geolocation] Common Options
+### [Geolocation] Common Options
 
-| Option | Type |  Default | Note |
-|--------|------|----------|------|
+| Option      | Type      | Default   | Note                              |
+|-------------|-----------|-----------|-----------------------------------|
 | [`desiredAccuracy`](#config-integer-desiredaccuracy-0-10-100-1000-in-meters) | `Integer` | `0` | Specify the desired-accuracy of the geolocation system with 1 of 4 values, `0`, `10`, `100`, `1000` where `0` means **HIGHEST POWER, HIGHEST ACCURACY** and `1000` means **LOWEST POWER, LOWEST ACCURACY** |
 | [`distanceFilter`](#config-integer-distancefilter) | `Integer` | `10` | The minimum distance (measured in meters) a device must move horizontally before an update event is generated. |
-| [`stopAfterElapsedMinutes`](#config-integer-stopafterelapsedminutes) | `Integer`  | `0`  | The plugin can optionally automatically stop tracking after some number of minutes elapses after the `#start` method was called. |
+| [`stopAfterElapsedMinutes`](#config-integer-stopafterelapsedminutes) | `Integer`  | `0`  | The plugin can optionally automatically stop tracking after some number of minutes elapses after the [`#start`](#startsuccessfn-failurefn) method was called. |
 | [`desiredOdometerAccuracy`](#config-integer-desiredodometeraccuracy-100) | `Integer`  | `100`  | Location accuracy threshold in **meters** for odometer calculations. |
 
 
-#### [Geolocation] iOS Options
+### [Geolocation] iOS Options
 
-| Option | Type |  Default | Note |
-|--------|------|----------|------|
+| Option      | Type      | Default   | Note                              |
+|-------------|-----------|-----------|-----------------------------------|
 | [`stationaryRadius`](#config-integer-stationaryradius-meters) | `Integer`  | `25`  | When stopped, the minimum distance the device must move beyond the stationary location for aggressive background-tracking to engage. |
 | [`useSignificantChangesOnly`](#config-boolean-usesignificantchangesonly-false) | `Boolean` | `false` | Defaults to `false`.  Set `true` in order to disable constant background-tracking and use only the iOS [Significant Changes API](https://developer.apple.com/library/ios/documentation/CoreLocation/Reference/CLLocationManager_Class/index.html#//apple_ref/occ/instm/CLLocationManager/startMonitoringSignificantLocationChanges). |
 | [`locationAuthorizationRequest`](#config-string-locationauthorizationrequest-always) | `String` | `Always` | The desired iOS location-authorization request, either `Always` or `WhenInUse`. |
-| [`locationAuthorizationAlert`](#config-object-locationauthorizationalert) | `Object` | `{}` | When you configure the plugin location-authorization `Always` or `WhenInUse` and the user *changes* that value in the app's location-services settings or *disables* location-services, the plugin will display an Alert directing the user to the **Settings** screen. |
+| [`locationAuthorizationAlert`](#config-object-locationauthorizationalert) | `Object` | `{}` | When you configure the plugin [`locationAuthorizationRequest`](config-string-locationauthorizationrequest-always) `Always` or `WhenInUse` and the user *changes* that value in the app's location-services settings or *disables* location-services, the plugin will display an Alert directing the user to the **Settings** screen. |
 
-#### [Geolocation] Android Options
+### [Geolocation] Android Options
 
-| Option | Type |  Default | Note |
-|--------|------|----------|------|
-| [`locationUpdateInterval`](#config-integer-millis-locationupdateinterval) | `Integer` | `1000` | With `distanceFilter: 0`, Sets the desired interval for location updates, in milliseconds. |
+| Option      | Type      | Default   | Note                              |
+|-------------|-----------|-----------|-----------------------------------|
+| [`locationUpdateInterval`](#config-integer-millis-locationupdateinterval) | `Integer` | `1000` | With [`distanceFilter: 0`](config-integer-distancefilter), Sets the desired interval for location updates, in milliseconds. |
 | [`fastestLocationUpdateInterval`](#config-integer-millis-fastestlocationupdateinterval) | `Integer` | `10000` | Explicitly set the fastest interval for location updates, in milliseconds. |
 | [`deferTime`](#config-integer-defertime) | `Integer` | `0` | Sets the maximum wait time in milliseconds for location updates to be delivered to your callback, when they will all be delivered in a batch.|
 
 
 ## :wrench: Activity Recognition Options
 
-#### [Activity Recognition] Common Options
+### [Activity Recognition] Common Options
 
-| Option | Type | Default | Note |
-|--------|------|---------|------|
+| Option      | Type      | Default   | Note                              |
+|-------------|-----------|-----------|-----------------------------------|
 | [`activityRecognitionInterval`](#config-integer-millis-10000-activityrecognitioninterval) | `Integer` | `10000` | The desired time between activity detections. Larger values will result in fewer activity detections while improving battery life. A value of `0` will result in activity detections at the fastest possible rate. |
 | [`stopTimeout`](#config-integer-minutes-stoptimeout) | `Integer` | `5`  | The number of **minutes** to wait before turning off location-services after the ActivityRecognition System (ARS) detects the device is `STILL` |
 | [`minimumActivityRecognitionConfidence`](#config-integer-millis-minimumactivityrecognitionconfidence) | `Integer` | `75` | Each activity-recognition-result returned by the API is tagged with a "confidence" level expressed as a `%`.  You can set your desired confidence to trigger a state-change.|
-| [`stopDetectionDelay`](#config-integer-minutes-stopdetectiondelay-0) | `Integer` | `0` | Allows the stop-detection system to be delayed from activating.| 
+| [`stopDetectionDelay`](#config-integer-minutes-stopdetectiondelay-0) | `Integer` | `0` | Number of **minute** to delay the stop-detection system from being activated.| 
 | [`disableStopDetection`](#config-boolean-disablestopdetection-false) | `Boolean` | `false` | Disable accelerometer-based **Stop-detection System**. :warning: Not recommended|
 
-#### [Activity Recognition] iOS Options
+### [Activity Recognition] iOS Options
 
-| Option | Type | Default | Note |
-|--------|------|---------|------|
+| Option      | Type      | Default   | Note                              |
+|-------------|-----------|-----------|-----------------------------------|
 | [`activityType`](#config-string-activitytype-automotivenavigation-othernavigation-fitness-other) | `String` |  `Other` | Presumably, this affects ios GPS algorithm.  See [Apple docs](https://developer.apple.com/library/ios/documentation/CoreLocation/Reference/CLLocationManager_Class/CLLocationManager/CLLocationManager.html#//apple_ref/occ/instp/CLLocationManager/activityType) for more information |
 | [`disableMotionActivityUpdates`](#config-boolean-disablemotionactivityupdates-false) | `Boolean` | `false` | Disable iOS motion-activity updates (eg: "walking", "in_vehicle").  This feature requires a device having the **M7** co-processor (ie: iPhone 5s and up). :warning: The plugin is **HIGHLY** optimized to use this for improved battery performance.  You are **STRONLY** recommended to **NOT** disable this. |
-
-## :wrench: Geofencing Options
-
-| Option | Type | Default | Note |
-|--------|------|---------|------|
-| [`geofenceProximityRadius`](#config-integer-meters-geofenceproximityradius-1000) | `Integer`  | `1000`  | When using Geofences, the plugin activates only those geofences in proximity (the maximim geofences allowed to be simultaneously monitored is limited by the platform (**iOS: 20**, **Android: 100**. |
-| [`geofenceInitialTriggerEntry`](#config-boolean-geofenceinitialtriggerentry-true) | `Boolean` | `true` | Set `false` to disable triggering a geofence immediately if device is already inside it.|
 
 
 ## :wrench: HTTP & Persistence Options
 
-| Option | Type | Default | Note |
-|--------|------|---------|------|
+:blue_book: [HTTP Guide](http.md)
+
+| Option      | Type      | Default   | Note                              |
+|-------------|-----------|-----------|-----------------------------------|
 | [`url`](#config-string-url-undefined) | `String` | `null` | Your server url where you wish to HTTP POST locations to |
-| [`params`](#config-object-params) | `Object` | `null` | Optional HTTP params sent along in HTTP request to above `#url` |
+| [`params`](#config-object-params) | `Object` | `null` | Optional HTTP params sent along in HTTP request to above [`#url`](#config-string-url-undefined) |
 | [`extras`](#config-object-extras) | `Object` | `null` | Optional meta-data to attach to *each* recorded location |
-| [`headers`](#config-object-headers) | `Object` | `null` | Optional HTTP headers sent along in HTTP request to above `#url` |
+| [`headers`](#config-object-headers) | `Object` | `null` | Optional HTTP headers sent along in HTTP request to above [`#url`](#config-string-url-undefined) |
 | [`method`](#config-string-method-post) | `String` | `POST` | The HTTP method.  Defaults to `POST`.  Some servers require `PUT`.|
 | [`httpRootProperty`](#config-string-httprootproperty-location) | `String` | `location` | The root property of the JSON data where location-data will be appended. |
 | [`locationTemplate`](#config-string-locationtemplate-undefined) | `String` | `undefined` | Optional custom location data schema (eg: `{ "lat:{{latitude}}, "lng":{{longitude}} }`|
 | [`geofenceTemplate`](#config-string-geofencetemplate-undefined) | `String` | `undefined` | Optional custom geofence data schema (eg: `{ "lat:{{latitude}}, "lng":{{longitude}}, "geofence":"{{geofence.identifier}}:{{geofence.action}}" }`|
-| [`autoSync`](#config-string-autosync-true) | `Boolean` | `true` | If you've enabeld HTTP feature by configuring an `#url`, the plugin will attempt to upload each location to your server **as it is recorded**.|
-| [`autoSyncThreshold`](#config-integer-autosyncthreshold-0) | `Integer` | `0` | The minimum number of persisted records to trigger an `autoSync` action. |
-| [`batchSync`](#config-string-batchsync-false) | `Boolean` | `false` | If you've enabled HTTP feature by configuring an `#url`, `batchSync: true` will POST all the locations currently stored in native SQLite datbase to your server in a single HTTP POST request.|
-| [`maxBatchSize`](#config-integer-maxbatchsize-undefined) | `Integer` | `-1` | If you've enabled HTTP feature by configuring an `#url` and `batchSync: true`, this parameter will limit the number of records attached to each batch.|
+| [`autoSync`](#config-string-autosync-true) | `Boolean` | `true` | If you've enabeld HTTP feature by configuring an [`#url`](#config-string-url-undefined), the plugin will attempt to upload each location to your server **as it is recorded**.|
+| [`autoSyncThreshold`](#config-integer-autosyncthreshold-0) | `Integer` | `0` | The minimum number of persisted records to trigger an [`#autoSync`](#config-string-autosync-true) action. |
+| [`batchSync`](#config-string-batchsync-false) | `Boolean` | `false` | If you've enabled HTTP feature by configuring an [`#url`](config-string-url-undefined), [`batchSync: true`](#config-string-batchsync-false) will POST all the locations currently stored in native SQLite datbase to your server in a single HTTP POST request.|
+| [`maxBatchSize`](#config-integer-maxbatchsize-undefined) | `Integer` | `-1` | If you've enabled HTTP feature by configuring an [`#url`](config-string-url-undefined) and [`batchSync: true`](#config-string-batchsync-false), this parameter will limit the number of records attached to each batch.|
 | [`maxDaysToPersist`](#config-integer-maxdaystopersist-1) | `Integer` |  `1` |  Maximum number of days to store a geolocation in plugin's SQLite database.|
 | [`maxRecordsToPersist`](#config-integer-maxrecordstopersist--1) | `Integer` |  `-1` |  Maximum number of records to persist in plugin's SQLite database.  Defaults to `-1` (no limit).  To disable persisting locations, set this to `0`|
 
 
 ## :wrench: Application Options
 
-#### [Application] Common Options
+### [Application] Common Options
 
-| Option | Type | Default | Note |
-|--------|------|---------|------|
+| Option      | Type      | Default   | Note                              |
+|-------------|-----------|-----------|-----------------------------------|
 | [`stopOnTerminate`](#config-boolean-stoponterminate-true) | `Boolean` |  `true` | Set `true` to continue tracking after user teminates the app. |
 | [`startOnBoot`](#config-boolean-startonboot-false) | `Boolean` | `false` | Set to `true` to enable background-tracking after the device reboots. |
-| [`heartbeatInterval`](#config-integer-heartbeatinterval-undefined) | `Integer` | `60` | Rate in **seconds** to fire `heartbeat` events. |
+| [`heartbeatInterval`](#config-integer-heartbeatinterval-undefined) | `Integer` | `60` | Rate in **seconds** to fire [`heartbeat`](#heartbeat) events. |
 | [`schedule`](#config-array-schedule-undefined) | `Array` | `undefined` | Defines a schedule to automatically start/stop tracking at configured times |
 
-#### [Application] iOS Options
+### [Application] iOS Options
 
-| Option | Type | Default | Note |
-|--------|------|---------|------|
-| [`preventSuspend`](#config-boolean-preventsuspend-false) | `Boolean` | `false` | Enable this to prevent **iOS** from suspending your app in the background while in the **stationary state**.  Must be used in conjunction with a `heartbeatInterval`.|
+| Option      | Type      | Default   | Note                              |
+|-------------|-----------|-----------|-----------------------------------|
+| [`preventSuspend`](#config-boolean-preventsuspend-false) | `Boolean` | `false` | Enable this to prevent **iOS** from suspending your app in the background while in the **stationary state**.  Must be used in conjunction with a [`#heartbeatInterval`](config-integer-heartbeatinterval-undefined).|
 
-#### [Application] Android Options
+### [Application] Android Options
 
-| Option | Type | Default | Note |
-|--------|------|---------|------|
+| Option      | Type      | Default   | Note                              |
+|-------------|-----------|-----------|-----------------------------------|
 | [`foregroundService`](#config-boolean-foregroundservice-false) | `Boolean` | `false` | Set `true` to make the plugin *mostly* immune to OS termination due to memory pressure from other apps. |
-| [`notificationTitle`](#config-string-notificationtitle-app-name) | `String` | "Your App Name" | When running the service with **`foregroundService: true`**, Android requires a persistent notification in the Notification Bar.  Defaults to the application name |
-| [`notificationText`](#config-string-notificationtext-location-service-activated) | `String` |  "Location service activated" | When running the service with **`foregroundService: true`**, Android requires a persistent notification in the Notification Bar.|
-| [`notificationColor`](#config-string-notificationcolor-null) | `String` | `null` | When running the service with **`foregroundService: true`**, controls the color of the persistent notification in the Notification Bar. |
-| [`notificationIcon`](#config-string-notificationicon-app-icon) | `String` |  Your App Icon | When running the service with **`foregroundService: true`**, controls your customize notification icon.  Defaults to your application icon.|
+| [`notificationTitle`](#config-string-notificationtitle-app-name) | `String` | "Your App Name" | When running the service with [`foregroundService: true`](#config-boolean-foregroundservice-false), Android requires a persistent notification in the Notification Bar.  Defaults to the application name |
+| [`notificationText`](#config-string-notificationtext-location-service-activated) | `String` |  "Location service activated" | When running the service with [`foregroundService: true`](#config-boolean-foregroundservice-false), Android requires a persistent notification in the Notification Bar.|
+| [`notificationColor`](#config-string-notificationcolor-null) | `String` | `null` | When running the service with [`foregroundService: true`](#config-boolean-foregroundservice-false), controls the color of the persistent notification in the Notification Bar. |
+| [`notificationIcon`](#config-string-notificationicon-app-icon) | `String` |  Your App Icon | When running the service with [`foregroundService: true`](#config-boolean-foregroundservice-false), controls your customize notification icon.  Defaults to your application icon.|
+| [`forceReloadOnMotionChange`](#config-boolean-forcereloadonmotionchange-false) | `Boolean` | `false` |  Launch your app whenever the [`#motionchange`](#motionchange) event fires. |
+| [`forceReloadOnLocationChange`](#config-boolean-forcereloadonlocationchange-false) | `Boolean` | `false` |  Launch your app whenever the [`#location`](#location) event fires. |
+| [`forceReloadOnGeofence`](#config-boolean-forcereloadongeofence-false) | `Boolean` | `false` |  Launch your app whenever the [`#geofence`](#geofence) event fires. |
+| [`forceReloadOnHeartbeat`](#config-boolean-forcereloadonheartbeat-false) | `Boolean` | `false` |  Launch your app whenever the [`#heartbeat`](#heartbeat) event fires. |
+| [`forceReloadOnSchedule`](#config-boolean-forcereloadonschedule-false) | `Boolean` | `false` |  Launch your app whenever a [`schedule`](#schedule) event fires. |
+| [`forceReloadOnBoot`](#config-boolean-forcereloadonboot-false) | `Boolean` | `false` |  If the user reboots the device with the plugin configured for [`startOnBoot: true`](#config-boolean-startonboot-false), your will app will launch when the device is rebooted. |
+
+
+
+## :wrench: Geofencing Options
+
+:blue_book: [Geofencing Guide](geofencing.md)
+
+| Option      | Type      | Default   | Note                              |
+|-------------|-----------|-----------|-----------------------------------|
+| [`geofenceProximityRadius`](#config-integer-meters-geofenceproximityradius-1000) | `Integer`  | `1000`  | Radius in **meters** to query for geofences within proximity. |
+| [`geofenceInitialTriggerEntry`](#config-boolean-geofenceinitialtriggerentry-true) | `Boolean` | `true` | Set `false` to disable triggering a geofence immediately if device is already inside it.|
+
 
 ## :wrench: Logging & Debug Options
 
-| Option | Type | Default | Note |
-|--------|------|---------|------|
+:blue_book: [Logging & Debugging Guide](../../../wiki/Debugging)
+
+| Option      | Type      | Default   | Note                              |
+|-------------|-----------|-----------|-----------------------------------|
 | [`debug`](#config-boolean-debug-false) | `Boolean` | `false` | When enabled, the plugin will emit sounds & notifications for life-cycle events of background-geolocation |
 | [`logLevel`](#config-integer-loglevel-5) | `Integer` | `LOG_LEVEL_VERBOSE` | Sets the verbosity of the plugin's logs from `LOG_LEVEL_OFF` to `LOG_LEVEL_VERBOSE` |
 | [`logMaxDays`](#config-integer-logmaxdays-3) | `Integer` | `3` | Maximum days to persist a log-entry in database. |
@@ -175,76 +196,75 @@ Event-listeners can be attached using the method **`#on`**, supplying the **Even
 BackgroundGeolocation.on("location", successFn, failureFn);
 ```
 
-| Event Name | Description |
-|------------|-------------|
+| Event Name         | Description                                     |
+|--------------------|-------------------------------------------------|
 | [`location`](#location) | Fired whenever a new location is recorded. |
 | [`motionchange`](#motionchange) | Fired when the device changes state between **stationary** and **moving** |
 | [`activitychange`](#activitychange) | Fired when the activity-recognition system detects a *change* in detected-activity (`still, on_foot, in_vehicle, on_bicycle, running`) |
 | [`providerchange`](#providerchange)| Fired when a change in the state of the device's **Location Services** has been detected.  eg: "GPS ON", "Wifi only".|
 | [`geofence`](#geofence) | Fired when a geofence crossing event occurs. |
-| [`geofenceschange`](#geofenceschange) | Fired when the list of monitored geofences within **`geofenceProximityRadius`** changed|
+| [`geofenceschange`](#geofenceschange) | Fired when the list of monitored geofences within [`#geofenceProximityRadius`](#config-integer-meters-geofenceproximityradius-1000) changed|
 | [`http`](#http) | Fired after a successful HTTP response. `response` object is provided with `status` and `responseText`. |
-| [`heartbeat`](#heartbeat) | Fired each **`heartbeatInterval`** while the plugin is in the **stationary** state with.  Your callback will be provided with a `params {}` containing the parameters `shakes {Integer}` (#shakes not implemented for Android) as well as the last known `location {Object}` |
-| [`schedule`](#schedule) | Fired when a schedule event occurs.  Your `callbackFn` will be provided with the current `state` Object. | 
+| [`heartbeat`](#heartbeat) | Fired each [`#heartbeatInterval`](#config-integer-heartbeatinterval-undefined) while the plugin is in the **stationary** state with.  Your callback will be provided with a `params {}` containing the last known `location {Object}` |
+| [`schedule`](#schedule) | Fired when a schedule event occurs.  Your `callbackFn` will be provided with the current **`state`** Object. | 
 
 
 # :large_blue_diamond: Methods
 
 ### :small_blue_diamond: Core API Methods
 
-| Method Name | Arguments | Notes |
-|-------------|-----------|-------|
+| Method Name      | Arguments       | Notes                                |
+|------------------|-----------------|--------------------------------------|
 | [`configure`](#configureconfig-success-failure) | `{config}`, `successFn`, `failureFn` | Initializes the plugin and configures the its config options The **`success`** callback will be executed after the plugin has successfully configured and provided with the current **`state`** `Object`. |
 | [`setConfig`](#setconfigconfig-successfn-failurefn) | `{config}`, `successFn`, `failureFn` | Re-configure the plugin with new config options. |
-| [`start`](#startsuccessfn-failurefn) | `callbackFn`| Enable location tracking.  Supplied **`callbackFn`** will be executed when tracking is successfully engaged.  This is the plugin's power **ON** button.  The plugin will initially start into its **stationary** state, fetching an initial location before turning off location services.  Android will be monitoring its **Activity Recognition System** while iOS will create a stationary geofence around the current location. |
+| [`start`](#startsuccessfn-failurefn) | `callbackFn`| Enable location tracking.  Supplied **`callbackFn`** will be executed when tracking is successfully engaged.  This is the plugin's power **ON** button. |
 | [`stop`](#stopsuccessfn-failurefn) | `callbackFn` | Disable location tracking.  Supplied **`callbackFn`** will be executed when tracking is successfully halted.  This is the plugin's power **OFF** button. |
 | [`getState`](#getstatesuccessfn) | `callbackFn` | Fetch the current-state of the plugin, including **`enabled`**, **`isMoving`**, as well as all other config params |
 | [`getCurrentPosition`](#getcurrentpositionsuccessfn-failurefn-options) | `successFn`, `failureFn`, `{options}` | Retrieves the current position using maximum power & accuracy by fetching a number of samples and returning the most accurate to your **`callbackFn`**.|
-| [`watchPosition`](#watchpositionsuccessfn-failurefn-options) | `successFn`, `failureFn`, `{options}` | Start a stream of continuous location-updates.  The native code will persist (optional) each fetched location to its SQLite database just as any other location in addition to uploading to your configured `#url` (if you've enabled the HTTP features).|
-| [`stopWatchPosition`](#stopwatchpositionsuccessfn-failurefn) | `successFn`, `failureFn` | Halt `watchPosition` updates. |
-| [`changePace`](#changepaceenabled-successfn-failurefn) | `isMoving` | Toggles the plugin's state between **stationary** and **moving**. When set to **`true`**, the plugin will begin aggressively tracking the device's location, bypassing stationary monitoring. If you were making a "Jogging" application, this would be your **[Start Workout]** button to immediately begin GPS tracking. Send **`false`** to change state to **stationary**. |
+| [`watchPosition`](#watchpositionsuccessfn-failurefn-options) | `successFn`, `failureFn`, `{options}` | Start a stream of continuous location-updates. |
+| [`stopWatchPosition`](#stopwatchpositionsuccessfn-failurefn) | `successFn`, `failureFn` | Halt [`#watchPosition`](#watchpositionsuccessfn-failurefn-options) updates. |
+| [`changePace`](#changepaceenabled-successfn-failurefn) | `Boolean`, `successFn` | Toggles the plugin's state between **stationary** and **moving**. |
 | [`getOdometer`](#getodometercallbackfn-failurefn) | `callbackFn` | The plugin constantly tracks distance travelled. The supplied callback will be executed and provided with the **`distance`** (meters) as the 1st parameter.|
-| [`setOdometer`](#setodometervalue-callbackfn-failurefn) | `callbackFn` | Set the `odometer` to *any* arbitrary value.  **NOTE** `setOdometer` will perform a `getCurrentPosition` in order to record to exact location where odometer was set; as a result, the `callback` signatures are identical to those of `getCurrentPosition`.|
+| [`setOdometer`](#setodometervalue-callbackfn-failurefn) | `Integer`, `callbackFn` | Set the `odometer` to *any* arbitrary value.  **NOTE** `setOdometer` will perform a `getCurrentPosition` in order to record to exact location where odometer was set; as a result, the `callback` signatures are identical to those of `getCurrentPosition`.|
 | [`resetOdometer`](#resetodometercallbackfn-failurefn) | `callbackFn` | Reset the **odometer** to `0`.  Alias for [`setOdometer(0)`](#setodometervalue-callbackfn-failurefn) |
-| [`startSchedule`](#startschedulecallbackfn) | `callbackFn` | If a `schedule` was configured, this method will initiate that schedule.  The plugin will automatically be started or stopped according to the configured `schedule`.    Supplied **`callbackFn`** will be executed once the Scheduler has parsed and initiated your **`schedule`** |
+| [`startSchedule`](#startschedulecallbackfn) | `callbackFn` | If a [`schedule`](#config-array-schedule-undefined) was configured, this method will initiate that schedule.|
 | [`stopSchedule`](#stopschedulecallbackfn) | `callbackFn` | This method will stop the Scheduler service.  Your **`callbackFn`** will be executed after the Scheduler has stopped |
 | [`removeListeners`](#removelistenerssuccessfn-failurefn) | `none` | Remove all events-listeners registered with **`#on`** method |
-| [`startBackgroundTask`](#startbackgroundtaskcallbackfn) | `callbackFn` | Sends a signal to the native OS that you wish to perform a long-running task.  The OS will not suspend your app until you signal completion with the **`#finish`** method.  The **`callbackFn`** will be provided with a single parameter `taskId` which you will send to the **`#finish`** method.  :warning: iOS provides **exactly** `180` seconds of background-running time.  If your long-running task exceeds this time, the plugin has a fail-safe which will automatically **`#finish`** your **`taskId`** to prevent the OS from force-killing your application.|
+| [`startBackgroundTask`](#startbackgroundtaskcallbackfn) | `callbackFn` | Sends a signal to the native OS that you wish to perform a long-running task.  The OS will not suspend your app until you signal completion with the **`#finish`** method.|
 | [`finish`](#finishtaskid) | `taskId` | Sends a signal to the native OS the supplied **`taskId`** is complete and the OS may proceed to suspend your application if applicable.|
-
-
-### :small_blue_diamond: Geofencing Methods
-
-| Method Name | Arguments | Notes |
-|-------------|-----------|-------|
-| [`startGeofences`](#startgeofencescallbackfn) | `callbackFn` | Engages the geofences-only **`trackingMode`**.  In this mode, no active location-tracking will occur -- only geofences will be monitored|
-| [`addGeofence`](#addgeofenceconfig-callbackfn-failurefn) | `{config}` | Adds a geofence to be monitored by the native plugin. Monitoring of a geofence is halted after a crossing occurs.|
-| [`addGeofences`](#addgeofencesgeofences-callbackfn-failurefn) | `[geofences]` | Adds a list geofences to be monitored by the native plugin. Monitoring of a geofence is halted after a crossing occurs.|
-| [`removeGeofence`](#removegeofenceidentifier-callbackfn-failurefn) | `identifier` | Removes a geofence identified by the provided `identifier` |
-| [`removeGeofences`](#removegeofencescallbackfn-failurefn) | `callbackFn, failureFn` | Removes all geofences |
-| [`getGeofences`](#getgeofencescallbackfn-failurefn) | `callbackFn` | Fetch the list of monitored geofences. Your callbackFn will be provided with an Array of geofences. If there are no geofences being monitored, you'll receive an empty `Array []`.|
 
 
 ### :small_blue_diamond: HTTP & Persistence Methods
 
-| Method Name | Arguments | Notes |
-|-------------|-----------|-------|
+| Method Name      | Arguments       | Notes                                |
+|------------------|-----------------|--------------------------------------|
 | [`getLocations`](#getlocationscallbackfn-failurefn) | `callbackFn` | Fetch all the locations currently stored in native plugin's SQLite database. Your **`callbackFn`** will receive an **`Array`** of locations in the 1st parameter |
 | [`getCount`](#getcountcallbackfn-failurefn) | `callbackFn` | Fetches count of SQLite locations table **`SELECT count(*) from locations`** |
-| [`clearDatabase`](#destroylocationscallbackfn-failurefn) | `callbackFn` | **DEPRECATED** use `#destroyLocations` |
 | [`destroyLocations`](#destroylocationscallbackfn-failurefn) | `callbackFn` | Delete all records in plugin's SQLite database |
-| [`sync`](#synccallbackfn-failurefn) | `successFn`, `failureFn` | If the plugin is configured for HTTP with an **`#url`** and **`#autoSync: false`**, this method will initiate POSTing the locations currently stored in the native SQLite database to your configured **`#url`**|
+| [`sync`](#synccallbackfn-failurefn) | `successFn`, `failureFn` | If the plugin is configured for HTTP with an [`#url`](#config-string-url-undefined) and [`#autoSync: false`](#config-string-autosync-true), this method will initiate POSTing the locations currently stored in the native SQLite database to your configured [`#url`](#config-string-url-undefined)|
+
+
+### :small_blue_diamond: Geofencing Methods
+
+| Method Name      | Arguments       | Notes                                |
+|------------------|-----------------|--------------------------------------|
+| [`startGeofences`](#startgeofencescallbackfn) | `callbackFn` | Engages the geofences-only **`trackingMode`**.  In this mode, no active location-tracking will occur -- only geofences will be monitored|
+| [`addGeofence`](#addgeofenceconfig-callbackfn-failurefn) | `{config}`, `successFn`, `failureFn` | Adds a geofence to be monitored by the native plugin.|
+| [`addGeofences`](#addgeofencesgeofences-callbackfn-failurefn) | `[geofences]`, `sucessFn`, `failureFn` | Adds a list geofences to be monitored by the native plugin. |
+| [`removeGeofence`](#removegeofenceidentifier-callbackfn-failurefn) | `identifier`, `successFn`, `failureFn` | Removes a geofence identified by the provided `identifier` |
+| [`removeGeofences`](#removegeofencescallbackfn-failurefn) | `successFn`, `failureFn` | Removes all geofences |
+| [`getGeofences`](#getgeofencescallbackfn-failurefn) | `callbackFn` | Fetch the list of monitored geofences. |
 
 
 ### :small_blue_diamond: Logging Methods
 
-| Method Name | Arguments | Notes |
-|-------------|-----------|-------|
-| [`setLogLevel`](#setloglevelcallbackfn) | `callbackFn` | Set the Log filter:  `LOG_LEVEL_OFF`, `LOG_LEVEL_ERROR`, `LOG_LEVEL_WARNING`, `LOG_LEVEL_INFO`, `LOG_LEVEL_DEBUG`, `LOG_LEVEL_VERBOSE`|
+| Method Name      | Arguments       | Notes                                |
+|------------------|-----------------|--------------------------------------|
+| [`setLogLevel`](#setloglevelcallbackfn) | `Integer`, `callbackFn` | Set the Log filter:  `LOG_LEVEL_OFF`, `LOG_LEVEL_ERROR`, `LOG_LEVEL_WARNING`, `LOG_LEVEL_INFO`, `LOG_LEVEL_DEBUG`, `LOG_LEVEL_VERBOSE`|
 | [`getLog`](#getlogcallbackfn) | `callbackFn` | Fetch the entire contents of the current log database as a `String`.|
-| [`destroyLog`](#destroylogcallbackfn-failurefn) | `callbackFn`,`failureFn` | Destroy the contents of the Log database. |
+| [`destroyLog`](#destroylogcallbackfn-failurefn) | `callbackFn`, `failureFn` | Destroy the contents of the Log database. |
 | [`emailLog`](#emaillogemail-callbackfn) | `email`, `callbackFn` | Fetch the entire contents of Log database and email it to a recipient using the device's native email client.|
-| [`playSound`](#playsoundsoundid) | `soundId` | Here's a fun one.  The plugin can play a number of OS system sounds for each platform.  For [IOS](http://iphonedevwiki.net/index.php/AudioServices) and [Android](http://developer.android.com/reference/android/media/ToneGenerator.html).  I offer this API as-is, it's up to you to figure out how this works. |
+| [`playSound`](#playsoundsoundid) | `Integer` | Here's a fun one.  The plugin can play a number of OS system sounds for each platform.  For [IOS](http://iphonedevwiki.net/index.php/AudioServices) and [Android](http://developer.android.com/reference/android/media/ToneGenerator.html).  I offer this API as-is, it's up to you to figure out how this works. |
 
 
 # :wrench: Geolocation Options
@@ -272,10 +292,12 @@ BackgroundGeoloction.configure({
 
 :warning: Only **`DESIRED_ACCURACY_HIGH`** uses GPS.  `speed`, `heading` and `altitude` are available only from GPS.
 
-:information_source: For platform-specific information about location accuracy, see the corresponding API docs:
+:blue_book: For platform-specific information about location accuracy, see the corresponding API docs:
 
 - [Android](https://developer.android.com/reference/com/google/android/gms/location/LocationRequest.html#PRIORITY_BALANCED_POWER_ACCURACY)
 - [iOS](https://developer.apple.com/reference/corelocation/cllocationmanager/1423836-desiredaccuracy?language=objc) 
+
+------------------------------------------------------------------------------
 
 ####`@config {Integer} distanceFilter`
 
@@ -317,9 +339,13 @@ Compare now background-geolocation in the scope of a city.  In this image, the l
 
 ![distanceFilter at city scale](https://dl.dropboxusercontent.com/u/2319755/cordova-background-geolocaiton/distance-filter-city.png)
 
+------------------------------------------------------------------------------
+
 ####`@config {Boolean} disableElasticity [false]`
 
 Defaults to **`false`**.  Set **`true`** to disable automatic, speed-based [`#distanceFilter`](#config-integer-distancefilter) elasticity.
+
+------------------------------------------------------------------------------
 
 ####`@config {Integer} stopAfterElapsedMinutes`
 
@@ -333,6 +359,7 @@ BackgroundGeolocation.configure({
 });
 ```
 
+------------------------------------------------------------------------------
 
 ####`@config {Integer} desiredOdometerAccuracy [100]`
 
@@ -345,11 +372,17 @@ Specify an accuracy threshold in **meters** for odometer calculations.  Defaults
 
 When stopped, the minimum distance the device must move beyond the stationary location for aggressive background-tracking to engage.
 
-:warning: iOS will not detect the exact moment the device moves out of the stationary-radius.  In normal conditions, it will typically take **~200 meters** before the plugin begins tracking.  For more information, see [Philosophy of Operation](../../../wiki/Philosophy-of-Operation).  Configuring **`stationaryRadius: 0`** has **NO EFFECT** (in fact the plugin enforces a minimum **``stationaryRadius``** of `25`).
+Configuring **`stationaryRadius: 0`** has **NO EFFECT** (in fact the plugin enforces a minimum **``stationaryRadius``** of `25`).
 
 The following image shows the typical distance iOS requires to detect exit of the **`stationaryRadius`**:
 
 ![](https://camo.githubusercontent.com/0230dfcb2457db3344f614bf5e3a641e61fb5c27/68747470733a2f2f7777772e64726f70626f782e636f6d2f732f7466746f327038767a30646e796b732f53637265656e73686f74253230323031372d30312d303725323031372e32362e35322e706e673f646c3d31)
+
+:blue_book: For more information, see [Philosophy of Operation](../../../wiki/Philosophy-of-Operation)
+
+:warning: iOS will not detect the exact moment the device moves out of the stationary-radius.  In normal conditions, it will typically take **~200 meters** before the plugin begins tracking.  
+
+------------------------------------------------------------------------------
 
 ####`@config {Boolean} useSignificantChangesOnly [false]`
 
@@ -357,17 +390,23 @@ Defaults to `false`.  Set `true` in order to disable constant background-trackin
 
 :warning: If Apple has denied your application, refusing to grant your app the privelege of using the **`UIBackgroundMode: "location"`**, this can be a solution.  **NOTE** The Significant Changes API will report a location only every `500` to `1000` meters.  Many of the plugin's configuration parameters **will be ignored**, such as [`#distanceFilter`](#config-integer-distancefilter), [`#stationaryRadius`](#config-integer-stationaryradius-meters), [`#activityType`](#config-string-activitytype-automotivenavigation-othernavigation-fitness-other), etc.
 
+------------------------------------------------------------------------------
+
 ####`@config {Boolean} pausesLocationUpdatesAutomatically [true]`
 
 :warning: This option should generally be left `undefined`.  You should only specifiy this option if you know *exactly* what you're doing.
 
 The default behaviour of the plugin is to turn **off** location-services *automatically* when the device is detected to be stationary.  When set to `false`, location-services will **never** be turned off (and `disableStopDetection` will automatically be set to `true`) -- it's your responsibility to turn them off when you no longer need to track the device.  This feature should **not** generally be used.  `preventSuspend` will no longer work either.
 
+------------------------------------------------------------------------------
+
 ####`@config {String} locationAuthorizationRequest [Always]`
 
-The desired iOS location-authorization request, either **`Always`** or **`WhenInUse`**.  **`locationAuthrorizationRequest`** tells the plugin the mode it *expects* to be in &mdash; if the user changes this mode in their settings, the plugin will detect this (@see [`locationAuthorizationAlert`](#config-object-locationauthorizationalert)).  Defaults to **`Always`**.  **`WhenInUse`** will display a **blue bar** at top-of-screen informing user that location-services are on.
+The desired iOS location-authorization request, either **`Always`** or **`WhenInUse`**.  **`locationAuthorizationRequest`** tells the plugin the mode it *expects* to be in &mdash; if the user changes this mode in their settings, the plugin will detect this (@see [`locationAuthorizationAlert`](#config-object-locationauthorizationalert)).  Defaults to **`Always`**.  **`WhenInUse`** will display a **blue bar** at top-of-screen informing user that location-services are on.
 
 :warning: Configuring **`WhenInUse`** will disable many of the plugin's features, since iOS forbids any API which operates in the background to operate (such as **geofences**, which the plugin relies upon to automatically engage background tracking).
+
+------------------------------------------------------------------------------
 
 ####`@config {Object} locationAuthorizationAlert`
 
@@ -412,7 +451,7 @@ This interval is inexact. You may not receive updates at all (if no location sou
 
 Applications with only the coarse location permission may have their interval silently throttled.
 
-:information_source: [Android docs](https://developers.google.com/android/reference/com/google/android/gms/location/LocationRequest.html#setInterval(long))
+:blue_book: [Android docs](https://developers.google.com/android/reference/com/google/android/gms/location/LocationRequest.html#setInterval(long))
 
 ```javascript
 BackgroundGeolocation.configure({
@@ -420,6 +459,8 @@ BackgroundGeolocation.configure({
   locationUpdateInterval: 5000  // Get a location every 5 seconds
 });
 ```
+
+------------------------------------------------------------------------------
 
 ####`@config {Integer millis} fastestLocationUpdateInterval`
 
@@ -437,11 +478,15 @@ An interval of `0` is allowed, but **not recommended**, since location updates m
 
 If **`#fastestLocationUpdateInterval`** is set slower than [`#locationUpdateInterval`](#config-integer-millis-locationupdateinterval), then your effective fastest interval is [`#locationUpdateInterval`](#config-integer-millis-locationupdateinterval).
 
-:information_source: [Android docs](https://developers.google.com/android/reference/com/google/android/gms/location/LocationRequest.html#setFastestInterval(long))
+:blue_book: [Android docs](https://developers.google.com/android/reference/com/google/android/gms/location/LocationRequest.html#setFastestInterval(long))
+
+------------------------------------------------------------------------------
 
 ####`@config {Integer} deferTime`
 
 Defaults to `0` (no defer).  Sets the maximum wait time in milliseconds for location updates.  If you pass a value at least 2x larger than the interval specified with [`#locationUpdateInterval`](#config-integer-millis-locationupdateinterval), then location delivery may be delayed and multiple locations can be delivered at once. Locations are determined at the [`#locationUpdateInterval`](#config-integer-millis-locationupdateinterval) rate, but can be delivered in batch after the interval you set in this method. This can consume less battery and give more accurate locations, depending on the device's hardware capabilities. You should set this value to be as large as possible for your needs if you don't need immediate location delivery.
+
+------------------------------------------------------------------------------
 
 ####`@config {String} triggerActivities`
 
@@ -469,6 +514,8 @@ BackgroundGeolocation.configure({
 });
 ```
 
+------------------------------------------------------------------------------
+
 # :wrench: Activity Recognition Options
 
 ## :wrench: [Activity Recognition] Common Options
@@ -477,44 +524,57 @@ BackgroundGeolocation.configure({
 
 Defaults to `10000` (10 seconds).  The desired time between activity detections. Larger values will result in fewer activity detections while improving battery life. A value of 0 will result in activity detections at the fastest possible rate.
 
+------------------------------------------------------------------------------
+
 ####`@config {Integer millis} minimumActivityRecognitionConfidence` 
 
-Each activity-recognition-result returned by the API is tagged with a "confidence" level expressed as a %.  You can set your desired confidence to trigger a state-change.  Defaults to **`75`**.
+Each activity-recognition-result returned by the API is tagged with a "confidence" level expressed as a %.  You can set your desired confidence to trigger a [`motionchange`](#motionchange) event.  Defaults to **`75`**.
+
+------------------------------------------------------------------------------
 
 ####`@config {Integer minutes} stopTimeout`
 
-When in the **moving** state, specifies the number of minutes to wait before turning off location-services and enter **stationary** state after the ActivityRecognition System detects the device is `STILL` (**Android:** defaults to 0, no timeout, **iOS:** defaults to 5min).  If you don't set a value, the plugin is eager to turn off the GPS ASAP.  An example use-case for this configuration is to delay GPS OFF while in a car waiting at a traffic light.  **WARNING** Setting a value > 15 min is **not** recommended, particularly for Android.
+When in the **moving** state, specifies the number of minutes to wait before turning off location-services and enter **stationary** state after the ActivityRecognition System detects the device is `STILL` (**Android:** defaults to 0, no timeout, **iOS:** defaults to 5min).  If you don't set a value, the plugin is eager to turn off the GPS ASAP.  An example use-case for this configuration is to delay GPS OFF while in a car waiting at a traffic light.
 
-:information_source: See [Philosophy of Operation](../../../wiki/Philosophy-of-Operation)
+:blue_book: See [Philosophy of Operation](../../../wiki/Philosophy-of-Operation)
+
+:warning: Setting a value > 15 min is **not** recommended, particularly for Android.
+
+------------------------------------------------------------------------------
 
 ####`@config {Boolean} disableStopDetection [false]`
 
 **iOS**
 
-Disables the accelerometer-based **Stop-detection System**.  When disabled, the plugin will use the default iOS behaviour of automatically turning off location-services when the device has stopped for exactly 15 minutes.  When disabled, you will no longer have control over `stopTimeout`.  
+Disables the accelerometer-based **Stop-detection System**.  When disabled, the plugin will use the default iOS behaviour of automatically turning off location-services when the device has stopped for exactly 15 minutes.  When disabled, you will no longer have control over [`#stopTimeout`](#config-integer-minutes-stoptimeout).
 
-**iOS Stop-detection timing**.  
+**iOS Stop-detection timing**.
 ![](https://dl.dropboxusercontent.com/u/2319755/cordova-background-geolocaiton/ios-stop-detection-timing.png)
 
 **Android**
 
-Location-services **will never turn OFF** if you set this to **`true`**!  It will be purely up to you or the user to execute [`#changePace(false)`](#changepaceenabled-successfn-failurefn) or [`#stop`](#stopsuccessfn-failurefn) to turn off location-services.
+Location-services **will never turn OFF** if you set this to **`true`**!  It will be purely up to you or the user to execute [`changePace(false)`](#changepaceenabled-successfn-failurefn) or [`#stop`](#stopsuccessfn-failurefn) to turn off location-services.
 
 ## :wrench: [Activity Recognition] iOS Options
+
 
 ####`@config {String} activityType [AutomotiveNavigation, OtherNavigation, Fitness, Other]`
 
 Presumably, this affects ios GPS algorithm.
 
-:information_source: [Apple docs](https://developer.apple.com/reference/corelocation/cllocationmanager/1620567-activitytype?language=objc).
+:blue_book: [Apple docs](https://developer.apple.com/reference/corelocation/cllocationmanager/1620567-activitytype?language=objc).
+
+------------------------------------------------------------------------------
 
 ####`@config {Integer minutes} stopDetectionDelay [0]` 
 
 Defaults to **`0`**.  Allows the stop-detection system to be delayed from activating.  When the stop-detection system *is* engaged, location-services will be turned **off** and only the accelerometer is monitored.  Stop-detection will only engage if this timer expires.  The timer is cancelled if any movement is detected before expiration.  If a value of **`0`** is specified, the stop-detection system will engage as soon as the device is detected to be stationary.
 
+------------------------------------------------------------------------------
+
 ####`@config {Boolean} disableMotionActivityUpdates [false]`
 
-Defaults to **`false`**.  Set **`true`** to disable iOS [`CMMotionActivity`](https://developer.apple.com/reference/coremotion/cmmotionactivitymanager) updates (eg: `walking`, `in_vehicle`).  This feature requires a device having the **M7** co-processor (ie: iPhone 5s and up).
+Defaults to **`false`**.  Set **`true`** to disable iOS [`CMMotionActivityManager`](https://developer.apple.com/reference/coremotion/cmmotionactivitymanager) updates (eg: `walking`, `in_vehicle`).  This feature requires a device having the **M7** co-processor (ie: iPhone 5s and up).
 
 :information_source: This feature will ask the user for "Health updates" permission using the **[`MOTION_USAGE_DESCRIPTION`](https://github.com/transistorsoft/cordova-background-geolocation#configuring-the-plugin)**.  If you do not wish to ask the user for the "Health updates", set this option to `true`; However, you will no longer receive accurate activity data in the recorded locations.
 
@@ -528,11 +588,13 @@ Defaults to **`false`**.  Set **`true`** to disable iOS [`CMMotionActivity`](htt
 
 Defaults to `1000` meters.  **@see** releated event [`geofenceschange`](#geofenceschange).  When using Geofences, the plugin activates only thoses in proximity (the maximim geofences allowed to be simultaneously monitored is limited by the platform, where **iOS** allows only 20 and **Android**.  However, the plugin allows you to create as many geofences as you wish (thousands even).  It stores these in its database and uses spatial queries to determine which **20** or **100** geofences to activate.
 
-:information_source: [See Geofencing Docs](geofencing.md)
+:blue_book: [See Geofencing Guide](geofencing.md)
 
-:information_source: [View animation of this behaviour](https://dl.dropboxusercontent.com/u/2319755/background-geolocation/images/background-geolocation-infinite-geofencing.gif)
+:tv: [View animation of this behaviour](https://dl.dropboxusercontent.com/u/2319755/background-geolocation/images/background-geolocation-infinite-geofencing.gif)
 
 ![](https://dl.dropboxusercontent.com/u/2319755/background-geolocation/images/geofenceProximityRadius_iphone6_spacegrey_portrait.png)
+
+------------------------------------------------------------------------------
 
 ####`@config {Boolean} geofenceInitialTriggerEntry [true]`
 
@@ -540,6 +602,7 @@ Defaults to `true`.  Set `false` to disable triggering a geofence immediately if
 
 
 # :wrench: HTTP & Persistence Options
+
 
 ####`@config {String} url [undefined]`
 
@@ -551,13 +614,15 @@ BackgroundGeolocation.configure({
 });
 ```
 
-:information_source: See [HTTP Features](http.md) for more information.
+:blue_book: See [HTTP Guide](http.md) for more information.
 
 :warning: It is highly recommended to let the plugin manage uploading locations to your server, **particularly for Android** when configured with **`stopOnTerminate: false`**, since your Cordova app (where your Javascript lives) *will* terminate &mdash; only the plugin's native Android background service will continue to operate, recording locations and uploading to your server.  The plugin's native HTTP service *is* better at this task than Javascript Ajax requests, since the plugin will automatically retry on server failure.
 
+------------------------------------------------------------------------------
+
 ####`@config {String} method [POST]`
 
-The HTTP method to use when creating an HTTP request to your configured `#url`.  Defaults to `POST`.  Valid values are `POST`, `PUT` and `OPTIONS`.
+The HTTP method to use when creating an HTTP request to your configured [`#url`](#config-string-url-undefined).  Defaults to `POST`.  Valid values are `POST`, `PUT` and `OPTIONS`.
 
 ```javascript
 BackgroundGeolocation.configure({
@@ -565,6 +630,8 @@ BackgroundGeolocation.configure({
   method: 'PUT'
 });
 ```
+
+------------------------------------------------------------------------------
 
 ####`@config {Object} params`
 
@@ -598,15 +665,19 @@ POST /locations
 
 ```
 
+------------------------------------------------------------------------------
+
 ####`@config {Object} headers`
 
-Optional HTTP params sent along in HTTP request to above `#url`.
+Optional HTTP params sent along in HTTP request to above [`#url`](#config-string-url-undefined).
+
+------------------------------------------------------------------------------
 
 ####`@config {String} httpRootProperty [location]`
 
 The root property of the JSON data where location-data will be placed.
 
-:information_source: See [HTTP Features](http.md) for more information.
+:blue_book: See [HTTP Guide](http.md) for more information.
 
 ```json
 {
@@ -630,11 +701,13 @@ You may also specify the character **`httpRootProperty:"."`** to place your data
 }
 ```
 
+------------------------------------------------------------------------------
+
 ####`@config {String} locationTemplate [undefined]`
 
 Optional custom template for rendering `location` JSON request data in HTTP requests.  Use "mutache-style" `{{tags}}`:
 
-:information_source: See [HTTP Features](http.md) for more information.
+:blue_book: See [HTTP Guide](http.md) for more information.
 
 ```javascript
 BackgroundGeolocation.configure({
@@ -647,7 +720,7 @@ BackgroundGeolocation.configure({
 })
 ```
 
-:warning: If you've configured `#extras`, these key-value pairs will be merged *directly* onto your location data.  Eg:
+:warning: If you've configured [`#extras`](#config-object-extras), these key-value pairs will be merged *directly* onto your location data.  Eg:
 
 ```javascript
 BackgroundGeolocation.configure({
@@ -690,11 +763,13 @@ Will result in JSON:
 | `{{battery.level}}` | `Float` | 0-100%|
 | `{{battery.is_charging}}` | `Boolean` | Is device plugged in?|
 
+------------------------------------------------------------------------------
+
 ####`@config {String} geofenceTemplate [undefined]`
 
-Optional custom template for rendering `geofence` JSON request data in HTTP requests.  The `geofenceTemplate` is similar to `locationTemplate` with the addition of two extra `geofence.*` tags.  Use "mutache-style" `{{tags}}`:
+Optional custom template for rendering `geofence` JSON request data in HTTP requests.  The `geofenceTemplate` is similar to [`#locationTemplate`](#config-string-locationtemplate-undefined) with the addition of two extra `geofence.*` tags.  Use "mutache-style" `{{tags}}`:
 
-:information_source: See [HTTP Features](http.md) for more information.
+:blue_book: See [HTTP Guide](http.md) for more information.
 
 ```javascript
 BackgroundGeolocation.configure({
@@ -709,7 +784,7 @@ BackgroundGeolocation.configure({
 ```
 
 **Template Tags**
-The tag-list is identical to `locationTemplate` with the addition of `geofence.identifier` and `geofence.action`
+The tag-list is identical to [`#locationTemplate`](#config-string-locationtemplate-undefined) with the addition of `geofence.identifier` and `geofence.action`
 
 | Tag | Type | Description |
 |-----|------|-------------|
@@ -731,21 +806,31 @@ The tag-list is identical to `locationTemplate` with the addition of `geofence.i
 | `{{battery.level}}` | `Float` | 0-100%|
 | `{{battery.is_charging}}` | `Boolean` | Is device plugged in?|
 
+------------------------------------------------------------------------------
+
 ####`@config {String} batchSync [false]`
 
-Default is **`false`**.  If you've enabled HTTP feature by configuring an [`#url`](#config-string-url-undefined), **`batchSync: true`** will POST *all* the locations currently stored in native SQLite datbase to your server in a single HTTP POST request.  With **`batchSync: false`**, an HTTP POST request will be initiated for **each** location in database.
+Default is **`false`**.  If you've enabled HTTP feature by configuring an [`#url`](#config-string-url-undefined), [`batchSync: true`](#config-string-batchsync-false) will POST *all* the locations currently stored in native SQLite datbase to your server in a single HTTP POST request.  With [`batchSync: false`](#config-string-batchsync-false), an HTTP POST request will be initiated for **each** location in database.
+
+------------------------------------------------------------------------------
 
 ####`@config {Integer} maxBatchSize [undefined]`
 
 If you've enabled HTTP feature by configuring an [`#url`](#config-string-url-undefined) with [`batchSync: true`](#config-string-batchsync-false), this parameter will limit the number of records attached to **each** batch request.  If the current number of records exceeds the **`maxBatchSize`**, multiple HTTP requests will be generated until the location queue is empty.
 
+------------------------------------------------------------------------------
+
 ####`@config {String} autoSync [true]`
 
 Default is `true`.  If you've enabeld HTTP feature by configuring an [`#url`](#config-string-url-undefined), the plugin will attempt to HTTP POST each location to your server **as it is recorded**.  If you set [`autoSync: false`](#config-string-autosync-true), it's up to you to **manually** execute the [`#sync`](synccallbackfn-failurefn) method to initate the HTTP POST (**NOTE** The plugin will continue to persist **every** recorded location in the SQLite database until you execute [`#sync`](synccallbackfn-failurefn)).
 
+------------------------------------------------------------------------------
+
 ####`@config {Integer} autoSyncThreshold [0]`
 
 The minimum number of persisted records to trigger an [`autoSync`](#config-string-autosync-true) action.  If you configure a value greater-than **`0`**, the plugin will wait until that many locations are recorded before executing HTTP requests to your server through your configured [`#url`](#config-string-url-undefined).
+
+------------------------------------------------------------------------------
 
 ####`@config {Object} extras`
 
@@ -753,7 +838,7 @@ Optional arbitrary key/value `{}` to attach to each recorded location
 
 Eg: Every recorded location will have the following **`extras`** appended:
 
-:information_source: See [HTTP Features](http.md) for more information.
+:blue_book: See [HTTP Guide](http.md) for more information.
 
 ```javascript
 BackgroundGeolocation.configure({
@@ -787,17 +872,25 @@ BackgroundGeolocation.configure({
 
 ```
 
+------------------------------------------------------------------------------
+
 ####`@config {Integer} maxDaysToPersist [1]`
 
 Maximum number of days to store a geolocation in plugin's SQLite database when your server fails to respond with **`HTTP 200 OK`**.  The plugin will continue attempting to sync with your server until **`maxDaysToPersist`** when it will give up and remove the location from the database.
+
+------------------------------------------------------------------------------
 
 ####`@config {Integer} maxRecordsToPersist [-1]`
 
 Maximum number of records to persist in plugin's SQLite database.  Default `-1` means **no limit**.
 
+------------------------------------------------------------------------------
+
 ####`@config {Integer} logMaxDays [3]`
 
 Maximum number of days to persist a log-entry in database.  Defaults to **`3`** days.
+
+------------------------------------------------------------------------------
 
 
 # :wrench: Application Options
@@ -822,7 +915,9 @@ In the following image, imagine the user terminated the application at the **"re
 
 **Android**
 
-Unlike iOS, tracking the Android plugin's tracking will not pause at all when user terminates the app.  However, only the plugin's native background service continues to operate, "headless" (in this case, you should configure an [`#url`](#config-string-url-undefined) in order for the background-service to continue uploading locations to your server).
+Unlike iOS, the Android plugin's tracking will **not** pause at all when user terminates the app.  However, only the plugin's native background service continues to operate, **"headless"** (in this case, you should configure an [`#url`](#config-string-url-undefined) in order for the background-service to continue uploading locations to your server).
+
+------------------------------------------------------------------------------
 
 ####`@config {Boolean} startOnBoot [false]`
 
@@ -835,6 +930,8 @@ iOS cannot **immediately** engage tracking after a device reboot.  Just like [`s
 **Android**
 
 Android will reboot the plugin's background-service *immediately* after device reboot.  However, just like [`stopOnTerminate:false`](config-boolean-stoponterminate-true-android), the plugin will be running "headless" without your Application code.  If you wish for your Application code to boot as well, you may configure [`forceReloadOnBoot: true`](#config-boolean-forcereloadonboot-false)
+
+------------------------------------------------------------------------------
 
 ####`@config {Integer} heartbeatInterval [undefined]`
 
@@ -853,6 +950,8 @@ BackgroundGeolocation.on('heartbeat', function(params) {
   });
 });
 ```
+
+------------------------------------------------------------------------------
 
 ####`@config {Array} schedule [undefined]`
 
@@ -911,6 +1010,22 @@ BackgroundGeolocation.setConfig({
 });
 ```
 
+**iOS**
+
+iOS **cannot** evaluate the Schedule at the *exact* time you configure &mdash; it can only evaluate the **`schedule`** *periodically*, whenever your app comes alive.  When the app is running in a scheduled **off** period, iOS will continue to monitor the low-power, [significant location changes API (SLC)](https://developer.apple.com/reference/corelocation/cllocationmanager/1423531-startmonitoringsignificantlocati?language=objc) in order to ensure periodic schedule evaluation.  **SLC** is required in order guarantee periodic schedule-evaluation when you're configured [`stopOnTerminate: false`](#config-boolean-stoponterminate-true), since the [iOS Background Fetch]() is halted if user *manually* terminates the app.  **SLC** will awaken your app whenever a "significant location change" occurs, typically every `1000` meters.  If the schedule is currently in an **off** period, this location will **not** be persisted nor will it be sent to the [`location`](#location) event &mdash; only the **`schedule`** will be evaluated.
+
+When a **`schedule`** is provided on iOS, it will be evaluated in the following cases:
+
+- Application `pause` / `resume` events.
+- Whenever a location is recorded (including **SLC**)
+- Background fetch event
+
+**Android**
+
+The Android Scheduler uses [`AlarmManager`](https://developer.android.com/reference/android/app/AlarmManager.html#setExactAndAllowWhileIdle(int, long, android.app.PendingIntent)) and *typically* operates on-the-minute.
+
+------------------------------------------------------------------------------
+
 ## :wrench: [Application] iOS Options
 
 ####`@config {Boolean} preventSuspend [false]`
@@ -920,6 +1035,7 @@ Defaults to **`false`**.  Set **`true`** to prevent **iOS** from suspending afte
 :warning: **`preventSuspend: true`** should **only** be used in **very** specific use-cases and should typically **not** be used as it *will* have a **very noticable impact on battery performance.**  You should carefully manage **`preventSuspend`**, engaging it for controlled periods-of-time.  You should **not** expect to run your app in this mode 24 hours / day, 7 days-a-week.
 
 ## :wrench: [Application] Android Options
+
 
 ####`@config {Boolean} forceReloadOn* [false]`
 
@@ -933,25 +1049,37 @@ To "force reload" your application, set any of the following options to **`true`
 
 Launch your app whenever the [`#motionchange`](#motionchange) event fires.
 
+------------------------------------------------------------------------------
+
 #####`@config {Boolean} forceReloadOnLocationChange [false]`
 
 Launch your app whenever the [`#location`](#location) event fires.
+
+------------------------------------------------------------------------------
 
 #####`@config {Boolean} forceReloadOnGeofence [false]`
 
 Launch your app whenever the [`#geofence`](#geofence) event fires.
 
+------------------------------------------------------------------------------
+
 #####`@config {Boolean} forceReloadOnHeartbeat [false]`
 
 Launch your app whenever the [`#heartbeat`](#heartbeat) event fires.
+
+------------------------------------------------------------------------------
 
 #####`@config {Boolean} forceReloadOnSchedule [false]`
 
 Launch your app whenever a [`schedule`](#schedule) event fires.
 
+------------------------------------------------------------------------------
+
 #####`@config {Boolean} forceReloadOnBoot [false]`
 
 If the user reboots the device with the plugin configured for [`startOnBoot: true`](#config-boolean-startonboot-false), your will app will launch when the device is rebooted.
+
+------------------------------------------------------------------------------
 
 ####`@config {Boolean} foregroundService [false]`
 
@@ -961,21 +1089,29 @@ If you set this option to **`true`**, the plugin will run its Android service in
 
 :information_source: See related config options [`notificationTitle`](#config-string-notificationtitle-app-name), [`notificationText`](#config-string-notificationtext-location-service-activated) & [`notificationColor`](#config-string-notificationcolor-null)
 
-:information_source: For more information, see the [Android Service](https://developer.android.com/reference/android/app/Service.html#startForeground(int,%20android.app.Notification)) docs.
+:blue_book: For more information, see the [Android Service](https://developer.android.com/reference/android/app/Service.html#startForeground(int,%20android.app.Notification)) docs.
+
+------------------------------------------------------------------------------
 
 ####`@config {String} notificationTitle [App name]`
 
 When running the service with [`foregroundService: true`](#config-boolean-foregroundservice-false), Android requires a persistent notification in the Notification Bar.  This will configure the **title** of that notification.  Defaults to the application name.
 
+------------------------------------------------------------------------------
+
 ####`@config {String} notificationText [Location service activated]`
 
 When running the service with [`foregroundService: true`](#config-boolean-foregroundservice-false), Android requires a persistent notification in the Notification Bar.  This will configure the **text** of that notification.  Defaults to "Location service activated".
+
+------------------------------------------------------------------------------
 
 ####`@config {String} notificationColor [null]`
 
 When running the service with [`foregroundService: true`](#config-boolean-foregroundservice-false), Android requires a persistent notification in the Notification Bar.  This will configure the **color** of the notification icon (API >= 21).Supported formats are: 
 - `#RRGGBB` 
 - `#AARRGGBB`
+
+------------------------------------------------------------------------------
 
 ####`@config {String} notificationIcon [app icon]`
 
@@ -997,8 +1133,12 @@ BackgroundGeolocation.configure({
 });
 ```
 
+------------------------------------------------------------------------------
+
 
 # :wrench: Logging & Debug Options
+
+:blue_book: [Logging & Debugging Guide](../../../wiki/Debugging)
 
 ####`@config {Boolean} debug [false]`
 
@@ -1008,7 +1148,9 @@ Defaults to **`false`**.  When set to **`true`**, the plugin will emit debugging
 
 ![](https://www.dropbox.com/s/iplaxheoq63oul6/Screenshot%202017-02-20%2012.10.57.png?dl=1)
 
-:information_source: See [Debugging Sounds](../../../wiki/Debug-Sounds)
+:blue_book: See [Debugging Sounds](../../../wiki/Debug-Sounds)
+
+------------------------------------------------------------------------------
 
 ####`@config {Integer} logLevel [5]`
 
@@ -1035,6 +1177,8 @@ BackgroundGeolocation.configure({
 :information_source: To retrieve the plugin's logs, see [`getLog`](#getlogcallbackfn) & [`emailLog`](#emaillogemail-callbackfn).
 
 :warning: When submitting your app to production, take care to configure the **`logLevel`** appropriately (eg: **`LOG_LEVEL_ERROR`**)
+
+------------------------------------------------------------------------------
 
 
 # :zap: Events
@@ -1080,6 +1224,8 @@ BackgroundGeolocation.on('location', function(location, taskId) {
 | 2     | Network error               |
 | 408   | Location timeout            |
 
+------------------------------------------------------------------------------
+
 ###`motionchange`
 
 Your **`callbackFn`** will be executed each time the device has changed-state between **MOVING** or **STATIONARY**.  The **`callbackFn`** will be provided with the following parameters:
@@ -1099,6 +1245,8 @@ BackgroundGeolocation.on('motionchange', function(isMoving, location, taskId) {
 });
 ```
 
+------------------------------------------------------------------------------
+
 
 ###`activitychange`
 
@@ -1112,12 +1260,14 @@ BackgroundGeolocation.on('activitychange', function(activityName) {
 });
 ```
 
+------------------------------------------------------------------------------
+
 
 ###`providerchange`
 
-Your `callbackFn` fill be executed when a change in the state of the device's **Location Services** has been detected.  eg: "GPS ON", "Wifi only".  Your `callbackFn` will be provided with an `{Object} provider` containing the following properties
+Your **`callbackFn`** fill be executed when a change in the state of the device's **Location Services** has been detected.  eg: "GPS ON", "Wifi only".  Your **`callbackFn`** will be provided with an **`{Object} provider`** containing the following properties
 
-#### `successFn` Paramters
+#### `callbackFn` Paramters
 
 #####`@param {Boolean} enabled` Whether location-services is enabled
 #####`@param {Boolean} gps` Whether gps is enabled
@@ -1159,12 +1309,14 @@ BackgroundGeolocation.on('providerchange', function(provider) {
 });
 ```
 
+------------------------------------------------------------------------------
+
 
 ###`geofence`
 
-Adds a geofence event-listener.  Your supplied `callbackFn` will be called when any monitored geofence crossing occurs.
+Adds a geofence event-listener.  Your supplied **`callbackFn`** will be called when any monitored geofence crossing occurs.
 
-#### `successFn` Paramters
+#### `callbackFn` Paramters
 
 #####`@param {Object} params`.  This object contains 2 keys: `@param {String} identifier`, `@param {String} action [ENTER|EXIT]` and `@param {Object} location`.
 #####`@param {Integer} taskId` The background taskId which you must send back to the native plugin via `BackgroundGeolocation.finish(taskId)` in order to signal that your callback is complete.
@@ -1186,6 +1338,8 @@ BackgroundGeolocation.on('geofence', function(params, taskId) {
 });
 ```
 
+------------------------------------------------------------------------------
+
 
 ###`geofenceschange`
 
@@ -1195,11 +1349,11 @@ The plugin achieves this by storing your geofences in its database, using a [geo
 
 When the device is determined to be moving, the plugin periodically queries for geofences in proximity (eg. every minute) using the latest recorded location.  This geospatial query is **very fast**, even with tens-of-thousands geofences in the database.
 
-It's when this list of monitored geofences *changes*, the plugin will fire the `geofenceschange` event.
+It's when this list of monitored geofences *changes*, the plugin will fire the **`geofenceschange`** event.
 
-:information_source: For more information, see [Geofencing](./geofencing.md)
+:blue_book: For more information, see [Geofencing Guide](./geofencing.md)
 
-#### `successFn` Paramters
+#### `callbackFn` Paramters
 
 #####`@param {Array} on` The list of geofences just activated.
 #####`@param {Array off` The list of geofences just de-activated
@@ -1223,9 +1377,9 @@ BackgroundGeolocation.on('geofenceschange', function(event) {
 });
 ```
 
-This `event` object provides only the *changed* geofences, those which just activated or de-activated.
+This **`event`** object provides only the *changed* geofences, those which just activated or de-activated.
 
-When **all** geofences have been removed, the event object will provide an empty-array `[]` for both `#on` and `#off` keys, ie:
+When **all** geofences have been removed, the event object will provide an empty-array **`[]`** for both **`#on`** and **`#off`** keys, ie:
 
 ```javascript
 {
@@ -1246,10 +1400,12 @@ BackgroundGeolocation.removeGeofences();
 
 ```
 
+------------------------------------------------------------------------------
+
 
 ###`http`
 
-The `successFn` will be executed for each successful HTTP request where the response-code is one of `200`, `201` or `204`.  `failureFn` will be executed for all other HTTP response codes.  The `successFn` and `failureFn` will be provided a single `response {Object}` parameter with the following properties:
+The **`successFn`** will be executed for each successful HTTP request where the response-code is one of `200`, `201` or `204`.  **`failureFn`** will be executed for all other HTTP response codes.  The **`successFn`** and **`failureFn`** will be provided a single **`response {Object}`** parameter with the following properties:
 
 #### `successFn`, `failureFn` Paramters
 
@@ -1271,16 +1427,18 @@ BackgroundGeolocation.onHttp(function(response) {
 })
 ```
 
+------------------------------------------------------------------------------
+
 
 ###`heartbeat`
 
-The `successFn` will be executed for each `heartbeatInterval` while the device is in **stationary** state (**iOS** requires `{preventSuspend: true}` as well).  The `successFn` will be provided a single `params {Object}` parameter with the following properties:
+The **`callbackFn`** will be executed for each [`#heartbeatInterval`](#config-integer-heartbeatinterval-undefined) while the device is in **stationary** state (**iOS** requires [`preventSuspend: true`](#config-boolean-preventsuspend-false) as well).  The **`callbackFn`** will be provided a single **`params {Object}`** parameter with the following properties:
 
-#### `successFn` Paramters
+#### `callbackFn` Paramters
 
 #####`@param {String} motionType [still|on_foot|running|on_bicycle|in_vehicle|shaking|unknown]`  The current motion-type.
 
-#####`@param {Object} location`  When the plugin detects movement (iOS only), it will always request a new high-accuracy location in order to determine if the device has moved beyond `stationaryRadius` and if the location has `speed > 0`.  This fresh location will be provided to your `successFn`.  Android will simply return the "last known location"
+#####`@param {Object} location`  When the plugin detects movement (iOS only), it will always request a new high-accuracy location in order to determine if the device has moved beyond `stationaryRadius` and if the location has `speed > 0`.  This fresh location will be provided to your `callbackFn`.  Android will simply return the "last known location"
 
 Example:
 
@@ -1296,12 +1454,14 @@ BackgroundGeolocation.on('heartbeat', function(params) {
 });
 ```
 
+------------------------------------------------------------------------------
+
 
 ###`schedule`
 
-The **`successFn`** will be executed each time a [`schedule`](#schedule) event fires.  Your **`successFn`** will be provided with the current **`state`** object (@see [`#getState`](getstatesuccessfn)).  **`state.enabled`** will reflect the state according to your [configured `schedule`](#config-array-schedule-undefined).
+The **`callbackFn`** will be executed each time a [`schedule`](#schedule) event fires.  Your **`callbackFn`** will be provided with the current **`state`** object (@see [`#getState`](getstatesuccessfn)).  **`state.enabled`** will reflect the state according to your [configured `schedule`](#config-array-schedule-undefined).
 
-#### `successFn` Paramters
+#### `callbackFn` Paramters
 
 #####`@param {Object} state` Current plugin state.
 
@@ -1315,12 +1475,14 @@ BackgroundGeolocation.on('schedule', function(state) {
 });
 ```
 
+------------------------------------------------------------------------------
+
 
 # :large_blue_diamond: Methods
 
 ## :small_blue_diamond: Core API Methods
 
-###`configure(config, success, failure)`
+###`configure(config, successFn, failureFn)`
 
 This is the **most** important method of the API.  **`#configure`** must be called only **once** for the lifetime of you application, providing the initial [configuration options](#wrench-configuration-options).  The **`successFn`** will be executed after the plugin has successfully configured.
 
@@ -1366,6 +1528,9 @@ BackgroundGeolocation.configure(options, function(state) {
 BackgroundGeolocation.getCurrentPosition(success, fail);
 ```
 
+------------------------------------------------------------------------------
+
+
 ###`setConfig(config, successFn, failureFn)`
 
 Re-configure plugin's [configuration parameters](#wrench-configuration-options).
@@ -1381,11 +1546,14 @@ BackgroundGeolocation.setConfig({
 });
 ```
 
+------------------------------------------------------------------------------
+
+
 ###`start(successFn, failureFn)`
 
 Enable location tracking.  Supplied **`successFn`** will be executed when tracking is successfully engaged.  This is the plugin's power **ON** button.  The plugin will initially start into its **stationary** state, fetching an initial location before turning off location services.
 
-Android will be monitoring its **Activity Recognition System** while iOS will create a stationary geofence around the current location.  **NOTE** If you've configured a `schedule`, this method will override that schedule and engage tracking immediately.
+Android will be monitoring its **Activity Recognition System** while iOS will create a stationary geofence around the current location.  **NOTE** If you've configured a [`#schedule`](#config-array-schedule-undefined), this method will override that schedule and engage tracking immediately.
 
 #### `successFn` Paramters
 
@@ -1397,7 +1565,10 @@ BackgroundGeolocation.start(function(state) {
 });
 ```
 
-:information_source: For more information, see [Philosophy of Operation](../../../wiki/Philosophy-of-Operation)
+:blue_book: For more information, see [Philosophy of Operation](../../../wiki/Philosophy-of-Operation)
+
+------------------------------------------------------------------------------
+
 
 ###`stop(successFn, failureFn)`
 
@@ -1408,6 +1579,9 @@ BackgroundGeolocation.stop();
 ```
 
 :warning: If you've configured a [`schedule`](config-array-schedule-undefined), **`#stop`** will halt the Scheduler as well.
+
+------------------------------------------------------------------------------
+
 
 ###`getState(successFn)`
 
@@ -1456,12 +1630,14 @@ BackgroundGeolocation.getState(function(state) {
 }
 ```
 
+------------------------------------------------------------------------------
+
 
 ###`getCurrentPosition(successFn, failureFn, options)`
 
-Retrieves the current position.  This method instructs the native code to fetch exactly one location using maximum power & accuracy.  The native code will persist the fetched location to its SQLite database just as any other location in addition to POSTing to your configured `#url` (if you've enabled the HTTP features).  In addition to your supplied `callbackFn`, the plugin will also execute the `callback` provided to `#configure`.
+Retrieves the current position.  This method instructs the native code to fetch exactly one location using maximum power & accuracy.  The native code will persist the fetched location to its SQLite database just as any other location in addition to POSTing to your configured [`#url`](#config-string-url-undefined) (if you've enabled the HTTP features).
 
-If an error occurs while fetching the location, the `failureFn` will be executed with an `Integer` [Error Code](../../../wiki/Location-Error-Codes) as the first argument.
+If an error occurs while fetching the location, the **`failureFn`** will be executed with an **`Integer`** [Error Code](../../../wiki/Location-Error-Codes) as the first argument.
 
 #### Options
 
@@ -1502,6 +1678,8 @@ BackgroundGeolocation.getCurrentPosition(function(location, taskId) {
 
 ```
 
+:information_source: While the **`successFn`** will receive only **one** location, the plugin *does* request **multiple** location [`samples`](#config-integer-samples-3-sets-the-maximum-number-of-location-samples-to-fetch--the-plugin-will-return-the-location-having-the-best-accuracy-to-your-successfn--defaults-to-3--only-the-final-location-will-be-persisted) in order to record the most accurate location possible.  These *samples* are **not** persisted to the database but they will be provided to your [`location`](#location) event-listener, for your convenience, since it can take some seconds for the best possible location to arrive.  For example, you might use these samples to progressively update the user's position on a map.  You can detect these *samples* in your [`location`](#location) `callbackFn` via `location.sample === true`.  If you're manually `POST`ing location to your server, you should ignore these locations.
+
 ####`failureFn` Parameters
 
 #####`@param {Integer} errorCode` If a location failed to be retrieved, one of the following error-codes will be returned
@@ -1533,6 +1711,9 @@ BackgroundGeolocation.getCurrentPosition(succesFn, function(errorCode) {
   }
 })
 ```
+
+------------------------------------------------------------------------------
+
 
 ###`watchPosition(successFn, failureFn, options)`
 
@@ -1567,6 +1748,9 @@ BackgroundGeolocation.watchPosition(function(location) {
 
 :information_source: Also see [`#stopWatchPosition`](stopwatchpositionsuccessfn-failurefn)
 
+------------------------------------------------------------------------------
+
+
 ###`stopWatchPosition(successFn, failureFn)`
 
 Halt [`#watchPosition`](watchpositionsuccessfn-failurefn-options) updates.
@@ -1574,6 +1758,8 @@ Halt [`#watchPosition`](watchpositionsuccessfn-failurefn-options) updates.
 ```javascript
 BackgroundGeolocation.stopWatchPosition();  // <-- callbacks are optional
 ```
+
+------------------------------------------------------------------------------
 
 
 ###`changePace(enabled, successFn, failureFn)`
@@ -1584,6 +1770,8 @@ Manually Toggles the plugin **motion state** between **stationary** and **moving
 BackgroundGeolocation.changePace(true);  // <-- Location-services ON
 BackgroundGeolocation.changePace(false); // <-- Location-services OFF
 ```
+
+------------------------------------------------------------------------------
 
 
 ###`getOdometer(callbackFn, failureFn)`
@@ -1600,6 +1788,9 @@ BackgroundGeolocation.getOdometer(function(distance) {
 
 :warning: Odometer calculations are dependant upon the accuracy of received locations.  If location accuracy is poor, this will necessarily introduce error into odometer calculations.
 
+------------------------------------------------------------------------------
+
+
 ###`setOdometer(value, callbackFn, failureFn)`
 
 Set the **`odometer`** to *any* arbitrary value.  **NOTE** `setOdometer` will perform a [`getCurrentPosition`](#getcurrentpositionsuccessfn-failurefn-options) in order to record to exact location where odometer was set; as a result, the `callback` signatures are identical to those of [`getCurrentPosition`](#getcurrentpositionsuccessfn-failurefn-options).
@@ -1614,21 +1805,27 @@ BackgroundGeolocation.setOdometer(1234.56, function(location) {
 });
 ```
 
+------------------------------------------------------------------------------
+
 
 ###`resetOdometer(callbackFn, failureFn)`
 
 Reset the **odometer** to `0`.  Alias for [`setOdometer(0)`](#setodometervalue-callbackfn-failurefn)
 
+------------------------------------------------------------------------------
+
 
 ###`startSchedule(callbackFn)`
 
-If a `schedule` was configured, this method will initiate that schedule.  The plugin will automatically be started or stopped according to the configured `schedule`.
+If a [`#schedule`](#config-array-schedule-undefined) was configured, this method will initiate that schedule.  The plugin will automatically be started or stopped according to the configured [`#schedule`](#config-array-schedule-undefined).
 
 ```javascript
 BackgroundGeolocation.startSchedule(function() {
   console.log('- Scheduler started');
 });
 ```
+
+------------------------------------------------------------------------------
 
 
 ###`stopSchedule(callbackFn)`
@@ -1641,10 +1838,16 @@ BackgroundGeolocation.stopSchedule(function() {
 });
 ```
 
+------------------------------------------------------------------------------
+
 
 ###`startBackgroundTask(callbackFn)`
 
-Sends a signal to the native OS that you wish to perform a long-running task.  The OS will not suspend your app until you signal completion with the `#finish` method.  The `callbackFn` will be provided with a single parameter `taskId` which you will send to the `#finish` method.  **NOTE** iOS provides **exactly** 180s of background-running time.  If your long-running task exceeds this time, the plugin has a fail-safe which will automatically `#finish` your `taskId` to prevent the OS from force-killing your application.
+Sends a signal to iOS that you wish to perform a long-running task.  The OS will not suspend your app until you signal completion with the [`#finish`](#finishtaskid) method.  The **`callbackFn`** will be provided with a single parameter **`taskId`** which you will send to the [`#finish`](#finishtaskid) method.  
+
+####`callbackFn` Parameters
+
+#####`@param {Integer} taskId` The taskId to send to the [`#finish`](#finishtaskid) method.
 
 Eg:
 ```javascript
@@ -1660,6 +1863,10 @@ BackgroundGeolocation.setOdometer(0, function(location) {
   });
 });
 ```
+
+:warning: iOS provides **exactly** 180s of background-running time.  If your long-running task exceeds this time, the plugin has a fail-safe which will automatically [`#finish`](#finishtaskid) your **`taskId`** to prevent the OS from force-killing your application.
+
+------------------------------------------------------------------------------
 
 
 ###`finish(taskId)`
@@ -1681,6 +1888,8 @@ BackgroundGeolocation.setOdometer(0, function(location) {
 });
 ```
 
+------------------------------------------------------------------------------
+
 
 ###`removeListeners(successFn, failureFn)`
 
@@ -1701,6 +1910,134 @@ BackgroundGeolocation.on('location', function(location, taskId) {
   BackgroundGeolocation.finish(taskId);
 });
 ```
+
+------------------------------------------------------------------------------
+
+
+## :small_blue_diamond: HTTP & Persistence Methods
+
+###`getLocations(successFn, failureFn)`
+Fetch all the locations currently stored in native plugin's SQLite database.  Your **`callbackFn`** will receive an `Array` of locations in the 1st parameter.  Eg:
+
+####`successFn` Parameters:
+
+#####`@param {Array} locations`  The list of locations stored in SQLite database.
+#####`@param {Integer} taskId` The background taskId which you must send back to the native plugin via `BackgroundGeolocation.finish(taskId)` in order to signal the end of your background thread.
+
+```javascript
+BackgroundGeolocation.getLocations(function(locations, taskId) {
+  console.log("locations: ", locations);
+  BackgroundGeolocation.finish(taskId);
+});
+```
+
+------------------------------------------------------------------------------
+
+
+###`getCount(successFn, failureFn)`
+Fetches count of SQLite locations table `SELECT count(*) from locations`.  The **`successFn`** will be executed with count as the only parameter.
+
+####`successFn` Parameters:
+
+#####`@param {Integer} count` Number of locations in the database.
+
+```javascript
+BackgroundGeolocation.getCount(function(count) {
+  console.log('- count: ', count);
+});
+```
+
+------------------------------------------------------------------------------
+
+
+###`insertLocation(config, successFn, failureFn)`
+
+Manually insert a location into the native plugin's SQLite database.  Your **`successFn`** will be executed if the operation was successful.  The inserted location's schema must match this plugin's published [Location Data Schema](wiki/Location-Data-Schema).  The plugin will have no problem inserting a location retrieved from the plugin itself.
+
+#### Config Options
+
+#####`@config {Object} config`  The location params/object matching the [Location Data Schema](wiki/Location-Data-Schema).
+
+```javascript
+BackgroundGeolocation.insertLocation({
+  "uuid": "f8424926-ff3e-46f3-bd48-2ec788c9e761", // <-- required
+  "timestamp": "2016-02-10T22:25:54.905Z"     // <-- required
+  "coords": {                   // <-- required
+    "latitude": 45.5192746,
+    "longitude": -73.616909,
+    "accuracy": 22.531999588012695,
+    "speed": 0,
+    "heading": 0,
+    "altitude": 0
+  }
+}, function() {
+  console.log('- Inserted location success');
+}, function(error) {
+  console.warn('- Failed to insert location: ', error);
+});
+
+// insertLocation can easily consume any location which it returned.  Note that #getCurrentPosition ALWAYS persists so this example
+// will manually persist a 2nd version of the same location.  The purpose here is to show that the plugin can consume any location object which it generated.
+BackgroundGeolocation.getCurrentPosition(function(location, taskId) {
+  location.extras = {foo: 'bar'}; // <-- add some arbitrary extras-data
+
+  // Insert it.
+  BackgroundGeolocation.insertLocation(location, function() {
+    BackgroundGeolocation.finish(taskId);
+  });
+});
+```
+
+------------------------------------------------------------------------------
+
+
+###`clearDatabase(successFn, failureFn)`
+**DEPRECATED**.  Use `#destroyLocations`.
+
+------------------------------------------------------------------------------
+
+
+###`destroyLocations(successFn, failureFn)`
+
+Remove all records in plugin's SQLite database.
+
+```javascript
+BackgroundGeolocation.destroyLocations(function() {
+  console.log('- cleared database'); 
+});
+```
+
+------------------------------------------------------------------------------
+
+
+###`sync(successFn, failureFn)`
+
+If the plugin is configured for HTTP with an [`#url`](#config-string-url-undefined) and [`autoSync: false`](#config-string-autosync-true), this method will initiate POSTing the locations currently stored in the native SQLite database to your configured [`#url`](#config-string-url-undefined).  When your HTTP server returns a response of `200 OK`, that record(s) in the database will be DELETED.  
+
+If you configured [`batchSync: true`](#config-string-batchsync-false), all the locations will be sent to your server in a single HTTP POST request, otherwise the plugin will create execute an HTTP post for **each** location in the database (REST-style).  Your **`callbackFn`** will be executed and provided with an Array of all the locations from the SQLite database.  If you configured the plugin for HTTP (by configuring an [`#url`](#config-string-url-undefined), your **`callbackFn`** will be executed after the HTTP request(s) have completed.  If the plugin failed to sync to your server (possibly because of no network connection), the **`failureFn`** will be called with an `errorMessage`.  If you are **not** using the HTTP features, **`sync`** will delete all records from its SQLite datbase.  Eg:
+
+Your callback will be provided with the following params
+
+####`successFn` Parameters
+
+#####`@param {Array} locations`  The list of locations stored in SQLite database.
+#####`@param {Integer} taskId` The background taskId which you must send back to the native plugin via `BackgroundGeolocation.finish(taskId)` in order to signal the end of your background thread.
+
+```javascript
+BackgroundGeolocation.sync(function(locations, taskId) {
+  // Here are all the locations from the database.  The database is now EMPTY.
+  console.log('synced locations: ', locations);
+  // Be sure to call finish(taskId) in order to signal the end of the background-thread.
+  BackgroundGeolocation.finish(taskId);
+}, function(errorMessage) {
+  console.warn('Sync FAILURE: ', errorMessage);
+});
+
+```
+
+:blue_book: For more information, see [HTTP Guide](http.md)
+
+------------------------------------------------------------------------------
 
 
 ## :small_blue_diamond: Geofencing Methods
@@ -1739,8 +2076,10 @@ BackgroundGeolocation.on('geofence', function(params, taskId) {
 });
 ```
 
+------------------------------------------------------------------------------
 
-###`addGeofence(config, callbackFn, failureFn)`
+
+###`addGeofence(config, successFn, failureFn)`
 
 Adds a geofence to be monitored by the native plugin.  If a geofence *already exists* with the configured **`identifier`**, the previous one will be **deleted** before the new one is inserted.  
 
@@ -1786,9 +2125,20 @@ BackgroundGeolocation.addGeofence({
 
 :information_source: When adding a list-of-geofences, it's about **10* faster** to use [`#addGeofences`](#addgeofencesgeofences-callbackfn-failurefn) instead.
 
-:information_source: See [Geofencing](./geofencing.md) for more information.
+:blue_book: See [Geofencing Guide](./geofencing.md) for more information.
 
-###`addGeofences(geofences, callbackFn, failureFn)`
+####`successFn` Parameters:
+
+#####`@param {String} identifier` The name of your geofence, eg: "Home", "Office"
+
+####`failureFn` Parameters
+
+#####`@param {String} errorMessage`
+
+------------------------------------------------------------------------------
+
+
+###`addGeofences(geofences, successFn, failureFn)`
 
 Adds a list of geofences to be monitored by the native plugin.  If a geofence *already* exists with the configured `identifier`, the previous one will be **deleted** before the new one is inserted.  The `geofences` param is an `Array` of geofence Objects `{}` with the following params:
 
@@ -1822,8 +2172,19 @@ BackgroundGeolocation.addGeofences([{
 });
 ```
 
+####`successFn` Parameters:
 
-###`removeGeofence(identifier, callbackFn, failureFn)`
+#####`@param {String} message`
+
+####`failureFn` Parameters:
+
+#####`@param {String} errorMessage`
+
+
+------------------------------------------------------------------------------
+
+
+###`removeGeofence(identifier, successFn, failureFn)`
 
 Removes a geofence having the given `{String} identifier`.
 
@@ -1843,6 +2204,16 @@ BackgroundGeolocation.removeGeofence("Home", function() {
 });
 ```
 
+####`successFn` Parameters:
+
+#####`@param {String} identifier`
+
+####`failureFn` Parameters:
+
+#####`@param {String} errorMessage`
+
+------------------------------------------------------------------------------
+
 
 ###`removeGeofences(callbackFn, failureFn)`
 
@@ -1860,12 +2231,22 @@ BackgroundGeolocation.removeGeofences(function() {
 });
 ```
 
+####`successFn` Parameters:
 
-###`getGeofences(callbackFn, failureFn)`
+#####`@param {String} message`
 
-Fetch the list of monitored geofences.  Your **`callbackFn`** will be provided with an `Array` of geofences.  If there are no geofences being monitored, you'll receive an empty Array `[]`.
+####`failureFn` Parameters:
 
-####`callbackFn` Parameters
+#####`@param {String} errorMessage`
+
+------------------------------------------------------------------------------
+
+
+###`getGeofences(successFn, failureFn)`
+
+Fetch the list of monitored geofences.  Your **`successFn`** will be provided with an `Array` of geofences.  If there are no geofences being monitored, you'll receive an empty Array `[]`.
+
+####`successFn` Parameters
 
 #####`@param {Array} geofences` List of all geofences in the database.
 
@@ -1881,120 +2262,9 @@ BackgroundGeolocation.getGeofences(function(geofences) {
 });
 ```
 
+####`failureFn` Parameters
 
-## :small_blue_diamond: HTTP & Persistence Methods
-
-###`getLocations(callbackFn, failureFn)`
-Fetch all the locations currently stored in native plugin's SQLite database.  Your `callbackFn` will receive an `Array` of locations in the 1st parameter.  Eg:
-
-The `callbackFn` will be executed with following params:
-
-#####`@param {Array} locations`  The list of locations stored in SQLite database.
-#####`@param {Integer} taskId` The background taskId which you must send back to the native plugin via `BackgroundGeolocation.finish(taskId)` in order to signal the end of your background thread.
-
-
-```javascript
-BackgroundGeolocation.getLocations(function(locations, taskId) {
-  console.log("locations: ", locations);
-  BackgroundGeolocation.finish(taskId);
-});
-```
-
-
-###`getCount(callbackFn, failureFn)`
-Fetches count of SQLite locations table `SELECT count(*) from locations`.  The `callbackFn` will be executed with count as the only parameter.
-
-####`callbackFn` Parameters:
-
-#####`@param {Integer} count` Number of locations in the database.
-
-```javascript
-BackgroundGeolocation.getCount(function(count) {
-  console.log('- count: ', count);
-});
-```
-
-
-###`insertLocation(config, callbackFn, failureFn)`
-
-Manually insert a location into the native plugin's SQLite database.  Your **`callbackFn`** will be executed if the operation was successful.  The inserted location's schema must match this plugin's published [Location Data Schema](wiki/Location-Data-Schema).  The plugin will have no problem inserting a location retrieved from the plugin itself.
-
-#### Config Options
-
-#####`@config {Object} config`  The location params/object matching the [Location Data Schema](wiki/Location-Data-Schema).
-
-```javascript
-BackgroundGeolocation.insertLocation({
-  "uuid": "f8424926-ff3e-46f3-bd48-2ec788c9e761", // <-- required
-  "timestamp": "2016-02-10T22:25:54.905Z"     // <-- required
-  "coords": {                   // <-- required
-    "latitude": 45.5192746,
-    "longitude": -73.616909,
-    "accuracy": 22.531999588012695,
-    "speed": 0,
-    "heading": 0,
-    "altitude": 0
-  }
-}, function() {
-  console.log('- Inserted location success');
-}, function(error) {
-  console.warn('- Failed to insert location: ', error);
-});
-
-// insertLocation can easily consume any location which it returned.  Note that #getCurrentPosition ALWAYS persists so this example
-// will manually persist a 2nd version of the same location.  The purpose here is to show that the plugin can consume any location object which it generated.
-BackgroundGeolocation.getCurrentPosition(function(location, taskId) {
-  location.extras = {foo: 'bar'}; // <-- add some arbitrary extras-data
-
-  // Insert it.
-  BackgroundGeolocation.insertLocation(location, function() {
-    BackgroundGeolocation.finish(taskId);
-  });
-});
-```
-
-
-###`clearDatabase(callbackFn, failureFn)`
-**DEPRECATED**.  Use `#destroyLocations`.
-
-
-###`destroyLocations(callbackFn, failureFn)`
-
-Remove all records in plugin's SQLite database.
-
-```javascript
-BackgroundGeolocation.destroyLocations(function() {
-  console.log('- cleared database'); 
-});
-```
-
-
-###`sync(callbackFn, failureFn)`
-
-If the plugin is configured for HTTP with an [`#url`](#config-string-url-undefined) and [`autoSync: false`](#config-string-autosync-true), this method will initiate POSTing the locations currently stored in the native SQLite database to your configured [`#url`](#config-string-url-undefined).  When your HTTP server returns a response of `200 OK`, that record(s) in the database will be DELETED.  
-
-If you configured [`batchSync: true`](#config-string-batchsync-false), all the locations will be sent to your server in a single HTTP POST request, otherwise the plugin will create execute an HTTP post for **each** location in the database (REST-style).  Your **`callbackFn`** will be executed and provided with an Array of all the locations from the SQLite database.  If you configured the plugin for HTTP (by configuring an [`#url`](#config-string-url-undefined), your **`callbackFn`** will be executed after the HTTP request(s) have completed.  If the plugin failed to sync to your server (possibly because of no network connection), the **`failureFn`** will be called with an `errorMessage`.  If you are **not** using the HTTP features, **`sync`** will delete all records from its SQLite datbase.  Eg:
-
-Your callback will be provided with the following params
-
-####`successFn` Parameters
-
-#####`@param {Array} locations`  The list of locations stored in SQLite database.
-#####`@param {Integer} taskId` The background taskId which you must send back to the native plugin via `BackgroundGeolocation.finish(taskId)` in order to signal the end of your background thread.
-
-```javascript
-BackgroundGeolocation.sync(function(locations, taskId) {
-  // Here are all the locations from the database.  The database is now EMPTY.
-  console.log('synced locations: ', locations);
-  // Be sure to call finish(taskId) in order to signal the end of the background-thread.
-  BackgroundGeolocation.finish(taskId);
-}, function(errorMessage) {
-  console.warn('Sync FAILURE: ', errorMessage);
-});
-
-```
-
-:information_source: For more information, see [HTTP Features](http.md)
+------------------------------------------------------------------------------
 
 
 ## :small_blue_diamond: Logging Methods
@@ -2021,6 +2291,8 @@ BackgroundGeolocation.setLogLevel(BackgroundGeolocation.LOG_LEVEL_VERBOSE,functi
 });
 ```
 
+------------------------------------------------------------------------------
+
 
 ###`getLog(callbackFn)`
 
@@ -2039,8 +2311,10 @@ BackgroundGeolocation.getLog(function(log) {
 });
 ```
 
+------------------------------------------------------------------------------
 
-###`destroyLog(callbackFn, failureFn)`
+
+###`destroyLog(successFn, failureFn)`
 
 Destory the entire contents of Log database.
 
@@ -2052,15 +2326,29 @@ BackgroundGeolocation.destroyLog(function() {
 });
 ```
 
+####`successFn` Parameters
+
+None
+
+####`failureFn` Parameters
+
+None
+
+------------------------------------------------------------------------------
+
 
 ###`emailLog(email, callbackFn)`
 
 Fetch the entire contents of the current circular log and email it to a recipient using the device's native email client.
 
-#### Config Options
+#### Config Options:
 
 #####`@param {String} email`  Email address to send log to.
 #####`@param {Function} callbackFn`  Executed after successfully emailed.
+
+####`callbackFn` Parameters:
+
+None
 
 ```javascript
 BackgroundGeolocation.emailLog("foo@bar.com");
@@ -2085,6 +2373,8 @@ BackgroundGeolocation.emailLog("foo@bar.com");
 
 ![](https://dl.dropboxusercontent.com/u/2319755/cordova-background-geolocaiton/Screenshot_20160218-183345.png)
 
+------------------------------------------------------------------------------
+
 
 ###`playSound(soundId)`
 
@@ -2098,4 +2388,4 @@ BackgroundGeolocation.playSound(1303);
 BackgroundGeolocation.playSound(90);
 ```
 
-
+------------------------------------------------------------------------------
