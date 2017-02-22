@@ -1328,23 +1328,17 @@ Adds a geofence event-listener.  Your supplied **`callbackFn`** will be called w
 
 #### `callbackFn` Paramters
 
-#####`@param {Object} params`.  This object contains 2 keys: `@param {String} identifier`, `@param {String} action [ENTER|EXIT]` and `@param {Object} location`.
-#####`@param {Integer} taskId` The background taskId which you must send back to the native plugin via `BackgroundGeolocation.finish(taskId)` in order to signal that your callback is complete.
+#####`@param {Object} geofence` The geofence data, including `identifier`, `action`, `extras`, `location`
 
 ```javascript
-BackgroundGeolocation.on('geofence', function(params, taskId) {
-  var location = params.location;
-  var identifier = params.identifier;
-  var action = params.action;
+BackgroundGeolocation.on('geofence', function(geofence) {
+  var location    = geofence.location;
+  var identifier  = geofence.identifier;
+  var action      = geofence.action;
 
   console.log('A geofence has been crossed: ', identifier);
   console.log('ENTER or EXIT?: ', action);
-  console.log('location: ', JSON.stringify(location));
-
-  // The plugin runs your callback in a background-thread:  
-  // you MUST signal to the native plugin when your callback is finished so it can halt the thread.
-  // IF YOU DON'T, iOS WILL KILL YOUR APP
-  BackgroundGeolocation.finish(taskId);
+  console.log('geofence: ', JSON.stringify(geofence));
 });
 ```
 
