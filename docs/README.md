@@ -120,8 +120,8 @@ BackgroundGeolocation.setConfig({
 | [`headers`](#config-object-headers) | `Object` | `null` | Optional HTTP headers sent along in HTTP request to above [`#url`](#config-string-url-undefined) |
 | [`method`](#config-string-method-post) | `String` | `POST` | The HTTP method.  Defaults to `POST`.  Some servers require `PUT`.|
 | [`httpRootProperty`](#config-string-httprootproperty-location) | `String` | `location` | The root property of the JSON data where location-data will be appended. |
-| [`locationTemplate`](#config-string-locationtemplate-undefined) | `String` | `undefined` | Optional custom location data schema (eg: `{ "lat:{{latitude}}, "lng":{{longitude}} }`|
-| [`geofenceTemplate`](#config-string-geofencetemplate-undefined) | `String` | `undefined` | Optional custom geofence data schema (eg: `{ "lat:{{latitude}}, "lng":{{longitude}}, "geofence":"{{geofence.identifier}}:{{geofence.action}}" }`|
+| [`locationTemplate`](#config-string-locationtemplate-undefined) | `String` | `undefined` | Optional custom location data schema (eg: `{ "lat:<%= latitude %>, "lng":<%= longitude %> }`|
+| [`geofenceTemplate`](#config-string-geofencetemplate-undefined) | `String` | `undefined` | Optional custom geofence data schema (eg: `{ "lat:<%= latitude %>, "lng":<%= longitude %>, "geofence":"<%= geofence.identifier %>:<%= geofence.action %>" }`|
 | [`autoSync`](#config-string-autosync-true) | `Boolean` | `true` | If you've enabeld HTTP feature by configuring an [`#url`](#config-string-url-undefined), the plugin will attempt to upload each location to your server **as it is recorded**.|
 | [`autoSyncThreshold`](#config-integer-autosyncthreshold-0) | `Integer` | `0` | The minimum number of persisted records to trigger an [`#autoSync`](#config-string-autosync-true) action. |
 | [`batchSync`](#config-string-batchsync-false) | `Boolean` | `false` | If you've enabled HTTP feature by configuring an [`#url`](config-string-url-undefined), [`batchSync: true`](#config-string-batchsync-false) will POST all the locations currently stored in native SQLite datbase to your server in a single HTTP POST request.|
@@ -190,7 +190,7 @@ BackgroundGeolocation.setConfig({
 
 Event-listeners can be attached using the method **`#on`**, supplying the **Event Name** in the following table. **`#on`** accepts both a **`successFn`** and **`failureFn`**.
 
-:information_source: **`#on`** method does not accept an `{}` -- you **must** specify each listener with a distinct call to `#on`:
+:information_source: **`#on`** method does not accept an **`{}`** &mdash; you **must** specify each listener with a distinct call to **`#on`**:
 
 ```javascript
 BackgroundGeolocation.on("location", successFn, failureFn);
@@ -705,18 +705,22 @@ You may also specify the character **`httpRootProperty:"."`** to place your data
 
 ####`@config {String} locationTemplate [undefined]`
 
-Optional custom template for rendering `location` JSON request data in HTTP requests.  Use "mutache-style" `{{tags}}`:
+Optional custom template for rendering `location` JSON request data in HTTP requests.  Evaulate variables in your **`locationTemplate`** using Ruby `erb`-style tags:
+
+```erb
+<%= variable_name %>
+```
 
 :blue_book: See [HTTP Guide](http.md) for more information.
 
 ```javascript
 BackgroundGeolocation.configure({
-  locationTemplate: '{"lat":{{latitude}},"lng":{{longitude}},"event":"{{event}}",isMoving:{{isMoving}}}'
+  locationTemplate: '{"lat":<%= latitude %>,"lng":<%= longitude %>,"event":"<%= event %>",isMoving:<%= isMoving %>}'
 });
 
 // Or use a compact [Array] template!
 BackgroundGeolocation.configure({
-  locationTemplate: '[{{latitude}}, {{longitude}}, "{{event}}", {{is_moving}}]'
+  locationTemplate: '[<%=latitude%>, <%=longitude%>, "<%=event%>", <%=is_moving%>]'
 })
 ```
 
@@ -725,7 +729,7 @@ BackgroundGeolocation.configure({
 ```javascript
 BackgroundGeolocation.configure({
   httpRootProperty: 'data',
-  locationTemplate: '{"lat":{{latitude}},"lng":{{longitude}}}',
+  locationTemplate: '{"lat":<%= latitude %>,"lng":<%= longitude %>}',
   extras: {
     "foo":"bar"
   }
@@ -747,64 +751,70 @@ Will result in JSON:
 
 | Tag | Type | Description |
 |-----|------|-------------|
-| `{{latitude}}` | `Float` ||
-| `{{longitude}}` | `Float` ||
-| `{{speed}}` | `Float` | Meters|
-| `{{heading}}` | `Float` | Degress|
-| `{{accuracy}}` | `Float` | Meters|
-| `{{altitude}}` | `Float` | Meters|
-| `{{altitude_accuracy}}` | `Float` | Meters|
-| `{{timestamp}}` | `String` |ISO-8601|
-| `{{uuid}}` | `String` |Unique ID|
-| `{{event}}` | `String` |`motionchange|geofenee|heartbeat`
-| `{{odometer}}` | `Float` | Meters|
-| `{{activity.type}}` | `String` | `still|on_foot|running|on_bicycle|in_vehicle|unknown`|
-| `{{activity.confidence}}` | `Integer` | 0-100%|
-| `{{battery.level}}` | `Float` | 0-100%|
-| `{{battery.is_charging}}` | `Boolean` | Is device plugged in?|
+| `latitude` | `Float` ||
+| `longitude` | `Float` ||
+| `speed` | `Float` | Meters|
+| `heading` | `Float` | Degress|
+| `accuracy` | `Float` | Meters|
+| `altitude` | `Float` | Meters|
+| `altitude_accuracy` | `Float` | Meters|
+| `timestamp` | `String` |ISO-8601|
+| `uuid` | `String` |Unique ID|
+| `event` | `String` |`motionchange|geofenee|heartbeat`
+| `odometer` | `Float` | Meters|
+| `activity.type` | `String` | `still|on_foot|running|on_bicycle|in_vehicle|unknown`|
+| `activity.confidence` | `Integer` | 0-100%|
+| `battery.level` | `Float` | 0-100%|
+| `battery.is_charging` | `Boolean` | Is device plugged in?|
 
 ------------------------------------------------------------------------------
 
 ####`@config {String} geofenceTemplate [undefined]`
 
-Optional custom template for rendering `geofence` JSON request data in HTTP requests.  The `geofenceTemplate` is similar to [`#locationTemplate`](#config-string-locationtemplate-undefined) with the addition of two extra `geofence.*` tags.  Use "mutache-style" `{{tags}}`:
+Optional custom template for rendering `geofence` JSON request data in HTTP requests.  The `geofenceTemplate` is similar to [`#locationTemplate`](#config-string-locationtemplate-undefined) with the addition of two extra `geofence.*` tags.
+
+Evaulate variables in your **`geofenceTemplate`** using Ruby `erb`-style tags:
+
+```erb
+<%= variable_name %>
+```
 
 :blue_book: See [HTTP Guide](http.md) for more information.
 
 ```javascript
 BackgroundGeolocation.configure({
-  geofenceTemplate: '{ "lat":{{latitude}}, "lng":{{longitude}}, "geofence":"{{geofence.identifier}}:{{geofence.action}}" }'
+  geofenceTemplate: '{ "lat":<%= latitude %>, "lng":<%= longitude %>, "geofence":"<%= geofence.identifier %>:<%= geofence.action %>" }'
 });
 
 // Or use a compact [Array] template!
 BackgroundGeolocation.configure({
-  geofenceTemplate: '[{{latitude}}, {{longitude}}, "{{geofence.identifier}}", "{{geofence.action}}"]'
+  geofenceTemplate: '[<%= latitude %>, <%= longitude %>, "<%= geofence.identifier %>", "<%= geofence.action %>"]'
 })
 
 ```
 
 **Template Tags**
-The tag-list is identical to [`#locationTemplate`](#config-string-locationtemplate-undefined) with the addition of `geofence.identifier` and `geofence.action`
+The tag-list is identical to [`#locationTemplate`](#config-string-locationtemplate-undefined) with the addition of `geofence.identifier` and `geofence.action`.  
 
 | Tag | Type | Description |
 |-----|------|-------------|
-| **`{{geofence.identifier}}`** | `String` | Which geofence?|
-| **`{{geofence.action}}`** | `String` | `ENTER|EXIT`|
-| `{{latitude}}` | `Float` ||
-| `{{longitude}}` | `Float` ||
-| `{{speed}}` | `Float` | Meters|
-| `{{heading}}` | `Float` | Degress|
-| `{{accuracy}}` | `Float` | Meters|
-| `{{altitude}}` | `Float` | Meters|
-| `{{altitude_accuracy}}` | `Float` | Meters|
-| `{{timestamp}}` | `String` |ISO-8601|
-| `{{uuid}}` | `String` |Unique ID|
-| `{{event}}` | `String` |`motionchange|geofenee|heartbeat`
-| `{{odometer}}` | `Float` | Meters|
-| `{{activity.type}}` | `String` | `still|on_foot|running|on_bicycle|in_vehicle|unknown`
-| `{{activity.confidence}}` | `Integer` | 0-100%|
-| `{{battery.level}}` | `Float` | 0-100%|
-| `{{battery.is_charging}}` | `Boolean` | Is device plugged in?|
+| **`geofence.identifier`** | `String` | Which geofence?|
+| **`geofence.action`** | `String` | `ENTER|EXIT`|
+| `latitude` | `Float` ||
+| `longitude` | `Float` ||
+| `speed` | `Float` | Meters|
+| `heading` | `Float` | Degress|
+| `accuracy` | `Float` | Meters|
+| `altitude` | `Float` | Meters|
+| `altitude_accuracy` | `Float` | Meters|
+| `timestamp` | `String` |ISO-8601|
+| `uuid` | `String` |Unique ID|
+| `event` | `String` |`motionchange|geofenee|heartbeat`
+| `odometer` | `Float` | Meters|
+| `activity.type` | `String` | `still|on_foot|running|on_bicycle|in_vehicle|unknown`
+| `activity.confidence` | `Integer` | 0-100%|
+| `battery.level` | `Float` | 0-100%|
+| `battery.is_charging` | `Boolean` | Is device plugged in?|
 
 ------------------------------------------------------------------------------
 

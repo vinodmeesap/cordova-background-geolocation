@@ -94,7 +94,13 @@ POST /my_url
 
 ### `locationTemplate` & `geofenceTemplate`
 
-If you wish to provide your own custom HTTP JSON schema, you can configure distinct templates for both `location` and `geofence` data.
+If you wish to provide your own custom HTTP JSON schema, you can configure distinct templates for both `location` and `geofence` data.  Evaulate variables in your template using Ruby `erb`-style tags:
+
+```erb
+<%= variable_name %>
+```
+
+Example:
 
 ```javascript
 bgGeo.configure({
@@ -103,7 +109,7 @@ bgGeo.configure({
   params: {
     myParams: {foo: 'bar'}
   },
-  locationTemplate: '{ "lat":{{latitude}}, "lng":{{longitude}} }',
+  locationTemplate: '{ "lat":<%= latitude %>, "lng":<%= longitude %> }',
   extras: {
     "location_extra_foo": "extra location data"
   }
@@ -124,27 +130,60 @@ POST /my_url
 }
 ```
 
+### Template Tags
+
+#### Common Tags
+
+The following template tags are common to both **`locationTemplate`** and **`geofenceTemplate`**:
+
+| Tag | Type | Description |
+|-----|------|-------------|
+| `latitude` | `Float` ||
+| `longitude` | `Float` ||
+| `speed` | `Float` | Meters|
+| `heading` | `Float` | Degress|
+| `accuracy` | `Float` | Meters|
+| `altitude` | `Float` | Meters|
+| `altitude_accuracy` | `Float` | Meters|
+| `timestamp` | `String` |ISO-8601|
+| `uuid` | `String` |Unique ID|
+| `event` | `String` |`motionchange|geofenee|heartbeat`
+| `odometer` | `Float` | Meters|
+| `activity.type` | `String` | `still|on_foot|running|on_bicycle|in_vehicle|unknown`|
+| `activity.confidence` | `Integer` | 0-100%|
+| `battery.level` | `Float` | 0-100%|
+| `battery.is_charging` | `Boolean` | Is device plugged in?|
+
+#### Geofence Tags
+
+The following template tags are specific to **`geofenceTemplate`** only:
+
+| Tag | Type | Description |
+|-----|------|-------------|
+| `geofence.identifier` | `String` | Which geofence?|
+| `geofence.action` | `String` | `ENTER|EXIT`|
+
 #### Quoting String Values
 
 You're completely responsible for `"quoting"` your own `String` values.  The following will generate a JSON parsing error:
 
 ```javascript
 bgGeo.configure({
-  locationTemplate: '{ "event":{{event}} }',
+  locationTemplate: '{ "event":<%= event %> }',
 });
 ```
 
 In the logs, you'll find:
 ```
 ‼️-[TSLocation templateError:template:] locationTemplate error: Invalid value around character 10.
-{ "event":{{event}} }
+{ "event":<%= event %> }
 ```
 
-To fix this, the `String` tag `{{event}}` must be wrapped in `""`:
+To fix this, the `String` tag `<%= event %>` must be wrapped in `""`:
 
 ```javascript
 bgGeo.configure({
-  locationTemplate: '{ "event":"{{event}}" }',
+  locationTemplate: '{ "event":"<%= event %>" }',
 });
 ```
 
@@ -154,13 +193,13 @@ bgGeo.configure({
 
 ```
 bgGeo.configure({
-  locationTemplate: '{ "is_moving":{{is_moving}}, "odometer":{{odometer}} }',
+  locationTemplate: '{ "is_moving":<%= is_moving %>, "odometer":<%= odometer %> }',
 });
 ```
 
 #### Array Templates
 
-You're not forced to define your templates as an **`{Object}`** -- You can define them as an **`[Array]`** too.
+You're not forced to define your templates as an **`{Object}`** &mdash; You can define them as an **`[Array]`** too.
 
 ```javascript
 bgGeo.configure({
@@ -169,7 +208,7 @@ bgGeo.configure({
   params: {
     myParams: {foo: 'bar'}
   },
-  locationTemplate: '[ {{latitude}}, {{longitude}} ]',
+  locationTemplate: '[ <%= latitude %>, <%= longitude %> ]',
   extras: {
     "location_extra_foo": "extra location data"
   }
@@ -194,7 +233,7 @@ POST /my_url
 
 #### Array Template with `httpRootProperty: "."`
 
-:exclamation: This case is tricky and should probably be avoided, particularly if you have configured `#params`, since there no place in the request JSON to append them.
+:warning: This case is tricky and should probably be avoided, particularly if you have configured `#params`, since there no place in the request JSON to append them.
 
 ```javascript
 bgGeo.configure({
@@ -203,7 +242,7 @@ bgGeo.configure({
   params: {
     myParams: {foo: 'bar'}
   },
-  locationTemplate: '[ {{latitude}}, {{longitude}} ]',
+  locationTemplate: '[<%=latitude%>, <%=longitude%>]',
   extras: {
     "location_extra_foo": "extra location data"
   }
@@ -221,36 +260,4 @@ bgGeo.configure({
 ]
 ```
 
-### Template Tags
-
-#### Common Tags
-
-The following template tags are common to both **`locationTemplate`** and **`geofenceTemplate`**:
-
-| Tag | Type | Description |
-|-----|------|-------------|
-| `{{latitude}}` | `Float` ||
-| `{{longitude}}` | `Float` ||
-| `{{speed}}` | `Float` | Meters|
-| `{{heading}}` | `Float` | Degress|
-| `{{accuracy}}` | `Float` | Meters|
-| `{{altitude}}` | `Float` | Meters|
-| `{{altitude_accuracy}}` | `Float` | Meters|
-| `{{timestamp}}` | `String` |ISO-8601|
-| `{{uuid}}` | `String` |Unique ID|
-| `{{event}}` | `String` |`motionchange|geofenee|heartbeat`
-| `{{odometer}}` | `Float` | Meters|
-| `{{activity.type}}` | `String` | `still|on_foot|running|on_bicycle|in_vehicle|unknown`|
-| `{{activity.confidence}}` | `Integer` | 0-100%|
-| `{{battery.level}}` | `Float` | 0-100%|
-| `{{battery.is_charging}}` | `Boolean` | Is device plugged in?|
-
-#### Geofence Tags
-
-The following template tags are specific to **`geofenceTemplate`** only:
-
-| Tag | Type | Description |
-|-----|------|-------------|
-| `{{geofence.identifier}}` | `String` | Which geofence?|
-| `{{geofence.action}}` | `String` | `ENTER|EXIT`|
 
