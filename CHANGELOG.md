@@ -2,6 +2,19 @@
 # Change Log
 
 ## [Unreleased]
+- [Fixed] `geofence` event not passing configured geofence `#extras`.
+- [Changed] Removed `taskId` from `geofence` event callback.  This change is backwards compatible.  If you want to do a long-running task, create your own `bgTask` with `#startBackgroundTask` (the plan is to remove `taskId` from **all** callbacks. Eg:
+
+```javascript
+bgGeo.on('geofence', function(geofence) {  // <-- taskId no longer provided!
+  // Start your own bgTask:
+  bgGeo.startBackgroundTask(function(taskId) {
+    performLongRunningTask(function() {
+      bgGeo.finish(taskId);
+    });
+  });
+});
+```
 
 ## [2.5.0] - 2017-02-21
 - [Fixed] iOS geofence identifiers containing ":" character were split and only the last chunk returned.  The plugin itself prefixes all geofences it creates with the string `TSGeofenceManager:` and the string-splitter was too naive.  Uses a `RegExp` replace to clear the plugin's internal prefix.
