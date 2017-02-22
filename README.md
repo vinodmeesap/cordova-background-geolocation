@@ -103,7 +103,7 @@ For those using `useSignificantChangesOnly: true`, possibly because Apple *denie
   <variable name="BACKGROUND_MODE_LOCATION" value="" />
 ```
 
-:warning If you *do* want the default behaviour of background-location updates, simply **IGNORE** this variable -- Do **NOT** even provide it.  If you *do* provide it, you must provide the full escaped XML value of `&lt;string&gt;location&lt;/string&gt;` (the default value when not provided), not just `location`.
+:warning: If you *do* want the default behaviour of background-location updates, simply **IGNORE** this variable -- Do **NOT** even provide it.  If you *do* provide it, you must provide the full escaped XML value of `&lt;string&gt;location&lt;/string&gt;` (the default value when not provided), not just `location`.
 
 ### Configure your license
 
