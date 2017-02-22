@@ -7,6 +7,22 @@ Follows the [Cordova Plugin spec](http://cordova.apache.org/docs/en/3.0.0/plugin
 
 This plugin leverages Cordova/PhoneGap's [require/define functionality used for plugins](http://simonmacdonald.blogspot.ca/2012/08/so-you-wanna-write-phonegap-200-android.html).
 
+## [:books: API Documentation](./docs/README.md)
+- :wrench: [Configuration Options](./docs/README.md#wrench-configuration-options)
+  + [Geolocation Options](./docs/README.md#wrench-geolocation-options)
+  + [Activity Recognition Options](./docs/README.md#wrench-activity-recognition-options)
+  + [HTTP & Persistence Options](./docs/README.md#wrench-http--persistence-options)
+  + [Geofencing Options](./docs/README.md#wrench-geofencing-options)
+  + [Application Options](./docs/README.md#wrench-application-options)
+- :zap: [Events](./docs/README.md#zap-events)
+- :small_blue_diamond: [Methods](./docs/README.md#large_blue_diamond-methods)
+- :blue_book: Guides
+  + [Philosophy of Operation](../../wiki/Philosophy-of-Operation)
+  + [Geofencing](./docs/geofencing.md)
+  + [HTTP Features](./docs/http.md)
+  + [Location Data Schema](../../wiki/Location-Data-Schema)
+  + [Debugging](../../wiki/Debugging)
+  
 ## Using the plugin ##
 The plugin creates the object `window.BackgroundGeolocation`.  See [API Documentation](docs) for details
   
@@ -47,7 +63,7 @@ The plugin requires configuration within your App's `config.xml`:
 ```
 ---
 
-:exclamation:**NOTE:** To apply changes to these `<variable />`, you **must** remove/re-add the plugin.
+:warning: To apply changes to these `<variable />`, you **must** remove/re-add the plugin.
 
 ---
 
@@ -87,7 +103,7 @@ For those using `useSignificantChangesOnly: true`, possibly because Apple *denie
   <variable name="BACKGROUND_MODE_LOCATION" value="" />
 ```
 
-**WARNING** If you *do* want the default behaviour of background-location updates, simply **IGNORE** this variable -- Do **NOT** even provide it.  If you *do* provide it, you must provide the full escaped XML value of `&lt;string&gt;location&lt;/string&gt;` (the default value when not provided), not just `location`.
+:warning If you *do* want the default behaviour of background-location updates, simply **IGNORE** this variable -- Do **NOT** even provide it.  If you *do* provide it, you must provide the full escaped XML value of `&lt;string&gt;location&lt;/string&gt;` (the default value when not provided), not just `location`.
 
 ### Configure your license
 
@@ -119,22 +135,10 @@ If building from your local machine (as you should be), ensure you have the foll
 
 ![](https://camo.githubusercontent.com/e0394b09555896127b96e70e2a62dedc932e3236/68747470733a2f2f7777772e64726f70626f782e636f6d2f732f356c37316d766333377971726271682f53637265656e73686f74253230323031352d31312d313225323030362e33342e30362e706e673f646c3d31)
 
-# Documentation
-- [API Documentation](./docs/README.md)
-- [Advanced Geofencing Features](./docs/geofencing.md)
-- [HTTP Features](./docs/http.md)
-- [Location Data Schema](../../wiki/Location-Data-Schema)
-- [Debugging Sounds](../../wiki/Debug-Sounds)
-- [Background Tasks](../../wiki/Background-Tasks)
-
-## Help
-
-[See the Wiki](https://github.com/transistorsoft/cordova-background-geolocation/wiki)
 
 ## Example
 
-```Javascript
-
+```javascript
 ////
 // As with all Cordova plugins, you must configure within an #deviceready callback.
 //
@@ -205,7 +209,6 @@ function onDeviceReady() {
     });
 }
 
-
 ```
 
 ## Advanced Sample Application for Field-testing
@@ -217,64 +220,6 @@ A fully-featured [SampleApp](https://github.com/transistorsoft/cordova-backgroun
 
 If you're using XCode, boot the SampleApp in the iOS Simulator and enable ```Debug->Location->City Drive```.
 
-## Help!  It doesn't work!
-
-Yes it does.  [See the Wiki](https://github.com/transistorsoft/cordova-background-geolocation/wiki)
-
-- on iOS, background tracking won't be engaged until you travel about **2-3 city blocks**, so go for a walk or car-ride (or use the Simulator with ```Debug->Location->City Drive```)
-- Android is much quicker detecting movements; typically several meters of walking will do it.
-- When in doubt, **nuke everything**:  First delete the app from your device (or simulator)
-
-```
-$ cordova plugin remove com.transistorsoft.cordova.background-geolocation
-$ cordova plugin add git@github.com:transistorsoft/cordova-background-geolocation.git
-
-$ cordova platform remove ios
-$ cordova platform add ios
-$ cordova build ios
-
-```
-
-## Behaviour
-
-The plugin has features allowing you to control the behaviour of background-tracking, striking a balance between accuracy and battery-usage.  In stationary-mode, the plugin attempts to descrease its power usage and accuracy by setting up a circular stationary-region of configurable #stationaryRadius.  
-
-The plugin has two states of operation:  **MOVING** and **STATIONARY**.  The plugin *desires* to be in the **STATIONARY** state.  When the plugin is first turned on with the `#start` method, the plugin immediately fetches a high-accuracy location and enters the **STATIONARY** state, when it turns **OFF** location-services.  The plugin will stay in this state until it detects the device is moving.
-
-When the plugin is detected to be **MOVING**, it will begin sending locations to your configured `location` listener:
-
-```Javascript
-bgGeo.on("motionchange", function(isMoving, location, taskId) {
-  console.log("motion state changed: ", isMoving, location);
-  bgGeo.finish(taskId);
-});
-
-bgGeo.on("location", function(location, taskId) {
-  console.log('- Location: ', location);
-});
-```
-
-Both iOS & Android use a SQLite database to persist **every** recorded location so you don't have to worry about persistence when no network is detected.  The plugin provides a Javascript API to fetch `#getLocations` and destroy the records in the database `#destroyLocations`.  In addition, the plugin has an optional HTTP layer allowing allowing you to automatically HTTP POST recorded geolocations to your server; the plugin will automatically keep trying to sync to your server until it receives a successful HTTP response code (`200, 201, 204`).
-
-The function [`#changePace(isMoving, success, failure)`](docs#changepaceenabled-successfn-failurefn) is provided to force the plugin to enter **MOVING** or **STATIONARY** state.
-
-When the device is determined to be stopped in the same position for `#stopTimeout` minutes, the plugin will change state to **STATIONARY**, fetch a high-accuracy location, fire the `motionchange` event and turn **OFF** location-services.
-
-## iOS
-
-While in the **STATIONARY** state, iOS monitors a geofence around the current-position of `#stationaryRadius` meters (min 25).  However, in practice, iOS won't trigger this stationary geofence until the device has moved ~100-200 meters beyond the stationary position.  Once this stationary-geofence triggers, the plugin changes state to **MOVING**, turns on location services and begins recording a location each `#distanceFilter` meters.  Your app is completely awake in the background.
-
-When the plugin detects the device has moved beyond its configured #stationaryRadius, it engages the native platform's geolocation system for aggressive monitoring according to the configured `#desiredAccuracy`, `#distanceFilter`.
-
-### [iOS `preventSuspend` mode](docs#param-boolean-preventsuspend-false)
-
-iOS has a **specialized** config-option called [`preventSuspend: true`](docs#param-boolean-preventsuspend-false).  This mode will keep your iOS app running constantly in the background, 24/7.  While in this mode, iOS does **NOT** require the "100-200" meters of movement to detect the device is moving, instead, it will constantly monitor the device movement using accelerometer/gyroscope APIs, making it highly sensitive to movement detection and `motionchange` trigger.  **NOTE** care **MUST** be taken with this mode since it *will* consume more energy.
-
-## Android
-
-Android uses the Google Play Services APIs [FusedLocationProvider API](https://developer.android.com/reference/com/google/android/gms/location/FusedLocationProviderApi.html) as well as the [ActivityRecognition API](https://developer.android.com/reference/com/google/android/gms/location/ActivityRecognitionApi.html) (for movement/stationary detection). 
-
-Unlike iOS, Android does not require a stationary-geofence to determine when the device is moving.  Instead it constantly monitors the [ActivityRecognition API](https://developer.android.com/reference/com/google/android/gms/location/ActivityRecognitionApi.html) provided by [Google Play Services](https://developer.android.com/google/play-services/index.html).  Android will constantly monitor [the nature](https://developer.android.com/reference/com/google/android/gms/location/DetectedActivity.html) of the device's movement at a sampling-rate configured by `#activityRecognitionRate`.  When the plugin sees a DetectedActivity of [STILL](https://developer.android.com/reference/com/google/android/gms/location/DetectedActivity.html), location-updates will be halted -- when it sees `IN_VEHICLE, ON_BICYCLE, ON_FOOT, RUNNING, WALKING`, location-updates will be initiated.
 
 ## Licence ##
 ```
