@@ -1488,7 +1488,7 @@ BackgroundGeolocation.on('schedule', function(state) {
 
 ###`configure(config, successFn, failureFn)`
 
-This is the **most** important method of the API.  **`#configure`** must be called only **once** for the lifetime of you application, providing the initial [configuration options](#wrench-configuration-options).  The **`successFn`** will be executed after the plugin has successfully configured.
+This is the **most** important method of the API.  **`#configure`** must be called **once** (and *only* once) **each time** your application boots, providing the initial [configuration options](#wrench-configuration-options).  The **`successFn`** will be executed after the plugin has successfully configured.
 
 If you later need to re-configure the plugin's [config options](#wrench-configuration-options), use the [`setConfig`](#setconfigconfig-successfn-failurefn) method.
 
