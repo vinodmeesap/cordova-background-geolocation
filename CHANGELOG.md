@@ -1,6 +1,6 @@
 
 # Change Log
-## [2.5.2] - 2017-03-01
+## [2.5.3] - 2017-03-01
 - [Changed] Refactor Android settings-management.  Plugin will always load previously known state as soon as plugin comes alive.  `#configure` will reset all settings to default before applying supplied `{Config}`.
 - [Fixed] Android database migration issue when upgrading from a very old version missed `geofences` table migration.
 
