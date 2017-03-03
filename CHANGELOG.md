@@ -1,5 +1,8 @@
 
 # Change Log
+## [Unreleased]
+- [Added] The Android plugin now broadcasts all its events using the Android `BroadcastReceiver` mechanism.  You're free to implement your own native Android handler to receive and react to these events as you wish.
+
 ## [2.5.3] - 2017-03-01
 - [Changed] Refactor Android settings-management.  Plugin will always load previously known state as soon as plugin comes alive.  `#configure` will reset all settings to default before applying supplied `{Config}`.
 - [Fixed] Android database migration issue when upgrading from a very old version missed `geofences` table migration.
