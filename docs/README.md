@@ -136,7 +136,7 @@ BackgroundGeolocation.setConfig({
 
 | Option      | Type      | Default   | Note                              |
 |-------------|-----------|-----------|-----------------------------------|
-| [`stopOnTerminate`](#config-boolean-stoponterminate-true) | `Boolean` |  `true` | Set `true` to continue tracking after user teminates the app. |
+| [`stopOnTerminate`](#config-boolean-stoponterminate-true) | `Boolean` |  `true` | Set `false` to continue tracking after user teminates the app. |
 | [`startOnBoot`](#config-boolean-startonboot-false) | `Boolean` | `false` | Set to `true` to enable background-tracking after the device reboots. |
 | [`heartbeatInterval`](#config-integer-heartbeatinterval-undefined) | `Integer` | `60` | Rate in **seconds** to fire [`heartbeat`](#heartbeat) events. |
 | [`schedule`](#config-array-schedule-undefined) | `Array` | `undefined` | Defines a schedule to automatically start/stop tracking at configured times |
