@@ -1,6 +1,7 @@
 
 # Change Log
 ## [Unreleased]
+- [Fixed] iOS bug with HTTP `401` handling.
 - [Added] The Android plugin now broadcasts all its events using the Android `BroadcastReceiver` mechanism.  You're free to implement your own native Android handler to receive and react to these events as you wish.
 
 ## [2.5.3] - 2017-03-01
