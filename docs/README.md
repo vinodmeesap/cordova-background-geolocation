@@ -1723,6 +1723,8 @@ BackgroundGeolocation.getCurrentPosition(succesFn, function(errorCode) {
 
 Start a stream of continuous location-updates.  The native code will persist the fetched location to its SQLite database just as any other location in addition to POSTing to your configured [`#url`](#config-string-url-undefined) (if you've enabled the HTTP features).
 
+:warning: **`#watchPosition`** is **not** reccommended for **long term** monitoring in the background &mdash; It's primarily designed for use in the foreground **only**.  You might use it for fast-updates of the user's current position on the map, for example.
+
 **iOS**
 - **`#watchPosition`** will continue to run in the background, preventing iOS from suspending your application.  Take care to listen to `suspend` event and call [`#stopWatchPosition`](stopwatchpositionsuccessfn-failurefn) if you don't want your app to keep running (TODO make this configurable).
 - There is **no** **`bgTask`** provided to the callback.
@@ -1739,14 +1741,22 @@ Start a stream of continuous location-updates.  The native code will persist the
 #####`@param {Object} location` The Location data
 
 ```javascript
-BackgroundGeolocation.watchPosition(function(location) {
-  console.log(“- Watch position: “, location);
-}, function(errorCode) {
-  alert('An location error occurred: ' + errorCode);
-}, {
-  interval: 5000,    // <-- retrieve a location every 5s.
-  persist: false,    // <-- default is true
-});
+// Start watching position when app comes to foreground
+onAppResume() {
+  BackgroundGeolocation.watchPosition(function(location) {
+    console.log(“- Watch position: “, location);
+  }, function(errorCode) {
+    alert('An location error occurred: ' + errorCode);
+  }, {
+    interval: 1000,    // <-- retrieve a location every 5s.
+    persist: false,    // <-- default is true
+  });
+}
+
+// Stop watching position when app moves to background
+onAppSuspend() {
+  BackgroundGeolocation.stopWatchPosition();
+}
 
 ```
 
