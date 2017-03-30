@@ -995,16 +995,16 @@ BackgroundGeolocation.configure({
 BackgroundGeolocation.on('schedule', function(state) {
   console.log('- Schedule event, enabled:', state.enabled);
 
-  if (state.enabled) {
-    // tracking started!
-  } else {
-    // tracking stopped
+  if (!state.schedulerEnabled) {
+    BackgroundGeolocation.startSchedule();
   }
 });
 
 // Later when you want to stop the Scheduler (eg: user logout)
 BackgroundGeolocation.stopSchedule(function() {
   console.info('- Scheduler stopped');
+  // You must explicitly stop tracking if currently enabled
+  BackgroundGeolocation.stop();
 });
 
 // Or modify the schedule with usual #setConfig method
@@ -1582,7 +1582,16 @@ Disable location tracking.  Supplied **`successFn`** will be executed when track
 BackgroundGeolocation.stop();
 ```
 
-:warning: If you've configured a [`schedule`](config-array-schedule-undefined), **`#stop`** will halt the Scheduler as well.
+:warning: If you've configured a [`schedule`](config-array-schedule-undefined), **`#stop`** will **not** halt the Scheduler.  You must explicitly stop the Scheduler as well:
+
+```javascript
+// Later when you want to stop the Scheduler (eg: user logout)
+BackgroundGeolocation.stopSchedule(function() {
+  console.info('- Scheduler stopped');
+  // You must explicitly stop tracking if currently enabled
+  BackgroundGeolocation.stop();
+});
+```
 
 ------------------------------------------------------------------------------
 
@@ -1852,6 +1861,16 @@ BackgroundGeolocation.stopSchedule(function() {
 });
 ```
 
+:warning: **`#stopSchedule`** will not execute **`#stop`** if the plugin is currently tracking.  You must explicitly execute `#stop`.
+
+```javascript
+// Later when you want to stop the Scheduler (eg: user logout)
+BackgroundGeolocation.stopSchedule(function() {
+  // You must explicitly stop tracking if currently enabled
+  BackgroundGeolocation.stop();
+});
+```
+
 ------------------------------------------------------------------------------
 
 
@@ -2111,9 +2130,9 @@ Adds a geofence to be monitored by the native plugin.  If a geofence *already ex
 
 ##### `@config {Boolean} notifyOnEntry` Whether to listen to ENTER events
 
-##### `@config {Boolean} notifyOnDwell` (**Android only**) Whether to listen to DWELL events
+##### `@config {Boolean} notifyOnDwell` Whether to listen to DWELL events
 
-##### `@config {Integer milliseconds} loiteringDelay` (**Android only**) When `notifyOnDwell` is `true`, the delay before DWELL event is fired after entering a geofence (@see [Creating and Monitoring Geofences](https://developer.android.com/training/location/geofencing.html))
+##### `@config {Integer milliseconds} loiteringDelay` When `notifyOnDwell` is `true`, the delay before DWELL event is fired after entering a geofence (@see [Creating and Monitoring Geofences](https://developer.android.com/training/location/geofencing.html))
 
 ##### `@config {Object} extras` Optional arbitrary meta-data.
 
