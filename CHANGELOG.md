@@ -1,6 +1,7 @@
 
 # Change Log
 ## [Unreleased]
+- [Added] New config param `locationsOrderDirection [ASC|DESC]` for controlling the order that locations are selected from the database (and syned to your server)
 - [Added] iOS now supports geofence `DWELL` with `loiteringDelay` with my own custom implementation, just as Android does natively.
 
 ## [2.6.0] - 2017-03-09
