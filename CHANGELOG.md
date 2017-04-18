@@ -1,6 +1,7 @@
 
 # Change Log
 ## [2.6.1] - 2017-04-18
+- [Fixed] Android was rounding `battery_level` to 1 decimal place
 - [Fixed] iOS geofences-only mode was not using significant-location-change events to evaluate geofences within proximity.
 - [Changed] iOS now uses `CLLocationManager requestLocation` to request the `motionchange` position, rather than counting samples.  This is a more robust way to get a single location
 - [Fixed] iOS crash when providing `null` values in `Object` config options (ie: `#extras`, `#params`, `#headers`, etc)
