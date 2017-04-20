@@ -1,5 +1,8 @@
 
 # Change Log
+- [Changed] iOS minimum version is now `8.4`.  Plugin will log an error when used on versions of iOS that don't implement the method `CLLocationManager#requestLocation`
+- [Fixed] iOS bug executing `#setConfig` multiple times too quickly can crash the plugin when multiple threads attempt to modify an `NSMutableDictionary`
+
 ## [2.6.1] - 2017-04-18
 - [Fixed] Android was rounding `battery_level` to 1 decimal place
 - [Fixed] iOS geofences-only mode was not using significant-location-change events to evaluate geofences within proximity.
