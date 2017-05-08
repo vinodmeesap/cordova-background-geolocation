@@ -1,5 +1,10 @@
 
 # Change Log
+
+## [2.7.0] - 2017-05-08
+- [Fixed] Improve switching between tracking-mode location and geofence.  It's not necessary to call `#stop` before executing `#start` / `#startGeofences`.
+- [Fixed] iOS issue with `cordova-plugin-cocoalumberjack` dependency issue with Cordova 7.0:  plugin version (should be `~0.0.2`, not `^0.0.2`)
+- [Fixed] iOS `maximumAge` with `getCurrentPosition` wasn't clearing the callbacks when current-location-age was `<= maximumAge`
 - [Fixed] iOS when `#stop` is executed, nullify the odometer reference location.
 - [Fixed] iOS issue with `preventSuspend: true`:  When a `motionchange` event with `is_moving: false` occurred, the event was incorrectly set to `heartbeat` instead of `motionchange`.
 - [Fixed] Android null pointer exception when using `startOnBoot: true, forceReloadOnBoot: true`:  there was a case where last known location failed to return a location.  The lib will check for null location in this case.
