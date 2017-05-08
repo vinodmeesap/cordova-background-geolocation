@@ -306,7 +306,7 @@ The minimum distance (measured in meters) a device must move horizontally before
 
 However, by default, **`distanceFilter`** is elastically auto-calculated by the plugin:  When speed increases, **`distanceFilter`** increases;  when speed decreases, so too does **`distanceFilter`**.  
 
-:information_source: To disable this behaviour, configure [`disableElasticity: true`](https://github.com/transistorsoft/cordova-background-geolocation/tree/docs/docs#config-boolean-disableelasticity-false)
+:information_source: To disable this behaviour, configure [`disableElasticity: true`](#config-boolean-disableelasticity-false)
 
 **`distanceFilter`** is auto calculated by rounding speed to the nearest `5 m/s` and adding **`distanceFilter`** meters for each `5 m/s` increment.
 
