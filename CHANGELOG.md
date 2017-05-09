@@ -2,6 +2,7 @@
 # Change Log
 
 ## [2.7.0] - 2017-05-08
+- [Added] When iOS detects a network connection with `autoSync: true`, an HTTP flush will be initiated.
 - [Fixed] Improve switching between tracking-mode location and geofence.  It's not necessary to call `#stop` before executing `#start` / `#startGeofences`.
 - [Fixed] iOS issue with `cordova-plugin-cocoalumberjack` dependency issue with Cordova 7.0:  plugin version (should be `~0.0.2`, not `^0.0.2`)
 - [Fixed] iOS `maximumAge` with `getCurrentPosition` wasn't clearing the callbacks when current-location-age was `<= maximumAge`
