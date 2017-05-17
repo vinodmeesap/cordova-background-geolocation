@@ -14,11 +14,13 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.io.ByteArrayOutputStream;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import java.util.zip.GZIPOutputStream;
 
 import org.apache.cordova.CallbackContext;
 import org.apache.cordova.CordovaPlugin;
@@ -786,23 +788,6 @@ public class CDVBackgroundGeolocation extends CordovaPlugin {
         }
     }
 
-    private String readLog() {
-        try {
-            Process process = Runtime.getRuntime().exec("logcat -d");
-            BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(process.getInputStream()));
-
-            StringBuilder log = new StringBuilder();
-            String line = "";
-            while ((line = bufferedReader.readLine()) != null) {
-                log.append(line + "\n");
-            }
-            return log.toString();
-        }
-        catch (IOException e) {
-            e.printStackTrace();
-            return null;
-        }
-    }
     private void getLog(CallbackContext callbackContext) {
         getAdapter().getLog(new GetLogCallback(callbackContext));
     }
@@ -837,53 +822,70 @@ public class CDVBackgroundGeolocation extends CordovaPlugin {
         }
     }
 
-    private void emailLog(final CallbackContext callback, final String email) {
-        cordova.getThreadPool().execute(new Runnable() {
-            public void run() {
-                String log = readLog();
-                if (log == null) {
-                    callback.error(500);
-                    return;
-                }
+    private class EmailLogCallback implements TSCallback {
+        private CallbackContext callbackContext;
+        private String email;
+        public EmailLogCallback(CallbackContext _callbackContext, String _email) {
+            callbackContext = _callbackContext;
+            email = _email;
+        }
+        @Override
+        public void success(Object result) {
+            String log = (String) result;
+            
+            Intent mailer = new Intent(Intent.ACTION_SEND);
+            mailer.setType("message/rfc822");
+            mailer.putExtra(Intent.EXTRA_EMAIL, new String[]{email});
+            mailer.putExtra(Intent.EXTRA_SUBJECT, "BackgroundGeolocation log");
 
-                Intent mailer = new Intent(Intent.ACTION_SEND);
-                mailer.setType("message/rfc822");
-                mailer.putExtra(Intent.EXTRA_EMAIL, new String[]{email});
-                mailer.putExtra(Intent.EXTRA_SUBJECT, "BackgroundGeolocation log");
-
-                try {
-                    JSONObject state = getState();
-                    mailer.putExtra(Intent.EXTRA_TEXT, state.toString(4));
-                } catch (JSONException e) {
-                    Log.w(TAG, "- Failed to write state to email body");
-                    e.printStackTrace();
-                }
-                File file = new File(Environment.getExternalStorageDirectory(), "background-geolocation.log");
-                try {
-                    FileOutputStream stream = new FileOutputStream(file);
-                    try {
-                        stream.write(log.getBytes());
-                        stream.close();
-                        mailer.putExtra(Intent.EXTRA_STREAM, Uri.fromFile(file));
-                        file.deleteOnExit();
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                    }
-                } catch (FileNotFoundException e) {
-                    Log.i(TAG, "FileNotFound");
-                    e.printStackTrace();
-                }
-
-                try {
-                    cordova.getActivity().startActivityForResult(Intent.createChooser(mailer, "Send log: " + email + "..."), 1);
-                    callback.success();
-                } catch (android.content.ActivityNotFoundException ex) {
-                    Toast.makeText(cordova.getActivity(), "There are no email clients installed.", Toast.LENGTH_SHORT).show();
-                    callback.error("There are no email clients installed");
-                }
+            try {
+                JSONObject state = getState();
+                mailer.putExtra(Intent.EXTRA_TEXT, state.toString(4));
+            } catch (JSONException e) {
+                Log.w(TAG, "- Failed to write state to email body");
+                e.printStackTrace();
             }
-        });
+            File file = new File(Environment.getExternalStorageDirectory(), "background-geolocation.log.gz");
+            try {
+                FileOutputStream stream = new FileOutputStream(file);
+                try {
+                    // Compresss log
+                    ByteArrayOutputStream os = new ByteArrayOutputStream(log.length());
+                    GZIPOutputStream gos = new GZIPOutputStream(os);
+                    gos.write(log.getBytes());
+                    gos.close();
+                    byte[] compressed = os.toByteArray();
+                    os.close();
+
+                    stream.write(compressed);
+                    stream.close();
+                    mailer.putExtra(Intent.EXTRA_STREAM, Uri.fromFile(file));
+                    file.deleteOnExit();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            } catch (FileNotFoundException e) {
+                Log.i(TAG, "FileNotFound");
+                e.printStackTrace();
+            }
+
+            try {
+                cordova.getActivity().startActivityForResult(Intent.createChooser(mailer, "Send log: " + email + "..."), 1);
+                callbackContext.success();
+            } catch (android.content.ActivityNotFoundException ex) {
+                Toast.makeText(cordova.getActivity(), "There are no email clients installed.", Toast.LENGTH_SHORT).show();
+                callbackContext.error("There are no email clients installed");
+            }
+        }
+        public void error(Object error) {
+            callbackContext.error((String)error);
+        }
     }
+
+    private void emailLog(final CallbackContext callback, final String email) {
+        getAdapter().getLog(new EmailLogCallback(callback, email));
+    }
+
     public void onPause(boolean multitasking) {
         Log.i(TAG, "- onPause");
     }

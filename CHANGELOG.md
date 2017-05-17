@@ -1,5 +1,7 @@
 
 # Change Log
+- [Fixed] Android `emailLog` method was using old `adb logcat` method of fetching logs rather than fetching from `#getLog`
+
 ## [2.7.1] - 2017-05-12
 - [Fixed] iOS has a new hook to execute an HTTP flush when network reachability is detected.  However, it was not checking if `autoSync: true` or state of `autoSyncThreshold`.
 
