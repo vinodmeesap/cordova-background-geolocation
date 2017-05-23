@@ -61,11 +61,16 @@ The plugin requires configuration within your App's `config.xml`:
   .
 </widget>
 ```
+
+:warning: To apply changes to these `<variable />`, you **must** remove/re-add the plugin (**append `--nosave` when removing the plugin**)
+
+```
+$ cordova plugin remove cordova-background-geolocation --nosave
+$ cordova plugin add https://github.com/transistorsoft/cordova-background-geolocation.git
+```
+
 ---
 
-:warning: To apply changes to these `<variable />`, you **must** remove/re-add the plugin.
-
----
 
 ### Disabling Background "location"
 
