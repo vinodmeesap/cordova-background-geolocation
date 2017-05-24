@@ -2,7 +2,7 @@
 # Change Log
 
 ## [Unreleased]
-
+- [Fixed] Ensure iOS background "location" capability is enabled before asking `CLLocationManager` to `setBackgroundLocationEnabled`.
 - [Added] Implement ability to provide literal dates to schedule (eg: `2017-06-01 09:00-17:00`) 
 - [Added] When Android motion-activity handler detects `stopTimeout` has expired, it will initiate a `motionchange` without waiting for the `stopTimeout` timer to expire (there were cases where the `stopTimeout` timer could be delayed from firing due likely to vendor-based battery-saving software)
 - [Fixed] Android `emailLog` method was using old `adb logcat` method of fetching logs rather than fetching from `#getLog`
