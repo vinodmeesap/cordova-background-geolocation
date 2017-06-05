@@ -115,6 +115,7 @@ BackgroundGeolocation.setConfig({
 | Option      | Type      | Default   | Note                              |
 |-------------|-----------|-----------|-----------------------------------|
 | [`url`](#config-string-url-undefined) | `String` | `null` | Your server url where you wish to HTTP POST locations to |
+| [`httpTimeout`](#config-integer-httptimeout-60000) | `Integer` | `60000` | HTTP request timeout in milliseconds. |
 | [`params`](#config-object-params) | `Object` | `null` | Optional HTTP params sent along in HTTP request to above [`#url`](#config-string-url-undefined) |
 | [`extras`](#config-object-extras) | `Object` | `null` | Optional meta-data to attach to *each* recorded location |
 | [`headers`](#config-object-headers) | `Object` | `null` | Optional HTTP headers sent along in HTTP request to above [`#url`](#config-string-url-undefined) |
@@ -618,6 +619,25 @@ BackgroundGeolocation.configure({
 :blue_book: See [HTTP Guide](http.md) for more information.
 
 :warning: It is highly recommended to let the plugin manage uploading locations to your server, **particularly for Android** when configured with **`stopOnTerminate: false`**, since your Cordova app (where your Javascript lives) *will* terminate &mdash; only the plugin's native Android background service will continue to operate, recording locations and uploading to your server.  The plugin's native HTTP service *is* better at this task than Javascript Ajax requests, since the plugin will automatically retry on server failure.
+
+------------------------------------------------------------------------------
+
+#### `@config {Integer} httpTimeout [60000]`
+
+HTTP request timeout in **milliseconds**.  The `http` **`failureFn`** will execute when an HTTP timeout occurs.  Defaults to `60000 ms` (1 minute).
+
+```javascript
+BackgroundGeolocation.on('http', function(request) {
+  console.log('HTTP SUCCESS: ', response);
+}, function(request) {
+  console.log('HTTP FAILURE', response);
+});
+
+BackgroundGeolocation.configure({
+  url: 'http://my-server.com/locations',
+  httpTimeout: 3000
+});
+```
 
 ------------------------------------------------------------------------------
 
@@ -2376,38 +2396,11 @@ Fetches the entire contents of the current circular-log and return it as a Strin
 
 ```javascript
 BackgroundGeolocation.getLog(function(log) {
-  console.log(log);
-  // or convert to an Array
-  var lines = log.split("\n");
-  console.log(lines);
+  console.log(log);  // <-- send log to console.  copy/paste result into your own text file.
 });
 ```
 
 ------------------------------------------------------------------------------
-
-
-### `destroyLog(successFn, failureFn)`
-
-Destory the entire contents of Log database.
-
-```javascript
-BackgroundGeolocation.destroyLog(function() {
-  console.log('- Destroyed log');
-}, function() {
-  console.log('- Destroy log failure');
-});
-```
-
-#### `successFn` Parameters
-
-None
-
-#### `failureFn` Parameters
-
-None
-
-------------------------------------------------------------------------------
-
 
 ### `emailLog(email, callbackFn)`
 
@@ -2444,6 +2437,26 @@ BackgroundGeolocation.emailLog("foo@bar.com");
 2. Grant "Storage" permission `Settings->Apps->[Your App]->Permissions: (o) Storage`
 
 ![](https://dl.dropboxusercontent.com/u/2319755/cordova-background-geolocaiton/Screenshot_20160218-183345.png)
+
+### `destroyLog(successFn, failureFn)`
+
+Destory the entire contents of Log database.
+
+```javascript
+BackgroundGeolocation.destroyLog(function() {
+  console.log('- Destroyed log');
+}, function() {
+  console.log('- Destroy log failure');
+});
+```
+
+#### `successFn` Parameters
+
+None
+
+#### `failureFn` Parameters
+
+None
 
 ------------------------------------------------------------------------------
 
