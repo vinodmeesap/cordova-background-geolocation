@@ -67,6 +67,7 @@ BackgroundGeolocation.setConfig({
 | [`desiredAccuracy`](#config-integer-desiredaccuracy-0-10-100-1000-in-meters) | `Integer` | `0` | Specify the desired-accuracy of the geolocation system with 1 of 4 values, `0`, `10`, `100`, `1000` where `0` means **HIGHEST POWER, HIGHEST ACCURACY** and `1000` means **LOWEST POWER, LOWEST ACCURACY** |
 | [`distanceFilter`](#config-integer-distancefilter) | `Integer` | `10` | The minimum distance (measured in meters) a device must move horizontally before an update event is generated. |
 | [`stopAfterElapsedMinutes`](#config-integer-stopafterelapsedminutes) | `Integer`  | `0`  | The plugin can optionally automatically stop tracking after some number of minutes elapses after the [`#start`](#startsuccessfn-failurefn) method was called. |
+| [`stopOnStationary`](#config-boolean-stoponstationary) | `Boolean`  | `false`  | The plugin can optionally automatically stop tracking when the `stopTimeout` timer elapses. |
 | [`desiredOdometerAccuracy`](#config-integer-desiredodometeraccuracy-100) | `Integer`  | `100`  | Location accuracy threshold in **meters** for odometer calculations. |
 
 
@@ -157,7 +158,8 @@ BackgroundGeolocation.setConfig({
 | [`notificationTitle`](#config-string-notificationtitle-app-name) | `String` | "Your App Name" | When running the service with [`foregroundService: true`](#config-boolean-foregroundservice-false), Android requires a persistent notification in the Notification Bar.  Defaults to the application name |
 | [`notificationText`](#config-string-notificationtext-location-service-activated) | `String` |  "Location service activated" | When running the service with [`foregroundService: true`](#config-boolean-foregroundservice-false), Android requires a persistent notification in the Notification Bar.|
 | [`notificationColor`](#config-string-notificationcolor-null) | `String` | `null` | When running the service with [`foregroundService: true`](#config-boolean-foregroundservice-false), controls the color of the persistent notification in the Notification Bar. |
-| [`notificationIcon`](#config-string-notificationicon-app-icon) | `String` |  Your App Icon | When running the service with [`foregroundService: true`](#config-boolean-foregroundservice-false), controls your customize notification icon.  Defaults to your application icon.|
+| [`notificationSmallIcon`](#config-string-notificationsmallicon-app-icon) | `String` |  Your App Icon | When running the service with [`foregroundService: true`](#config-boolean-foregroundservice-false), controls your customize notification *small* icon.  Defaults to your application icon.|
+| [`notificationLargeIcon`](#config-string-notificationlargeicon-undefined) | `String` |  `undefined` | When running the service with [`foregroundService: true`](#config-boolean-foregroundservice-false), controls your customize notification *large* icon.  Defaults to `undefined`.|
 | [`forceReloadOnMotionChange`](#config-boolean-forcereloadonmotionchange-false) | `Boolean` | `false` |  Launch your app whenever the [`#motionchange`](#motionchange) event fires. |
 | [`forceReloadOnLocationChange`](#config-boolean-forcereloadonlocationchange-false) | `Boolean` | `false` |  Launch your app whenever the [`#location`](#location) event fires. |
 | [`forceReloadOnGeofence`](#config-boolean-forcereloadongeofence-false) | `Boolean` | `false` |  Launch your app whenever the [`#geofence`](#geofence) event fires. |
@@ -358,6 +360,22 @@ BackgroundGeolocation.configure({
   stopAfterElapsedMinutes: 30
 }, function(state) {
   BackgroundGeolocation.start();  // <-- plugin will automatically #stop in 30 minutes
+});
+```
+
+------------------------------------------------------------------------------
+
+#### `@config {Boolean} stopOnStationary`
+
+The plugin can optionally automatically stop tracking when the `stopTimeout` timer elapses.  For example, when the plugin first detects a `motionchange` into the "moving" state, the next time a `motionchange` event occurs into the "stationary" state, the plugin will have automatically called `#stop` upon itself.
+
+:warning: `stopOnStationary` will **only** occur due to `stopTimeout` elapse.  It will **not** occur by manually executing `changePace(false)`.
+
+```javascript
+BackgroundGeolocation.configure({
+  stopOnStationary: true
+}, function(state) {
+  BackgroundGeolocation.start();
 });
 ```
 
@@ -1176,9 +1194,35 @@ When running the service with [`foregroundService: true`](#config-boolean-foregr
 
 ------------------------------------------------------------------------------
 
-#### `@config {String} notificationIcon [app icon]`
+#### `@config {String} notificationSmallIcon [app icon]`
 
-When running the service with [`foregroundService: true`](#config-boolean-foregroundservice-false), Android requires a persistent notification in the Notification Bar.  This allows you customize that icon.  Defaults to your application icon.  **NOTE** You must specify the **`type`** of resource you wish to use in the following format:
+When running the service with [`foregroundService: true`](#config-boolean-foregroundservice-false), Android requires a persistent notification in the Notification Bar.  This allows you customize that icon.  Defaults to your application icon.  **NOTE** You must specify the **`type`** (`drawable|mipmap`) of resource you wish to use in the following format:
+
+`{type}/icon_name`, 
+
+:warning: Do not append the file-extension (eg: `.png`)
+
+eg:
+
+```javascript
+// 1. drawable
+BackgroundGeolocation.configure({
+  notificationIcon: "drawable/my_custom_notification_small_icon"
+});
+
+// 2. mipmap
+BackgroundGeolocation.configure({
+  notificationIcon: "mipmap/my_custom_notification_small_icon"
+});
+```
+
+------------------------------------------------------------------------------
+
+#### `@config {String} notificationLargeIcon [undefined]`
+
+When running the service with [`foregroundService: true`](#config-boolean-foregroundservice-false), Android requires a persistent notification in the Notification Bar.  This allows you customize that icon.  Defaults to `undefined`.  **NOTE** You must specify the **`type`** (`drawable|mipmap`) of resource you wish to use in the following format:
+
+:warning: Do not append the file-extension (eg: `.png`)
 
 `{type}/icon_name`, 
 
@@ -1187,12 +1231,12 @@ eg:
 ```javascript
 // 1. drawable
 BackgroundGeolocation.configure({
-  notificationIcon: "drawable/my_custom_notification_icon"
+  notificationIcon: "drawable/my_custom_notification_large_icon"
 });
 
 // 2. mipmap
 BackgroundGeolocation.configure({
-  notificationIcon: "mipmap/my_custom_notification_icon"
+  notificationIcon: "mipmap/my_custom_notification_large_icon"
 });
 ```
 
