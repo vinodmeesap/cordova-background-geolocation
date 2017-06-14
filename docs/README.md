@@ -1207,12 +1207,12 @@ eg:
 ```javascript
 // 1. drawable
 BackgroundGeolocation.configure({
-  notificationIcon: "drawable/my_custom_notification_small_icon"
+  notificationSmallIcon: "drawable/my_custom_notification_small_icon"
 });
 
 // 2. mipmap
 BackgroundGeolocation.configure({
-  notificationIcon: "mipmap/my_custom_notification_small_icon"
+  notificationSmallIcon: "mipmap/my_custom_notification_small_icon"
 });
 ```
 
@@ -1231,12 +1231,12 @@ eg:
 ```javascript
 // 1. drawable
 BackgroundGeolocation.configure({
-  notificationIcon: "drawable/my_custom_notification_large_icon"
+  notificationLargeIcon: "drawable/my_custom_notification_large_icon"
 });
 
 // 2. mipmap
 BackgroundGeolocation.configure({
-  notificationIcon: "mipmap/my_custom_notification_large_icon"
+  notificationLargeIcon: "mipmap/my_custom_notification_large_icon"
 });
 ```
 
