@@ -4,13 +4,21 @@
 <dict>
 	<key>files</key>
 	<dict>
+		<key>Headers/LocationManager.h</key>
+		<data>
+		g0mUx4Xt6DQpXvsH22XVlCdk4Pg=
+		</data>
 		<key>Headers/TSLocationManager.h</key>
 		<data>
-		z1DNY3dldWto6fzLcbYhN49auaI=
+		IRhcCxcph9341C5sf8F6anoCmIc=
+		</data>
+		<key>Headers/TSSchedule.h</key>
+		<data>
+		Vf6rEW8+HwFYpwFB5+5DZ3MkfqM=
 		</data>
 		<key>Info.plist</key>
 		<data>
-		a51UeNTQ03D1JsHmpfrXeuEyB5g=
+		Y8yoNHfI8JqRLkONpcfHRWbZOuE=
 		</data>
 		<key>Modules/module.modulemap</key>
 		<data>
@@ -19,14 +27,50 @@
 	</dict>
 	<key>files2</key>
 	<dict>
+		<key>Headers/LocationManager.h</key>
+		<dict>
+			<key>hash</key>
+			<data>
+			g0mUx4Xt6DQpXvsH22XVlCdk4Pg=
+			</data>
+			<key>hash2</key>
+			<data>
+			CYgwNo/szYFk3HGSwQIBagce5hrNzWvKsPpsu0ri3s8=
+			</data>
+		</dict>
 		<key>Headers/TSLocationManager.h</key>
-		<data>
-		z1DNY3dldWto6fzLcbYhN49auaI=
-		</data>
+		<dict>
+			<key>hash</key>
+			<data>
+			IRhcCxcph9341C5sf8F6anoCmIc=
+			</data>
+			<key>hash2</key>
+			<data>
+			h7Ch+EyrL15CTRUqEoySv/J0RDxM8A55i4nw+DTCgyA=
+			</data>
+		</dict>
+		<key>Headers/TSSchedule.h</key>
+		<dict>
+			<key>hash</key>
+			<data>
+			Vf6rEW8+HwFYpwFB5+5DZ3MkfqM=
+			</data>
+			<key>hash2</key>
+			<data>
+			wikkY1kZ6S9dyFQzUOee3f8dQ0S0BbP2iQIMFfm27Y4=
+			</data>
+		</dict>
 		<key>Modules/module.modulemap</key>
-		<data>
-		ZlH8rkma2jB7yWJU5dFqHfgbHZc=
-		</data>
+		<dict>
+			<key>hash</key>
+			<data>
+			ZlH8rkma2jB7yWJU5dFqHfgbHZc=
+			</data>
+			<key>hash2</key>
+			<data>
+			jIrgG/kJ63bRRctOY4TrN0HWWuvt4GulOzhO3I0OG3U=
+			</data>
+		</dict>
 	</dict>
 	<key>rules</key>
 	<dict>
@@ -45,6 +89,11 @@
 			<true/>
 			<key>weight</key>
 			<real>1100</real>
+		</dict>
+		<key>^Base\.lproj/</key>
+		<dict>
+			<key>weight</key>
+			<real>1010</real>
 		</dict>
 		<key>^version.plist$</key>
 		<true/>
@@ -90,6 +139,11 @@
 			<true/>
 			<key>weight</key>
 			<real>1100</real>
+		</dict>
+		<key>^Base\.lproj/</key>
+		<dict>
+			<key>weight</key>
+			<real>1010</real>
 		</dict>
 		<key>^Info\.plist$</key>
 		<dict>
