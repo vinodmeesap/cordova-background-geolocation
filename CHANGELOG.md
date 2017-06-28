@@ -2,6 +2,7 @@
 # Change Log
 
 ## [Unreleased]
+- [Fixed] Bug in broadcast event `GEOFENCE` not being fired when `MainActivity` is terminated (only applies to those using a `BroadcastReceiver`).
 - [Fixed] Android scheduler issue when device is rebooted and plugin is currently within a scheduled ON period (fails to start)
 - [Fixed] (Android) Fix error calling `stopWatchPosition` before `#configure` callback has executed.  Also add support for executing `#getCurrentPosition` before `#configure` callback has fired.
 - [Added] (Android) Listen to LocationResult while stopTimeout is engaged and perform manual motion-detection by checking if location distance from stoppedAtLocation is > stationaryRadius
