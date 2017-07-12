@@ -15,7 +15,7 @@
     </engines>
 
     <dependency id="cordova-plugin-dialogs" version="^1.3.3" />
-    <dependency id="cordova-plugin-background-fetch" version="^4.0.0" />
+    <dependency id="cordova-plugin-background-fetch" version="^4.0.4" />
 
     <js-module src="www/BackgroundGeolocation.js" name="BackgroundGeolocation">
         <clobbers target="window.BackgroundGeolocation" />
