@@ -23,6 +23,7 @@
 
      <platform name="ios">
         <preference name="BACKGROUND_MODE_LOCATION" default="&lt;string&gt;location&lt;/string&gt;" />
+        <preference name="LOCATION_ALWAYS_AND_WHEN_IN_USE_USAGE_DESCRIPTION" default="Always use is required for constant background location-tracking" />
         <preference name="LOCATION_ALWAYS_USAGE_DESCRIPTION" default="Background location-tracking is required" />
         <preference name="LOCATION_WHEN_IN_USE_USAGE_DESCRIPTION" default="Background location-tracking is required" />
         <preference name="MOTION_USAGE_DESCRIPTION" default="Using the accelerometer increases battery-efficiency by intelligently toggling location-tracking only when the device is detected to be moving" />
@@ -33,6 +34,10 @@
             <array>
                 $BACKGROUND_MODE_LOCATION
             </array>
+        </config-file>
+        
+        <config-file target="*-Info.plist" parent="NSLocationAlwaysAndWhenInUseUsageDescription">
+            <string>$LOCATION_ALWAYS_AND_WHEN_IN_USE_USAGE_DESCRIPTION</string>
         </config-file>
 
         <config-file target="*-Info.plist" parent="NSLocationAlwaysUsageDescription">

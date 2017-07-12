@@ -52,6 +52,7 @@ The plugin requires configuration within your App's `config.xml`:
 <widget id="com.your.company.app.id">
   <plugin name="cordova-background-geolocation">
     <variable name="LICENSE" value="YOUR_LICENSE_KEY" />
+    <variable name="LOCATION_ALWAYS_AND_WHEN_IN_USE_USAGE_DESCRIPTION" value="Always use is required for background location tracking" />
     <variable name="LOCATION_ALWAYS_USAGE_DESCRIPTION" value="Background location-tracking is required" />
     <variable name="LOCATION_WHEN_IN_USE_USAGE_DESCRIPTION" value="Background location-tracking is required" />
     <variable name="MOTION_USAGE_DESCRIPTION" value="Using the accelerometer increases battery-efficiency by intelligently toggling location-tracking only when the device is detected to be moving" />
