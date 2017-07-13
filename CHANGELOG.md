@@ -2,6 +2,7 @@
 # Change Log
 
 ## Unreleased
+- [Changed] Tweak iOS Location Authorization to not show locationAuthorizationAlert if user initially denies location permission.
 - [Fixed] Android:  Remove isMoving condition from geofence proximity evaluator.
 - [Fixed] iOS 11 fix:  Added new location-authorization string `NSLocationAlwaysAndWhenInUseUsageDescription`.  iOS 11 now requires location-authorization popup to allow user to select either `Always` or `WhenInUse`.
 ## [2.7.4] - 2017-07-10
