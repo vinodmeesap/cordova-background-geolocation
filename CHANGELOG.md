@@ -1,5 +1,8 @@
 
 # Change Log
+
+## Unreleased
+- [Fixed] Android:  Remove isMoving condition from geofence proximity evaluator.
 - [Fixed] iOS 11 fix:  Added new location-authorization string `NSLocationAlwaysAndWhenInUseUsageDescription`.  iOS 11 now requires location-authorization popup to allow user to select either `Always` or `WhenInUse`.
 ## [2.7.4] - 2017-07-10
 - [Fixed] Android & iOS will ensure old location samples are ignored with `getCurrentPosition` 
