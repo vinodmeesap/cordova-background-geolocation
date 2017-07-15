@@ -155,6 +155,7 @@ BackgroundGeolocation.setConfig({
 | Option      | Type      | Default   | Note                              |
 |-------------|-----------|-----------|-----------------------------------|
 | [`foregroundService`](#config-boolean-foregroundservice-false) | `Boolean` | `false` | Set `true` to make the plugin *mostly* immune to OS termination due to memory pressure from other apps. |
+| [`notificationPriority`](#config-integer-notificationpriority-notification_priority_default) | `Integer` | `NOTIFICATION_PRIORITY_DEFAULT` | Controls the priority of the `foregroundService` notification and notification-bar icon. |
 | [`notificationTitle`](#config-string-notificationtitle-app-name) | `String` | "Your App Name" | When running the service with [`foregroundService: true`](#config-boolean-foregroundservice-false), Android requires a persistent notification in the Notification Bar.  Defaults to the application name |
 | [`notificationText`](#config-string-notificationtext-location-service-activated) | `String` |  "Location service activated" | When running the service with [`foregroundService: true`](#config-boolean-foregroundservice-false), Android requires a persistent notification in the Notification Bar.|
 | [`notificationColor`](#config-string-notificationcolor-null) | `String` | `null` | When running the service with [`foregroundService: true`](#config-boolean-foregroundservice-false), controls the color of the persistent notification in the Notification Bar. |
@@ -1173,6 +1174,33 @@ If you set this option to **`true`**, the plugin will run its Android service in
 :blue_book: For more information, see the [Android Service](https://developer.android.com/reference/android/app/Service.html#startForeground(int,%20android.app.Notification)) docs.
 
 ------------------------------------------------------------------------------
+
+
+#### `@config {Integer} notificationPriority [NOTIFICATION_PRIORITY_DEFAULT]`
+
+When running the service with [`foregroundService: true`](#config-boolean-foregroundservice-false), Android requires a persistent notification in the Notification Bar.  This will control the **priority** of that notification as well as the position of the notificaiton-bar icon.
+
+:information_source: To completely **hide** the icon in the notification-bar, use `NOTIFICATION_PRIORITY_MIN`
+
+The following `notificationPriority` values defined as **constants** on the `BackgroundGeolocation` object:
+
+| Value                           | Description                           |
+|---------------------------------|---------------------------------------|
+| `NOTIFICATION_PRIORITY_DEFAULT` | Notification weighted to top of list; notification-bar icon weighted left                                       |
+| `NOTIFICATION_PRIORITY_HIGH`    | Notification **strongly** weighted to top of list; notification-bar icon **strongly** weighted to left              |
+| `NOTIFICATION_PRIORITY_LOW`     | Notification weighted to bottom of list; notification-bar icon weighted right                                      |
+| `NOTIFICATION_PRIORITY_MAX`     | Same as `NOTIFICATION_PRIORITY_HIGH`  |
+| `NOTIFICATION_PRIORITY_MIN`     | Notification **strongly** weighted to bottom of list; notification-bar icon **hidden**                          |
+
+```javascript
+BackgroundGeolocation.configure({
+  foregroundService: true,
+  notificationPriority: BackgroundGeolocation.NOTIFICATION_PRIORITY_MIN
+});
+```
+
+------------------------------------------------------------------------------
+
 
 #### `@config {String} notificationTitle [App name]`
 

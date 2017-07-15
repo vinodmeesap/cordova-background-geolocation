@@ -2,6 +2,7 @@
 # Change Log
 
 ## Unreleased
+- [Added] Implement new Android config `notificationPriority` for controlling the behaviour of the `foregroundService` notification and notification-bar icon.
 - [Fixed] Android was creating a foreground notification even when `foregroundService: false`
 - [Changed] Tweak iOS Location Authorization to not show locationAuthorizationAlert if user initially denies location permission.
 - [Fixed] Android:  Remove isMoving condition from geofence proximity evaluator.
