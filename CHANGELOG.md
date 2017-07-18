@@ -2,11 +2,13 @@
 # Change Log
 
 ## Unreleased
+- [Changed] iOS `emailLog` will gzip the attached log file.
 - [Added] Implement new Android config `notificationPriority` for controlling the behaviour of the `foregroundService` notification and notification-bar icon.
 - [Fixed] Android was creating a foreground notification even when `foregroundService: false`
 - [Changed] Tweak iOS Location Authorization to not show locationAuthorizationAlert if user initially denies location permission.
 - [Fixed] Android:  Remove isMoving condition from geofence proximity evaluator.
 - [Fixed] iOS 11 fix:  Added new location-authorization string `NSLocationAlwaysAndWhenInUseUsageDescription`.  iOS 11 now requires location-authorization popup to allow user to select either `Always` or `WhenInUse`.
+
 ## [2.7.4] - 2017-07-10
 - [Fixed] Android & iOS will ensure old location samples are ignored with `getCurrentPosition` 
 - [Fixed] Android `providerchange` event would continue to persist a providerchange location even when plugin was disabled for the case where location-services is disabled by user.
