@@ -62,6 +62,7 @@
         <framework src="SystemConfiguration.framework" weak="true" />
         <framework src="AVFoundation.framework" weak="true" />
         <framework src="libsqlite3.dylib" weak="true" />
+        <framework src="libz.dylib" weak="true" />
         <framework src="src/ios/TSLocationManager.framework" custom="true" />
         <source-file src="src/ios/CDVBackgroundGeolocation.m" />
         <header-file src="src/ios/CDVBackgroundGeolocation.h" />
