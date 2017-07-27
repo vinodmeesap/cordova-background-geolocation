@@ -66,6 +66,7 @@ BackgroundGeolocation.setConfig({
 |-------------|-----------|-----------|-----------------------------------|
 | [`desiredAccuracy`](#config-integer-desiredaccuracy-0-10-100-1000-in-meters) | `Integer` | `0` | Specify the desired-accuracy of the geolocation system with 1 of 4 values, `0`, `10`, `100`, `1000` where `0` means **HIGHEST POWER, HIGHEST ACCURACY** and `1000` means **LOWEST POWER, LOWEST ACCURACY** |
 | [`distanceFilter`](#config-integer-distancefilter) | `Integer` | `10` | The minimum distance (measured in meters) a device must move horizontally before an update event is generated. |
+| [`disableElasticity`](#config-boolean-disableelasticity-false) | `Boolean` | `false` | Set true to disable automatic speed-based #distanceFilter elasticity. eg: When device is moving at highway speeds, locations are returned at ~ 1 / km. |
 | [`stopAfterElapsedMinutes`](#config-integer-stopafterelapsedminutes) | `Integer`  | `0`  | The plugin can optionally automatically stop tracking after some number of minutes elapses after the [`#start`](#startsuccessfn-failurefn) method was called. |
 | [`stopOnStationary`](#config-boolean-stoponstationary) | `Boolean`  | `false`  | The plugin can optionally automatically stop tracking when the `stopTimeout` timer elapses. |
 | [`desiredOdometerAccuracy`](#config-integer-desiredodometeraccuracy-100) | `Integer`  | `100`  | Location accuracy threshold in **meters** for odometer calculations. |
@@ -269,6 +270,7 @@ BackgroundGeolocation.on("location", successFn, failureFn);
 | [`getLog`](#getlogcallbackfn) | `callbackFn` | Fetch the entire contents of the current log database as a `String`.|
 | [`destroyLog`](#destroylogsuccessfn-failurefn) | `callbackFn`, `failureFn` | Destroy the contents of the Log database. |
 | [`emailLog`](#emaillogemail-callbackfn) | `email`, `callbackFn` | Fetch the entire contents of Log database and email it to a recipient using the device's native email client.|
+| [`getSensors`](#getsensorscallbackfn-failurefn) | `callbackFn`, `failureFn` | Returns the presense of device sensors *accelerometer*, *gyroscope*, *magnetometer*, in addition to iOS/Android-specific sensors|
 | [`playSound`](#playsoundsoundid) | `Integer` | Here's a fun one.  The plugin can play a number of OS system sounds for each platform.  For [IOS](http://iphonedevwiki.net/index.php/AudioServices) and [Android](http://developer.android.com/reference/android/media/ToneGenerator.html).  I offer this API as-is, it's up to you to figure out how this works. |
 
 
@@ -1391,13 +1393,16 @@ BackgroundGeolocation.on('motionchange', function(isMoving, location, taskId) {
 
 ### `activitychange`
 
-Your **`callbackFn`** will be executed each time the activity-recognition system detects a *change* in detected-activity (`still, on_foot, in_vehicle, on_bicycle, running`).
+Your **`callbackFn`** will be executed each time the activity-recognition system receives an event (`still, on_foot, in_vehicle, on_bicycle, running`).  
 
-##### `@param {String still|on_foot|in_vehicle|on_bicycle|running|unknown} activityName`
+It will be provided an event `{Object}` containing the following parameters:
+
+##### `@param {String} activity [still|on_foot|running|on_bicycle|in_vehicle]`
+##### `@param {Integer} confidence [0-100%]`
 
 ```javascript
-BackgroundGeolocation.on('activitychange', function(activityName) {
-  console.log('- Activity changed: ', activityName);
+BackgroundGeolocation.on('activitychange', function(event) {
+  console.log('- Activity changed: ', event.activity, event.confidence);
 });
 ```
 
@@ -2529,6 +2534,40 @@ None
 #### `failureFn` Parameters
 
 None
+
+------------------------------------------------------------------------------
+
+### `getSensors(callbackFn, failureFn)`
+
+Returns the presense of device sensors *accelerometer*, *gyroscope*, *magnetometer*, in addition to iOS/Android-specific sensors.  These core sensors are used by the motion activity-recognition system &mdash; when any of these sensors are missing from a device (particularly on cheap Android devices), the performance of the motion activity-recognition system will be **severly** degraded and highly inaccurate.
+
+Your `callbackFn` will be provided an event `{Object}` containing the following parameters:
+
+#### `callbackFn` Parameters
+
+##### `@param {String} platform`  "ios" | "android"
+##### `@param {Boolean} accelerometer`  Presense of device accelerometer
+##### `@param {Boolean} gyroscope`  Presense of device gyroscope
+##### `@param {Boolean} magnetometer`  Presense of device magnetometer (compass)
+
+**iOS**
+##### `@param {Boolean} motion_hardware`  Presense of device motion hardware (ie: M7 chip)
+
+**Android**
+##### `@param {Boolean} significant_motion`  Presense of significant motion sensor
+
+```javascript
+BackgroundGeolocation.getSensors(function(sensors) {
+  console.log('- has accelerometer? ', sensors.accelerometer);
+  console.log('- has gyroscope? ', sensors.gyroscope);
+  console.log('- has magnetometer? ', sensors.magnetometer);
+  if (sensors.platform === 'ios') {
+    console.log('- has motion hardware (M7 chip)?', sensors.motion_hardware);
+  } else if (sensors.platform === 'android') {
+    console.log('- has significant motion sensor? ', sensors.significant_motion);
+  }
+});
+```
 
 ------------------------------------------------------------------------------
 
