@@ -2,6 +2,9 @@
 # Change Log
 
 ## Unreleased
+- [Changed] Improve iOS/Android acquisition of `motionchange` location to ensure a recent location is fetched.
+- [Changed] Implement `#getSensors` method for both iOS & Android.  Returns an object indicating the presense of *accelerometer*, *gyroscope* and *magnetometer*.  If any of these sensors are missing, the motion-detection system for that device will poor.
+- [Changed] The `activitychange` success callback method signature has been changed from `{String} activityName` -> `{Object}` containing both `activityName` as well as `confidence`.  This event only used to fire after the `activityName` changed (eg: `on_foot` -> `in_vehicle`), regardless of `confidence`.  This event will now fire for *any* change in activity, including `confidence` changes.
 - [Changed] iOS `emailLog` will gzip the attached log file.
 - [Added] Implement new Android config `notificationPriority` for controlling the behaviour of the `foregroundService` notification and notification-bar icon.
 - [Fixed] Android was creating a foreground notification even when `foregroundService: false`
