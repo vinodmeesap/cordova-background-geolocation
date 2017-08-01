@@ -155,27 +155,20 @@ function onDeviceReady() {
     /**
     * This callback will be executed every time a geolocation is recorded in the background.
     */
-    var callbackFn = function(location, taskId) {
+    var callbackFn = function(location) {
         console.log('- Location', location);
 
         myUpdatePositionOnMapMethod(location);
 
         // The plugin records multiple samples when doing motionchange events.
-        // It sends these to the location callback for you convenience.
+        // It sends these to the location callback for you convenience.  These 
+        // "samples" are NOT persisted to the plugin's database.
         // You might uses these to "progressively" update user's current
         // position on a map, for example.
         if (location.sample) {
             console.log('- Ignore samples');
-
-            // IMPORTANT:  send signal to native code that your callback is complete.
-            bgGeo.finish();
             return;
         }
-
-        myCustommProcessingMethod(function() {
-            // IMPORTANT:  send signal to native code that your callback is 
-            bgGeo.finish();
-        });
     };
 
     var failureFn = function(error) {
@@ -189,7 +182,6 @@ function onDeviceReady() {
     bgGeo.configure({
         // Geolocation config
         desiredAccuracy: 0,
-        stationaryRadius: 50,
         distanceFilter: 50,
 
         // Activity recognition config
@@ -198,12 +190,11 @@ function onDeviceReady() {
         
         // Application config
         debug: true, // <-- enable this hear sounds for background-geolocation life-cycle.
-        logLevel: 5,    // Verbose logging.  0: NONE
-        stopOnTerminate: false,              // <-- Don't stop tracking when user closes app.
-        startOnBoot: true,                   // <-- [Android] Auto start background-service in headless mode when device is powered-up.
-        
+        logLevel: bgGeo.LOG_LEVEL_VERBOSE,    // Verbose logging
+        stopOnTerminate: false,               // Don't stop tracking when user closes app.
+        startOnBoot: true,                    // Auto-start tracking on reboot        
         // HTTP / SQLite config
-        url: 'http://posttestserver.com/post.php?dir=cordova-background-geolocation',
+        url: 'http://your.server.url/locations',
         batchSync: false,       // <-- [Default: false] Set true to sync locations to server in a single HTTP request.
         autoSync: true,         // <-- [Default: true] Set true to sync each location to server as it arrives.
         maxDaysToPersist: 1,    // <-- Maximum days to persist a location in plugin's SQLite database when HTTP fails

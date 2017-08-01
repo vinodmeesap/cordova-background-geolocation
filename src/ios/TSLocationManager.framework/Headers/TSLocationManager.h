@@ -4,6 +4,14 @@
 #import <CoreLocation/CoreLocation.h>
 #import <AudioToolbox/AudioToolbox.h>
 #import "TSSchedule.h"
+#import "TSLocation.h"
+#import "TSActivityChangeEvent.h"
+#import "TSProviderChangeEvent.h"
+#import "TSHttpEvent.h"
+#import "TSHeartbeatEvent.h"
+#import "TSScheduleEvent.h"
+#import "TSGeofencesChangeEvent.h"
+#import "TSGeofenceEvent.h"
 #import "LocationManager.h"
 
 @interface TSLocationManager : NSObject <CLLocationManagerDelegate>
@@ -14,29 +22,32 @@
 @property (nonatomic) UIBackgroundTaskIdentifier preventSuspendTask;
 
 // Blocks
-@property (nonatomic, copy) void (^httpResponseBlock) (NSInteger statusCode, NSDictionary *requestData, NSData *responseData, NSError *error);
-@property (nonatomic, copy) void (^locationChangedBlock) (NSDictionary *locationData, enum tsLocationType, BOOL isMoving);
-@property (nonatomic, copy) void (^motionChangedBlock) (NSDictionary *locationData, BOOL isMoving);
-@property (nonatomic, copy) void (^activityChangedBlock) (NSDictionary *activity);
-@property (nonatomic, copy) void (^heartbeatBlock) (NSString* motionType, NSDictionary *locationData);
-@property (nonatomic, copy) void (^geofenceBlock) (NSDictionary *geofenceData);
-@property (nonatomic, copy) void (^syncCompleteBlock) (NSArray *locations);
-@property (nonatomic, copy) void (^errorBlock) (NSString *type, NSError *error);
-@property (nonatomic, copy) void (^scheduleBlock) (TSSchedule* schedule);
-@property (nonatomic, copy) void (^authorizationChangedBlock) (CLAuthorizationStatus status);
 
 + (TSLocationManager *)sharedInstance;
 
 
 // Methods
 - (NSDictionary*) configure:(NSDictionary*)config;
-- (void) addListener:(NSString*)event callback:(void (^)(NSDictionary*))callback;
+- (void) on:(NSString*)event success:(void (^)(id))success failure:(void(^)(id))failure;
+- (void) onLocation:(void(^)(TSLocation*))success failure:(void(^)(NSError*))failure;
+- (void) onHttp:(void(^)(TSHttpEvent*))success;
+- (void) onGeofence:(void(^)(TSGeofenceEvent*))success;
+- (void) onHeartbeat:(void(^)(TSHeartbeatEvent*))success;
+- (void) onMotionChange:(void(^)(TSLocation*))success;
+- (void) onActivityChange:(void(^)(TSActivityChangeEvent*))success;
+- (void) onProviderChange:(void(^)(TSProviderChangeEvent*))success;
+- (void) onGeofencesChange:(void(^)(TSGeofencesChangeEvent*))success;
+- (void) onSchedule:(void(^)(TSScheduleEvent*))success;
+- (void) un:(NSString*)event callback:(void(^)(id))callback;
+- (void) removeListener:(NSString*)event callback:(void(^)(id))callback;
+- (void) removeListeners;
+
 - (void) start;
 - (void) stop;
 - (void) startSchedule;
 - (void) stopSchedule;
 - (void) startGeofences;
-- (NSArray*) sync;
+- (void) sync:(void(^)(NSArray*))success failure:(void(^)(NSError*))failure;
 - (NSArray*) getLocations;
 - (UIBackgroundTaskIdentifier) createBackgroundTask;
 - (void) stopBackgroundTask:(UIBackgroundTaskIdentifier)taskId;
@@ -53,8 +64,8 @@
 - (void) removeGeofence:(NSString*)identifier success:(void (^)(NSString*))success error:(void (^)(NSString*))error;
 - (void) removeGeofences:(NSArray*)identifiers success:(void (^)(NSString*))success error:(void (^)(NSString*))error;;
 - (NSArray*) getGeofences;
-- (void) getCurrentPosition:(NSDictionary*)options success:(void (^)(NSDictionary*))success failure:(void (^)(NSError*))failure;
-- (void) watchPosition:(NSDictionary*)options success:(void (^)(NSDictionary*))success failure:(void (^)(NSError*))failure;
+- (void) getCurrentPosition:(NSDictionary*)options success:(void (^)(TSLocation*))success failure:(void (^)(NSError*))failure;
+- (void) watchPosition:(NSDictionary*)options success:(void (^)(TSLocation*))success failure:(void (^)(NSError*))failure;
 - (void) stopWatchPosition;
 - (void) playSound:(SystemSoundID)soundId;
 - (BOOL) clearDatabase;
@@ -66,7 +77,7 @@
 - (void) emailLog:(NSString*)to;
 - (void) setLogLevel:(NSInteger)level;
 - (CLLocationDistance)getOdometer;
-- (void) setOdometer:(CLLocationDistance)odometer success:(void (^)(NSDictionary*))success failure:(void (^)(NSError*))failure;
+- (void) setOdometer:(CLLocationDistance)odometer success:(void (^)(TSLocation*))success failure:(void (^)(NSError*))failure;
 // Sensor methods
 -(BOOL) isMotionHardwareAvailable;
 -(BOOL) isDeviceMotionAvailable;
