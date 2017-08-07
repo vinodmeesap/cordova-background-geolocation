@@ -16,74 +16,98 @@
 
 @interface TSLocationManager : NSObject <CLLocationManagerDelegate>
 
+#pragma mark - Properties
+
 @property (nonatomic) UIViewController* viewController;
 @property (nonatomic, strong) CLLocationManager* locationManager;
 @property (nonatomic) NSDate *stoppedAt;
 @property (nonatomic) UIBackgroundTaskIdentifier preventSuspendTask;
 
-// Blocks
-
 + (TSLocationManager *)sharedInstance;
 
+#pragma mark - Event Listener Methods
 
-// Methods
-- (NSDictionary*) configure:(NSDictionary*)config;
-- (void) on:(NSString*)event success:(void (^)(id))success failure:(void(^)(id))failure;
-- (void) onLocation:(void(^)(TSLocation*))success failure:(void(^)(NSError*))failure;
-- (void) onHttp:(void(^)(TSHttpEvent*))success;
-- (void) onGeofence:(void(^)(TSGeofenceEvent*))success;
-- (void) onHeartbeat:(void(^)(TSHeartbeatEvent*))success;
-- (void) onMotionChange:(void(^)(TSLocation*))success;
-- (void) onActivityChange:(void(^)(TSActivityChangeEvent*))success;
-- (void) onProviderChange:(void(^)(TSProviderChangeEvent*))success;
-- (void) onGeofencesChange:(void(^)(TSGeofencesChangeEvent*))success;
-- (void) onSchedule:(void(^)(TSScheduleEvent*))success;
-- (void) un:(NSString*)event callback:(void(^)(id))callback;
+- (void) onLocation:(void(^)(TSLocation* location))success failure:(void(^)(NSError*))failure;
+- (void) onHttp:(void(^)(TSHttpEvent* event))success;
+- (void) onGeofence:(void(^)(TSGeofenceEvent* event))success;
+- (void) onHeartbeat:(void(^)(TSHeartbeatEvent* event))success;
+- (void) onMotionChange:(void(^)(TSLocation* event))success;
+- (void) onActivityChange:(void(^)(TSActivityChangeEvent* event))success;
+- (void) onProviderChange:(void(^)(TSProviderChangeEvent* event))success;
+- (void) onGeofencesChange:(void(^)(TSGeofencesChangeEvent* event))success;
+- (void) onSchedule:(void(^)(TSScheduleEvent* event))success;
 - (void) removeListener:(NSString*)event callback:(void(^)(id))callback;
+- (void) un:(NSString*)event callback:(void(^)(id))callback;
+- (void) removeListeners:(NSString*)event;
 - (void) removeListeners;
 
+#pragma mark - Core API Methods
+
+- (NSDictionary*) configure:(NSDictionary*)config;
 - (void) start;
 - (void) stop;
 - (void) startSchedule;
 - (void) stopSchedule;
 - (void) startGeofences;
-- (void) sync:(void(^)(NSArray*))success failure:(void(^)(NSError*))failure;
-- (NSArray*) getLocations;
-- (UIBackgroundTaskIdentifier) createBackgroundTask;
-- (void) stopBackgroundTask:(UIBackgroundTaskIdentifier)taskId;
-- (void) error:(UIBackgroundTaskIdentifier)taskId message:(NSString*)message;
-- (void) changePace:(BOOL)value;
 - (NSDictionary*) setConfig:(NSDictionary*)command;
 - (NSMutableDictionary*) getState;
-- (NSDictionary*) getStationaryLocation;
-- (void) onSuspend:(NSNotification *)notification;
-- (void) onResume:(NSNotification *)notification;
-- (void) onAppTerminate;
-- (void) addGeofence:(NSDictionary*)params success:(void (^)(NSString*))success error:(void (^)(NSString*))error;
-- (void) addGeofences:(NSArray*)geofences success:(void (^)(NSString*))success error:(void (^)(NSString*))error;
-- (void) removeGeofence:(NSString*)identifier success:(void (^)(NSString*))success error:(void (^)(NSString*))error;
-- (void) removeGeofences:(NSArray*)identifiers success:(void (^)(NSString*))success error:(void (^)(NSString*))error;;
-- (NSArray*) getGeofences;
-- (void) getCurrentPosition:(NSDictionary*)options success:(void (^)(TSLocation*))success failure:(void (^)(NSError*))failure;
-- (void) watchPosition:(NSDictionary*)options success:(void (^)(TSLocation*))success failure:(void (^)(NSError*))failure;
+
+#pragma mark - Geolocation Methods
+
+- (void) changePace:(BOOL)value;
+- (void) getCurrentPosition:(NSDictionary*)options success:(void (^)(TSLocation* location))success failure:(void (^)(NSError* error))failure;
+- (void) setOdometer:(CLLocationDistance)odometer success:(void (^)(TSLocation* location))success failure:(void (^)(NSError* error))failure;
+- (CLLocationDistance)getOdometer;
+- (void) watchPosition:(NSDictionary*)options success:(void (^)(TSLocation* location))success failure:(void (^)(NSError* error))failure;
 - (void) stopWatchPosition;
-- (void) playSound:(SystemSoundID)soundId;
+- (NSDictionary*) getStationaryLocation;
+
+#pragma mark - HTTP & Persistence Methods
+
+- (void) sync:(void(^)(NSArray* locations))success failure:(void(^)(NSError* error))failure;
+- (void) getLocations:(void(^)(NSArray* locations))success failure:(void(^)(NSString* error))failure;
 - (BOOL) clearDatabase;
 - (BOOL) destroyLocations;
-- (BOOL) insertLocation:(NSDictionary*)params;
+- (void) destroyLocations:(void(^)(void))success failure:(void(^)(NSString* error))failure;
+- (void) insertLocation:(NSDictionary*)params success:(void(^)(NSString* uuid))success failure:(void(^)(NSString* error))failure;
 - (int) getCount;
-- (NSString*) getLog;
+
+#pragma mark - Application Methods
+
+- (UIBackgroundTaskIdentifier) createBackgroundTask;
+- (void) stopBackgroundTask:(UIBackgroundTaskIdentifier)taskId;
+
+#pragma mark - Logging & Debug Methods
+
+- (void) getLog:(void(^)(NSString* log))success failure:(void(^)(NSString* error))failure;
+- (void) emailLog:(NSString*)email success:(void(^)(void))success failure:(void(^)(NSString* error))failure;
 - (BOOL) destroyLog;
-- (void) emailLog:(NSString*)to;
 - (void) setLogLevel:(NSInteger)level;
-- (CLLocationDistance)getOdometer;
-- (void) setOdometer:(CLLocationDistance)odometer success:(void (^)(TSLocation*))success failure:(void (^)(NSError*))failure;
-// Sensor methods
+- (void) playSound:(SystemSoundID)soundId;
+- (void) error:(UIBackgroundTaskIdentifier)taskId message:(NSString*)message;
+
+#pragma mark - Geofencing Methods
+
+- (void) addGeofence:(NSDictionary*)params success:(void (^)(void))success failure:(void (^)(NSString* error))failure;
+- (void) addGeofences:(NSArray*)geofences success:(void (^)(void))success failure:(void (^)(NSString* error))failure;
+- (void) removeGeofence:(NSString*)identifier success:(void (^)(void))success failure:(void (^)(NSString* error))failure;
+- (void) removeGeofences:(NSArray*)identifiers success:(void (^)(void))success failure:(void (^)(NSString* error))failure;;
+- (NSArray*) getGeofences;
+- (void) getGeofences:(void (^)(NSArray*))success failure:(void (^)(NSString*))failure;
+
+#pragma mark - Sensor Methods
+
 -(BOOL) isMotionHardwareAvailable;
 -(BOOL) isDeviceMotionAvailable;
 -(BOOL) isAccelerometerAvailable;
 -(BOOL) isGyroAvailable;
 -(BOOL) isMagnetometerAvailable;
+
+#pragma mark - Application life-cycle callbacks
+
+- (void) onSuspend:(NSNotification *)notification;
+- (void) onResume:(NSNotification *)notification;
+- (void) onAppTerminate;
 
 @end
 

@@ -1,4 +1,3 @@
-
 /**
 * cordova-background-geolocation
 * Copyright (c) 2015, Transistor Software (9224-2932 Quebec Inc)
@@ -556,8 +555,7 @@ module.exports = {
     getCurrentPosition: function(success, failure, options) {
         options = options || {};
         success = success || function() {};
-        var mySuccess = function(params) {
-            var location    = params.location;
+        var mySuccess = function(location) {
             // Transform timestamp to Date instance.
             if (location.timestamp) {
                 location.timestamp = new Date(location.timestamp);
@@ -724,4 +722,3 @@ module.exports = {
         }
     }
 };
-
