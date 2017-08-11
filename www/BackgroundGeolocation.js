@@ -705,7 +705,7 @@ module.exports = {
         }
         return destination;
     },
-    _registerCallback(userSuccess, mySuccess) {
+    _registerCallback: function(userSuccess, mySuccess) {
         var callbacks = window.cordova.callbacks;
         var re = new RegExp(MODULE_NAME);
         for (var callbackId in callbacks) {
