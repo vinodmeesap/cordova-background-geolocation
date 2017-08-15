@@ -1,10 +1,10 @@
 
 # Change Log
 
-## Unreleased
-- [Changed] Refactor iOS core library event-subscription API.
+## [2.8.0] - 2017-08-15
+- [Changed] Refactor iOS/Android core library event-subscription API.
 - [Changed] Removed `taskId` supplied to all event-callbacks.  You no longer have to call `bgGeo.finish(taskId)` in your event-callbacks (though the method will still operate as a `noop` for backwards compatibility).  You will now be responsible for creating your own iOS background-tasks using the method `#startBackgroundTask` when performing long-running tasks in your event-callbacks.
-- [Added] iOS now supports ability to remove single event-listeners with method `#un`
+- [Added] iOS and Android now support ability to remove single event-listeners with method `#un`
 
 ## [2.7.5] - 2017-07-27
 - [Changed] Remove dependency `cordova-plugin-dialogs`.  It's not required.
