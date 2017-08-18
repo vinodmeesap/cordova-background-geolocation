@@ -2,6 +2,7 @@
 # Change Log
 
 ## Unreleased
+- [Added] Javascript API to plugin's logging system.
 - [Fixed] Minor issue with iOS flush where multiple threads might create multiple background-tasks, leaving some unfinished.
 
 ## [2.8.0] - 2017-08-15
