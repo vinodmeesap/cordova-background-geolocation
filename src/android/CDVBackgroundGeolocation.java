@@ -95,6 +95,7 @@ public class CDVBackgroundGeolocation extends CordovaPlugin {
     public static final String ACTION_EMAIL_LOG         = "emailLog";
     public static final String ACTION_START_SCHEDULE    = "startSchedule";
     public static final String ACTION_STOP_SCHEDULE     = "stopSchedule";
+    public static final String ACTION_LOG               = "log";
 
     private List<TSCallback> locationAuthorizationCallbacks = new ArrayList<TSCallback>();
     private List<CallbackContext> watchPositionCallbacks = new ArrayList<CallbackContext>();
@@ -266,6 +267,9 @@ public class CDVBackgroundGeolocation extends CordovaPlugin {
         } else if (BackgroundGeolocation.ACTION_GET_SENSORS.equalsIgnoreCase(action)) {
             result = true;
             getSensors(callbackContext);
+        } else if (ACTION_LOG.equalsIgnoreCase(action)) {
+            result = true;
+            log(data, callbackContext);
         }
         return result;
     }
@@ -862,6 +866,14 @@ public class CDVBackgroundGeolocation extends CordovaPlugin {
                 callbackContext.error(error);
             }
         });
+    }
+
+    private void log(JSONArray arguments, CallbackContext callbackContext) throws JSONException {
+        String level = arguments.getString(0);
+        String message = arguments.getString(1);
+        String caller = arguments.getString(2);
+        TSLog.log(level, message, caller);
+        callbackContext.success();
     }
 
     public void onPause(boolean multitasking) {
