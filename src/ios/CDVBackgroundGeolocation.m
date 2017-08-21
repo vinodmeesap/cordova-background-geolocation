@@ -603,9 +603,8 @@
 {
     NSString *level = [command.arguments objectAtIndex:0];
     NSString *msg = [command.arguments objectAtIndex:1];
-    NSString *caller = [command.arguments objectAtIndex:2];
     
-    [bgGeo log:level message:msg caller:caller];
+    [bgGeo log:level message:msg];
     [self.commandDelegate sendPluginResult:[CDVPluginResult resultWithStatus:CDVCommandStatus_OK] callbackId:command.callbackId];
 }
 

@@ -871,8 +871,7 @@ public class CDVBackgroundGeolocation extends CordovaPlugin {
     private void log(JSONArray arguments, CallbackContext callbackContext) throws JSONException {
         String level = arguments.getString(0);
         String message = arguments.getString(1);
-        String caller = arguments.getString(2);
-        TSLog.log(level, message, caller);
+        TSLog.log(level, message);
         callbackContext.success();
     }
 

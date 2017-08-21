@@ -14,15 +14,17 @@ var MODULE_NAME = "BackgroundGeolocation";
 */
 function log(level, msg) {
     var method = 'anonymous';
+    /** Doesn't work in strict mode
     var caller = arguments.callee.caller.caller;
     if (caller) {
         method = caller.name;
     }
+    */
     exec(function() {},
         function() {},
         MODULE_NAME,
         'log',
-        [level, msg, method]
+        [level, msg]
     );
 }
 
