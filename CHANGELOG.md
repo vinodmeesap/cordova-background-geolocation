@@ -1,7 +1,8 @@
 
 # Change Log
 
-## Unreleased
+## [2.8.1] - 2017-08-21
+- [Changed] Reference latest `cordova-plugin-background-fetch` version `5.0.0`
 - [Added] Javascript API to plugin's logging system.
 - [Fixed] Minor issue with iOS flush where multiple threads might create multiple background-tasks, leaving some unfinished.
 
