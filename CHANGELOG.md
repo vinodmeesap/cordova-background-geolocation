@@ -1,6 +1,7 @@
 
 # Change Log
-## Unreleased
+## [2.8.4] - 2017-09-14
+
 - [Changed] Refactor Android `onDestroy` mechanism attempting to solve nagging and un-reproducible null pointer exceptions.
 - [Fixed] Fixed bug not where `stopAfterElapsedMinutes` is not evaluated when executing `#getCurrentPosition`.
 - [Fixed] Modifications for Android O.  For now, `foregroundService: true` will be enforced when running on Android O (api 26).
