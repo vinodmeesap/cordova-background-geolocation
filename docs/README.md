@@ -205,6 +205,7 @@ BackgroundGeolocation.setConfig({
 | [`http`](#http) | Fired after a successful HTTP response. `response` object is provided with `status` and `responseText`. |
 | [`heartbeat`](#heartbeat) | Fired each [`#heartbeatInterval`](#config-integer-heartbeatinterval-undefined) while the plugin is in the **stationary** state with.  Your callback will be provided with a `params {}` containing the last known `location {Object}` |
 | [`schedule`](#schedule) | Fired when a schedule event occurs.  Your `callbackFn` will be provided with the current **`state`** Object. | 
+| [`powersavechange`](#powersavechange) | Fired when the state of the operating-system's "Power Saving" system changes.  Your `callbackFn` will be provided with a `Boolean` showing whether "Power Saving" is **enabled** or **disabled** | 
 
 ### Adding event-listeners: `#on`
 
@@ -260,6 +261,7 @@ BackgroundGeolocation.un('location', onLocation);
 | [`removeListeners`](#removelistenerssuccessfn-failurefn) | `none` | Remove all events-listeners registered with **`#on`** method |
 | [`startBackgroundTask`](#startbackgroundtaskcallbackfn) | `callbackFn` | Sends a signal to the native OS that you wish to perform a long-running task.  The OS will not suspend your app until you signal completion with the **`#finish`** method.|
 | [`finish`](#finishtaskid) | `taskId` | Sends a signal to the native OS the supplied **`taskId`** is complete and the OS may proceed to suspend your application if applicable.|
+| [`isPowerSaveMode`](#ispowersavemodecallbackfn) | `callbackFn` | Fetches the state of the operating-systems "Power Saving" mode, whether `enabled` or `disabled`|
 
 
 ### :small_blue_diamond: HTTP & Persistence Methods
@@ -1054,7 +1056,7 @@ BackgroundGeolocation.configure({
     '1 17:30-21:00',   // Sunday: 5:30pm-9:00pm
     '2-6 9:00-17:00',  // Mon-Fri: 9:00am to 5:00pm
     '2,4,6 20:00-00:00',// Mon, Web, Fri: 8pm to midnight (next day)
-    '7 10:00-19:00'    // Sun: 10am-7pm
+    '7 10:00-19:00'    // Sat: 10am-7pm
   ]
 }, function(state) {
   // Start the Scheduler
@@ -1639,6 +1641,38 @@ BackgroundGeolocation.on('schedule', function(state) {
 ------------------------------------------------------------------------------
 
 
+### `powersavechange`
+
+Fired when the state of the operating-system's "Power Saving" mode changes.  Your `callbackFn` will be provided with a `Boolean` showing whether "Power Saving" is **enabled** or **disabled**.  Power Saving mode can throttle certain services in the background, such as HTTP requests or GPS.
+
+:information_source: You can manually request the current-state of "Power Saving" mode with the **method** [`#isPowerSaveMode`](#ispowersavemodecallbackfn).
+
+#### iOS
+
+iOS Power Saving mode can be engaged manually by the user in **Settings -> Battery** or from an automatic OS dialog.
+
+![](https://dl.dropboxusercontent.com/s/lz3zl2jg4nzstg3/Screenshot%202017-09-19%2010.34.21.png?dl=1)
+
+#### Android
+
+Android Power Saving mode can be engaged manually by the user in **Settings -> Battery -> Battery Saver** or automatically with a user-specified "threshold" (eg: 15%).
+
+![](https://dl.dropboxusercontent.com/s/raz8lagrqayowia/Screenshot%202017-09-19%2010.33.49.png?dl=1)
+
+#### `callbackFn` Paramters
+
+##### `@param {Boolean} isPowerSaveMode`
+
+```javascript
+BackgroundGeolocation.on('powersavechange', function(isPowerSaveMode) {
+  console.log("- powersavechange, power-saving mode enabled? ", isPowerSaveMode);
+});
+```
+
+
+------------------------------------------------------------------------------
+
+
 # :large_blue_diamond: Methods
 
 ## :small_blue_diamond: Core API Methods
@@ -2113,6 +2147,34 @@ BackgroundGeolocation.setOdometer(0, function(location) {
       BackgroundGeolocation.finish(taskId);
     });
   });
+});
+```
+
+------------------------------------------------------------------------------
+
+
+### `isPowerSaveMode(callbackFn)`
+
+Fetches the state of the operating-systems "Power Saving" mode, whether `enabled` or `disabled`.  Power Saving mode can throttle certain services in the background, such as HTTP requests or GPS.
+
+:information_source: You can listen to changes in the state of "Power Saving" mode with the **event** [`#powersavechange`](#powersavechange).
+
+#### iOS
+
+iOS Power Saving mode can be engaged manually by the user in **Settings -> Battery** or from an automatic OS dialog.
+
+![](https://dl.dropboxusercontent.com/s/lz3zl2jg4nzstg3/Screenshot%202017-09-19%2010.34.21.png?dl=1)
+
+#### Android
+
+Android Power Saving mode can be engaged manually by the user in **Settings -> Battery -> Battery Saver** or automatically with a user-specified "threshold" (eg: 15%).
+
+![](https://dl.dropboxusercontent.com/s/raz8lagrqayowia/Screenshot%202017-09-19%2010.33.49.png?dl=1)
+
+Eg:
+```javascript
+BackgroundGeolocation.isPowerSaveMode(function(isPowerSaveMode) {
+  console.log('- is Power Saving mode enabled?', isPowerSaveMode);
 });
 ```
 
