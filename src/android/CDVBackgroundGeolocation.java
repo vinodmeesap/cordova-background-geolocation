@@ -100,7 +100,7 @@ public class CDVBackgroundGeolocation extends CordovaPlugin {
         getAdapter().onPlayServicesConnectError((new TSPlayServicesConnectErrorCallback() {
             @Override
             public void onPlayServicesConnectError(int errorCode) {
-                onPlayServicesConnectError(errorCode);
+                handlePlayServicesConnectError(errorCode);
             }
         }));
     }
@@ -984,7 +984,7 @@ public class CDVBackgroundGeolocation extends CordovaPlugin {
         locationAuthorizationCallbacks.clear();
     }
 
-    private void onPlayServicesConnectError(Integer errorCode) {
+    private void handlePlayServicesConnectError(Integer errorCode) {
         Activity activity = cordova.getActivity();
         GoogleApiAvailability.getInstance().getErrorDialog(activity, errorCode, 1001).show();
     }
