@@ -67,6 +67,7 @@ BackgroundGeolocation.setConfig({
 | [`desiredAccuracy`](#config-integer-desiredaccuracy-0-10-100-1000-in-meters) | `Integer` | `0` | Specify the desired-accuracy of the geolocation system with 1 of 4 values, `0`, `10`, `100`, `1000` where `0` means **HIGHEST POWER, HIGHEST ACCURACY** and `1000` means **LOWEST POWER, LOWEST ACCURACY** |
 | [`distanceFilter`](#config-integer-distancefilter) | `Integer` | `10` | The minimum distance (measured in meters) a device must move horizontally before an update event is generated. |
 | [`disableElasticity`](#config-boolean-disableelasticity-false) | `Boolean` | `false` | Set true to disable automatic speed-based #distanceFilter elasticity. eg: When device is moving at highway speeds, locations are returned at ~ 1 / km. |
+| [`elasticityMultiplier`](#config-float-elasticitymultiplier-1) | `Float` | `1` | Controls the scale of automatic speed-based `distanceFilter` elasticity.  Increasing `elasticityMultiplier` will result in few location samples as speed increases. |
 | [`stopAfterElapsedMinutes`](#config-integer-stopafterelapsedminutes) | `Integer`  | `0`  | The plugin can optionally automatically stop tracking after some number of minutes elapses after the [`#start`](#startsuccessfn-failurefn) method was called. |
 | [`stopOnStationary`](#config-boolean-stoponstationary) | `Boolean`  | `false`  | The plugin can optionally automatically stop tracking when the `stopTimeout` timer elapses. |
 | [`desiredOdometerAccuracy`](#config-integer-desiredodometeraccuracy-100) | `Integer`  | `100`  | Location accuracy threshold in **meters** for odometer calculations. |
@@ -347,6 +348,8 @@ However, by default, **`distanceFilter`** is elastically auto-calculated by the 
 
 :information_source: To disable this behaviour, configure [`disableElasticity: true`](#config-boolean-disableelasticity-false)
 
+:information_source: To control the scale of the automatic `distanceFilter` calculation, see [`elasticityMultiplier`](#config-float-elasticitymultiplier-1)
+
 **`distanceFilter`** is auto calculated by rounding speed to the nearest `5 m/s` and adding **`distanceFilter`** meters for each `5 m/s` increment.
 
 For example, at biking speed of 7.7 m/s with a configured **`distanceFilter: 30`**:
@@ -367,7 +370,7 @@ At highway speed of `27 m/s` with a configured `distanceFilter: 50`:
   => 30
   multiplier = rounded_speed / 5
   => 30 / 5 = 6
-  adjusted_distance_filter = multiplier * distanceFilter
+  adjusted_distance_filter = multiplier * distanceFilter * elasticityMultipiler
   => 6 * 50 = 300 meters
 ```
 
@@ -384,6 +387,12 @@ Compare now background-geolocation in the scope of a city.  In this image, the l
 #### `@config {Boolean} disableElasticity [false]`
 
 Defaults to **`false`**.  Set **`true`** to disable automatic, speed-based [`#distanceFilter`](#config-integer-distancefilter) elasticity.
+
+------------------------------------------------------------------------------
+
+#### `@config {Float} elasticityMultiplier [1]`
+
+Controls the scale of automatic speed-based [`#distanceFilter`](#config-integer-distancefilter) elasticity.  Increasing `elasticityMultiplier` will result in fewer location samples as speed increases.  A value of `0` has the same effect as [`disableElasticity: true`](#config-boolean-disableelasticity-false)
 
 ------------------------------------------------------------------------------
 
