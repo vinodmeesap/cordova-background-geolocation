@@ -1,6 +1,10 @@
 
 # Change Log
 
+## [Unreleased]
+- [Fixed] Android `getState` could cause an NPE if executed before `#configure`.
+- [Fixed] Work around iOS 11 bug with `CLLocationManager#stopMonitoringSignificantLocationChanges` (SLC):  When this method is called upon *any* single `CLLocationManager` instance, it would cause *all* instances to `#stopMonitoringSignificantLocationChanges`.  This caused problems with Scheduler evaluation, since SLC is required to periodically evaluate the schedule.
+
 ## [2.8.5] - 2017-09-25
 - [Added] Build for iOS 11, XCode 9.
 - [Added] Implement new `powersavechange` event in addition to `isPowerSaveMode` method for determining if OS "Power saving" mode is enabled.
