@@ -46,12 +46,13 @@ This plugin has tagged stable versions.  To install a particular version, append
 
 ## Configuring the plugin
 
-The plugin requires configuration within your App's `config.xml`:
+After adding the plugin, your `config.xml` will contain the following block, containing a number of `<variable />` for you to configure (eg: `LICENSE`):
 
 ```xml
 <widget id="com.your.company.app.id">
   <plugin name="cordova-background-geolocation">
     <variable name="LICENSE" value="YOUR_LICENSE_KEY" />
+    <variable name="GOOGLE_API_VERSION" value="11.0.1" />
     <variable name="LOCATION_ALWAYS_AND_WHEN_IN_USE_USAGE_DESCRIPTION" value="Always use is required for background location tracking" />
     <variable name="LOCATION_ALWAYS_USAGE_DESCRIPTION" value="Background location-tracking is required" />
     <variable name="LOCATION_WHEN_IN_USE_USAGE_DESCRIPTION" value="Background location-tracking is required" />
@@ -63,7 +64,7 @@ The plugin requires configuration within your App's `config.xml`:
 </widget>
 ```
 
-:warning: To apply changes to these `<variable />`, you **must** remove/re-add the plugin (**append `--nosave` when removing the plugin**)
+:warning: :exclamation: To apply changes to these `<variable />`, you **must** remove/re-add the plugin (**append `--nosave` when removing the plugin**)
 
 ```
 $ cordova plugin remove cordova-background-geolocation --nosave
@@ -89,6 +90,9 @@ For those using `useSignificantChangesOnly: true`, possibly because Apple *denie
 
 ##### `@variable LICENSE [""]` Android
 **[Android]** Your Android license key generated from [Product Dashboard](http://www.transistorsoft.com/shop/customers)
+
+##### `@variable GOOGLE_API_VERSION ["11.0.1"]` Android
+**[Android]** Sets the desired version of `play-services-location` dependency.  Many other plugins require `play-services` dependencies, (eg: `cordova-plugin-googlemaps`, `phonegap-plugin-push`):  If the version of `play-services` and/or `firebase` is not aligned to the **same** version for **ALL** plugins, your build **will fail**.
 
 ##### `@variable LOCATION_ALWAYS_AND_WHEN_IN_USE_USAGE_DESCRIPTION ["Background location-tracking is required"]` iOS
 
