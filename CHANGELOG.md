@@ -2,6 +2,7 @@
 # Change Log
 
 ## [Unreleased]
+- [Added] Expose Android variable `APPCOMPAT_VERSION` allowing customization of the plugin's required dependency `com.android.support:appcompat-v7` (default `26.1.0`).  This dependency is required for Android 8 API support.
 - [Added] Implement new Android 8 `NotificationChannel` which is now required for displaying the `foregroundService` notification.
 - [Added] New Android `<variable name="GOOGLE_API_VERSION" />` in `config.xml`.  This new `<variable />` is only possible to use in Cordova version `>= 7.1.0`.  This new variable helps to solve the old problem when multiple plugins require `play-services` of a different version, causing build failures.  The `GOOGLE_API_VERSION` allows you to configure the `play-services-location` version to align with the version used by other plugins (eg: `cordova-plugin-googlemaps`, `phonegap-plugin-push`, etc).
 - [Added] Android foreground-service notification now uses `id: 9942585`.  If you wish to interact with the foreground-service notification in native code, this is the `id`.
