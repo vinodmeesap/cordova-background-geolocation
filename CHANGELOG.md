@@ -2,6 +2,7 @@
 # Change Log
 
 ## [Unreleased]
+- [Fixed] On Android, when `changePace(true)` is executed while device is currently `still` (and remains `still`), `stopTimeout` timer would never initiate until device movement is detected.
 - [Fixed] iOS manual `#sync` was not executing *any* callback if database was empty.
 - [Added] Expose Android variable `APPCOMPAT_VERSION` allowing customization of the plugin's required dependency `com.android.support:appcompat-v7` (default `26.1.0`).  This dependency is required for Android 8 API support.
 - [Added] Implement new Android 8 `NotificationChannel` which is now required for displaying the `foregroundService` notification.
