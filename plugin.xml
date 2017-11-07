@@ -76,7 +76,7 @@
             <meta-data android:name="com.transistorsoft.locationmanager.license" android:value="$LICENSE" />
         </config-file>
 
-        <preference name="GOOGLE_API_VERSION" default="11.0.1" />
+        <preference name="GOOGLE_API_VERSION" default="11.6.0" />
         <framework src="com.google.android.gms:play-services-location:$GOOGLE_API_VERSION"/>
         <preference name="APPCOMPAT_VERSION" default="27.0.0" />
         <framework src="com.android.support:appcompat-v7:$APPCOMPAT_VERSION"/>
