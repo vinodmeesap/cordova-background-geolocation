@@ -2,6 +2,8 @@
 # Change Log
 
 ## [2.9.0] - 2017-11-09
+- [Fixed] Android NPE on `Settings.getForegroundService()` when using `foregroundService: false`
+- [Fixed] Android 8 error with `emailLog`.  Crash due to `SecurityException` when writing the log-file.  Fixed by implementing `FileProvider` (storage permissions no longer necessary).
 - [Fixed] iOS bug when providing non-string `#header` values.  Ensure casted to String.
 - [Changed] Android minimum required play-services version is `11.2.0` (required for new `play-services` APis.  Anything less and plugin will crash.
 - [Changed] Update Android to use new [`FusedLocationProviderClient`](https://developers.google.com/android/reference/com/google/android/gms/location/FusedLocationProviderClient) instead of now-deprectated `FusedLocationProviderAPI`.  It's the same underlying play-services location API -- just with a much simpler, less error-prone interface to implement.

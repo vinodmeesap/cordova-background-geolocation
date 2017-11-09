@@ -2618,24 +2618,6 @@ None
 BackgroundGeolocation.emailLog("foo@bar.com");
 ```
 
-**Android:**  
-
-1. The following permissions are required in your `AndroidManifest.xml` in order to attach the `.log` file to the email:
-
-```xml
-<manifest>
-  <application>
-  ...
-  </application>
-
-  <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
-  <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
-</manifest>
-```
-
-2. Grant "Storage" permission `Settings->Apps->[Your App]->Permissions: (o) Storage`
-
-![](https://dl.dropboxusercontent.com/s/mqfx11u15vbe3ed/screenshot-android-app-permissions.png?dl=1)
 
 ### `destroyLog(successFn, failureFn)`
 
