@@ -1,7 +1,8 @@
 
 # Change Log
 
-## [2.9.0] - 2017-11-07
+## [2.9.0] - 2017-11-09
+- [Fixed] iOS bug when providing non-string `#header` values.  Ensure casted to String.
 - [Changed] Android minimum required play-services version is `11.2.0` (required for new `play-services` APis.  Anything less and plugin will crash.
 - [Changed] Update Android to use new [`FusedLocationProviderClient`](https://developers.google.com/android/reference/com/google/android/gms/location/FusedLocationProviderClient) instead of now-deprectated `FusedLocationProviderAPI`.  It's the same underlying play-services location API -- just with a much simpler, less error-prone interface to implement.
 - [Fixed] On Android, when `changePace(true)` is executed while device is currently `still` (and remains `still`), `stopTimeout` timer would never initiate until device movement is detected.
