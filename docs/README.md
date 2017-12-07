@@ -89,6 +89,7 @@ BackgroundGeolocation.setConfig({
 | [`locationUpdateInterval`](#config-integer-millis-locationupdateinterval) | `Integer` | `1000` | With [`distanceFilter: 0`](config-integer-distancefilter), Sets the desired interval for location updates, in milliseconds. |
 | [`fastestLocationUpdateInterval`](#config-integer-millis-fastestlocationupdateinterval) | `Integer` | `10000` | Explicitly set the fastest interval for location updates, in milliseconds. |
 | [`deferTime`](#config-integer-defertime) | `Integer` | `0` | Sets the maximum wait time in milliseconds for location updates to be delivered to your callback, when they will all be delivered in a batch.|
+| [`allowIdenticalLocations`](#config-boolean-allowidenticallocations) | `Boolean` | `false` | The Android plugin will ignore a received location when it is identical to the last location.  Set `true` to override this behaviour and record every location, regardless if it is identical to the last location.|
 
 
 ## :wrench: Activity Recognition Options
@@ -550,6 +551,19 @@ If **`#fastestLocationUpdateInterval`** is set slower than [`#locationUpdateInte
 #### `@config {Integer} deferTime`
 
 Defaults to `0` (no defer).  Sets the maximum wait time in milliseconds for location updates.  If you pass a value at least 2x larger than the interval specified with [`#locationUpdateInterval`](#config-integer-millis-locationupdateinterval), then location delivery may be delayed and multiple locations can be delivered at once. Locations are determined at the [`#locationUpdateInterval`](#config-integer-millis-locationupdateinterval) rate, but can be delivered in batch after the interval you set in this method. This can consume less battery and give more accurate locations, depending on the device's hardware capabilities. You should set this value to be as large as possible for your needs if you don't need immediate location delivery.
+
+------------------------------------------------------------------------------
+
+#### `@config {Boolean} allowIdenticalLocations [false]`
+
+By default, the Android plugin will ignore a received location when it is identical to the last location.  Set `true` to override this behaviour and record *every*location, regardless if it is identical to the last location.
+
+In the logs, you will see a location being ignored:
+```
+TSLocationManager:   ℹ️  IGNORED: same as last location
+```
+
+An identical location is often generated when changing state from *stationary* -> *moving*, where a single location is first requested (the `motionchange` location) before turning on regular location updates.  Changing geolocation config params can also generate a duplicate location (eg: changing `distanceFilter`).
 
 ------------------------------------------------------------------------------
 
@@ -1031,6 +1045,8 @@ Android will reboot the plugin's background-service *immediately* after device r
 Controls the rate (in seconds) the [`heartbeat`](#heartbeat) event will fire.  The plugin will **not** provide any updated locations to your **`callbackFn`**, since it will provide only the last-known location.  If you wish for an updated location in your **`callbackFn`**, it's up to you to request one with [`#getCurrentPosition`](#getcurrentpositionsuccessfn-failurefn-options).
 
 :warning: On **iOS** the **`heartbeat`** event will fire only when configured with [`preventSuspend: true`](config-boolean-preventsuspend-false)
+
+:warning: Android *minimum* interval is `60` seconds.  It is **impossible** to have a `heartbeatInterval` faster than this on Android.
 
 ```javascript
 BackgroundGeolocation.on('heartbeat', function(params) {
