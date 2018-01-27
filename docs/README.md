@@ -1,5 +1,5 @@
 # :books: API Documentation
-- :wrench: [Configuration Options](#wrench-configuration-options)
+### :wrench: [Configuration Options](#wrench-configuration-options)
   + [Geolocation Options](#wrench-geolocation-options)
     * [Common](#geolocation-common-options)
     * [iOS](#geolocation-ios-options)
@@ -13,16 +13,17 @@
     * [Common](#application-common-options)
     * [iOS](#application-ios-options)
     * [Android](#application-android-options)
-- :zap: [Events](#zap-events)
-- :small_blue_diamond: [Methods](#large_blue_diamond-methods)
+### :zap: [Events](#zap-events)
+### :small_blue_diamond: [Methods](#large_blue_diamond-methods)
   + [Core API Methods](#small_blue_diamond-core-api-methods)
   + [HTTP & Persistence Methods](#small_blue_diamond-http--persistence-methods)
   + [Geofencing Methods](#small_blue_diamond-geofencing-methods)
   + [Logging Methods](#small_blue_diamond-logging-methods)
-- :blue_book: Guides
+### :blue_book: Guides
   + [Philosophy of Operation](../../../wiki/Philosophy-of-Operation)
   + [Geofencing](geofencing.md)
   + [HTTP Features](http.md)
+  + [Android Headless Mode](../../..//wiki/Android-Headless-Mode)
   + [Location Data Schema](../../../wiki/Location-Data-Schema)
   + [Debugging](../../../wiki/Debugging)
 
@@ -158,6 +159,7 @@ BackgroundGeolocation.setConfig({
 | Option      | Type      | Default   | Note                              |
 |-------------|-----------|-----------|-----------------------------------|
 | [`foregroundService`](#config-boolean-foregroundservice-false) | `Boolean` | `false` | Set `true` to make the plugin *mostly* immune to OS termination due to memory pressure from other apps. |
+| [`enableHeadless`](#config-boolean-enableheadless-false) | `Boolean` | `false` | Set to `true` to enable "Headless" mode when the user terminates the application.  In this mode, you can respond to all the plugin's events in the native Android environment.  For more information, see the wiki for [Android Headless Mode](../../../wiki/Android-Headless-Mode) |
 | [`notificationPriority`](#config-integer-notificationpriority-notification_priority_default) | `Integer` | `NOTIFICATION_PRIORITY_DEFAULT` | Controls the priority of the `foregroundService` notification and notification-bar icon. |
 | [`notificationTitle`](#config-string-notificationtitle-app-name) | `String` | "Your App Name" | When running the service with [`foregroundService: true`](#config-boolean-foregroundservice-false), Android requires a persistent notification in the Notification Bar.  Defaults to the application name |
 | [`notificationText`](#config-string-notificationtext-location-service-activated) | `String` |  "Location service activated" | When running the service with [`foregroundService: true`](#config-boolean-foregroundservice-false), Android requires a persistent notification in the Notification Bar.|
@@ -1024,6 +1026,8 @@ In the following image, imagine the user terminated the application at the **"re
 
 Unlike iOS, the Android plugin's tracking will **not** pause at all when user terminates the app.  However, only the plugin's native background service continues to operate, **"headless"** (in this case, you should configure an [`#url`](#config-string-url-undefined) in order for the background-service to continue uploading locations to your server).
 
+:information_source: See [Android Headless Mode](../../../wiki/Android-Headless-Mode)
+
 ------------------------------------------------------------------------------
 
 #### `@config {Boolean} startOnBoot [false]`
@@ -1039,6 +1043,7 @@ iOS cannot **immediately** engage tracking after a device reboot.  Just like [`s
 Android will reboot the plugin's background-service *immediately* after device reboot.  However, just like [`stopOnTerminate:false`](config-boolean-stoponterminate-true-android), the plugin will be running "headless" without your Application code.  If you wish for your Application code to boot as well, you may configure [`forceReloadOnBoot: true`](#config-boolean-forcereloadonboot-false)
 
 ------------------------------------------------------------------------------
+
 
 #### `@config {Integer} heartbeatInterval [undefined]`
 
@@ -1177,6 +1182,26 @@ Defaults to **`false`**.  Set **`true`** to prevent **iOS** from suspending afte
 
 ## :wrench: [Application] Android Options
 
+#### `@config {Boolean} foregroundService [false]`
+
+Defaults to **`false`**.  When the Android OS is under memory pressure from other applications (eg: a phone call), the OS can and will free up memory by terminating other processes and scheduling them for re-launch when memory becomes available.  If you find your tracking being **terminated unexpectedly**, *this* is why.
+
+If you set this option to **`true`**, the plugin will run its Android service in the foreground, **supplying the ongoing notification to be shown to the user while in this state**.  Running as a foreground-service makes the tracking-service **much** more inmmune to OS killing it due to memory/battery pressure.  By default services are background, meaning that if the system needs to kill them to reclaim more memory (such as to display a large page in a web browser).
+
+:information_source: See related config options [`notificationTitle`](#config-string-notificationtitle-app-name), [`notificationText`](#config-string-notificationtext-location-service-activated) & [`notificationColor`](#config-string-notificationcolor-null)
+
+:blue_book: For more information, see the [Android Service](https://developer.android.com/reference/android/app/Service.html#startForeground(int,%20android.app.Notification)) docs.
+
+------------------------------------------------------------------------------
+
+
+#### `@config {Boolean} enableHeadless [false]`
+
+Set to `true` to enable "Headless" mode when the user terminates the application where you've configured **`stopOnTerminate: false`**.  In this mode, you can respond to all the plugin's [events](#events) in the native Android environment.  For more information, see the wiki for [Headless Mode](../../../wiki/Android-Headless-Mode).
+
+:information_source: "Headless" mode is an alternartive to using the **`forceReloadOnXXX`** configuration options below.
+
+------------------------------------------------------------------------------
 
 #### `@config {Boolean} forceReloadOn* [false]`
 
@@ -1219,18 +1244,6 @@ Launch your app whenever a [`schedule`](#schedule) event fires.
 ##### `@config {Boolean} forceReloadOnBoot [false]`
 
 If the user reboots the device with the plugin configured for [`startOnBoot: true`](#config-boolean-startonboot-false), your will app will launch when the device is rebooted.
-
-------------------------------------------------------------------------------
-
-#### `@config {Boolean} foregroundService [false]`
-
-Defaults to **`false`**.  When the Android OS is under memory pressure from other applications (eg: a phone call), the OS can and will free up memory by terminating other processes and scheduling them for re-launch when memory becomes available.  If you find your tracking being **terminated unexpectedly**, *this* is why.
-
-If you set this option to **`true`**, the plugin will run its Android service in the foreground, **supplying the ongoing notification to be shown to the user while in this state**.  Running as a foreground-service makes the tracking-service **much** more inmmune to OS killing it due to memory/battery pressure.  By default services are background, meaning that if the system needs to kill them to reclaim more memory (such as to display a large page in a web browser).
-
-:information_source: See related config options [`notificationTitle`](#config-string-notificationtitle-app-name), [`notificationText`](#config-string-notificationtext-location-service-activated) & [`notificationColor`](#config-string-notificationcolor-null)
-
-:blue_book: For more information, see the [Android Service](https://developer.android.com/reference/android/app/Service.html#startForeground(int,%20android.app.Notification)) docs.
 
 ------------------------------------------------------------------------------
 
