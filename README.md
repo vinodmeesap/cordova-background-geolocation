@@ -1,32 +1,47 @@
-Background Geolocation
-==============================
+cordova-background-geolocation &middot; [Premium Version]
+===========================================================================
 
-Cross-platform background geolocation for Cordova with battery-saving "circular region monitoring" and "stop detection".
+[![](https://dl.dropboxusercontent.com/s/nm4s5ltlug63vv8/logo-150-print.png?dl=1)](https://www.transistorsoft.com)
+
+-------------------------------------------------------------------------------
 
 The *most* sophisticated background **location-tracking & geofencing** module with battery-conscious motion-detection intelligence for **iOS** and **Android**.
 
+The plugin's [Philosophy of Operation](../../wiki/Philosophy-of-Operation) is to use **motion-detection** APIs (using accelerometer, gyroscope and magnetometer) to detect when the device is *moving* and *stationary*.  
+
+- When the device is detected to be **moving**, the plugin will *automatically* start recording a location according to the configured `distanceFilter` (meters).  
+
+- When the device is detected be **stationary**, the plugin will automatically turn off location-services to conserve energy.
+
 Also available for [React Native](https://github.com/transistorsoft/react-native-background-geolocation), [NativeScript](https://github.com/transistorsoft/nativescript-background-geolocation-lt) and pure native apps.
+
+----------------------------------------------------------------------------
+
+[![Google Play](https://dl.dropboxusercontent.com/s/80rf906x0fheb26/google-play-icon.png?dl=1)](https://play.google.com/store/apps/details?id=com.transistorsoft.backgroundgeolocation.ionic2)
 
 ![Home](https://dl.dropboxusercontent.com/s/wa43w1n3xhkjn0i/home-framed-350.png?dl=1)
 ![Settings](https://dl.dropboxusercontent.com/s/8oad228siog49kt/settings-framed-350.png?dl=1)
 
 # Contents
-- [API Documentation](./docs/README.md)
-- [Installing the Plugin](#large_blue_diamond-installing-the-plugin)
-- [Android SDK Setup](#large_blue_diamond-android-sdk)
-- [Configuring the Plugin](#large_blue_diamond-configuring-the-plugin)
-- [Using the plugin](#large_blue_diamond-using-the-plugin)
-- [Debugging](../../wiki/Debugging)
-- [Example](#large_blue_diamond-example)
-- [Sample Application](#large_blue_diamond-advanced-sample-application)
-- [Testing Server](#large_blue_diamond-simple-testing-server)
+- ### :books: [API Documentation](./docs/README.md)
+  - :wrench: [Configuration Options](./docs/README.md#wrench-configuration-options)
+  - :zap: [Events](./docs/README.md#zap-events)
+  - :small_blue_diamond: [Methods](./docs/README.md#large_blue_diamond-methods)
+- ### [Installing the Plugin](#large_blue_diamond-installing-the-plugin)
+- ### [Android SDK Setup](#large_blue_diamond-android-sdk)
+- ### [Configuring the Plugin](#large_blue_diamond-configuring-the-plugin)
+- ### [Using the plugin](#large_blue_diamond-using-the-plugin)
+- ### [Debugging](../../wiki/Debugging)
+- ### [Example](#large_blue_diamond-example)
+- ### [Sample Application](#large_blue_diamond-advanced-sample-application)
+- ### [Testing Server](#large_blue_diamond-simple-testing-server)
   
 ## :large_blue_diamond: Installing the plugin ##
 
 #### From master (latest, greatest.)
 
 ```
-   cordova plugin add https://github.com/transistorsoft/cordova-background-geolocation.git
+$ cordova plugin add https://github.com/transistorsoft/cordova-background-geolocation.git
 ```
 
 #### Installing a tagged version.
@@ -34,7 +49,7 @@ Also available for [React Native](https://github.com/transistorsoft/react-native
 This plugin has tagged stable versions.  To install a particular version, append a version code to the github url prefixed by `#`.
 
 ```
-    cordova plugin add <git.url>#2.9.0
+$ cordova plugin add <git.url>#2.9.0
 ```
 
 ![](https://dl.dropboxusercontent.com/s/5y59djjvxlnvkou/screenshot-github-tagged-branches.png?dl=1)
@@ -80,6 +95,7 @@ $ cordova platform add android
 :exclamation: To apply changes to these `<variable />`, you **must** remove/re-add the cordova platform(s)
 
 #### Adding your LICENSE key
+
 ```bash
 $ cordova plugin add https://github.com/transistorsoft/cordova-background-geolocation.git --variable LICENSE=your_key_here
 
@@ -239,6 +255,8 @@ bgGeo.configure({
 :warning: Do not execute *any* API method (aside from `#getState` or adding event-listeners with `#on`) *before* the `callbackFn` to the `#configure` method fires, as noted above.
 
 ## :large_blue_diamond: Example
+
+See [here](https://gist.github.com/christocracy/2abf5587cc12b83e15aa12958de7a7d2#file-backgroundgeolocation-ionic2-js) for an Ionic 3 example.
 
 ```javascript
 

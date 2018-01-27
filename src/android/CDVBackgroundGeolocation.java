@@ -46,6 +46,7 @@ public class CDVBackgroundGeolocation extends CordovaPlugin {
     public static final String ACCESS_COARSE_LOCATION = Manifest.permission.ACCESS_COARSE_LOCATION;
     public static final String ACCESS_FINE_LOCATION = Manifest.permission.ACCESS_FINE_LOCATION;
     private static final String[] LOCATION_PERMISSIONS = {ACCESS_COARSE_LOCATION, ACCESS_FINE_LOCATION};
+    private static final String HEADLESS_JOB_SERVICE_CLASS = "HeadlessJobService";
 
     public static final int REQUEST_ACTION_START = 1;
     public static final int REQUEST_ACTION_GET_CURRENT_POSITION = 2;
@@ -265,7 +266,7 @@ public class CDVBackgroundGeolocation extends CordovaPlugin {
         return result;
     }
 
-    private void configure(final JSONObject config, final CallbackContext callbackContext) {
+    private void configure(final JSONObject config, final CallbackContext callbackContext) throws JSONException {
         final TSCallback callback = new TSCallback() {
             public void onSuccess() {
                 callbackContext.success(getAdapter().getState());
@@ -274,6 +275,9 @@ public class CDVBackgroundGeolocation extends CordovaPlugin {
                 callbackContext.error(error);
             }
         };
+        if (config.has("enableHeadless") && config.getBoolean("enableHeadless")) {
+            config.put("headlessJobService", getClass().getPackage().getName() + "." + HEADLESS_JOB_SERVICE_CLASS);
+        }
         if (hasPermission(ACCESS_COARSE_LOCATION) && hasPermission(ACCESS_FINE_LOCATION)) {
             getAdapter().configure(config, callback);
         } else {
@@ -636,7 +640,7 @@ public class CDVBackgroundGeolocation extends CordovaPlugin {
             }
         };
         registerCallback(callbackContext, callback);
-        getAdapter().onPowerSaveChange(callback);    
+        getAdapter().onPowerSaveChange(callback);
     }
     private void addHeartbeatListener(final CallbackContext callbackContext) {
         TSHeartbeatCallback callback = new TSHeartbeatCallback() {
@@ -655,7 +659,7 @@ public class CDVBackgroundGeolocation extends CordovaPlugin {
         TSActivityChangeCallback callback = new TSActivityChangeCallback() {
             @Override
             public void onActivityChange(ActivityChangeEvent event) {
-                
+
                 PluginResult result = new PluginResult(PluginResult.Status.OK, event.toJson());
                 result.setKeepCallback(true);
                 callbackContext.sendPluginResult(result);
