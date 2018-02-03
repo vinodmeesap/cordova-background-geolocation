@@ -742,7 +742,10 @@ public class CDVBackgroundGeolocation extends CordovaPlugin {
         });
     }
 
-    private void setConfig(final JSONObject config, final CallbackContext callbackContext) {
+    private void setConfig(final JSONObject config, final CallbackContext callbackContext) throws JSONException {
+        if (config.has("enableHeadless") && config.getBoolean("enableHeadless")) {
+            config.put("headlessJobService", getClass().getPackage().getName() + "." + HEADLESS_JOB_SERVICE_CLASS);
+        }
         TSCallback callback = new TSCallback() {
             @Override
             public void onSuccess() {
@@ -851,7 +854,7 @@ public class CDVBackgroundGeolocation extends CordovaPlugin {
 
         // Show alert popup with js error
         if (Settings.getDebug()) {
-            getAdapter().startTone(BackgroundGeolocation.TONE_ERROR);
+            getAdapter().startTone(android.media.ToneGenerator.TONE_CDMA_HIGH_S_X4);
             AlertDialog.Builder builder = new AlertDialog.Builder(this.cordova.getActivity());
             builder.setMessage(message)
                     .setCancelable(false)
