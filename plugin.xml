@@ -21,6 +21,7 @@
     <js-module src="www/BackgroundGeolocation.js" name="BackgroundGeolocation">
         <clobbers target="window.BackgroundGeolocation" />
     </js-module>
+    <js-module src="www/API.js" name="API"></js-module>    
 
      <platform name="ios">
         <preference name="BACKGROUND_MODE_LOCATION" default="&lt;string&gt;location&lt;/string&gt;" />
