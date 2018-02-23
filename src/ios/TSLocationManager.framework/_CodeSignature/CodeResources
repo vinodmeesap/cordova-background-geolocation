@@ -14,11 +14,19 @@
 		</data>
 		<key>Headers/TSConfig.h</key>
 		<data>
-		NPyxbUg46cwlvkUhie73CiwYmVw=
+		UaLb4aElq0acmD3cVkjSjv+8TLE=
+		</data>
+		<key>Headers/TSConnectivityChangeEvent.h</key>
+		<data>
+		dQ6Sio4UVzeXwLBVxsmFav6+tgA=
 		</data>
 		<key>Headers/TSCurrentPositionRequest.h</key>
 		<data>
 		yKTpnW40XVP/6siKMvaUdYenXqk=
+		</data>
+		<key>Headers/TSEnabledChangeEvent.h</key>
+		<data>
+		pFNEzIfiGmzNDl2OZDN3t+bw2u4=
 		</data>
 		<key>Headers/TSGeofence.h</key>
 		<data>
@@ -46,7 +54,7 @@
 		</data>
 		<key>Headers/TSLocationManager.h</key>
 		<data>
-		4EiY32RLsAkl5GNeBlb0NWYkV58=
+		lmSbRZqCgd3g0VkUf82OvDBTFr0=
 		</data>
 		<key>Headers/TSPowerSaveChangeEvent.h</key>
 		<data>
@@ -70,7 +78,7 @@
 		</data>
 		<key>Info.plist</key>
 		<data>
-		mBf8Vy5to3Gb3vTBrscMplSQW2E=
+		b3U9s7ii0L7KIKBn0AmJYrc8rZQ=
 		</data>
 		<key>Modules/module.modulemap</key>
 		<data>
@@ -105,11 +113,22 @@
 		<dict>
 			<key>hash</key>
 			<data>
-			NPyxbUg46cwlvkUhie73CiwYmVw=
+			UaLb4aElq0acmD3cVkjSjv+8TLE=
 			</data>
 			<key>hash2</key>
 			<data>
-			ttrfjudQPnZ1ozG1gTc8n7XfWH6z5jcF6O9tdNtTdqM=
+			4KRzKrp5e/atolhqbYwprpPGtfc5Iwnt4eCr/SRd/Z4=
+			</data>
+		</dict>
+		<key>Headers/TSConnectivityChangeEvent.h</key>
+		<dict>
+			<key>hash</key>
+			<data>
+			dQ6Sio4UVzeXwLBVxsmFav6+tgA=
+			</data>
+			<key>hash2</key>
+			<data>
+			eJAtk4flOD1eSjp4l1Pt5rLhg52h7o8gTLJMU10wj2Y=
 			</data>
 		</dict>
 		<key>Headers/TSCurrentPositionRequest.h</key>
@@ -121,6 +140,17 @@
 			<key>hash2</key>
 			<data>
 			bnfli5n57enpBEZC5kQ6T87yaGFCxzELlZO/1I+KAkY=
+			</data>
+		</dict>
+		<key>Headers/TSEnabledChangeEvent.h</key>
+		<dict>
+			<key>hash</key>
+			<data>
+			pFNEzIfiGmzNDl2OZDN3t+bw2u4=
+			</data>
+			<key>hash2</key>
+			<data>
+			kVtlkX7OVlQn0z2pM22BoC4HKNmgcl34O/ZdR2XaH1k=
 			</data>
 		</dict>
 		<key>Headers/TSGeofence.h</key>
@@ -193,11 +223,11 @@
 		<dict>
 			<key>hash</key>
 			<data>
-			4EiY32RLsAkl5GNeBlb0NWYkV58=
+			lmSbRZqCgd3g0VkUf82OvDBTFr0=
 			</data>
 			<key>hash2</key>
 			<data>
-			JO3fmoWf/M9t777SaURi/PoX1t91sNRehxZS5wfABBQ=
+			clnGgz0ddz5ZQ7vUnAlNNgqigCX0QljaVi6cNOgLm+8=
 			</data>
 		</dict>
 		<key>Headers/TSPowerSaveChangeEvent.h</key>

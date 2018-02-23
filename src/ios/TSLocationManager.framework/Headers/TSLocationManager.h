@@ -12,6 +12,8 @@
 #import "TSScheduleEvent.h"
 #import "TSGeofencesChangeEvent.h"
 #import "TSPowerSaveChangeEvent.h"
+#import "TSConnectivityChangeEvent.h"
+#import "TSEnabledChangeEvent.h"
 #import "TSGeofenceEvent.h"
 #import "TSGeofence.h"
 #import "LocationManager.h"
@@ -42,6 +44,9 @@
 - (void) onGeofencesChange:(void(^)(TSGeofencesChangeEvent* event))success;
 - (void) onSchedule:(void(^)(TSScheduleEvent* event))success;
 - (void) onPowerSaveChange:(void(^)(TSPowerSaveChangeEvent* event))success;
+- (void) onConnectivityChange:(void(^)(TSConnectivityChangeEvent* event))succes;
+- (void) onEnabledChange:(void(^)(TSEnabledChangeEvent* event))success;
+
 - (void) removeListener:(NSString*)event callback:(void(^)(id))callback;
 - (void) un:(NSString*)event callback:(void(^)(id))callback;
 - (void) removeListeners:(NSString*)event;

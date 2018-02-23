@@ -41,8 +41,11 @@
 - (void) ready:(CDVInvokedUrlCommand*) command
 {
     TSConfig *config = [TSConfig sharedInstance];
+    NSDictionary *params = [command.arguments objectAtIndex:0];
     if (config.isFirstBoot) {
-        NSDictionary *params = [command.arguments objectAtIndex:0];
+        [config updateWithDictionary:params];
+    } else if (params[@"reset"] && [[params objectForKey:@"reset"] boolValue]) {
+        [config reset];
         [config updateWithDictionary:params];
     }
     [bgGeo ready];
@@ -392,6 +395,33 @@
     [self registerCallback:command.callbackId callback:callback];
     [bgGeo onPowerSaveChange:callback];   
 }
+
+- (void) addConnectivityChangeListener:(CDVInvokedUrlCommand*)command
+{
+    __typeof(self.commandDelegate) __weak commandDelegate = self.commandDelegate;
+    void(^callback)(TSConnectivityChangeEvent*) = ^void(TSConnectivityChangeEvent* event) {
+        NSDictionary *params = @{@"connected":@(event.hasConnection)};
+        CDVPluginResult *result = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsDictionary:params];
+        [result setKeepCallbackAsBool:YES];
+        [commandDelegate sendPluginResult:result callbackId:command.callbackId];
+    };
+    [self registerCallback:command.callbackId callback:callback];
+    [bgGeo onConnectivityChange:callback];
+}
+
+- (void) addEnabledChangeListener:(CDVInvokedUrlCommand*)command
+{
+    __typeof(self.commandDelegate) __weak commandDelegate = self.commandDelegate;
+    void(^callback)(TSEnabledChangeEvent*) = ^void(TSEnabledChangeEvent* event) {
+        NSDictionary *params = @{@"enabled":@(event.enabled)};
+        CDVPluginResult *result = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsDictionary:params];
+        [result setKeepCallbackAsBool:YES];
+        [commandDelegate sendPluginResult:result callbackId:command.callbackId];
+    };
+    [self registerCallback:command.callbackId callback:callback];
+    [bgGeo onEnabledChange:callback];
+}
+
 - (void) addGeofence:(CDVInvokedUrlCommand*)command
 {
     __typeof(self.commandDelegate) __weak commandDelegate = self.commandDelegate;

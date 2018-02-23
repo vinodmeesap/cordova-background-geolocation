@@ -10,12 +10,18 @@ var MODULE_NAME = "BackgroundGeolocation";
 var exec = require("cordova/exec");
 
 // Plugin callback registry.
+var CALLBACK_REGEXP = new RegExp("^" + MODULE_NAME + ".*");
+
 var cordovaCallbacks = [];
-function registerCallback(userSuccess, mySuccess) {
+
+/**
+* Register a single Cordova Callback
+*/
+function registerCordovaCallback(userSuccess, mySuccess) {
     var callbacks = window.cordova.callbacks;
     var re = new RegExp(MODULE_NAME);
     for (var callbackId in callbacks) {
-        if (callbackId.match(re)) {
+        if (CALLBACK_REGEXP.test(callbackId)) {
             var callback = callbacks[callbackId];
             if (callback.success === mySuccess) {
                 cordovaCallbacks.push({
@@ -24,6 +30,41 @@ function registerCallback(userSuccess, mySuccess) {
                 });
                 break;
             }
+        }
+    }
+}
+/**
+* Remove a single plugin CordovaCallback
+*/
+function removeCordovaCallback(callback) {    
+    for (var n=0,len=cordovaCallbacks.length;n<len;n++) {
+        var cordovaCallback = cordovaCallbacks[n];
+        if (cordovaCallback.success === callback) {
+            var callbackId = cordovaCallback.callbackId;
+            if (typeof(window.cordova.callbacks[callbackId]) === 'object') {
+                // Destroy Cordova callback.
+                delete window.cordova.callbacks[callbackId];
+                // Destroy internal reference
+                cordovaCallbacks.splice(n, 1);
+                return callbackId;
+            } else {
+                var error = '#un ' + event + ' failed to locate cordova callback';
+                console.warn(error);
+                return null;
+            }
+            break;
+        }
+    }
+}
+
+/**
+* Remove all plugin Cordova callbacks
+*/
+function removeCordovaCallbacks() {
+    var callbacks = window.cordova.callbacks;
+    for (var callbackId in callbacks) {
+        if (callbacks.hasOwnProperty(callbackId) && CALLBACK_REGEXP.test(callbackId)) {
+            delete callbacks[callbackId];
         }
     }
 }
@@ -80,7 +121,7 @@ module.exports = {
         return new Promise(function(resolve, reject) {
             var success = function(state) { resolve(state) }
             var failure = function(error) { reject(error) }
-            var args = (defaultConfig !== undefined) ? [defaultConfig] : [];
+            var args = (defaultConfig !== undefined) ? [defaultConfig] : [{}];
             exec(success, failure, MODULE_NAME, 'reset', args);
         });
     },
@@ -95,7 +136,7 @@ module.exports = {
     */
     addListener: function(event, success, fail) {
         if (typeof(success) !== 'function') {
-            throw "#on " + event + " requires a success callback";
+            throw MODULE_NAME + "#on " + event + " requires a success callback";
         }
         fail = fail || emptyFn;
         switch (event) {
@@ -118,61 +159,44 @@ module.exports = {
             case 'geofenceschange':
                 return this.onGeofencesChange(success, fail);
             case 'powersavechange':
-                return this.onPowerSaveChange(success, fail);                
+                return this.onPowerSaveChange(success, fail);
+            case 'connectivitychange':
+                return this.onConnectivityChange(success, fail);
+            case 'enabledchange':
+                return this.onEnabledChange(success, fail);
         }
     },
     
     /**
     * remove event-listener
     */
-    removeListener: function(event, handler, success, failure) {
+    removeListener: function(event, handler) {
         // Compose remove-listener method name, eg:  "removeLocationListener"
-        var cordovaCallback;
-        for (var n=0,len=cordovaCallbacks.length;n<len;n++) {
-            cordovaCallback = cordovaCallbacks[n];
-            if (cordovaCallback.success === handler) {
-                var callbackId = cordovaCallback.callbackId;
-                if (typeof(window.cordova.callbacks[callbackId]) === 'object') {
-                    // Destroy Cordova callback.
-                    delete window.cordova.callbacks[callbackId];
-                    // Destroy internal reference
-                    cordovaCallbacks.splice(n, 1);
-
-                    exec(success || emptyFn,
-                         failure || emptyFn,
-                         MODULE_NAME,
-                         'removeListener',
-                         [event, callbackId]
-                    );
-                } else {
-                    console.warn('#un ' + event + ' failed to locate cordova callback');
-                }
-                break;
+        return new Promise(function(resolve, reject) {
+            var callbackId = removeCordovaCallback(handler);
+            if (callbackId) {
+                var success = function()        { resolve() }
+                var failure = function(error)   { reject(error) }
+                exec(success, failure, MODULE_NAME, 'removeListener', [event, callbackId]);
+            } else {
+                var error = MODULE_NAME + '#removeListener ' + event + ' failed to locate cordova callback';
+                console.warn(error);
+                reject(error);
             }
-        }
+        });        
     },
     /**
     * Remove all event-listeners
     */
-    removeListeners: function(success, failure) {
-        success = success || function(){};
-        failure = failure || function(){};
-        var re = /^BackgroundGeolocation.*/;
-        var mySuccess = function(response) {
-            var callbacks = window.cordova.callbacks;
-            for (var callbackId in callbacks) {
-                if (callbacks.hasOwnProperty(callbackId) && callbackId.match(re)) {
-                    delete callbacks[callbackId];
-                }
+    removeListeners: function() {
+        return new Promise(function(resolve, reject) {
+            var success = function(response) {
+                removeCordovaCallbacks();
+                resolve();
             }
-            success(response);
-        }
-        exec(mySuccess,
-             failure,
-             MODULE_NAME,
-             'removeListeners',
-             []
-        );
+            var failure = function(error)   { reject(error) };            
+            exec(success, failure, MODULE_NAME, 'removeListeners', []);
+        });        
     },
     /**
     * Event handlers
@@ -186,7 +210,7 @@ module.exports = {
             success(location);
         }
         exec(mySuccess, failure, MODULE_NAME, 'addLocationListener', []);
-        registerCallback(success, mySuccess);
+        registerCordovaCallback(success, mySuccess);
     },    
     onMotionChange: function(success, failure) {        
         var mySuccess = function(params) {
@@ -199,39 +223,47 @@ module.exports = {
             success(isMoving, location);
         };
         exec(mySuccess, failure, MODULE_NAME, 'addMotionChangeListener', []);
-        registerCallback(success, mySuccess);
+        registerCordovaCallback(success, mySuccess);
     },
     onActivityChange: function(success) {
         exec(success, emptyFn, MODULE_NAME, 'addActivityChangeListener', []);
-        registerCallback(success, success);
+        registerCordovaCallback(success, success);
     },
     onProviderChange: function(success) {
         exec(success, emptyFn, MODULE_NAME, 'addProviderChangeListener', []);
-        registerCallback(success, success);
+        registerCordovaCallback(success, success);
     },
     onGeofence: function(success, failure) {    
         exec(success, failure || emptyFn, MODULE_NAME, 'addGeofenceListener', []);
-        registerCallback(success, success);
+        registerCordovaCallback(success, success);
     },
     onGeofencesChange: function(success, failure) {
         exec(success, failure, MODULE_NAME, 'addGeofencesChangeListener', []);
-        registerCallback(success, success);
+        registerCordovaCallback(success, success);
     },
     onHttp: function(success, failure) {
         exec(success, failure, MODULE_NAME, 'addHttpListener', []);
-        registerCallback(success, success);
+        registerCordovaCallback(success, success);
     },
     onPowerSaveChange: function(success, failure) {
         exec(success, failure, MODULE_NAME, 'addPowerSaveChangeListener', []);
-        registerCallback(success, success);
+        registerCordovaCallback(success, success);
+    },
+    onConnectivityChange: function(success, failure) {
+        exec(success, failure, MODULE_NAME, 'addConnectivityChangeListener', []);
+        registerCordovaCallback(success, success);
+    },
+    onEnabledChange: function(success, failure) {
+        exec(success, failure, MODULE_NAME, 'addEnabledChangeListener', []);
+        registerCordovaCallback(success, success);
     },
     onHeartbeat: function(success, failure) {
         exec(success, failure, MODULE_NAME, 'addHeartbeatListener', []);
-        registerCallback(success, success);
+        registerCordovaCallback(success, success);
     },
     onSchedule: function(success, failure) {
         exec(success, failure, MODULE_NAME, 'addScheduleListener', []);
-        registerCallback(success, success);
+        registerCordovaCallback(success, success);
     },
 
     getState: function() {
@@ -382,18 +414,6 @@ module.exports = {
     addGeofence: function(config) {
         return new Promise(function(resolve, reject) {
             config = config || {};
-            if (!config.identifier) {
-                return reject("#addGeofence requires an 'identifier'");
-            }
-            if (!(config.latitude && config.longitude)) {
-                return rejet("#addGeofence requires a #latitude and #longitude");
-            }
-            if (!config.radius) {
-                return reject("#addGeofence requires a #radius");
-            }
-            if ( (typeof(config.notifyOnEntry) === 'undefined') && (typeof(config.notifyOnExit) === 'undefined') ) {
-                return reject("#addGeofence requires at least notifyOnEntry {Boolean} and/or #notifyOnExit {Boolean}");
-            }
             var success = function() { resolve() }
             var failure = function(error) { reject(error) }
             exec(success, failure, MODULE_NAME, 'addGeofence', [config]);
@@ -498,9 +518,10 @@ module.exports = {
     },
     setLogLevel: function(logLevel) {
         return new Promise(function(resolve, reject) {
+            var config = {logLevel: logLevel};
             var success = function() { resolve() }
             var failure = function() { reject() }
-            exec(success, failure, MODULE_NAME, 'setLogLevel', [logLevel]);
+            exec(success, failure, MODULE_NAME, 'setConfig', [config]);
         });
     },
     getLog: function() {
@@ -532,12 +553,18 @@ module.exports = {
         });
     },
     playSound: function(soundId) {
-        var success = function() {};
-        var failure = function() {};
-        exec(success, failure, MODULE_NAME, 'playSound', [soundId]);
+        return new Promise(function(resolve, reject) {
+            var success = function() { resolve() };
+            var failure = function(error) { reject(error) };
+            exec(success, failure, MODULE_NAME, 'playSound', [soundId]);
+        });        
     },
     log: function(level, msg) {
-        exec(emptyFn, emptyFn, MODULE_NAME, 'log', [level, msg]);
+        return new Promise(function(resolve, reject) {
+            var success = function() { resolve() };
+            var failure = function(error) { reject(error) }
+            exec(emptyFn, emptyFn, MODULE_NAME, 'log', [level, msg]);
+        });        
     },
     /**
     * Fetch list of available sensors: accelerometer, gyroscope, magnetometer

@@ -96,7 +96,6 @@ typedef enum TSLogLevel : NSInteger {
 
 + (void)eachProperty:(Class)mClass callback:(void(^)(NSString*, TSSettingType))block;
 + (TSSettingType) getPropertyType:(objc_property_t)property;
-- (void) eachModifiedProperty:(void(^)(NSString*, id, TSSettingType))block;
 + (CLLocationAccuracy) decodeDesiredAccuracy:(NSNumber*)accuracy;
 - (NSDictionary*) toDictionary;
 

@@ -46,7 +46,7 @@ module.exports = {
     ACTIVITY_TYPE_AUTOMOTIVE_NAVIGATION: 2,
     ACTIVITY_TYPE_FITNESS: 3,
     ACTIVITY_TYPE_OTHER_NAVIGATION: 4,
-
+    
     ready: function(success, failure, defaultConfig) {
         if ((arguments.length == 1) && (typeof(success) === 'object')) {
             return API.ready.apply(API, arguments);
@@ -75,7 +75,7 @@ module.exports = {
     },
     on: function(event, success, failure) {
         if (typeof(success) !== 'function') {
-            throw "Event '" + event + "' was not provided with a success callback";
+            throw "BackgroundGeolocation event '" + event + "' was not provided with a success callback.  If you're attempting to use Promise API to add an event-listener, that won't work, since a Promise can only evaluate once.";
         }
         failure = failure || emptyFn;
         API.on(event, success, failure);
@@ -128,7 +128,7 @@ module.exports = {
             API.startSchedule().then(success).catch(failure);
         }
     },
-    stopSchedule: function(successs, failure) {
+    stopSchedule: function(success, failure) {
         if (!arguments.length) {
             return API.stopSchedule();
         } else {
@@ -193,7 +193,7 @@ module.exports = {
     },
     // @deprecated
     clearDatabase: function() {
-        this.destroyLocations.apply(this, arguments);
+        return this.destroyLocations.apply(this, arguments);
     },
     insertLocation: function(location, success, failure) {
         if (arguments.length == 1) {
@@ -217,7 +217,11 @@ module.exports = {
         }
     },
     resetOdometer: function(success, failure) {
-        this.setOdometer(0, success, failure);
+        if (!arguments.length) {
+            return API.setOdometer(0);
+        } else {
+            API.setOdometer(0).then(success).catch(failure);
+        }
     },
     setOdometer: function(value, success, failure) {
         if (arguments.length == 1) {
@@ -254,8 +258,8 @@ module.exports = {
     * 3. removeGeofences(success, [failure])    
     * 4. removeGeofences(['foo'], success, [failure])
     */
-    removeGeofences(identifiers, success, failure) {        
-        if ((arguments.length <= 1) && (typeof(identifiers) !== 'function'))  {
+    removeGeofences: function(identifiers, success, failure) {        
+        if ( (arguments.length <= 1) && (typeof(identifiers) !== 'function') )  {
             return API.removeGeofences(identifiers);
         } else {            
             if (typeof(identifiers) === 'function') {
@@ -340,12 +344,12 @@ module.exports = {
         } else {
             API.isPowerSaveMode().then(success).catch(failure);
         }
-    },
+    },    
     getSensors: function(success, failure) {
         if (!arguments.length) {
             return API.getSensors();
         } else {
-            API.getSensors.then(success).catch(failure);
+            API.getSensors().then(success).catch(failure);
         }
     },
     /**
@@ -354,36 +358,142 @@ module.exports = {
     * Android:
     */
     playSound: function(soundId) {
-        API.playSound(soundId);
+        return API.playSound(soundId);
     },
     logger: {
         error: function(msg) {
-            API.log('error', msg);
+            return API.log('error', msg);
         },
         warn: function(msg) {
-            API.log('warn', msg);
+            return API.log('warn', msg);
         },
         debug: function(msg) {
-            API.log('debug', msg);
+            return API.log('debug', msg);
         },
         info: function(msg) {
-            API.log('info', msg);
+            return API.log('info', msg);
         },        
         notice: function(msg) {
-            API.log('notice', msg);
+            return API.log('notice', msg);
         },        
         header: function(msg) {
-            API.log('header', msg);
+            return API.log('header', msg);
         },
         on: function(msg) {
-            API.log('on', msg);
+            return API.log('on', msg);
         },
         off: function(msg) {
-            API.log('off', msg);
+            return API.log('off', msg);
         },
         ok: function(msg) {
-            API.log('ok', msg);
+            return API.log('ok', msg);
         }
+    },
+    test: function(delay) {
+        test(this, delay);
     }
 };
+
+var test = function(bgGeo, delay) {
+    delay = delay || 250;
+    
+    var methods = [
+        ['reset', {debug: true, logLevel: 5}],
+        ['setConfig', {distanceFilter: 50}],
+        ['setLogLevel', 5],
+        ['getLog', null],
+        ['emailLog', 'foo@bar.com'],
+        ['on', 'location'],
+        ['ready', {}],  
+        ['configure', {debug: true, logLevel: 5, schedule: ['1-7 00:00-23:59']}],
+        ['getState', null],
+        ['startSchedule', null],
+        ['stopSchedule', null],
+        ['startGeofences', null],
+        ['stop', null],
+        ['start', null],
+        ['startBackgroundTask', null],
+        ['finish', 0],
+        ['changePace', true],        
+        ['getLocations', null],        
+        ['insertLocation', {}],
+        ['sync', null],
+        ['getOdometer', null],
+        ['setOdometer', 0],
+        ['resetOdometer'],
+        ['addGeofence', {identifier: 'test-geofence-1', radius: 100, latitude: 0, longitude:0, notifyOnEntry:true}],        
+        ['addGeofences', [{identifier: 'test-geofence-2', radius: 100, latitude: 0, longitude:0, notifyOnEntry:true}, {identifier: 'test-geofence-3', radius: 100, latitude: 0, longitude:0, notifyOnEntry:true}]],
+        ['getGeofences', null],
+        ['removeGeofence', 'test-geofence-1'],
+        ['removeGeofences', null],
+        ['getCurrentPosition', {}],
+        ['watchPosition', {}],
+        ['stopWatchPosition', null],      
+        ['isPowerSaveMode', null],
+        ['getSensors', null],
+        ['playSound', 1509],        
+        ['destroyLocations', null],
+        ['clearDatabase', null],
+        ['destroyLog', null],
+        ['removeListeners', null]
+    ];
+
+    var createCallback = function(type, method, params) {
+        return function(result) {
+            console.log('- ' + method + '(' + params + ') - ' + type + ': ', result); 
+        }
+    }            
+    var executeMethod = function(record) {
+        console.log('* Execute method: ', record)
+        var method = '' + record[0];      
+        var params = record[1];
+
+        var success = createCallback('success', method, params);
+        var failure = createCallback('failure', method, params);
+
+        // Execute Standard API
+        try {
+            console.log('- Standard API: ' + method);
+            if (params == null) {
+                bgGeo[method](success, failure);
+            } else {
+                // Adjust params for different signatures.
+                switch (method) {
+                    case 'watchPosition':
+                    case 'getCurrentPosition':
+                        bgGeo[method](success, failure, params);
+                        break;
+                    default:
+                        bgGeo[method](params, success, failure);
+                        break;
+                }                
+            }
+        } catch (e) {
+            console.warn(e);
+        }
+        // Execute Promise API
+        setTimeout(function() {
+            console.log('- Promise API: ' + method);
+            try {
+                if (params == null) {
+                    bgGeo[method]().then(success).catch(failure);
+                } else {
+                    bgGeo[method](params).then(success).catch(failure);
+                }
+            } catch (e) {
+                console.warn(e);
+            }
+        }, 10);
+    }        
+    // Begin fetching methods.
+    var intervalId = setInterval(function() {
+        var record = methods.shift();        
+        if (!record || !methods.length) {
+            clearInterval(intervalId);
+            console.log('*** TEST COMPLETE ***');
+            return;
+        }        
+        executeMethod(record);
+    }, delay);
+}
 

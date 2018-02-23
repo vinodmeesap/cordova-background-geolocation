@@ -5,6 +5,7 @@ import com.transistorsoft.locationmanager.adapter.TSConfig;
 import com.transistorsoft.locationmanager.adapter.callback.*;
 import com.transistorsoft.locationmanager.data.LocationModel;
 import com.transistorsoft.locationmanager.event.ActivityChangeEvent;
+import com.transistorsoft.locationmanager.event.ConnectivityChangeEvent;
 import com.transistorsoft.locationmanager.event.GeofenceEvent;
 import com.transistorsoft.locationmanager.event.GeofencesChangeEvent;
 import com.transistorsoft.locationmanager.event.HeartbeatEvent;
@@ -53,7 +54,7 @@ public class CDVBackgroundGeolocation extends CordovaPlugin {
      * Timeout in millis for a getCurrentPosition request to give up.
      * TODO make configurable.
      */
-
+    public static final String ACTION_RESET             = "reset";
     public static final String ACTION_FINISH            = "finish";
     public static final String ACTION_START_BACKGROUND_TASK = "startBackgroundTask";
     public static final String ACTION_ERROR             = "error";
@@ -68,6 +69,8 @@ public class CDVBackgroundGeolocation extends CordovaPlugin {
     public static final String ACTION_REMOVE_LISTENERS  = "removeListeners";
     public static final String ACTION_ADD_GEOFENCE_LISTENER = "addGeofenceListener";
     public static final String ACTION_ADD_GEOFENCESCHANGE_LISTENER = "addGeofencesChangeListener";
+    public static final String ACTION_ADD_CONNECTIVITYCHANGE_LISTENER = "addConnectivityChangeListener";
+    public static final String ACTION_ADD_ENABLEDCHANGE_LISTENER = "addEnabledChangeListener";
     public static final String ACTION_ADD_POWERSAVECHANGE_LISTENER = "addPowerSaveChangeListener";
 
     public static final String ACTION_PLAY_SOUND        = "playSound";
@@ -134,6 +137,9 @@ public class CDVBackgroundGeolocation extends CordovaPlugin {
             result = true;
             this.onError(data.getString(1));
             callbackContext.success();
+        } else if (ACTION_RESET.equalsIgnoreCase(action)) {
+            result = true;
+            reset(data.getJSONObject(0), callbackContext);
         } else if (ACTION_READY.equalsIgnoreCase(action)) {
             result = true;
             ready(data.getJSONObject(0), callbackContext);
@@ -200,6 +206,12 @@ public class CDVBackgroundGeolocation extends CordovaPlugin {
         } else if (ACTION_ADD_POWERSAVECHANGE_LISTENER.equalsIgnoreCase(action)) {
             result = true;
             addPowerSaveChangeListener(callbackContext);
+        } else if (ACTION_ADD_CONNECTIVITYCHANGE_LISTENER.equalsIgnoreCase(action)) {
+            result = true;
+            addConnectivityChangeListener(callbackContext);
+        } else if (ACTION_ADD_ENABLEDCHANGE_LISTENER.equalsIgnoreCase(action)) {
+            result = true;
+            addEnabledChangeListener(callbackContext);
         } else if (BackgroundGeolocation.ACTION_GET_GEOFENCES.equalsIgnoreCase(action)) {
             result = true;
             getGeofences(callbackContext);
@@ -266,12 +278,21 @@ public class CDVBackgroundGeolocation extends CordovaPlugin {
         return result;
     }
 
+    private void reset(JSONObject params, CallbackContext callbackContext) throws JSONException {
+        TSConfig config = TSConfig.getInstance(cordova.getActivity().getApplicationContext());
+        config.reset();
+        config.updateWithJSONObject(setHeadlessJobService(params));
+        callbackContext.success(config.toJson());
+    }
     private void ready(final JSONObject params, final CallbackContext callbackContext) throws JSONException {
         BackgroundGeolocation adapter = getAdapter();
         final TSConfig config = TSConfig.getInstance(cordova.getActivity().getApplicationContext());
 
         if (config.isFirstBoot()) {
             config.useCLLocationAccuracy(true);
+            config.updateWithJSONObject(setHeadlessJobService(params));
+        } else if (params.has("reset") && params.getBoolean("reset")) {
+            config.reset();
             config.updateWithJSONObject(setHeadlessJobService(params));
         }
         adapter.ready(new TSCallback() {
@@ -501,6 +522,7 @@ public class CDVBackgroundGeolocation extends CordovaPlugin {
                 return;
             } catch (TSGeofence.Exception e) {
                 callbackContext.error(e.getMessage());
+                return;
             }
         }
         getAdapter().addGeofences(geofences, new TSCallback() {
@@ -619,6 +641,44 @@ public class CDVBackgroundGeolocation extends CordovaPlugin {
         registerCallback(callbackContext, callback);
         getAdapter().onPowerSaveChange(callback);
     }
+
+    private void addConnectivityChangeListener(final CallbackContext callbackContext) {
+        TSConnectivityChangeCallback callback = new TSConnectivityChangeCallback() {
+            @Override public void onConnectivityChange(ConnectivityChangeEvent event) {
+                JSONObject params = new JSONObject();
+                try {
+                    params.put("connected", event.hasConnection());
+                    PluginResult result = new PluginResult(PluginResult.Status.OK, params);
+                    result.setKeepCallback(true);
+                    callbackContext.sendPluginResult(result);
+                }
+                catch (JSONException e) {
+                    callbackContext.error(e.getMessage());
+                }
+            }
+        };
+        registerCallback(callbackContext, callback);
+        getAdapter().onConnectivityChange(callback);
+    }
+
+    private void addEnabledChangeListener(final CallbackContext callbackContext) {
+        TSEnabledChangeCallback callback = new TSEnabledChangeCallback() {
+            @Override public void onEnabledChange(boolean b) {
+                JSONObject params = new JSONObject();
+                try {
+                    params.put("enabled", TSConfig.getInstance(cordova.getActivity().getApplicationContext()).getEnabled());
+                    PluginResult result = new PluginResult(PluginResult.Status.OK, params);
+                    result.setKeepCallback(true);
+                    callbackContext.sendPluginResult(result);
+                } catch (JSONException e) {
+                    callbackContext.error(e.getMessage());
+                }
+            }
+        };
+        registerCallback(callbackContext, callback);
+        getAdapter().onEnabledChange(callback);
+    }
+
     private void addHeartbeatListener(final CallbackContext callbackContext) {
         TSHeartbeatCallback callback = new TSHeartbeatCallback() {
             @Override
