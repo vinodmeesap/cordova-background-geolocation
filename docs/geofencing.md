@@ -8,16 +8,33 @@ The plugin achieves this by storing your geofences in its database, using a [geo
 
 When the device is determined to be moving, the plugin periodically queries for geofences in proximity (eg. every minute) using the latest recorded location.  This geospatial query is **very fast**, even with tens-of-thousands geofences in the database.
 
+## Event: `geofence`
+
+The `geofence` event will fire whenever a geofence transition event occurs.  Your callback will be provided an event object containing the `geofence` which fired, the corresponding `location` and the `action` (`EXIT|ENTRY|DWELL`) which triggered the geofence.
+
+```javascript
+BackgroundGeolocation.on('geofence', function(geofence) {
+  var location    = geofence.location;
+  var identifier  = geofence.identifier;
+  var action      = geofence.action;
+
+  console.log('A geofence has been crossed: ', identifier);
+  console.log('ENTER, EXIT or DWELL?: ', action);
+  console.log('geofence: ', JSON.stringify(geofence));
+  console.log('location: ', JSON.stringify(location));
+});
+```
+
 ## Event: `geofenceschange`
 
-When a proximity-query detects a change in the list of monitored geofences, it will fire the `geofenceschanged` event, providing information about which geofences were activiated as well as those which were de-activiated.
+When a proximity-query detects a change in the *list* of monitored geofences, it will fire the `geofenceschanged` event, providing information about which geofences were activiated as well as those which were de-activiated.
 
 The parameter provided to your event-handler takes the following form:
 ####@param {Array} on The list of geofences just activated.
 ####@param {Array off The list of geofences just de-activated
 
 ```Javascript
-bgGeo.on('geofenceschange', function(event) {
+BackgroundGeolocation.on('geofenceschange', function(event) {
   var on = event.on;   //<-- new geofences activiated.
   var off = event.off; //<-- geofences that were de-activated.
 
