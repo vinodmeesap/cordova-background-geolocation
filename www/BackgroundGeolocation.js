@@ -47,9 +47,9 @@ module.exports = {
     ACTIVITY_TYPE_FITNESS: 3,
     ACTIVITY_TYPE_OTHER_NAVIGATION: 4,
     
-    ready: function(success, failure, defaultConfig) {
-        if ((arguments.length == 1) && (typeof(success) === 'object')) {
-            return API.ready.apply(API, arguments);
+    ready: function(defaultConfig, success, failure) {
+        if (arguments.length <= 1) {
+            return API.ready(defaultConfig||{});
         } else {
             API.ready(defaultConfig).then(success).catch(failure);
         }
