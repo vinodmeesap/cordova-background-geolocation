@@ -1,6 +1,8 @@
 
 # Change Log
 ## [Unreleased]
+- [Fixed] iOS `stopAfterElapsedMinutes` was not being evaluated during `heartbeat` event.
+- [Changed] Re-structure Android lib `tslocationmanager.aar` as a Maven repo.
 - [Added] Added new initialization method `#ready`, desigend to replace `#configure` (which is now deprectated).  The new `#ready` method operates in the same manner as `#configure` with a crucial difference -- the plugin will only apply the supplied configuration `{}` at the first launch of your app &mdash; thereafter, it will automatically load the last-known config from persistent storage.
 - [Added] Add new method `#reset` for resetting the plugin configuration to documented defaults.
 - [Added] Refactor Javascript API to use Promises.  Only `#watchPosition` and adding event-listeners with `#on` will not use promises.
