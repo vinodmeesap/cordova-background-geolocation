@@ -14,7 +14,7 @@
 		</data>
 		<key>Headers/TSConfig.h</key>
 		<data>
-		UaLb4aElq0acmD3cVkjSjv+8TLE=
+		DqlWFQ2Gy6sXvNQ2fqt+4/Ae7fU=
 		</data>
 		<key>Headers/TSConnectivityChangeEvent.h</key>
 		<data>
@@ -50,7 +50,7 @@
 		</data>
 		<key>Headers/TSLocation.h</key>
 		<data>
-		UmAaqlQChE0usal27sWOqnt5W+E=
+		0WBO8ktLZn5+OxA3J7hm5thnWuo=
 		</data>
 		<key>Headers/TSLocationManager.h</key>
 		<data>
@@ -113,11 +113,11 @@
 		<dict>
 			<key>hash</key>
 			<data>
-			UaLb4aElq0acmD3cVkjSjv+8TLE=
+			DqlWFQ2Gy6sXvNQ2fqt+4/Ae7fU=
 			</data>
 			<key>hash2</key>
 			<data>
-			4KRzKrp5e/atolhqbYwprpPGtfc5Iwnt4eCr/SRd/Z4=
+			29LqzV1n9ik5UM3mEFMkUr2VrZZreABw3ddruYUNlr4=
 			</data>
 		</dict>
 		<key>Headers/TSConnectivityChangeEvent.h</key>
@@ -212,11 +212,11 @@
 		<dict>
 			<key>hash</key>
 			<data>
-			UmAaqlQChE0usal27sWOqnt5W+E=
+			0WBO8ktLZn5+OxA3J7hm5thnWuo=
 			</data>
 			<key>hash2</key>
 			<data>
-			cpiPf7vM/wXSR6yFkHITUGe5mVnAubpOnDoo+cs9Rkk=
+			rJh0VLZOKwnFmEMaePasZYIKeYG+6foSTRZzXiE1uqI=
 			</data>
 		</dict>
 		<key>Headers/TSLocationManager.h</key>

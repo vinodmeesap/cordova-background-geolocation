@@ -133,7 +133,6 @@ typedef enum TSLogLevel : NSInteger {
 @property (nonatomic) BOOL enabled;
 @property (nonatomic) BOOL isMoving;
 @property (nonatomic) BOOL schedulerEnabled;
-@property (nonatomic) BOOL heartbeatEnabled;
 @property (nonatomic) CLLocationDistance odometer;
 @property (nonatomic) TSTrackingMode trackingMode;
 @property (nonatomic) CLAuthorizationStatus lastLocationAuthorizationStatus;

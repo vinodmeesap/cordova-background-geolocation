@@ -15,7 +15,8 @@ typedef enum tsLocationType : NSInteger {
     TS_LOCATION_TYPE_CURRENT        = 2,
     TS_LOCATION_TYPE_SAMPLE         = 3,
     TS_LOCATION_TYPE_WATCH          = 4,
-    TS_LOCATION_TYPE_GEOFENCE       = 5
+    TS_LOCATION_TYPE_GEOFENCE       = 5,
+    TS_LOCATION_TYPE_HEARTBEAT      = 6
 } tsLocationtype;
 
 @property (nonatomic, readonly) CLLocation* location;
