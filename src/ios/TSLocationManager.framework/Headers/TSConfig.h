@@ -8,6 +8,9 @@
 @import CoreLocation;
 #import <objc/runtime.h>
 
+/**
+ * Create TSSettingType
+ */
 typedef enum TSSettingType : NSInteger {
     tsSettingTypeString = 0,
     tsSettingTypeInteger,
@@ -39,8 +42,16 @@ typedef enum TSLogLevel : NSInteger {
  */
 @interface TSConfigBuilder : NSObject
 
+/// @name Properties
+
 // Geolocation
+/**
+ * desired accuracy in meterssss
+ */
 @property (nonatomic) CLLocationAccuracy desiredAccuracy;
+/**
+ * distance filter in meters
+ */
 @property (nonatomic) CLLocationDistance distanceFilter;
 @property (nonatomic) CLLocationDistance stationaryRadius;
 @property (nonatomic) NSTimeInterval locationTimeout;
@@ -101,16 +112,23 @@ typedef enum TSLogLevel : NSInteger {
 
 @end
 
-/**
- * TSConfig
- */
 # pragma mark TSConfig
 
+/**
+TSConfig
+ */
 @interface TSConfig : NSObject <NSCoding>
 #pragma mark - Singleton
 + (TSConfig *)sharedInstance;
 
 # pragma mark Initializers
+
+/**
+ * Update with Block doc
+ * @param block This is the block
+ * @see TSConfigBuilder
+ */
+
 - (void)updateWithBlock:(void(^)(TSConfigBuilder*))block;
 - (void)updateWithDictionary:(NSDictionary*)config;
 - (void)reset;
@@ -129,15 +147,30 @@ typedef enum TSLogLevel : NSInteger {
 # pragma mark Utility methods
 - (NSDictionary*) toDictionary;
 
-// State
+/// @name State Properties
+/**
+ * enabled is tracking enabled?
+ */
 @property (nonatomic) BOOL enabled;
+/**
+ * State of plugin, moving or stationary.
+ */
 @property (nonatomic) BOOL isMoving;
+/**
+ * True when scheduler is enabled
+ */
 @property (nonatomic) BOOL schedulerEnabled;
 @property (nonatomic) CLLocationDistance odometer;
 @property (nonatomic) TSTrackingMode trackingMode;
 @property (nonatomic) CLAuthorizationStatus lastLocationAuthorizationStatus;
-// Geolocation
+/// @name Geolocation Properties
+/**
+ * GPS is only used when kCLDesiredAccuracyBest or kCLDesiredAccuracyBestForNavigation.
+ */
 @property (nonatomic, readonly) CLLocationAccuracy desiredAccuracy;
+/**
+ * A location will be recorded each distanceFilter meters
+ */
 @property (nonatomic, readonly) CLLocationDistance distanceFilter;
 @property (nonatomic, readonly) CLLocationDistance stationaryRadius;
 @property (nonatomic, readonly) NSTimeInterval locationTimeout;
@@ -152,7 +185,7 @@ typedef enum TSLogLevel : NSInteger {
 @property (nonatomic, readonly) BOOL geofenceInitialTriggerEntry;
 @property (nonatomic, readonly) CLLocationAccuracy desiredOdometerAccuracy;
 
-// ActivityRecognition
+/// @name ActivityRecognition Properties
 @property (nonatomic, readonly) CLActivityType activityType;
 @property (nonatomic, readonly) NSTimeInterval stopDetectionDelay;
 @property (nonatomic, readonly) NSTimeInterval stopTimeout;
@@ -162,7 +195,7 @@ typedef enum TSLogLevel : NSInteger {
 @property (nonatomic, readonly) BOOL disableStopDetection;
 @property (nonatomic, readonly) BOOL stopOnStationary;
 
-// HTTP & Persistence
+/// @name HTTP & Persistence Properties
 @property (nonatomic, readonly) NSString* url;
 @property (nonatomic, readonly) NSString* method;
 @property (nonatomic, readonly) NSString* httpRootProperty;
@@ -180,13 +213,13 @@ typedef enum TSLogLevel : NSInteger {
 @property (nonatomic, readonly) NSString* locationsOrderDirection;
 @property (nonatomic, readonly) NSInteger httpTimeout;
 
-// Application
+/// @name Application Properties
 @property (nonatomic, readonly) BOOL stopOnTerminate;
 @property (nonatomic, readonly) BOOL startOnBoot;
 @property (nonatomic, readonly) BOOL preventSuspend;
 @property (nonatomic, readonly) NSTimeInterval heartbeatInterval;
 @property (nonatomic, readonly) NSArray *schedule;
-// Logging & Debug
+// @name Logging & Debug Properties
 @property (nonatomic, readonly) BOOL debug;
 @property (nonatomic, readonly) TSLogLevel logLevel;
 @property (nonatomic, readonly) NSInteger logMaxDays;
