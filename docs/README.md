@@ -80,7 +80,7 @@ BackgroundGeolocation.setConfig({
 |-------------|-----------|-----------|-----------------------------------|
 | [`stationaryRadius`](#config-integer-stationaryradius-meters) | `Integer`  | `25`  | When stopped, the minimum distance the device must move beyond the stationary location for aggressive background-tracking to engage. |
 | [`useSignificantChangesOnly`](#config-boolean-usesignificantchangesonly-false) | `Boolean` | `false` | Defaults to `false`.  Set `true` in order to disable constant background-tracking and use only the iOS [Significant Changes API](https://developer.apple.com/library/ios/documentation/CoreLocation/Reference/CLLocationManager_Class/index.html#//apple_ref/occ/instm/CLLocationManager/startMonitoringSignificantLocationChanges). |
-| [`locationAuthorizationRequest`](#config-string-locationauthorizationrequest-always) | `String` | `Always` | The desired iOS location-authorization request, either `Always` or `WhenInUse`. |
+| [`locationAuthorizationRequest`](#config-string-locationauthorizationrequest-always) | `String` | `Always` | The desired iOS location-authorization request, either `Always`, `WhenInUse` or `Any`. |
 | [`locationAuthorizationAlert`](#config-object-locationauthorizationalert) | `Object` | `{}` | When you configure the plugin [`locationAuthorizationRequest`](config-string-locationauthorizationrequest-always) `Always` or `WhenInUse` and the user *changes* that value in the app's location-services settings or *disables* location-services, the plugin will display an Alert directing the user to the **Settings** screen. |
 
 ### [Geolocation] Android Options
@@ -507,7 +507,9 @@ The default behaviour of the plugin is to turn **off** location-services *automa
 
 #### `@config {String} locationAuthorizationRequest [Always]`
 
-The desired iOS location-authorization request, either **`Always`** or **`WhenInUse`**.  **`locationAuthorizationRequest`** tells the plugin the mode it *expects* to be in &mdash; if the user changes this mode in their settings, the plugin will detect this (@see [`locationAuthorizationAlert`](#config-object-locationauthorizationalert)).  Defaults to **`Always`**.  **`WhenInUse`** will display a **blue bar** at top-of-screen informing user that location-services are on.
+The desired iOS location-authorization request, either **`Always`**, **`WhenInUse`** or **`Any`**.  **`locationAuthorizationRequest`** tells the plugin the mode it *expects* to be in &mdash; if the user changes this mode in their settings, the plugin will detect this (@see [`locationAuthorizationAlert`](#config-object-locationauthorizationalert)).  Defaults to **`Always`**.  **`WhenInUse`** will display a **blue bar** at top-of-screen informing user that location-services are on.
+
+If you configure **`Any`**, the plugin allow the user to choose either `Always` or `WhenInUse`.   The plugin will **not** show the location-authorization dialog when the user changes the selection in `Privacy->Location Services`
 
 :warning: Configuring **`WhenInUse`** will disable many of the plugin's features, since iOS forbids any API which operates in the background to operate (such as **geofences**, which the plugin relies upon to automatically engage background tracking).
 
