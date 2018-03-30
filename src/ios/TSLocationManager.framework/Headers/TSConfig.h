@@ -142,7 +142,7 @@ TSConfig
 -(BOOL)isLocationTrackingMode;
 -(BOOL)hasValidUrl;
 -(BOOL)hasSchedule;
--(NSDictionary*)getLocationAuthorizationAlert;
+-(NSDictionary*)getLocationAuthorizationAlertStrings;
 -(BOOL)isFirstBoot;
 # pragma mark Utility methods
 - (NSDictionary*) toDictionary;
