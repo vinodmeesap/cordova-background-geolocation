@@ -1,6 +1,7 @@
 
 # Change Log
-## [Unreleased]
+## Unreleased
+- [Added] iOS config `disableLocationAuthorizationAlert` for disabling automatic location-authorization alert when location-services are disabled or user changes toggles location access (eg: `Always` -> `WhenInUse`).
 - [Fixed] Fixed issue executing `#getCurrentPosition` from Headless mode while plugin is current disabled.
 - [Added] Add new iOS `locationAuthorizationRequest: "Any"` for allowing the plugin to operate in either `Always` or `WhenInUse` without being spammed by location-authorization dialog.
 - [Fixed] iOS `stopAfterElapsedMinutes` was not being evaluated during `heartbeat` event.
