@@ -1,6 +1,7 @@
 
 # Change Log
 ## Unreleased
+- [Fixed] iOS was not persiting odometer.
 - [Fixed] iOS geofence exit event not being executed due to a condition where a stationary event occurs while geofence exit events are awaiting their location to be returned.
 - [Added] iOS config `disableLocationAuthorizationAlert` for disabling automatic location-authorization alert when location-services are disabled or user changes toggles location access (eg: `Always` -> `WhenInUse`).
 - [Fixed] Fixed issue executing `#getCurrentPosition` from Headless mode while plugin is current disabled.
