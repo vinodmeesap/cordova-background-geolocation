@@ -1,6 +1,10 @@
 
 # Change Log
 
+## [Unreleased]
+- [Fixed] iOS `preventSuspend` was not working with `useSignificantChangesOnly`
+- [Changed] iOS disable encryption on SQLite database file when "Data Protection" capability is enabled with `NSFileProtectionNone` so that plugin can continue to insert records while device is locked.
+
 ## [2.12.2] - 2018-05-25
 - [Changed] Reduce required `cordova` version from `8.0.0` to `7.1.0`.
 - [Fixed] iOS issue when plugin is booted in background in geofences-only mode, could engage location-tracking mode.
