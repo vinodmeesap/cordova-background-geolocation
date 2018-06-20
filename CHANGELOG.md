@@ -2,6 +2,8 @@
 # Change Log
 
 ## [Unreleased]
+- [Fixed] Android `headlessJobService` class could fail to be applied when upgrading from previous version.  Ensure always applied.
+- [Fixed] Android `httpTimeout` was not being applied to new `okhttp3.Client#connectionTimeout`
 - [Fixed] iOS `preventSuspend` was not working with `useSignificantChangesOnly`
 - [Changed] iOS disable encryption on SQLite database file when "Data Protection" capability is enabled with `NSFileProtectionNone` so that plugin can continue to insert records while device is locked.
 
