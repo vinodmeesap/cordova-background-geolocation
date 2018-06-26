@@ -2,6 +2,9 @@
 # Change Log
 
 ## [Unreleased]
+- [Added] iOS support for HTTP method `PATCH` (Android already supports it).
+- [Fixed] Android was not using `httpTimeout` with latest `okhttp3`.
+- [Fixed] Android issue not firing `providerchange` on boot when configured with `stopOnTerminate: true`
 - [Fixed] Android `headlessJobService` class could fail to be applied when upgrading from previous version.  Ensure always applied.
 - [Fixed] Android `httpTimeout` was not being applied to new `okhttp3.Client#connectionTimeout`
 - [Fixed] iOS `preventSuspend` was not working with `useSignificantChangesOnly`
