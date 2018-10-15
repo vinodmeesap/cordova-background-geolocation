@@ -3,7 +3,7 @@
 <plugin xmlns="http://www.phonegap.com/ns/plugins/1.0"
     xmlns:android="http://schemas.android.com/apk/res/android"
     id="cordova-background-geolocation"
-    version="2.14.0">
+    version="2.14.0-beta.1">
 
     <name>BackgroundGeolocation</name>
     <description>The most sophisticated, battery-efficient background-geolocation and geofencing plugin for Cordova</description>
@@ -77,7 +77,7 @@
             <meta-data android:name="com.transistorsoft.locationmanager.license" android:value="$LICENSE" />
         </config-file>
 
-        <preference name="GOOGLE_API_VERSION" default="15.0.1" />
+        <preference name="GOOGLE_API_VERSION" default="16.0.0" />
         <framework src="com.google.android.gms:play-services-location:$GOOGLE_API_VERSION"/>
         <preference name="APPCOMPAT_VERSION" default="27.1.1" />
         <framework src="com.android.support:appcompat-v7:$APPCOMPAT_VERSION"/>

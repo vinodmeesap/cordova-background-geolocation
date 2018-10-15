@@ -2,7 +2,7 @@ const plugin = function() {
 	return (<any>window).BackgroundGeolocation;
 }
 
-export class BackgroundGeolocation {
+export default class BackgroundGeolocation {
 
   static get LOG_LEVEL_OFF() { return plugin().LOG_LEVEL_OFF; }
   static get LOG_LEVEL_ERROR() { return plugin().LOG_LEVEL_ERROR; }

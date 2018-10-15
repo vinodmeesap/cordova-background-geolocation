@@ -1,5 +1,6 @@
-
-
+/// <reference path="../types.d.ts" />
+/// <reference path="./LocationAuthorizationAlert.d.ts" />
+///
 declare module "cordova-background-geolocation" {
   /**
   * ## 🔧 Configuration API.

@@ -1,3 +1,5 @@
+/// <reference path="./Geofence.d.ts" />
+///
 declare module "cordova-background-geolocation" {
   /**
   * The event-object provided to [[BackgroundGeolocation.onGeofencesChange]].

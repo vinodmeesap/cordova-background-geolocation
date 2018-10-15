@@ -272,12 +272,7 @@
 {
     __typeof(self.commandDelegate) __weak commandDelegate = self.commandDelegate;
     void(^callback)(TSHttpEvent*) = ^void(TSHttpEvent* response) {
-        NSDictionary *params = @{
-            @"success": @(response.isSuccess),
-            @"status": @(response.statusCode),
-            @"responseText":response.responseText
-        };
-        CDVPluginResult *result = [CDVPluginResult resultWithStatus:(response.isSuccess) ? CDVCommandStatus_OK : CDVCommandStatus_ERROR messageAsDictionary:params];
+        CDVPluginResult *result = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsDictionary:[response toDictionary]];
         [result setKeepCallbackAsBool:YES];
         [commandDelegate sendPluginResult:result callbackId:command.callbackId];
     };
@@ -414,8 +409,7 @@
 {
     __typeof(self.commandDelegate) __weak commandDelegate = self.commandDelegate;
     void(^callback)(TSEnabledChangeEvent*) = ^void(TSEnabledChangeEvent* event) {
-        NSDictionary *params = @{@"enabled":@(event.enabled)};
-        CDVPluginResult *result = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsDictionary:params];
+        CDVPluginResult *result = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsBool:event.enabled];
         [result setKeepCallbackAsBool:YES];
         [commandDelegate sendPluginResult:result callbackId:command.callbackId];
     };

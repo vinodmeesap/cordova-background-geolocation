@@ -2,7 +2,7 @@ declare module "cordova-background-geolocation" {
   /**
   * Append your own log-messages into the plugin's logging database.  The following methods are available at [[BackgroundGeolocation.logger]]:
   *
-  ### Methods
+  ## Methods
 
   | method     | logLevel | icon            |
   |------------|----------|-----------------|
@@ -16,7 +16,11 @@ declare module "cordova-background-geolocation" {
   |`off`       |`INFO`    | 🔴              |
   |`ok`        |`INFO`    | ✅              |
 
-  @example
+
+  ## Examples
+  *
+  * @example
+  *
   * ```javascript
   * BackgroundGeolocation.logger.error("Something bad happened");
   * BackgroundGeolocation.logger.warn("Something weird happened");

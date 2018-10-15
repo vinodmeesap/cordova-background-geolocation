@@ -1,4 +1,3 @@
-
 declare module "cordova-background-geolocation" {
 	/**
 	* __`[iOS only]`__ Controls the text-elements of the plugin's location-authorization dialog.

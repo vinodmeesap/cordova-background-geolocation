@@ -218,4 +218,4 @@ var BackgroundGeolocation = /** @class */ (function () {
     BackgroundGeolocation.playSound = function () { return plugin().playSound.apply(this, arguments); };
     return BackgroundGeolocation;
 }());
-export { BackgroundGeolocation };
+export default BackgroundGeolocation;

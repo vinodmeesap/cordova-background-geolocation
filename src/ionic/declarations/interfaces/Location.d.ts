@@ -1,3 +1,7 @@
+/// <reference path="./GeofenceEvent.d.ts" />
+/// <reference path="./MotionActivityEvent.d.ts" />
+/// <reference path="./ProviderChangeEvent.d.ts" />
+///
 declare module "cordova-background-geolocation" {
   /**
   */

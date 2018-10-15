@@ -22,42 +22,42 @@ declare module "cordova-background-geolocation" {
   * Primary API of the SDK.
   * @break
   *
-  ## 📚 Help
-  - 📘 [Philosophy of Operation](github:wiki/Philosophy-of-Operation)
-  - 📘 HTTP Guide: [[HttpEvent]].
-  - 📘 Geofencing Guide:  [[Geofence]].
-  - 📘 [Android Headless Mode](github:wiki/Android-Headless-Mode).
-  - 📘 [Debugging](github:wiki/Debugging).
+  * ## 📚 Help
+  * - 📘 [Philosophy of Operation](github:wiki/Philosophy-of-Operation)
+  * - 📘 HTTP Guide: [[HttpEvent]].
+  * - 📘 Geofencing Guide:  [[Geofence]].
+  * - 📘 [Android Headless Mode](github:wiki/Android-Headless-Mode).
+  * - 📘 [Debugging](github:wiki/Debugging).
   *
-  ## ⚡️ Events
+  * ## ⚡️ Events
   *
-  [[BackgroundGeolocation]] is event-based.  Interacting with the SDK is largely through implementing listeners on the following events:
+  * [[BackgroundGeolocation]] is event-based.  Interacting with the SDK is largely through implementing listeners on the following events:
   *
-  | Method                 | Description                             |
-  |------------------------|-----------------------------------------|
-  | [[onLocation]]           | Fired with each recorded [[Location]]     |
-  | [[onMotionChange]]       | Fired when the plugin changes state between *moving* / *stationary* |
-  | [[onHttp]]               | Fired with each HTTP response from your server.  (see [[Config.url]]). |
-  | [[onActivityChange]]     | Fired with each change in device motion-activity.                    |
-  | [[onProviderChange]]     | Fired after changes to device location-services configuration.       |
-  | [[onHeartbeat]]          | Periodic timed events.  See [[Config.heartbeatInterval]].  iOS requires [[Config.preventSuspend]]. |
-  | [[onGeofence]]           | Fired with each [[Geofence]] transition event (`ENTER, EXIT, DWELL`).  |
-  | [[onGeofencesChange]]    | Fired when the list of actively-monitored geofences changed.  See [[Config.geofenceProximityRadius]]. |
-  | [[onSchedule]]           | Fired for [[Config.schedule]] events.                                  |
-  | [[onConnectivityChange]] | Fired when network-connectivity changes (connected / disconnected).  |
-  | [[onPowerSaveChange]]    | Fired when state of operating-system's "power-saving" feature is enabled / disabld. |
-  | [[onEnabledChange]]      | Fired when the plugin is enabled / disabled via its [[start]] / [[stop]] methods.        |
+  * | Method                 | Description                             |
+  * |------------------------|-----------------------------------------|
+  * | [[onLocation]]           | Fired with each recorded [[Location]]     |
+  * | [[onMotionChange]]       | Fired when the plugin changes state between *moving* / *stationary* |
+  * | [[onHttp]]               | Fired with each HTTP response from your server.  (see [[Config.url]]). |
+  * | [[onActivityChange]]     | Fired with each change in device motion-activity.                    |
+  * | [[onProviderChange]]     | Fired after changes to device location-services configuration.       |
+  * | [[onHeartbeat]]          | Periodic timed events.  See [[Config.heartbeatInterval]].  iOS requires [[Config.preventSuspend]]. |
+  * | [[onGeofence]]           | Fired with each [[Geofence]] transition event (`ENTER, EXIT, DWELL`).  |
+  * | [[onGeofencesChange]]    | Fired when the list of actively-monitored geofences changed.  See [[Config.geofenceProximityRadius]]. |
+  * | [[onSchedule]]           | Fired for [[Config.schedule]] events.                                  |
+  * | [[onConnectivityChange]] | Fired when network-connectivity changes (connected / disconnected).  |
+  * | [[onPowerSaveChange]]    | Fired when state of operating-system's "power-saving" feature is enabled / disabld. |
+  * | [[onEnabledChange]]      | Fired when the plugin is enabled / disabled via its [[start]] / [[stop]] methods.        |
   *
-  ## 🔧 [[Config]] API
+  * ## 🔧 [[Config]] API
   *
-  [[BackgroundGeolocation]] is highly configurable.  See the [[Config]] API for more information.
+  * [[BackgroundGeolocation]] is highly configurable.  See the [[Config]] API for more information.
   *
-  There are three main steps to using `BackgroundGeolocation`
-  1. Wire up event-listeners.
-  2. [[ready]] the SDK.
-  3. [[start]] tracking.
+  * There are three main steps to using `BackgroundGeolocation`
+  * 1. Wire up event-listeners.
+  * 2. [[ready]] the SDK.
+  * 3. [[start]] tracking.
   *
-  @example
+  * @example
   * ```typescript
   *
   * ////
@@ -130,10 +130,10 @@ declare module "cordova-background-geolocation" {
   *
   * ```
   *
-  ### ℹ️ Note:
-  The configuration **`{}`** provided to the [[ready]] method is applied **only** when your app is **first booted** &mdash; for every launch thereafter, the plugin will automatically load the last known configuration from persistant storage.  If you wish to **force** the `#ready` method to *always* apply the supplied config `{}`, you can specify **`reset: true`**
+  * ### ℹ️ Note:
+  * The configuration **`{}`** provided to the [[ready]] method is applied **only** when your app is **first booted** &mdash; for every launch thereafter, the plugin will automatically load the last known configuration from persistant storage.  If you wish to **force** the `#ready` method to *always* apply the supplied config `{}`, you can specify **`reset: true`**
   *
-  @example
+  * @example
   * ```javascript
   * BackgroundGeolocation.ready({
   *   reset: true,  // <-- true to always apply the supplied config
@@ -143,13 +143,13 @@ declare module "cordova-background-geolocation" {
   * });
   * ```
   *
-  ### ⚠️ Warning:
-  Do not execute *any* API method which will require accessing location-services until the callback to [[ready]] executes (eg: [[getCurrentPosition]], [[watchPosition]], [[start]]).
+  * ### ⚠️ Warning:
+  * Do not execute *any* API method which will require accessing location-services until the callback to [[ready]] executes (eg: [[getCurrentPosition]], [[watchPosition]], [[start]]).
   *
-  ### Promise API
+  * ### Promise API
   *
-  The `BackgroundGeolocation` Javascript API supports [Promises](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise) for *nearly* every method (the exceptions are [[watchPosition]] and adding event-listeners via **`#onEventName`** methods.)
-  @example
+  * The `BackgroundGeolocation` Javascript API supports [Promises](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise) for *nearly* every method (the exceptions are [[watchPosition]] and adding event-listeners via **`#onEventName`** methods.)
+  * @example
   * ```javascript
   * // Traditional API still works:
   * BackgroundGeolocation.ready({desiredAccuracy: 0, distanceFilter: 50}).then(state => {
@@ -159,8 +159,7 @@ declare module "cordova-background-geolocation" {
   * });
   * ```
   */
-
-  export class BackgroundGeolocation {
+  export default class BackgroundGeolocation {
     static LOG_LEVEL_OFF: LogLevel;
     static LOG_LEVEL_ERROR: LogLevel;
     static LOG_LEVEL_WARNING: LogLevel;
@@ -205,7 +204,14 @@ declare module "cordova-background-geolocation" {
     *
     * @example
     * ```typescript
-    * BackgroundGeolocation.removeListener('location', myLocationCallback);
+    * let locationHandler = (location) => {
+    *   console.log('[location] - ', location)
+    * }
+    * BackgroundGeolocation.onLocation(locationHandler)
+    * .
+    * .
+    * // Remove the listener providing a reference to the original callback.
+    * BackgroundGeolocation.removeListener('location', locationHandler)
     * ```
     */
     static removeListener(event: string, handler: Function, success?:Function, failure?:Function): void;
@@ -234,8 +240,9 @@ declare module "cordova-background-geolocation" {
     /**
     * Subscribe to location events.
     *
-    Every location recorded by the SDK is provided to your `callback`, including those from [[onMotionChange]], [[getCurrentPosition]] and [[watchPosition]].
-    @example
+    * Every location recorded by the SDK is provided to your `callback`, including those from [[onMotionChange]], [[getCurrentPosition]] and [[watchPosition]].
+    *
+    * @example
 	  * ```javascript
     * BackgroundGeolocation.onLocation((location) => {
     *   console.log('[onLocation] success: ', location);
@@ -243,19 +250,18 @@ declare module "cordova-background-geolocation" {
     *   console.log('[onLocation] ERROR: ', error);
     * });
     * ```
-
-    ### Error Codes
-
-    If the native location API fails to return a location, the `failure` callback will be provided a [[LocationError]].
-
-    ### ⚠️ Note [[Location.sample]]:
-
-    When performing a [[onMotionChange]] or [[getCurrentPosition]], the plugin requests **multiple** location *samples* in order to record the most accurate location possible.  These *samples* are **not** persisted to the database but they will be provided to your `callback`, for your convenience, since it can take some seconds for the best possible location to arrive.
-
-    For example, you might use these samples to progressively update the user's position on a map.  You can detect these *samples* in your `callback` via `location.sample == true`.  If you're manually `POST`ing location to your server, you should ignore these locations.
-
-    @event location
     *
+    * ### Error Codes
+    *
+    * If the native location API fails to return a location, the `failure` callback will be provided a [[LocationError]].
+    *
+    * ### ⚠️ Note [[Location.sample]]:
+    *
+    * When performing a [[onMotionChange]] or [[getCurrentPosition]], the plugin requests **multiple** location *samples* in order to record the most accurate location possible.  These *samples* are **not** persisted to the database but they will be provided to your `callback`, for your convenience, since it can take some seconds for the best possible location to arrive.
+    *
+    * For example, you might use these samples to progressively update the user's position on a map.  You can detect these *samples* in your `callback` via `location.sample == true`.  If you're manually `POST`ing location to your server, you should ignore these locations.
+    *
+    * @event location
     */
     static onLocation(success: (location:Location)=>void, failure?:(errorCode: LocationError) => void):void;
 
@@ -285,11 +291,11 @@ declare module "cordova-background-geolocation" {
     *
     * @example
 	  * ```javascript
-    * BackgroundGeolocation.onMotionChange((event) => {
-    *   if (event.isMoving) {
-    *      console.log('[onMotionChange] Device has just started MOVING ', event.location);
+    * BackgroundGeolocation.onMotionChange((location) => {
+    *   if (location.isMoving) {
+    *      console.log('[onMotionChange] Device has just started MOVING ', location);
     *   } else {
-    *      console.log('[onMotionChange] Device has just STOPPED:  ', event.location);
+    *      console.log('[onMotionChange] Device has just STOPPED:  ', location);
     *   }
     * });
     * ```
@@ -1200,32 +1206,7 @@ declare module "cordova-background-geolocation" {
     static playSound(soundId:number, success?:Function, failure?:Function): Promise<void>;
 
     /**
-    * Append your own log-messages into the plugin's logging database.  The following methods are available at [[BackgroundGeolocation.logger]]:
     *
-    | method     | logLevel | icon            |
-    |------------|----------|-----------------|
-    |`error`     |`ERROR`   | ❗️              |
-    |`warn`      |`WARNING` | ⚠️              |
-    |`debug`     |`DEBUG`   | 🐞              |
-    |`info`      |`INFO`    | ℹ️              |
-    |`notice`    |`INFO`    | 🔵              |
-    |`header`    |`INFO`    | *message wrapped in box*    |
-    |`on`        |`INFO`    | 🎾              |
-    |`off`       |`INFO`    | 🔴              |
-    |`ok`        |`INFO`    | ✅              |
-
-    @example
-    * ```javascript
-    * BackgroundGeolocation.logger.error("Something bad happened");
-    * BackgroundGeolocation.logger.warn("Something weird happened");
-    * BackgroundGeolocation.logger.debug("Debug message");
-    * BackgroundGeolocation.logger.info("Something informative");
-    * BackgroundGeolocation.logger.notice("Something interesting");
-    * BackgroundGeolocation.logger.header("Something bold");
-    * BackgroundGeolocation.logger.on("Something on or positive");
-    * BackgroundGeolocation.logger.off("Something off or negative");
-    * BackgroundGeolocation.logger.ok("Something affirmative happened");
-    * ```
     */
     static logger: Logger;
   }

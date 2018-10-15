@@ -840,11 +840,11 @@ BackgroundGeolocation.onHeartbeat(<span class="hljs-function">(<span class="hljs
 								<p>Your <code>callback</code> will be executed each time the device has changed-state between <strong>MOVING</strong> or <strong>STATIONARY</strong>.</p>
 								<dl class="tsd-comment-tags">
 									<dt class="tsd-comment-tag-example">example</dt>
-									<dd><pre><code class="language-javascript">BackgroundGeolocation.onMotionChange(<span class="hljs-function">(<span class="hljs-params">event</span>) =&gt;</span> {
-  <span class="hljs-keyword">if</span> (event.isMoving) {
-     <span class="hljs-built_in">console</span>.log(<span class="hljs-string">'[onMotionChange] Device has just started MOVING '</span>, event.location);
+									<dd><pre><code class="language-javascript">BackgroundGeolocation.onMotionChange(<span class="hljs-function">(<span class="hljs-params">location</span>) =&gt;</span> {
+  <span class="hljs-keyword">if</span> (location.isMoving) {
+     <span class="hljs-built_in">console</span>.log(<span class="hljs-string">'[onMotionChange] Device has just started MOVING '</span>, location);
   } <span class="hljs-keyword">else</span> {
-     <span class="hljs-built_in">console</span>.log(<span class="hljs-string">'[onMotionChange] Device has just STOPPED:  '</span>, event.location);
+     <span class="hljs-built_in">console</span>.log(<span class="hljs-string">'[onMotionChange] Device has just STOPPED:  '</span>, location);
   }
 });</code></pre>
 									</dd>
@@ -1256,78 +1256,6 @@ BackgroundGeolocation.onHeartbeat(<span class="hljs-function">(<span class="hljs
 					<div class="tsd-signature tsd-kind-icon">logger<span class="tsd-signature-symbol">:</span> <a href="../interfaces/_cordova_background_geolocation_.logger.html" class="tsd-signature-type">Logger</a></div>
 					<aside class="tsd-sources">
 					</aside>
-					<div class="tsd-comment tsd-typography">
-						<div class="lead">
-							<p>Append your own log-messages into the plugin&#39;s logging database.  The following methods are available at <a href="_cordova_background_geolocation_.backgroundgeolocation.html#logger">BackgroundGeolocation.logger</a>:</p>
-						</div>
-						<table>
-							<thead>
-								<tr>
-									<th>method</th>
-									<th>logLevel</th>
-									<th>icon</th>
-								</tr>
-							</thead>
-							<tbody><tr>
-									<td><code>error</code></td>
-									<td><code>ERROR</code></td>
-									<td>❗️</td>
-								</tr>
-								<tr>
-									<td><code>warn</code></td>
-									<td><code>WARNING</code></td>
-									<td>⚠️</td>
-								</tr>
-								<tr>
-									<td><code>debug</code></td>
-									<td><code>DEBUG</code></td>
-									<td>🐞</td>
-								</tr>
-								<tr>
-									<td><code>info</code></td>
-									<td><code>INFO</code></td>
-									<td>ℹ️</td>
-								</tr>
-								<tr>
-									<td><code>notice</code></td>
-									<td><code>INFO</code></td>
-									<td>🔵</td>
-								</tr>
-								<tr>
-									<td><code>header</code></td>
-									<td><code>INFO</code></td>
-									<td><em>message wrapped in box</em></td>
-								</tr>
-								<tr>
-									<td><code>on</code></td>
-									<td><code>INFO</code></td>
-									<td>🎾</td>
-								</tr>
-								<tr>
-									<td><code>off</code></td>
-									<td><code>INFO</code></td>
-									<td>🔴</td>
-								</tr>
-								<tr>
-									<td><code>ok</code></td>
-									<td><code>INFO</code></td>
-									<td>✅</td>
-								</tr>
-						</tbody></table>
-						<dl class="tsd-comment-tags">
-							<dt class="tsd-comment-tag-example">example</dt>
-							<dd><pre><code class="language-javascript">BackgroundGeolocation.logger.error(<span class="hljs-string">"Something bad happened"</span>);
-BackgroundGeolocation.logger.warn(<span class="hljs-string">"Something weird happened"</span>);
-BackgroundGeolocation.logger.debug(<span class="hljs-string">"Debug message"</span>);
-BackgroundGeolocation.logger.info(<span class="hljs-string">"Something informative"</span>);
-BackgroundGeolocation.logger.notice(<span class="hljs-string">"Something interesting"</span>);
-BackgroundGeolocation.logger.header(<span class="hljs-string">"Something bold"</span>);
-BackgroundGeolocation.logger.on(<span class="hljs-string">"Something on or positive"</span>);
-BackgroundGeolocation.logger.off(<span class="hljs-string">"Something off or negative"</span>);
-BackgroundGeolocation.logger.ok(<span class="hljs-string">"Something affirmative happened"</span>);</code></pre>
-							</dd>
-						</dl>
-					</div>
 				</section>
 			</section>
 			<section class="tsd-panel-group tsd-member-group ">
@@ -2681,7 +2609,14 @@ bgGeo.reset({
 								</div>
 								<dl class="tsd-comment-tags">
 									<dt class="tsd-comment-tag-example">example</dt>
-									<dd><pre><code class="language-typescript">BackgroundGeolocation.removeListener(<span class="hljs-string">'location'</span>, myLocationCallback);</code></pre>
+									<dd><pre><code class="language-typescript"><span class="hljs-keyword">let</span> locationHandler = <span class="hljs-function">(<span class="hljs-params">location</span>) =&gt;</span> {
+  <span class="hljs-built_in">console</span>.log(<span class="hljs-string">'[location] - '</span>, location)
+}
+BackgroundGeolocation.onLocation(locationHandler)
+.
+.
+<span class="hljs-comment">// Remove the listener providing a reference to the original callback.</span>
+BackgroundGeolocation.removeListener(<span class="hljs-string">'location'</span>, locationHandler)</code></pre>
 									</dd>
 								</dl>
 							</div>

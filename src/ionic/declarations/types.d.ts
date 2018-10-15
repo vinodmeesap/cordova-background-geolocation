@@ -1,12 +1,3 @@
-/**
-* ## 📚 Help
-*  - 📘 [Philosophy of Operation](github:wiki/Philosophy-of-Operation)
-*  - 📘 HTTP Guide: [[HttpEvent]].
-*  - 📘 Geofencing Guide:  [[Geofence]].
-*  - 📘 [Android Headless Mode](github:wiki/Android-Headless-Mode).
-*  - 📘 [Debugging](github:wiki/Debugging).
-*
-*/
 declare module "cordova-background-geolocation" {
 	/**
 	* Controls the volume of [[Config.logLevel]] log-entries recorded to database.

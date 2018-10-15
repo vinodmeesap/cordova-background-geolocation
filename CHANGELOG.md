@@ -10,7 +10,8 @@ BackgroundGeolocation.on('motionchange', (motionChangeEvent) => {
   let isMoving = event.isMoving;
   let location = event.location;
 });
-
+- [Breaking] Changed event-signature of `http` event.  There is no more `failure` callback -- HTTP failures will be provided to your single `callback`.
+- [Breaking] Changed event-signature of `enabledchange` event callback to `boolean` instead of Object `{enabled: boolean}`.
 ```
 
 ## [2.13.2] - 2018-10-01
