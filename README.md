@@ -7,9 +7,9 @@ cordova-background-geolocation &middot; [Premium Version]
 
 The *most* sophisticated background **location-tracking & geofencing** module with battery-conscious motion-detection intelligence for **iOS** and **Android**.
 
-The plugin's [Philosophy of Operation](../../wiki/Philosophy-of-Operation) is to use **motion-detection** APIs (using accelerometer, gyroscope and magnetometer) to detect when the device is *moving* and *stationary*.  
+The plugin's [Philosophy of Operation](../../wiki/Philosophy-of-Operation) is to use **motion-detection** APIs (using accelerometer, gyroscope and magnetometer) to detect when the device is *moving* and *stationary*.
 
-- When the device is detected to be **moving**, the plugin will *automatically* start recording a location according to the configured `distanceFilter` (meters).  
+- When the device is detected to be **moving**, the plugin will *automatically* start recording a location according to the configured `distanceFilter` (meters).
 
 - When the device is detected be **stationary**, the plugin will automatically turn off location-services to conserve energy.
 
@@ -23,10 +23,7 @@ Also available for [React Native](https://github.com/transistorsoft/react-native
 ![Settings](https://dl.dropboxusercontent.com/s/8oad228siog49kt/settings-framed-350.png?dl=1)
 
 # Contents
-- ### :books: [API Documentation](./docs/README.md)
-  - :wrench: [Configuration Options](./docs/README.md#wrench-configuration-options-1)
-  - :zap: [Events](./docs/README.md#zap-events-1)
-  - :small_blue_diamond: [Methods](./docs/README.md#large_blue_diamond-methods)
+- ### :books: [API Documentation](https://transistorsoft.github.io/cordova-background-geolocation)
 - ### [Installing the Plugin](#large_blue_diamond-installing-the-plugin)
 - ### [Android SDK Setup](#large_blue_diamond-android-sdk)
 - ### [Configuring the Plugin](#large_blue_diamond-configuring-the-plugin)
@@ -35,7 +32,7 @@ Also available for [React Native](https://github.com/transistorsoft/react-native
 - ### [Example](#large_blue_diamond-example)
 - ### [Sample Application](#large_blue_diamond-advanced-sample-application)
 - ### [Testing Server](#large_blue_diamond-simple-testing-server)
-  
+
 ## :large_blue_diamond: Installing the plugin ##
 
 #### From master (latest, greatest.)
@@ -214,9 +211,9 @@ Adds the iOS background-mode `location` to your iOS `.plist` file.  This is the 
 
 ## :large_blue_diamond: Using the Plugin
 
-The plugin creates the object **`window.BackgroundGeolocation`**.  See [API Documentation](docs) for details
+The plugin creates the object **`window.BackgroundGeolocation`**.  See [API Documentation](https://transistorsoft.github.io/cordova-background-geolocation) for details
 
-### Ionic 2 and Typescript
+### Ionic 2+ and Typescript
 
 [Sample Implementation](https://gist.github.com/christocracy/2abf5587cc12b83e15aa12958de7a7d2)
 
@@ -231,7 +228,7 @@ platform.ready().then(() => {
 There are **three** simple steps to using `BackgroundGeolocation`:
 
 1. Listen to events
-2. Execute [`#ready`](docs/README.md#readydefaultconfig-successfn-failurefn) method
+2. Execute [`#ready`](https://transistorsoft.github.io/cordova-background-geolocation/classes/_cordova_background_geolocation_.backgroundgeolocation.html#ready) method
 3. `#start` the plugin
 
 ```javascript
@@ -240,8 +237,8 @@ bgGeo.on('location', onLocation, onLocationFailure);
 bgGeo.on('motionchange', onMotionChange);
 bgGeo.on('providerchange', onProviderChange);
 
-// 2. Execute #ready method:  
-bgGeo.ready({  
+// 2. Execute #ready method:
+bgGeo.ready({
   desiredAccuracy: 0,   // <-- Config params
   distanceFilter: 50,
   debug: true,
@@ -255,7 +252,7 @@ bgGeo.ready({
     });
   }
 });
-// NOTE:  Do NOT execute any API methods which will access location-services 
+// NOTE:  Do NOT execute any API methods which will access location-services
 // until the callback to #ready executes!
 //
 // For example, DO NOT do this here:
@@ -279,7 +276,7 @@ bgGeo.ready({
 
 ### Promise API
 
-The `BackgroundGeolocation` Javascript API supports [Promises](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise) for *nearly* every method (the exceptions are **`#watchPosition`** and adding event-listeners via **`#on`** method.  For more information, see the [API Documentation](docs/README.md#large_blue_diamond-methods)
+The `BackgroundGeolocation` Javascript API supports [Promises](https://developer.mozilla.org/en-US/help/Web/JavaScript/Reference/Global_Objects/Promise) for *nearly* every method (the exceptions are **`#watchPosition`** and adding event-listeners via **`#on`** method.  For more information, see the [API Documentation](https://transistorsoft.github.io/cordova-background-geolocation)
 
 ```javascript
 // Traditional API still works:
@@ -346,7 +343,7 @@ function onDeviceReady() {
         // Activity Recognition config
         activityRecognitionInterval: 10000,
         stopTimeout: 5,
-        // Application config        
+        // Application config
         stopOnTerminate: false,
         startOnBoot: true,
         // HTTP / SQLite config
@@ -401,7 +398,7 @@ A simple Node-based [web-application](https://github.com/transistorsoft/backgrou
 ![](https://dl.dropboxusercontent.com/s/tiy5b2oivt0np2y/background-geolocation-console-grid.png?dl=1)
 
 
-# Licence 
+# Licence
 ```
 cordova-background-geolocation
 Copyright (c) 2018, Transistor Software (9224-2932 Quebec Inc)
@@ -429,7 +426,7 @@ http://transistorsoft.com
 
 	2.5 Including the Right to Create Derivative Works: </strong>Licensee may create derivative works based on Software, including amending Software&rsquo;s source code, modifying it, integrating it into a larger work or removing portions of Software, as long as no distribution of the derivative works is made.
 
-3. Term & Termination:  The Term of this license shall be until terminated. Licensor may terminate this Agreement, including Licensee's license in the case where Licensee : 
+3. Term & Termination:  The Term of this license shall be until terminated. Licensor may terminate this Agreement, including Licensee's license in the case where Licensee :
 
 	3.1 became insolvent or otherwise entered into any liquidation process; or
 
@@ -459,7 +456,7 @@ http://transistorsoft.com
 
 7. Liability: To the extent permitted under Law, The Software is provided under an   AS-IS basis. Licensor shall never, and without any limit, be liable for   any damage, cost, expense or any other payment incurred by Licensee as a   result of Software&rsquo;s actions, failure, bugs and/or any other  interaction  between The Software &nbsp;and Licensee&rsquo;s end-equipment, computers,  other  software or any 3rd party, end-equipment, computer or  services. Moreover, Licensor shall never be liable for any defect in  source code  written by Licensee when relying on The Software or using The Software&rsquo;s source  code.
 
-8. Warranty: 
+8. Warranty:
 
 	8.1 Intellectual Property:  Licensor   hereby warrants that The Software does not violate or infringe any 3rd   party claims in regards to intellectual property, patents and/or   trademarks and that to the best of its knowledge no legal action has   been taken against it for any infringement or violation of any 3rd party   intellectual property rights.
 

@@ -1,5 +1,17 @@
 
 # Change Log
+## [Unreleased]
+- [Breaking] Changed event-signature of `motionchange` callback from `isMoving:boolean, location:Location` -> `event:MotionChangeEvent`.
+```javascript
+// old
+BackgroundGeolocation.on('motionchange', (isMoving, location) => {...})
+// new
+BackgroundGeolocation.on('motionchange', (motionChangeEvent) => {
+  let isMoving = event.isMoving;
+  let location = event.location;
+});
+
+```
 
 ## [2.13.2] - 2018-10-01
 - [Fixed] iOS was missing Firebase adapter hook for persisting geofences.
@@ -130,9 +142,9 @@
 - [Fixed] iOS 11 fix:  Added new location-authorization string `NSLocationAlwaysAndWhenInUseUsageDescription`.  iOS 11 now requires location-authorization popup to allow user to select either `Always` or `WhenInUse`.
 
 ## [2.7.4] - 2017-07-10
-- [Fixed] Android & iOS will ensure old location samples are ignored with `getCurrentPosition` 
+- [Fixed] Android & iOS will ensure old location samples are ignored with `getCurrentPosition`
 - [Fixed] Android `providerchange` event would continue to persist a providerchange location even when plugin was disabled for the case where location-services is disabled by user.
-- [Fixed] Don't mutate iOS `url` to lowercase.  Just lowercase the comparison when checking for `301` redirects. 
+- [Fixed] Don't mutate iOS `url` to lowercase.  Just lowercase the comparison when checking for `301` redirects.
 - [Changed] Android will attempt up to 5 motionchange samples instead of 3.
 - [Changed] Android foregroundService notification priority set to `PRIORITY_MIN` so that notification doesn't always appear on top.
 - [Fixed] Android plugin was not nullifying the odometer reference location when `#stop` method is executed, resulting in erroneous odometer calculations if plugin was stopped, moved some distance then started again.
@@ -150,14 +162,14 @@
 ## [2.7.2] - 2017-06-14
 - [Added] New config `stopOnStationary` for both iOS and Android.  Allows you to automatically `#stop` tracking when the `stopTimeout` timer elapses.
 - [Added] Support for configuring the "Large Icon" (`notificationLargeIcon`) on Android `foregroundService` notification.  `notificationIcon` has now been aliased -> `notificationSmallIcon`.
-- [Fixed] iOS timing issue when fetching `motionchange` position after initial `#start` -- since the significant-location-changes API (SLC) is engaged in the `#stop` method and eagerly returns a location ASAP, that first SLC location could sometimes be several minutes old and come from cell-tower triangulation (ie: ~1000m accuracy).  The plugin could mistakenly capture this location as the `motionchange` location instead of waiting for the highest possible accuracy location that was requested.  SLC API will be engaged only after the `motionchange` location has been received. 
+- [Fixed] iOS timing issue when fetching `motionchange` position after initial `#start` -- since the significant-location-changes API (SLC) is engaged in the `#stop` method and eagerly returns a location ASAP, that first SLC location could sometimes be several minutes old and come from cell-tower triangulation (ie: ~1000m accuracy).  The plugin could mistakenly capture this location as the `motionchange` location instead of waiting for the highest possible accuracy location that was requested.  SLC API will be engaged only after the `motionchange` location has been received.
 - [Fixed] On Android, when adding a *massive* number of geofences (ie: *thousands*), it can take several minutes to perform all `INSERT` queries.  There was a threading issue which could cause the main-thread to be blocked while waiting for the database lock from the geofence queries to be released, resulting in an ANR (app isn't responding) warning.
 - [Changed] Changing the Android foreground-service notification is now supported (you no longer need to `#stop` / `#start` the plugin for changes to take effect).
 - [Fixed] Improved Android handling of simultaneous `#getCurrentPosition`, `#start`, `#configure` requests when location-services are not yet authorized by the user (the plugin will buffer all these requests and execute them in order once location-services are authorized).
 - [Added] New config option `httpTimeout` (milliseconds) for configuring the timeout where the plugin will give up on sending an HTTP request.
 - [Fixed] When iOS engages the `stopTimeout` timer, the OS will pause background-execution if there's no work being performed, in spite of `startBackgroundTask`, preventing the `stopTimeout` timer from running.  iOS will now keep location updates running at minimum accuracy during `stopTimeout` to prevent this.
 - [Fixed] Ensure iOS background "location" capability is enabled before asking `CLLocationManager` to `setBackgroundLocationEnabled`.
-- [Added] Implement ability to provide literal dates to schedule (eg: `2017-06-01 09:00-17:00`) 
+- [Added] Implement ability to provide literal dates to schedule (eg: `2017-06-01 09:00-17:00`)
 - [Added] When Android motion-activity handler detects `stopTimeout` has expired, it will initiate a `motionchange` without waiting for the `stopTimeout` timer to expire (there were cases where the `stopTimeout` timer could be delayed from firing due likely to vendor-based battery-saving software)
 - [Fixed] Android `emailLog` method was using old `adb logcat` method of fetching logs rather than fetching from `#getLog`
 
@@ -249,7 +261,7 @@ bgGeo.on('geofence', function(geofence) {  // <-- taskId no longer provided!
 - [Changed] Location parameters `heading`, `accuracy`, `odometer`, `speed`, `altitude`, `altitudeAccuracy` are now fixed at 2 decimal places.
 - [Fixed] Bug reported with `EventBus already registered` error.  Found a few cases where `EventBus.isRegistered` was not being used.
 - [Added] Android will attempt to auto-sync on heartbeat events.
-- [Changed] permission `android.hardware.location.gps" **android:required="false"**` 
+- [Changed] permission `android.hardware.location.gps" **android:required="false"**`
 - [Added] Implement `IntentFilter` to capture `MY_PACKAGE_REPLACED`, broadcast when user upgrades the app.  If you've configured `startOnBoot: true, stopOnTerminate: false` and optionally `foreceRelaodOnBoot: true`, the plugin will automatically restart when user upgrades the app.
 - [Changed] When adding a geofence (either `#addGeofence` or `#addGeofences`), if a geofence already exists with the provided `identifier`, the plugin will first destroy the existing one before creating the new one.
 - [Changed] When iOS Scheduler is engaged and a scheduled OFF event occurs, the plugin will continue to monitor significant-changes, since background-fetch events alone cannot be counted on.  This will guarantee the plugin evaluates the schedule each time the device moves ~ 1km.  This will have little impact on power consumption, since these sig.change events will not be persisted or `POST`ed, nor will they even be provided to Javascript.
@@ -284,7 +296,7 @@ bgGeo.on('geofence', function(geofence) {  // <-- taskId no longer provided!
 
 ## [2.1.5] - 2016-11-04
 - [Fixed] Issue #998.  FMDB [has issues](https://github.com/ccgus/fmdb/pull/180) binding array arguments (eg: DELETE FROM locations WHERE id IN(?)).  Solution is to simply compose the query string with concatenation.  Sanitization isn't required here anyway, since the ids come directly from my own query.
-  
+
 ## [2.1.4] - 2016-11-02
 - [Changed] Extract `CococaLumberjack` static-libary from compiled binary TSLocationManager.  It causes problems if other libs also use this dependency.  Extracted CocoaLumberjack to its own distinct plugin `cordova-plugin-cocoalumberjack`, which background-geolocation installs as a dependency.  This change should be completely transparent.
 
@@ -377,7 +389,7 @@ bgGeo.on('geofence', function(geofence) {  // <-- taskId no longer provided!
 - [Changed] Significantly simplified Cordova plugin (CDVBackgroundGeolocation.java) by moving boiler-plate code into the Proxy object.  This significantly simplifies the Cordova plugin, making it much easier to support all the different frameworks the plugin has been ported to (ie: React Native, NativeScript).
 - [Changed] Disable iOS start-detection system when no accelerometer detected (ie: when running in simulator, fixes issue #767)
 - [Changed] Refactor iOS location-authorization request system.  The plugin will now constantly check the status of location-authorization and show an Alert popup directing the user to the **Settings** screen if the user changes the state to anything other than what you requested (eg: user changes authorization-request to `WhenInUse` or `Never` when you requestd `Always`)
-- [Fixed] `stopOnTerminate` on iOS was broken when app is closed while in background.  
+- [Fixed] `stopOnTerminate` on iOS was broken when app is closed while in background.
 
 ## [1.7.0] - 2016-07-18
 - [Changed] `Scheduler` will use `Locale.US` in its Calendar operations, such that the days-of-week correspond to Sunday=1..Saturday=7.  Fixes issue #659
@@ -463,7 +475,7 @@ bgGeo.on('geofence', function(geofence) {  // <-- taskId no longer provided!
 
 ## [1.3.0]
 
-- [Changed] Upgrade `emailLog` method to attach log as email-attachment rather than rendering to email-body.  The result of `#getState` is now rendered to the 
+- [Changed] Upgrade `emailLog` method to attach log as email-attachment rather than rendering to email-body.  The result of `#getState` is now rendered to the
 
 ##0.6.4
 
