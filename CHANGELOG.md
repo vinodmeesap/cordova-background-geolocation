@@ -1,17 +1,78 @@
 
-# Change Log
+# CHANGELOG
+
 ## [Unreleased]
-- [Breaking] Changed event-signature of `motionchange` callback from `isMoving:boolean, location:Location` -> `event:MotionChangeEvent`.
+## [2.14.0-beta.1] 2018-10-16
+
+- [Added] Implement Typescript API.  No more `let bgGeo = (<any>window).BackgroundGeolocation`!
+
+```typescript
+// Import the SDK in addition to any desired interfaces:
+import BackgroundGeolocation, {
+  State,
+  Config,
+  Location,
+  LocationError,
+  Geofence,
+  HttpEvent,
+  MotionActivityEvent,
+  ProviderChangeEvent,
+  MotionChangeEvent,
+  GeofenceEvent,
+  GeofencesChangeEvent,
+  HeartbeatEvent,
+  ConnectivityChangeEvent
+} from "cordova-background-geolocation";
+
+```
+
+- [Added] Refactor documentation.  Now auto-generated from Typescript api with [Typedoc](https://typedoc.org/) and served from https://transistorsoft.github.io/cordova-background-geolocation
+- [Added] With the new Typescript API, it's necessary to add dedicated listener-methods for each method (in order for code-assist to work).
 ```javascript
-// old
-BackgroundGeolocation.on('motionchange', (isMoving, location) => {...})
-// new
-BackgroundGeolocation.on('motionchange', (motionChangeEvent) => {
-  let isMoving = event.isMoving;
-  let location = event.location;
-});
+// Old:  No code-assist for event-signature with new Typescript API
+BackgroundGeolocation.on('location', (location) => {}, (error) => {});
+// New:  use dedicated listener-method #onLocation
+BackgroundGeolocation.onLocation((location) => {}, (error) => {});
+// And every other event:
+BackgroundGeolocation.onMotionChange(callback);
+BackgroundGeolocation.onMotionProviderChange(callback);
+BackgroundGeolocation.onActivityChange(callback);
+BackgroundGeolocation.onHttp(callback);
+BackgroundGeolocation.onGeofence(callback);
+BackgroundGeolocation.onGeofencesChange(callback);
+BackgroundGeolocation.onSchedule(callback);
+BackgroundGeolocation.onConnectivityChange(callback);
+BackgroundGeolocation.onPowerSaveChange(callback);
+BackgroundGeolocation.onEnabledChange(callback);
+```
+- [Breaking] Change event-signature of `enabledchange` event to return simple `boolean` instead of `{enabled: true}`:  It was pointless to return an `{}` for this event.
+```javascript
+// Old
+BackgroundGeolocation.onEnabledChange((enabledChangeEvent) => {
+  console.log('[enabledchange] -' enabledChangeEvent.enabled);
+})
+// New
+BackgroundGeolocation.onEnabledChange((enabled) => {
+  console.log('[enabledchange] -' enabled);
+})
+```
 - [Breaking] Changed event-signature of `http` event.  There is no more `failure` callback -- HTTP failures will be provided to your single `callback`.
-- [Breaking] Changed event-signature of `enabledchange` event callback to `boolean` instead of Object `{enabled: boolean}`.
+```
+// Old
+BackgroundGeolocation.on('http', (response) => {
+  console.log('[http] success -', response);
+}, (response) => {
+  console.log('[http] FAILURE -', response);
+})
+
+// New
+BackgroundGeolocation.onHttp((response) => {
+  if (response.success) {
+  	console.log('[http] success -', response);
+  } else {
+  	console.log('[http] FAILURE -', response);
+  }
+})
 ```
 
 ## [2.13.2] - 2018-10-01
