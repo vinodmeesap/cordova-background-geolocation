@@ -1,6 +1,6 @@
 {
   "name": "cordova-background-geolocation",
-  "version": "2.13.2",
+  "version": "2.14.0-beta.1",
   "description": "The most sophisticated cross-platform background location tracking & geofencing plugin with battery-conscious motion-detection",
   "cordova": {
     "id": "cordova-background-geolocation",
@@ -9,9 +9,14 @@
       "android"
     ]
   },
+  "main": "src/ionic/index.js",
   "repository": {
     "type": "git",
     "url": "https://github.com/transistorsoft/cordova-background-geolocation"
+  },
+  "scripts": {
+    "build": "tsc -p src/ionic",
+    "prepublish": "npm run build"
   },
   "keywords": [
     "gps",
@@ -46,6 +51,11 @@
         "cordova-ios": ">=4.4.0"
       }
     }
+  },
+  "devDependencies": {
+    "typedoc": "^0.12.0",
+    "typedoc-theme-transistor": "git+https://github.com/transistorsoft/typedoc-theme-transistor.git",
+    "typedoc-plugin-gitlink": "^0.0.3"
   },
   "author": "Chris Scott, Transistor Software",
   "license": "Commercial (http://www.binpress.com/license/view/l/7bbff78c0e0f33e865b4f83333a54bdf)",

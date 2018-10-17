@@ -1,7 +1,11 @@
 *.png
 *.log
-src/*.ts
-!src/*.d.ts
+node_modules
+docs
+help
+scripts
 ISSUE_TEMPLATE.md
 
+src/ionic/index.ts
+src/ionic/tsconfig.json
 
