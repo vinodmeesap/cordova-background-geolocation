@@ -139,83 +139,222 @@ var BackgroundGeolocation = /** @class */ (function () {
         enumerable: true,
         configurable: true
     });
-    BackgroundGeolocation.ready = function (config, success, failure) { return plugin().ready.apply(this, arguments); };
-    BackgroundGeolocation.configure = function () { return plugin().configure.apply(this, arguments); };
-    BackgroundGeolocation.reset = function () { return plugin().reset.apply(this, arguments); };
+    BackgroundGeolocation.ready = function (config, success, failure) {
+        var bgGeo = plugin();
+        return bgGeo.ready.apply(bgGeo, arguments);
+    };
+    BackgroundGeolocation.configure = function () {
+        var bgGeo = plugin();
+        return bgGeo.configure.apply(bgGeo, arguments);
+    };
+    BackgroundGeolocation.reset = function () {
+        var bgGeo = plugin();
+        return bgGeo.reset.apply(bgGeo, arguments);
+    };
     BackgroundGeolocation.onLocation = function () {
-        plugin().onLocation.apply(this, arguments);
+        var bgGeo = plugin();
+        bgGeo.onLocation.apply(bgGeo, arguments);
     };
     BackgroundGeolocation.onMotionChange = function () {
-        plugin().onMotionChange.apply(this, arguments);
+        var bgGeo = plugin();
+        bgGeo.onMotionChange.apply(bgGeo, arguments);
     };
     BackgroundGeolocation.onHttp = function () {
-        plugin().onHttp.apply(this, arguments);
+        var bgGeo = plugin();
+        bgGeo.onHttp.apply(bgGeo, arguments);
     };
     BackgroundGeolocation.onHeartbeat = function () {
-        plugin().onHeartbeat.apply(this, arguments);
+        var bgGeo = plugin();
+        bgGeo.onHeartbeat.apply(bgGeo, arguments);
     };
     BackgroundGeolocation.onProviderChange = function () {
-        plugin().onProviderChange.apply(this, arguments);
+        var bgGeo = plugin();
+        bgGeo.onProviderChange.apply(bgGeo, arguments);
     };
     BackgroundGeolocation.onActivityChange = function () {
-        plugin().onActivityChange.apply(this, arguments);
+        var bgGeo = plugin();
+        bgGeo.onActivityChange.apply(bgGeo, arguments);
     };
     BackgroundGeolocation.onGeofence = function () {
-        plugin().onGeofence.apply(this, arguments);
+        var bgGeo = plugin();
+        bgGeo.onGeofence.apply(bgGeo, arguments);
     };
     BackgroundGeolocation.onGeofencesChange = function () {
-        plugin().onGeofencesChange.apply(this, arguments);
+        var bgGeo = plugin();
+        bgGeo.onGeofencesChange.apply(bgGeo, arguments);
     };
     BackgroundGeolocation.onSchedule = function () {
-        plugin().onSchedule.apply(this, arguments);
+        var bgGeo = plugin();
+        bgGeo.onSchedule.apply(bgGeo, arguments);
     };
     BackgroundGeolocation.onEnabledChange = function (callback) {
-        plugin().onEnabledChange.apply(this, arguments);
+        var bgGeo = plugin();
+        bgGeo.onEnabledChange.apply(bgGeo, arguments);
     };
     BackgroundGeolocation.onConnectivityChange = function (callback) {
-        plugin().onConnectivityChange.apply(this, arguments);
+        var bgGeo = plugin();
+        bgGeo.onConnectivityChange.apply(bgGeo, arguments);
     };
     BackgroundGeolocation.onPowerSaveChange = function (callback) {
-        plugin().onPowerSaveChange.apply(this, arguments);
+        var bgGeo = plugin();
+        bgGeo.onPowerSaveChange.apply(bgGeo, arguments);
     };
-    BackgroundGeolocation.on = function () { return plugin().on.apply(this, arguments); };
-    BackgroundGeolocation.un = function () { return plugin().un.apply(this, arguments); };
-    BackgroundGeolocation.removeListener = function () { return plugin().removeListener.apply(this, arguments); };
-    BackgroundGeolocation.removeListeners = function () { return plugin().removeListeners.apply(this, arguments); };
-    BackgroundGeolocation.getState = function () { return plugin().getState.apply(this, arguments); };
-    BackgroundGeolocation.start = function () { return plugin().start.apply(this, arguments); };
-    BackgroundGeolocation.stop = function () { return plugin().stop.apply(this, arguments); };
-    BackgroundGeolocation.startSchedule = function () { return plugin().startSchedule.apply(this, arguments); };
-    BackgroundGeolocation.stopSchedule = function () { return plugin().stopSchedule.apply(this, arguments); };
-    BackgroundGeolocation.startGeofences = function () { return plugin().startGeofences.apply(this, arguments); };
-    BackgroundGeolocation.startBackgroundTask = function () { return plugin().startBackgroundTask.apply(this, arguments); };
-    BackgroundGeolocation.finish = function () { return plugin().finish.apply(this, arguments); };
-    BackgroundGeolocation.changePace = function () { return plugin().changePace.apply(this, arguments); };
-    BackgroundGeolocation.setConfig = function () { return plugin().setConfig.apply(this, arguments); };
-    BackgroundGeolocation.getLocations = function () { return plugin().getLocations.apply(this, arguments); };
-    BackgroundGeolocation.getCount = function () { return plugin().getCount.apply(this, arguments); };
-    BackgroundGeolocation.destroyLocations = function () { return plugin().destroyLocations.apply(this, arguments); };
-    BackgroundGeolocation.insertLocation = function () { return plugin().insertLocation.apply(this, arguments); };
-    BackgroundGeolocation.sync = function () { return plugin().sync.apply(this, arguments); };
-    BackgroundGeolocation.getOdometer = function () { return plugin().getOdometer.apply(this, arguments); };
-    BackgroundGeolocation.resetOdometer = function () { return plugin().resetOdometer.apply(this, arguments); };
-    BackgroundGeolocation.setOdometer = function () { return plugin().setOdometer.apply(this, arguments); };
-    BackgroundGeolocation.addGeofence = function () { return plugin().addGeofence.apply(this, arguments); };
-    BackgroundGeolocation.removeGeofence = function () { return plugin().removeGeofence.apply(this, arguments); };
-    BackgroundGeolocation.addGeofences = function () { return plugin().addGeofences.apply(this, arguments); };
-    BackgroundGeolocation.removeGeofences = function () { return plugin().removeGeofences.apply(this, arguments); };
-    BackgroundGeolocation.getGeofences = function () { return plugin().getGeofences.apply(this, arguments); };
-    BackgroundGeolocation.getCurrentPosition = function () { return plugin().getCurrentPosition.apply(this, arguments); };
-    BackgroundGeolocation.watchPosition = function () { return plugin().watchPosition.apply(this, arguments); };
-    BackgroundGeolocation.stopWatchPosition = function () { return plugin().stopWatchPosition.apply(this, arguments); };
-    BackgroundGeolocation.registerHeadlessTask = function () { return plugin().registerHeadlessTask.apply(this, arguments); };
-    BackgroundGeolocation.setLogLevel = function () { return plugin().setLogLevel.apply(this, arguments); };
-    BackgroundGeolocation.getLog = function () { return plugin().getLog.apply(this, arguments); };
-    BackgroundGeolocation.destroyLog = function () { return plugin().destroyLog.apply(this, arguments); };
-    BackgroundGeolocation.emailLog = function () { return plugin().emailLog.apply(this, arguments); };
-    BackgroundGeolocation.isPowerSaveMode = function () { return plugin().isPowerSaveMode.apply(this, arguments); };
-    BackgroundGeolocation.getSensors = function () { return plugin().getSensors.apply(this, arguments); };
-    BackgroundGeolocation.playSound = function () { return plugin().playSound.apply(this, arguments); };
+    BackgroundGeolocation.on = function () {
+        var bgGeo = plugin();
+        return bgGeo.on.apply(bgGeo, arguments);
+    };
+    BackgroundGeolocation.un = function () {
+        var bgGeo = plugin();
+        return bgGeo.un.apply(bgGeo, arguments);
+    };
+    BackgroundGeolocation.removeListener = function () {
+        var bgGeo = plugin();
+        return bgGeo.removeListener.apply(bgGeo, arguments);
+    };
+    BackgroundGeolocation.removeListeners = function () {
+        var bgGeo = plugin();
+        return bgGeo.removeListeners.apply(bgGeo, arguments);
+    };
+    BackgroundGeolocation.getState = function () {
+        var bgGeo = plugin();
+        return bgGeo.getState.apply(bgGeo, arguments);
+    };
+    BackgroundGeolocation.start = function () {
+        var bgGeo = plugin();
+        return bgGeo.start.apply(bgGeo, arguments);
+    };
+    BackgroundGeolocation.stop = function () {
+        var bgGeo = plugin();
+        return bgGeo.stop.apply(bgGeo, arguments);
+    };
+    BackgroundGeolocation.startSchedule = function () {
+        var bgGeo = plugin();
+        return bgGeo.startSchedule.apply(bgGeo, arguments);
+    };
+    BackgroundGeolocation.stopSchedule = function () {
+        var bgGeo = plugin();
+        return bgGeo.stopSchedule.apply(bgGeo, arguments);
+    };
+    BackgroundGeolocation.startGeofences = function () {
+        var bgGeo = plugin();
+        return bgGeo.startGeofences.apply(bgGeo, arguments);
+    };
+    BackgroundGeolocation.startBackgroundTask = function () {
+        var bgGeo = plugin();
+        return bgGeo.startBackgroundTask.apply(bgGeo, arguments);
+    };
+    BackgroundGeolocation.finish = function () {
+        var bgGeo = plugin();
+        return bgGeo.finish.apply(bgGeo, arguments);
+    };
+    BackgroundGeolocation.changePace = function () {
+        var bgGeo = plugin();
+        return bgGeo.changePace.apply(bgGeo, arguments);
+    };
+    BackgroundGeolocation.setConfig = function () {
+        var bgGeo = plugin();
+        return bgGeo.setConfig.apply(bgGeo, arguments);
+    };
+    BackgroundGeolocation.getLocations = function () {
+        var bgGeo = plugin();
+        return bgGeo.getLocations.apply(bgGeo, arguments);
+    };
+    BackgroundGeolocation.getCount = function () {
+        var bgGeo = plugin();
+        return bgGeo.getCount.apply(bgGeo, arguments);
+    };
+    BackgroundGeolocation.destroyLocations = function () {
+        var bgGeo = plugin();
+        return bgGeo.destroyLocations.apply(bgGeo, arguments);
+    };
+    BackgroundGeolocation.insertLocation = function () {
+        var bgGeo = plugin();
+        return bgGeo.insertLocation.apply(bgGeo, arguments);
+    };
+    BackgroundGeolocation.sync = function () {
+        var bgGeo = plugin();
+        return bgGeo.sync.apply(bgGeo, arguments);
+    };
+    BackgroundGeolocation.getOdometer = function () {
+        var bgGeo = plugin();
+        return bgGeo.getOdometer.apply(bgGeo, arguments);
+    };
+    BackgroundGeolocation.resetOdometer = function () {
+        var bgGeo = plugin();
+        return bgGeo.resetOdometer.apply(bgGeo, arguments);
+    };
+    BackgroundGeolocation.setOdometer = function () {
+        var bgGeo = plugin();
+        return bgGeo.setOdometer.apply(bgGeo, arguments);
+    };
+    BackgroundGeolocation.addGeofence = function () {
+        var bgGeo = plugin();
+        return bgGeo.addGeofence.apply(bgGeo, arguments);
+    };
+    BackgroundGeolocation.removeGeofence = function () {
+        var bgGeo = plugin();
+        return bgGeo.removeGeofence.apply(bgGeo, arguments);
+    };
+    BackgroundGeolocation.addGeofences = function () {
+        var bgGeo = plugin();
+        return bgGeo.addGeofences.apply(bgGeo, arguments);
+    };
+    BackgroundGeolocation.removeGeofences = function () {
+        var bgGeo = plugin();
+        return bgGeo.removeGeofences.apply(bgGeo, arguments);
+    };
+    BackgroundGeolocation.getGeofences = function () {
+        var bgGeo = plugin();
+        return bgGeo.getGeofences.apply(bgGeo, arguments);
+    };
+    BackgroundGeolocation.getCurrentPosition = function () {
+        var bgGeo = plugin();
+        return bgGeo.getCurrentPosition.apply(bgGeo, arguments);
+    };
+    BackgroundGeolocation.watchPosition = function () {
+        var bgGeo = plugin();
+        return bgGeo.watchPosition.apply(bgGeo, arguments);
+    };
+    BackgroundGeolocation.stopWatchPosition = function () {
+        var bgGeo = plugin();
+        return bgGeo.stopWatchPosition.apply(bgGeo, arguments);
+    };
+    BackgroundGeolocation.registerHeadlessTask = function () {
+        var bgGeo = plugin();
+        return bgGeo.registerHeadlessTask.apply(bgGeo, arguments);
+    };
+    BackgroundGeolocation.setLogLevel = function () {
+        var bgGeo = plugin();
+        return bgGeo.setLogLevel.apply(bgGeo, arguments);
+    };
+    BackgroundGeolocation.getLog = function () {
+        var bgGeo = plugin();
+        return bgGeo.getLog.apply(bgGeo, arguments);
+    };
+    BackgroundGeolocation.destroyLog = function () {
+        var bgGeo = plugin();
+        return bgGeo.destroyLog.apply(bgGeo, arguments);
+    };
+    BackgroundGeolocation.emailLog = function () {
+        var bgGeo = plugin();
+        return bgGeo.emailLog.apply(bgGeo, arguments);
+    };
+    BackgroundGeolocation.isPowerSaveMode = function () {
+        var bgGeo = plugin();
+        return bgGeo.isPowerSaveMode.apply(bgGeo, arguments);
+    };
+    BackgroundGeolocation.getSensors = function () {
+        var bgGeo = plugin();
+        return bgGeo.getSensors.apply(bgGeo, arguments);
+    };
+    BackgroundGeolocation.playSound = function () {
+        var bgGeo = plugin();
+        return bgGeo.playSound.apply(bgGeo, arguments);
+    };
+    BackgroundGeolocation.transistorTrackerParams = function () {
+        var bgGeo = plugin();
+        return bgGeo.transistorTrackerParams.apply(bgGeo, arguments);
+    };
     return BackgroundGeolocation;
 }());
 export default BackgroundGeolocation;

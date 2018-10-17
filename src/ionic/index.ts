@@ -37,83 +37,222 @@ export default class BackgroundGeolocation {
 
   static get logger() { return plugin().logger; }
 
-  static ready(config:any, success?:Function, failure?:Function) { return plugin().ready.apply(this, arguments); }
-  static configure() { return plugin().configure.apply(this, arguments); }
-  static reset() { return plugin().reset.apply(this, arguments); }
+  static ready(config:any, success?:Function, failure?:Function) {
+    let bgGeo = plugin();
+    return bgGeo.ready.apply(bgGeo, arguments);
+  }
+  static configure() {
+    let bgGeo = plugin();
+    return bgGeo.configure.apply(bgGeo, arguments);
+  }
+  static reset() {
+    let bgGeo = plugin();
+    return bgGeo.reset.apply(bgGeo, arguments);
+  }
 
   static onLocation() {
-    plugin().onLocation.apply(this, arguments);
+    let bgGeo = plugin();
+    bgGeo.onLocation.apply(bgGeo, arguments);
   }
   static onMotionChange() {
-    plugin().onMotionChange.apply(this, arguments);
+    let bgGeo = plugin();
+    bgGeo.onMotionChange.apply(bgGeo, arguments);
   }
   static onHttp() {
-    plugin().onHttp.apply(this, arguments);
+    let bgGeo = plugin();
+    bgGeo.onHttp.apply(bgGeo, arguments);
   }
   static onHeartbeat() {
-    plugin().onHeartbeat.apply(this, arguments);
+    let bgGeo = plugin();
+    bgGeo.onHeartbeat.apply(bgGeo, arguments);
   }
   static onProviderChange() {
-    plugin().onProviderChange.apply(this, arguments);
+    let bgGeo = plugin();
+    bgGeo.onProviderChange.apply(bgGeo, arguments);
   }
   static onActivityChange() {
-    plugin().onActivityChange.apply(this, arguments);
+    let bgGeo = plugin();
+    bgGeo.onActivityChange.apply(bgGeo, arguments);
   }
   static onGeofence() {
-    plugin().onGeofence.apply(this, arguments);
+    let bgGeo = plugin();
+    bgGeo.onGeofence.apply(bgGeo, arguments);
   }
   static onGeofencesChange() {
-    plugin().onGeofencesChange.apply(this, arguments);
+    let bgGeo = plugin();
+    bgGeo.onGeofencesChange.apply(bgGeo, arguments);
   }
   static onSchedule() {
-    plugin().onSchedule.apply(this, arguments);
+    let bgGeo = plugin();
+    bgGeo.onSchedule.apply(bgGeo, arguments);
   }
   static onEnabledChange(callback:Function) {
-    plugin().onEnabledChange.apply(this, arguments);
+    let bgGeo = plugin();
+    bgGeo.onEnabledChange.apply(bgGeo, arguments);
   }
   static onConnectivityChange(callback:Function) {
-    plugin().onConnectivityChange.apply(this, arguments);
+    let bgGeo = plugin();
+    bgGeo.onConnectivityChange.apply(bgGeo, arguments);
   }
   static onPowerSaveChange(callback:Function) {
-    plugin().onPowerSaveChange.apply(this, arguments);
+    let bgGeo = plugin();
+    bgGeo.onPowerSaveChange.apply(bgGeo, arguments);
   }
 
-  static on() { return plugin().on.apply(this, arguments); }
-  static un() { return plugin().un.apply(this, arguments); }
-  static removeListener() { return plugin().removeListener.apply(this, arguments); }
-  static removeListeners() { return plugin().removeListeners.apply(this, arguments); }
-  static getState() { return plugin().getState.apply(this, arguments); }
-  static start() { return plugin().start.apply(this, arguments); }
-  static stop() { return plugin().stop.apply(this, arguments); }
-  static startSchedule() { return plugin().startSchedule.apply(this, arguments); }
-  static stopSchedule() { return plugin().stopSchedule.apply(this, arguments); }
-  static startGeofences() { return plugin().startGeofences.apply(this, arguments); }
-  static startBackgroundTask() { return plugin().startBackgroundTask.apply(this, arguments); }
-  static finish() { return plugin().finish.apply(this, arguments); }
-  static changePace() { return plugin().changePace.apply(this, arguments); }
-  static setConfig() { return plugin().setConfig.apply(this, arguments); }
-  static getLocations() { return plugin().getLocations.apply(this, arguments); }
-  static getCount() { return plugin().getCount.apply(this, arguments); }
-  static destroyLocations() { return plugin().destroyLocations.apply(this, arguments); }
-  static insertLocation() { return plugin().insertLocation.apply(this, arguments); }
-  static sync() { return plugin().sync.apply(this, arguments); }
-  static getOdometer() { return plugin().getOdometer.apply(this, arguments); }
-  static resetOdometer() { return plugin().resetOdometer.apply(this, arguments); }
-  static setOdometer() { return plugin().setOdometer.apply(this, arguments); }
-  static addGeofence() { return plugin().addGeofence.apply(this, arguments); }
-  static removeGeofence() { return plugin().removeGeofence.apply(this, arguments); }
-  static addGeofences() { return plugin().addGeofences.apply(this, arguments); }
-  static removeGeofences() { return plugin().removeGeofences.apply(this, arguments); }
-  static getGeofences() { return plugin().getGeofences.apply(this, arguments); }
-  static getCurrentPosition() { return plugin().getCurrentPosition.apply(this, arguments); }
-  static watchPosition() { return plugin().watchPosition.apply(this, arguments); }
-  static stopWatchPosition() { return plugin().stopWatchPosition.apply(this, arguments); }
-  static registerHeadlessTask() { return plugin().registerHeadlessTask.apply(this, arguments); }
-  static setLogLevel() { return plugin().setLogLevel.apply(this, arguments); }
-  static getLog() { return plugin().getLog.apply(this, arguments); }
-  static destroyLog() { return plugin().destroyLog.apply(this, arguments); }
-  static emailLog() { return plugin().emailLog.apply(this, arguments); }
-  static isPowerSaveMode() { return plugin().isPowerSaveMode.apply(this, arguments); }
-  static getSensors() { return plugin().getSensors.apply(this, arguments); }
-  static playSound() { return plugin().playSound.apply(this, arguments); }
+  static on() {
+    let bgGeo = plugin();
+    return bgGeo.on.apply(bgGeo, arguments);
+  }
+  static un() {
+    let bgGeo = plugin();
+    return bgGeo.un.apply(bgGeo, arguments);
+  }
+  static removeListener() {
+    let bgGeo = plugin();
+    return bgGeo.removeListener.apply(bgGeo, arguments);
+  }
+  static removeListeners() {
+    let bgGeo = plugin();
+    return bgGeo.removeListeners.apply(bgGeo, arguments);
+  }
+  static getState() {
+    let bgGeo = plugin();
+    return bgGeo.getState.apply(bgGeo, arguments);
+  }
+  static start() {
+    let bgGeo = plugin();
+    return bgGeo.start.apply(bgGeo, arguments);
+  }
+  static stop() {
+    let bgGeo = plugin();
+    return bgGeo.stop.apply(bgGeo, arguments);
+  }
+  static startSchedule() {
+    let bgGeo = plugin();
+    return bgGeo.startSchedule.apply(bgGeo, arguments);
+  }
+  static stopSchedule() {
+    let bgGeo = plugin();
+    return bgGeo.stopSchedule.apply(bgGeo, arguments);
+  }
+  static startGeofences() {
+    let bgGeo = plugin();
+    return bgGeo.startGeofences.apply(bgGeo, arguments);
+  }
+  static startBackgroundTask() {
+    let bgGeo = plugin();
+    return bgGeo.startBackgroundTask.apply(bgGeo, arguments);
+  }
+  static finish() {
+    let bgGeo = plugin();
+    return bgGeo.finish.apply(bgGeo, arguments);
+  }
+  static changePace() {
+    let bgGeo = plugin();
+    return bgGeo.changePace.apply(bgGeo, arguments);
+  }
+  static setConfig() {
+    let bgGeo = plugin();
+    return bgGeo.setConfig.apply(bgGeo, arguments);
+  }
+  static getLocations() {
+    let bgGeo = plugin();
+    return bgGeo.getLocations.apply(bgGeo, arguments);
+  }
+  static getCount() {
+    let bgGeo = plugin();
+    return bgGeo.getCount.apply(bgGeo, arguments);
+  }
+  static destroyLocations() {
+    let bgGeo = plugin();
+    return bgGeo.destroyLocations.apply(bgGeo, arguments);
+  }
+  static insertLocation() {
+    let bgGeo = plugin();
+    return bgGeo.insertLocation.apply(bgGeo, arguments);
+  }
+  static sync() {
+    let bgGeo = plugin();
+    return bgGeo.sync.apply(bgGeo, arguments);
+  }
+  static getOdometer() {
+    let bgGeo = plugin();
+    return bgGeo.getOdometer.apply(bgGeo, arguments);
+  }
+  static resetOdometer() {
+    let bgGeo = plugin();
+    return bgGeo.resetOdometer.apply(bgGeo, arguments);
+  }
+  static setOdometer() {
+    let bgGeo = plugin();
+    return bgGeo.setOdometer.apply(bgGeo, arguments);
+  }
+  static addGeofence() {
+    let bgGeo = plugin();
+    return bgGeo.addGeofence.apply(bgGeo, arguments);
+  }
+  static removeGeofence() {
+    let bgGeo = plugin();
+    return bgGeo.removeGeofence.apply(bgGeo, arguments);
+  }
+  static addGeofences() {
+    let bgGeo = plugin();
+    return bgGeo.addGeofences.apply(bgGeo, arguments);
+  }
+  static removeGeofences() {
+    let bgGeo = plugin();
+    return bgGeo.removeGeofences.apply(bgGeo, arguments);
+  }
+  static getGeofences() {
+    let bgGeo = plugin();
+    return bgGeo.getGeofences.apply(bgGeo, arguments);
+  }
+  static getCurrentPosition() {
+    let bgGeo = plugin();
+    return bgGeo.getCurrentPosition.apply(bgGeo, arguments);
+  }
+  static watchPosition() {
+    let bgGeo = plugin();
+    return bgGeo.watchPosition.apply(bgGeo, arguments);
+  }
+  static stopWatchPosition() {
+    let bgGeo = plugin();
+    return bgGeo.stopWatchPosition.apply(bgGeo, arguments);
+  }
+  static registerHeadlessTask() {
+    let bgGeo = plugin();
+    return bgGeo.registerHeadlessTask.apply(bgGeo, arguments);
+  }
+  static setLogLevel() {
+    let bgGeo = plugin();
+    return bgGeo.setLogLevel.apply(bgGeo, arguments);
+  }
+  static getLog() {
+    let bgGeo = plugin();
+    return bgGeo.getLog.apply(bgGeo, arguments);
+  }
+  static destroyLog() {
+    let bgGeo = plugin();
+    return bgGeo.destroyLog.apply(bgGeo, arguments);
+  }
+  static emailLog() {
+    let bgGeo = plugin();
+    return bgGeo.emailLog.apply(bgGeo, arguments);
+  }
+  static isPowerSaveMode() {
+    let bgGeo = plugin();
+    return bgGeo.isPowerSaveMode.apply(bgGeo, arguments);
+  }
+  static getSensors() {
+    let bgGeo = plugin();
+    return bgGeo.getSensors.apply(bgGeo, arguments);
+  }
+  static playSound() {
+    let bgGeo = plugin();
+    return bgGeo.playSound.apply(bgGeo, arguments);
+  }
+  static transistorTrackerParams() {
+    let bgGeo = plugin();
+    return bgGeo.transistorTrackerParams.apply(bgGeo, arguments);
+  }
 }

@@ -1209,5 +1209,20 @@ declare module "cordova-background-geolocation" {
     *
     */
     static logger: Logger;
+
+    /**
+    * Convenience method to compose a [[params]] Object suitable for posting to the **Transistor Software Test Server** at http://tracker.transistorsoft.com.  You must provide a reference to **`Device`** instance.
+    *
+    * ![](https://dl.dropboxusercontent.com/s/3abuyyhioyypk8c/screenshot-tracker-transistorsoft.png?dl=1)
+    *
+    * @example
+    * ```typescript
+    * BackgroundGeolocation.ready({
+    *   url: 'http://tracker.transistorsoft.com/locations/my-username',
+    *   params: BackgroundGeolocation.transistorTrackerParams(device)
+    * })
+    * ```
+    */
+    static transistorTrackerParams(device:Object):Object;
   }
 }

@@ -440,6 +440,25 @@ module.exports = {
             return API.log('ok', msg);
         }
     },
+    /**
+    * Returns a #params object suitable for recognition by tracker.transistorsoft.com
+    * @param {Device} cordova-plugin-device instance
+    * @return {Object}
+    */
+    transistorTrackerParams: function(device) {
+        if (typeof(device) === undefined) { throw "An instance of cordova-plugin-device must be provided"; }
+        if (typeof(device.model) === undefined) { throw "Invalid instance of cordova-plugin-device"; }
+        return {
+            device: {
+                model: device.model,
+                platform: device.platform,
+                uuid: (device.model + '-' + device.version).replace(/[\s\.,]/g, '-'),
+                version: device.version,
+                manufacturer: device.manufacturer,
+                framework: 'Cordova'
+            }
+        };
+    },
     test: function(delay) {
         test(this, delay);
     }
