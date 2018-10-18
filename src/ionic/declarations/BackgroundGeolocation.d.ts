@@ -1213,6 +1213,8 @@ declare module "cordova-background-geolocation" {
     /**
     * Convenience method to compose a [[params]] Object suitable for posting to the **Transistor Software Test Server** at http://tracker.transistorsoft.com.  You must provide a reference to **`Device`** instance.
     *
+    * The test server is a great way to debug location problems, since the results can easily be shared with *Transistor Software* when requesting support.
+    *
     * ![](https://dl.dropboxusercontent.com/s/3abuyyhioyypk8c/screenshot-tracker-transistorsoft.png?dl=1)
     *
     * @example
@@ -1222,6 +1224,8 @@ declare module "cordova-background-geolocation" {
     *   params: BackgroundGeolocation.transistorTrackerParams(device)
     * })
     * ```
+    * ### ⚠️ Note:
+    * - To *view* your tracking results in the browser, the url is just __`/YOUR-USERNAME`__ &mdash; not `/locations/YOUR-USERNAME`
     */
     static transistorTrackerParams(device:Object):Object;
   }

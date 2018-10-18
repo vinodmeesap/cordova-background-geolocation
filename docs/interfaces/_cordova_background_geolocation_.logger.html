@@ -57,7 +57,7 @@
 					<div class="lead">
 						<p>Append your own log-messages into the plugin&#39;s logging database.  The following methods are available at <a href="../classes/_cordova_background_geolocation_.backgroundgeolocation.html#logger">BackgroundGeolocation.logger</a>:</p>
 					</div>
-					<h2 id="methods">Methods</h2>
+					<h3 id="methods">Methods</h3>
 					<table>
 						<thead>
 							<tr>
@@ -112,7 +112,6 @@
 								<td>✅</td>
 							</tr>
 					</tbody></table>
-					<h2 id="examples">Examples</h2>
 					<dl class="tsd-comment-tags">
 						<dt class="tsd-comment-tag-example">example</dt>
 						<dd><pre><code class="language-javascript">BackgroundGeolocation.logger.error(<span class="hljs-string">"Something bad happened"</span>);
@@ -124,6 +123,18 @@ BackgroundGeolocation.logger.header(<span class="hljs-string">"Something bold"</
 BackgroundGeolocation.logger.on(<span class="hljs-string">"Something on or positive"</span>);
 BackgroundGeolocation.logger.off(<span class="hljs-string">"Something off or negative"</span>);
 BackgroundGeolocation.logger.ok(<span class="hljs-string">"Something affirmative happened"</span>);</code></pre>
+							<h3 id="viewing-logs">Viewing Logs</h3>
+							<p>When developing for Android, it&#39;s a good idea to <em>tail</em> the Android device logs with <a href="https://developer.android.com/studio/command-line/logcat">logcat</a>:</p>
+						</dd>
+						<dt class="tsd-comment-tag-example">example</dt>
+						<dd><pre><code class="language-bash">$ adb logcat -s TSLocationManager</code></pre>
+							<h3 id="-see-also-">ℹ️ See also:</h3>
+							<ul>
+								<li><a href="_cordova_background_geolocation_.config.html#loglevel">logLevel</a></li>
+								<li><a href="../classes/_cordova_background_geolocation_.backgroundgeolocation.html#getlog">getLog</a></li>
+								<li><a href="../classes/_cordova_background_geolocation_.backgroundgeolocation.html#emaillog">emailLog</a></li>
+								<li><a href="https://github.com/transistorsoft/cordova-background-geolocation/wiki/Debugging">Debugging Guide</a></li>
+							</ul>
 						</dd>
 					</dl>
 				</div>
