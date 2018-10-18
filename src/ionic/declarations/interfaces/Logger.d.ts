@@ -2,7 +2,7 @@ declare module "cordova-background-geolocation" {
   /**
   * Append your own log-messages into the plugin's logging database.  The following methods are available at [[BackgroundGeolocation.logger]]:
   *
-  ## Methods
+  ### Methods
 
   | method     | logLevel | icon            |
   |------------|----------|-----------------|
@@ -16,9 +16,6 @@ declare module "cordova-background-geolocation" {
   |`off`       |`INFO`    | 🔴              |
   |`ok`        |`INFO`    | ✅              |
 
-
-  ## Examples
-  *
   * @example
   *
   * ```javascript
@@ -32,6 +29,19 @@ declare module "cordova-background-geolocation" {
   * BackgroundGeolocation.logger.off("Something off or negative");
   * BackgroundGeolocation.logger.ok("Something affirmative happened");
   * ```
+  ### Viewing Logs
+
+  When developing for Android, it's a good idea to *tail* the Android device logs with [logcat](https://developer.android.com/studio/command-line/logcat):
+  * @example
+  * ```bash
+  * $ adb logcat -s TSLocationManager
+  * ```
+  *
+  ### ℹ️ See also:
+  - [[logLevel]]
+  - [[getLog]]
+  - [[emailLog]]
+  - [Debugging Guide](github:wiki/Debugging)
   */
   interface Logger {
     error: (message:string) => void;

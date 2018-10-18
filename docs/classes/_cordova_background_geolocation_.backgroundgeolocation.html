@@ -3503,6 +3503,7 @@ BackgroundGeolocation.stopSchedule();</code></pre>
 								<div class="lead">
 									<p>Convenience method to compose a <a href="../interfaces/_cordova_background_geolocation_.config.html#params">params</a> Object suitable for posting to the <strong>Transistor Software Test Server</strong> at <a href="http://tracker.transistorsoft.com">http://tracker.transistorsoft.com</a>.  You must provide a reference to <strong><code>Device</code></strong> instance.</p>
 								</div>
+								<p>The test server is a great way to debug location problems, since the results can easily be shared with <em>Transistor Software</em> when requesting support.</p>
 								<p><img src="https://dl.dropboxusercontent.com/s/3abuyyhioyypk8c/screenshot-tracker-transistorsoft.png?dl=1" alt=""></p>
 								<dl class="tsd-comment-tags">
 									<dt class="tsd-comment-tag-example">example</dt>
@@ -3510,6 +3511,10 @@ BackgroundGeolocation.stopSchedule();</code></pre>
   url: <span class="hljs-string">'http://tracker.transistorsoft.com/locations/my-username'</span>,
   params: BackgroundGeolocation.transistorTrackerParams(device)
 })</code></pre>
+										<h3 id="-note-">⚠️ Note:</h3>
+										<ul>
+											<li>To <em>view</em> your tracking results in the browser, the url is just <strong><code>/YOUR-USERNAME</code></strong> &mdash; not <code>/locations/YOUR-USERNAME</code></li>
+										</ul>
 									</dd>
 								</dl>
 							</div>
