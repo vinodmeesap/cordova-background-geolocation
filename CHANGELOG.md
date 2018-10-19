@@ -2,6 +2,9 @@
 # CHANGELOG
 
 ## [Unreleased]
+
+- [iOS] Catch `NSInvalidArgumentException` when decoding `TSConfig`.  References #1781.
+
 ## [2.14.0-beta.1] 2018-10-16
 
 - [Added] Implement Typescript API.  No more `let bgGeo = (<any>window).BackgroundGeolocation`!
