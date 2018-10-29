@@ -1,8 +1,11 @@
 
 # CHANGELOG
 
-## [Unreleased]
+## [2.14.0] 2018-10-29
+- [Fixed] Android `NullPointerException` on `WatchPositionCallback` with `watchPosition`.
 
+## [2.14.0-beta.2] 2018-10-23
+- [Breaking] Change signature of `#getCurrentPosition` method:  Options `{}` is now first argument rather than last:
 - [iOS] Catch `NSInvalidArgumentException` when decoding `TSConfig`.  References #1781.
 
 ## [2.14.0-beta.1] 2018-10-16
