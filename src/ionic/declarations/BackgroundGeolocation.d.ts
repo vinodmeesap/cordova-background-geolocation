@@ -929,7 +929,7 @@ declare module "cordova-background-geolocation" {
     *     console.log('[watchPosition] ERROR -', errorCode);
     *   }, {
     *     interval: 1000
-    *   }
+    *   })
     * }
     *
     * onSuspend() {
