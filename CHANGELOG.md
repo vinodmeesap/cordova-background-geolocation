@@ -1,6 +1,10 @@
 
 # CHANGELOG
 
+## Unreleased
+- [Fixed] Prevent Android foreground-service from auto-starting when location permission is revoked via Settings screen.
+- [Fixed] NPE in Android HTTP Service when manual sync is called.  Probably a threading issue with multiple sync operations executed simultaneously.
+
 ## [2.14.2] 2018-11-22
 - [Fixed] Typescript definitions not loading with Ionic 4.  Requires `"types":"./src/ionic/index.d.ts"` in `package.json`.
 
