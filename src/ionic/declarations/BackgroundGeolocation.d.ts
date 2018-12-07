@@ -879,7 +879,7 @@ declare module "cordova-background-geolocation" {
     *
     * This method instructs the native code to fetch exactly one location using maximum power & accuracy.  The native code will persist the fetched location to
     * its SQLite database just as any other location in addition to POSTing to your configured [[url]].
-    * If an error occurs while fetching the location, `catchError` will be provided with an [[LocationError]].
+    * If an error occurs while fetching the location, `catch` will be provided with an [[LocationError]].
     * @break
     *
     * ### Options
@@ -1015,7 +1015,7 @@ declare module "cordova-background-geolocation" {
 	  * ```javascript
     * BackgroundGeolocation.sync((records) => {
     *   console.log('[sync] success: ', records);
-    * }).catchError((error) => {
+    * }).catch((error) => {
     *   console.log('[sync] FAILURE: ', error);
     * });
     *
@@ -1096,7 +1096,7 @@ declare module "cordova-background-geolocation" {
     *   }
     * }).then((success) => {
     *   console.log('[addGeofence] success');
-    * }).catchError((error) => {
+    * }).catch((error) => {
     *   console.log('[addGeofence] FAILURE: ', error);
     * });
     * ```
@@ -1145,7 +1145,7 @@ declare module "cordova-background-geolocation" {
 	  * ```javascript
     * BackgroundGeolocation.removeGeofence("Home").then((success) => {
     *   console.log('[removeGeofence] success');
-    * }).catchError((error) => {
+    * }).catch((error) => {
     *   console.log('[removeGeofence] FAILURE: ', error);
     * });
     * ```
@@ -1263,7 +1263,7 @@ declare module "cordova-background-geolocation" {
 	  * ```javascript
     * BackgroundGeolocation.emailLog('foo@bar.com').then((success) => {
     *   console.log('[emailLog] success');
-    * }).catchError((error) => {
+    * }).catch((error) => {
     *   console.log('[emailLog] FAILURE: ', error);
     * });
     * ```
