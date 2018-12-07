@@ -494,6 +494,7 @@ module.exports = {
             success(location);
         }
         failure = failure || emptyFn;
+        options = options || {};
         exec(mySuccess, failure, MODULE_NAME, 'watchPosition', [options]);
     },
     stopWatchPosition: function() {

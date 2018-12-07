@@ -23,7 +23,7 @@
 						<li class="state loading">Preparing search index...</li>
 						<li class="state failure">The search index is not available</li>
 					</ul>
-					<a href="../globals.html" class="title">[API Docs] Cordova Background Geolocation</a>&nbsp;<span class="tsd-flag ts-flagOptional ts-flagVersion">v 2.14.2</span>
+					<a href="../globals.html" class="title">[API Docs] Cordova Background Geolocation</a>&nbsp;<span class="tsd-flag ts-flagOptional ts-flagVersion">v 2.14.3</span>
 				</div>
 				<div class="" id="tsd-widgets">
 					<a class="github" href="https://github.com/transistorsoft/cordova-background-geolocation">Github</a>
@@ -1300,7 +1300,7 @@ BackgroundGeolocation.onHeartbeat(<span class="hljs-function">(<span class="hljs
   }
 }).then(<span class="hljs-function">(<span class="hljs-params">success</span>) =&gt;</span> {
   <span class="hljs-built_in">console</span>.log(<span class="hljs-string">'[addGeofence] success'</span>);
-}).catchError(<span class="hljs-function">(<span class="hljs-params">error</span>) =&gt;</span> {
+}).catch(<span class="hljs-function">(<span class="hljs-params">error</span>) =&gt;</span> {
   <span class="hljs-built_in">console</span>.log(<span class="hljs-string">'[addGeofence] FAILURE: '</span>, error);
 });</code></pre>
 										<h3 id="-note-">ℹ️ Note:</h3>
@@ -1552,7 +1552,7 @@ BackgroundGeolocation.changePace(<span class="hljs-literal">false</span>); <span
 									<dt class="tsd-comment-tag-example">example</dt>
 									<dd><pre><code class="language-javascript">BackgroundGeolocation.emailLog(<span class="hljs-string">'foo@bar.com'</span>).then(<span class="hljs-function">(<span class="hljs-params">success</span>) =&gt;</span> {
   <span class="hljs-built_in">console</span>.log(<span class="hljs-string">'[emailLog] success'</span>);
-}).catchError(<span class="hljs-function">(<span class="hljs-params">error</span>) =&gt;</span> {
+}).catch(<span class="hljs-function">(<span class="hljs-params">error</span>) =&gt;</span> {
   <span class="hljs-built_in">console</span>.log(<span class="hljs-string">'[emailLog] FAILURE: '</span>, error);
 });</code></pre>
 										<h3 id="-see-also-">ℹ️ See also:</h3>
@@ -1709,7 +1709,7 @@ BackgroundGeolocation.changePace(<span class="hljs-literal">false</span>); <span
 								</div>
 								<p>This method instructs the native code to fetch exactly one location using maximum power &amp; accuracy.  The native code will persist the fetched location to
 									its SQLite database just as any other location in addition to POSTing to your configured <a href="../interfaces/_cordova_background_geolocation_.config.html#url">url</a>.
-								If an error occurs while fetching the location, <code>catchError</code> will be provided with an <a href="../modules/_cordova_background_geolocation_.html#locationerror">LocationError</a>.</p>
+								If an error occurs while fetching the location, <code>catch</code> will be provided with an <a href="../modules/_cordova_background_geolocation_.html#locationerror">LocationError</a>.</p>
 								<dl class="tsd-comment-tags">
 									<dt class="tsd-comment-tag-break">break</dt>
 									<dd><h3 id="options">Options</h3>
@@ -2595,7 +2595,7 @@ BackgroundGeolocation.registerHeadlessTask(BackgroundGeolocationHeadlessTask);</
 									<dt class="tsd-comment-tag-example">example</dt>
 									<dd><pre><code class="language-javascript">BackgroundGeolocation.removeGeofence(<span class="hljs-string">"Home"</span>).then(<span class="hljs-function">(<span class="hljs-params">success</span>) =&gt;</span> {
   <span class="hljs-built_in">console</span>.log(<span class="hljs-string">'[removeGeofence] success'</span>);
-}).catchError(<span class="hljs-function">(<span class="hljs-params">error</span>) =&gt;</span> {
+}).catch(<span class="hljs-function">(<span class="hljs-params">error</span>) =&gt;</span> {
   <span class="hljs-built_in">console</span>.log(<span class="hljs-string">'[removeGeofence] FAILURE: '</span>, error);
 });</code></pre>
 										<h3 id="-see-also-">ℹ️ See also:</h3>
@@ -3600,7 +3600,7 @@ onSuspend() {
 									<dt class="tsd-comment-tag-example">example</dt>
 									<dd><pre><code class="language-javascript">BackgroundGeolocation.sync(<span class="hljs-function">(<span class="hljs-params">records</span>) =&gt;</span> {
   <span class="hljs-built_in">console</span>.log(<span class="hljs-string">'[sync] success: '</span>, records);
-}).catchError(<span class="hljs-function">(<span class="hljs-params">error</span>) =&gt;</span> {
+}).catch(<span class="hljs-function">(<span class="hljs-params">error</span>) =&gt;</span> {
   <span class="hljs-built_in">console</span>.log(<span class="hljs-string">'[sync] FAILURE: '</span>, error);
 });
 </code></pre>

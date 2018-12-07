@@ -23,7 +23,7 @@
 						<li class="state loading">Preparing search index...</li>
 						<li class="state failure">The search index is not available</li>
 					</ul>
-					<a href="../globals.html" class="title">[API Docs] Cordova Background Geolocation</a>&nbsp;<span class="tsd-flag ts-flagOptional ts-flagVersion">v 2.14.2</span>
+					<a href="../globals.html" class="title">[API Docs] Cordova Background Geolocation</a>&nbsp;<span class="tsd-flag ts-flagOptional ts-flagVersion">v 2.14.3</span>
 				</div>
 				<div class="" id="tsd-widgets">
 					<a class="github" href="https://github.com/transistorsoft/cordova-background-geolocation">Github</a>
@@ -79,7 +79,7 @@
   }
 }).then(<span class="hljs-function">(<span class="hljs-params">success</span>) =&gt;</span> {
   <span class="hljs-built_in">console</span>.log(<span class="hljs-string">'[addGeofence] success'</span>);
-}).catchError(<span class="hljs-function">(<span class="hljs-params">error</span>) =&gt;</span> {
+}).catch(<span class="hljs-function">(<span class="hljs-params">error</span>) =&gt;</span> {
   <span class="hljs-built_in">console</span>.log(<span class="hljs-string">'[addGeofence] FAILURE: '</span>, error);
 });</code></pre>
 							<p>Adding multiple geofences with <a href="../classes/_cordova_background_geolocation_.backgroundgeolocation.html#addgeofences">addGeofences</a>.</p>
@@ -99,7 +99,7 @@
   notifyOnEntry: <span class="hljs-literal">true</span>
 }]).then(<span class="hljs-function">(<span class="hljs-params">success</span>) =&gt;</span> {
   <span class="hljs-built_in">console</span>.log(<span class="hljs-string">'[addGeofences] success'</span>);
-}).catchError(<span class="hljs-function">(<span class="hljs-params">error</span>) =&gt;</span> {
+}).catch(<span class="hljs-function">(<span class="hljs-params">error</span>) =&gt;</span> {
   <span class="hljs-built_in">console</span>.log(<span class="hljs-string">'[addGeofences] FAILURE: '</span>, error);
 });</code></pre>
 							<p><strong>ℹ️ Note:</strong> Adding a geofence having an <a href="_cordova_background_geolocation_.geofence.html#identifier">identifier</a> which already exists within the SDK geofence database will cause the previous record to be destroyed and the new one inserted.</p>

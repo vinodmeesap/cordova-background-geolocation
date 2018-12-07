@@ -24,7 +24,7 @@ declare module "cordova-background-geolocation" {
   *   }
   * }).then((success) => {
   *   console.log('[addGeofence] success');
-  * }).catchError((error) => {
+  * }).catch((error) => {
   *   console.log('[addGeofence] FAILURE: ', error);
   * });
   * ```
@@ -46,7 +46,7 @@ declare module "cordova-background-geolocation" {
   *   notifyOnEntry: true
   * }]).then((success) => {
   *   console.log('[addGeofences] success');
-  * }).catchError((error) => {
+  * }).catch((error) => {
   *   console.log('[addGeofences] FAILURE: ', error);
   * });
   * ```

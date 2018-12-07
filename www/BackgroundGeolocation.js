@@ -339,11 +339,6 @@ module.exports = {
     },
     watchPosition: function(success, failure, options) {
         if (typeof(success) === 'function') {
-            if (typeof(failure) === 'object') {
-                // Allow -> #watchPosition(success, options)
-                options = failure;
-                failure = emptyFn;
-            }
             API.watchPosition.apply(API, arguments);
         } else {
             throw "BackgroundGeolocation#watchPosition does not support Promise API, since Promises cannot resolve multiple times.  The #watchPosition callback *will* be run multiple times.  Use the #watchPosition(success, failure, options) API.";
