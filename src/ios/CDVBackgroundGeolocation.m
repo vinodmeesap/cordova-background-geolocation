@@ -773,6 +773,22 @@
     [self.commandDelegate sendPluginResult:result callbackId:command.callbackId];
 }
 
+- (void) getProviderState:(CDVInvokedUrlCommand *) command {
+    TSProviderChangeEvent *event = [bgGeo getProviderState];
+    CDVPluginResult *result = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsDictionary:[event toDictionary]];
+    [self.commandDelegate sendPluginResult:result callbackId:command.callbackId];
+}
+
+- (void) requestPermission:(CDVInvokedUrlCommand *) command {
+    [bgGeo requestPermission:^(NSNumber *status) {
+        CDVPluginResult* result = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsInt: [status intValue]];
+        [self.commandDelegate sendPluginResult:result callbackId:command.callbackId];
+    } failure:^(NSNumber *status) {
+        CDVPluginResult* result = [CDVPluginResult resultWithStatus:CDVCommandStatus_ERROR messageAsInt: [status intValue]];
+        [self.commandDelegate sendPluginResult:result callbackId:command.callbackId];
+    }];
+}
+
 -(void) registerCallback:(NSString*)callbackId callback:(void(^)(id))callback
 {
     @synchronized (callbacks) {

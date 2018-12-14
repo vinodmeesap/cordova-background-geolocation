@@ -23,7 +23,7 @@
 						<li class="state loading">Preparing search index...</li>
 						<li class="state failure">The search index is not available</li>
 					</ul>
-					<a href="../globals.html" class="title">[API Docs] Cordova Background Geolocation</a>&nbsp;<span class="tsd-flag ts-flagOptional ts-flagVersion">v 2.14.3</span>
+					<a href="../globals.html" class="title">[API Docs] Cordova Background Geolocation</a>&nbsp;<span class="tsd-flag ts-flagOptional ts-flagVersion">v 2.14.4</span>
 				</div>
 				<div class="" id="tsd-widgets">
 					<a class="github" href="https://github.com/transistorsoft/cordova-background-geolocation">Github</a>
@@ -307,6 +307,7 @@ BackgroundGeolocation.ready({<span class="hljs-attr">desiredAccuracy</span>: <sp
 								<li class="tsd-kind-method tsd-parent-kind-class tsd-is-static"><a href="_cordova_background_geolocation_.backgroundgeolocation.html#getlocations" class="tsd-kind-icon">get<wbr>Locations</a></li>
 								<li class="tsd-kind-method tsd-parent-kind-class tsd-is-static"><a href="_cordova_background_geolocation_.backgroundgeolocation.html#getlog" class="tsd-kind-icon">get<wbr>Log</a></li>
 								<li class="tsd-kind-method tsd-parent-kind-class tsd-is-static"><a href="_cordova_background_geolocation_.backgroundgeolocation.html#getodometer" class="tsd-kind-icon">get<wbr>Odometer</a></li>
+								<li class="tsd-kind-method tsd-parent-kind-class tsd-is-static"><a href="_cordova_background_geolocation_.backgroundgeolocation.html#getproviderstate" class="tsd-kind-icon">get<wbr>Provider<wbr>State</a></li>
 								<li class="tsd-kind-method tsd-parent-kind-class tsd-is-static"><a href="_cordova_background_geolocation_.backgroundgeolocation.html#getsensors" class="tsd-kind-icon">get<wbr>Sensors</a></li>
 								<li class="tsd-kind-method tsd-parent-kind-class tsd-is-static"><a href="_cordova_background_geolocation_.backgroundgeolocation.html#getstate" class="tsd-kind-icon">get<wbr>State</a></li>
 								<li class="tsd-kind-method tsd-parent-kind-class tsd-is-static"><a href="_cordova_background_geolocation_.backgroundgeolocation.html#insertlocation" class="tsd-kind-icon">insert<wbr>Location</a></li>
@@ -319,6 +320,7 @@ BackgroundGeolocation.ready({<span class="hljs-attr">desiredAccuracy</span>: <sp
 								<li class="tsd-kind-method tsd-parent-kind-class tsd-is-static"><a href="_cordova_background_geolocation_.backgroundgeolocation.html#removegeofences" class="tsd-kind-icon">remove<wbr>Geofences</a></li>
 								<li class="tsd-kind-method tsd-parent-kind-class tsd-is-static"><a href="_cordova_background_geolocation_.backgroundgeolocation.html#removelistener" class="tsd-kind-icon">remove<wbr>Listener</a></li>
 								<li class="tsd-kind-method tsd-parent-kind-class tsd-is-static"><a href="_cordova_background_geolocation_.backgroundgeolocation.html#removelisteners" class="tsd-kind-icon">remove<wbr>Listeners</a></li>
+								<li class="tsd-kind-method tsd-parent-kind-class tsd-is-static"><a href="_cordova_background_geolocation_.backgroundgeolocation.html#requestpermission" class="tsd-kind-icon">request<wbr>Permission</a></li>
 								<li class="tsd-kind-method tsd-parent-kind-class tsd-is-static"><a href="_cordova_background_geolocation_.backgroundgeolocation.html#reset" class="tsd-kind-icon">reset</a></li>
 								<li class="tsd-kind-method tsd-parent-kind-class tsd-is-static"><a href="_cordova_background_geolocation_.backgroundgeolocation.html#resetodometer" class="tsd-kind-icon">reset<wbr>Odometer</a></li>
 								<li class="tsd-kind-method tsd-parent-kind-class tsd-is-static"><a href="_cordova_background_geolocation_.backgroundgeolocation.html#setconfig" class="tsd-kind-icon">set<wbr>Config</a></li>
@@ -984,6 +986,10 @@ BackgroundGeolocation.onHeartbeat(<span class="hljs-function">(<span class="hljs
       <span class="hljs-keyword">break</span>;
   }
 });</code></pre>
+										<h3 id="-see-also-">ℹ️ See also:</h3>
+										<ul>
+											<li>You can explicitly request the current state of location-services using <a href="_cordova_background_geolocation_.backgroundgeolocation.html#getproviderstate">getProviderState</a>.</li>
+										</ul>
 										<h3 id="-note-">⚠️ Note:</h3>
 										<ul>
 											<li>The plugin always force-fires an <a href="_cordova_background_geolocation_.backgroundgeolocation.html#onproviderchange">onProviderChange</a> event whenever the app is launched (right after the <a href="_cordova_background_geolocation_.backgroundgeolocation.html#ready">ready</a> method is executed), regardless of current state, so you can learn the the current state of location-services with each boot of your application.</li>
@@ -2102,6 +2108,62 @@ BackgroundGeolocation.changePace(<span class="hljs-literal">false</span>); <span
 					</ul>
 				</section>
 				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class tsd-is-static">
+					<a name="getproviderstate" class="tsd-anchor"></a>
+					<h3><span class="tsd-flag ts-flagStatic">Static</span> get<wbr>Provider<wbr>State</h3>
+					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class tsd-is-static">
+						<li class="tsd-signature tsd-kind-icon">get<wbr>Provider<wbr>State<span class="tsd-signature-symbol">(</span>success<span class="tsd-signature-symbol">?: </span><span class="tsd-signature-type">function</span>, failure<span class="tsd-signature-symbol">?: </span><span class="tsd-signature-type">Function</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><a href="../interfaces/_cordova_background_geolocation_.providerchangeevent.html" class="tsd-signature-type">ProviderChangeEvent</a><span class="tsd-signature-symbol">&gt;</span></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+							</aside>
+							<div class="tsd-comment tsd-typography">
+								<div class="lead">
+									<p>Retrieves the current state of location-provider authorization.</p>
+								</div>
+								<h3 id="-see-also-">ℹ️ See also:</h3>
+								<ul>
+									<li>You can also <em>listen</em> for changes in location-authoriztion using the event <a href="_cordova_background_geolocation_.backgroundgeolocation.html#onproviderchange">onProviderChange</a>.</li>
+								</ul>
+								<dl class="tsd-comment-tags">
+									<dt class="tsd-comment-tag-example">example</dt>
+									<dd><pre><code class="language-javascript"><span class="hljs-keyword">let</span> providerState = <span class="hljs-keyword">await</span> BackgroundGeolocation.getProviderState();
+<span class="hljs-built_in">console</span>.log(<span class="hljs-string">'- Provider state: '</span>, providerState);</code></pre>
+									</dd>
+								</dl>
+							</div>
+							<h4 class="tsd-parameters-title">Parameters</h4>
+							<ul class="tsd-parameters">
+								<li>
+									<h5><span class="tsd-flag ts-flagOptional">Optional</span> success: <span class="tsd-signature-type">function</span></h5>
+									<ul class="tsd-parameters">
+										<li class="tsd-parameter-siganture">
+											<ul class="tsd-signatures tsd-kind-type-literal tsd-is-not-exported">
+												<li class="tsd-signature tsd-kind-icon"><span class="tsd-signature-symbol">(</span>state<span class="tsd-signature-symbol">: </span><a href="../interfaces/_cordova_background_geolocation_.providerchangeevent.html" class="tsd-signature-type">ProviderChangeEvent</a><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">void</span></li>
+											</ul>
+											<ul class="tsd-descriptions">
+												<li class="tsd-description">
+													<h4 class="tsd-parameters-title">Parameters</h4>
+													<ul class="tsd-parameters">
+														<li>
+															<h5>state: <a href="../interfaces/_cordova_background_geolocation_.providerchangeevent.html" class="tsd-signature-type">ProviderChangeEvent</a></h5>
+														</li>
+													</ul>
+													<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">void</span></h4>
+												</li>
+											</ul>
+										</li>
+									</ul>
+								</li>
+								<li>
+									<h5><span class="tsd-flag ts-flagOptional">Optional</span> failure: <span class="tsd-signature-type">Function</span></h5>
+								</li>
+							</ul>
+							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><a href="../interfaces/_cordova_background_geolocation_.providerchangeevent.html" class="tsd-signature-type">ProviderChangeEvent</a><span class="tsd-signature-symbol">&gt;</span></h4>
+						</li>
+					</ul>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class tsd-is-static">
 					<a name="getsensors" class="tsd-anchor"></a>
 					<h3><span class="tsd-flag ts-flagStatic">Static</span> get<wbr>Sensors</h3>
 					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class tsd-is-static">
@@ -2778,6 +2840,84 @@ BackgroundGeolocation.removeListener(<span class="hljs-string">'location'</span>
 								</li>
 							</ul>
 							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">void</span></h4>
+						</li>
+					</ul>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class tsd-is-static">
+					<a name="requestpermission" class="tsd-anchor"></a>
+					<h3><span class="tsd-flag ts-flagStatic">Static</span> request<wbr>Permission</h3>
+					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class tsd-is-static">
+						<li class="tsd-signature tsd-kind-icon">request<wbr>Permission<span class="tsd-signature-symbol">(</span>success<span class="tsd-signature-symbol">?: </span><span class="tsd-signature-type">function</span>, failure<span class="tsd-signature-symbol">?: </span><span class="tsd-signature-type">function</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><a href="../modules/_cordova_background_geolocation_.html#authorizationstatus" class="tsd-signature-type">AuthorizationStatus</a><span class="tsd-signature-symbol">&gt;</span></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+							</aside>
+							<div class="tsd-comment tsd-typography">
+								<div class="lead">
+									<p>Initiates a location permission dialog with the user.</p>
+								</div>
+								<p>If the user has already provided authorization for location-services, your <code>success</code> callback will be executed immediately.</p>
+								<h3 id="-note-">⚠️ Note:</h3>
+								<ul>
+									<li>The SDK will <strong>already request permission</strong> from the user when you execute <a href="_cordova_background_geolocation_.backgroundgeolocation.html#start">start</a>, <a href="_cordova_background_geolocation_.backgroundgeolocation.html#startgeofences">startGeofences</a>, <a href="_cordova_background_geolocation_.backgroundgeolocation.html#getcurrentposition">getCurrentPosition</a>, etc.  You <strong>do not need to explicitly execute this method</strong> with typical use-cases.</li>
+								</ul>
+								<dl class="tsd-comment-tags">
+									<dt class="tsd-comment-tag-example">example</dt>
+									<dd><pre><code class="language-javascript">BackgroundGeolocation.requestPermission().then(<span class="hljs-function">(<span class="hljs-params">status</span>) =&gt;</span> {
+  <span class="hljs-built_in">console</span>.log(<span class="hljs-string">'[requestPermission] SUCCESS'</span>);
+}).catch(<span class="hljs-function">(<span class="hljs-params">status</span>) =&gt;</span> {
+  <span class="hljs-built_in">console</span>.log(<span class="hljs-string">'[requestPermission] REJECTED'</span>, status);
+});</code></pre>
+									</dd>
+								</dl>
+							</div>
+							<h4 class="tsd-parameters-title">Parameters</h4>
+							<ul class="tsd-parameters">
+								<li>
+									<h5><span class="tsd-flag ts-flagOptional">Optional</span> success: <span class="tsd-signature-type">function</span></h5>
+									<ul class="tsd-parameters">
+										<li class="tsd-parameter-siganture">
+											<ul class="tsd-signatures tsd-kind-type-literal tsd-is-not-exported">
+												<li class="tsd-signature tsd-kind-icon"><span class="tsd-signature-symbol">(</span>status<span class="tsd-signature-symbol">: </span><a href="../modules/_cordova_background_geolocation_.html#authorizationstatus" class="tsd-signature-type">AuthorizationStatus</a><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">void</span></li>
+											</ul>
+											<ul class="tsd-descriptions">
+												<li class="tsd-description">
+													<h4 class="tsd-parameters-title">Parameters</h4>
+													<ul class="tsd-parameters">
+														<li>
+															<h5>status: <a href="../modules/_cordova_background_geolocation_.html#authorizationstatus" class="tsd-signature-type">AuthorizationStatus</a></h5>
+														</li>
+													</ul>
+													<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">void</span></h4>
+												</li>
+											</ul>
+										</li>
+									</ul>
+								</li>
+								<li>
+									<h5><span class="tsd-flag ts-flagOptional">Optional</span> failure: <span class="tsd-signature-type">function</span></h5>
+									<ul class="tsd-parameters">
+										<li class="tsd-parameter-siganture">
+											<ul class="tsd-signatures tsd-kind-type-literal tsd-is-not-exported">
+												<li class="tsd-signature tsd-kind-icon"><span class="tsd-signature-symbol">(</span>status<span class="tsd-signature-symbol">: </span><a href="../modules/_cordova_background_geolocation_.html#authorizationstatus" class="tsd-signature-type">AuthorizationStatus</a><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">void</span></li>
+											</ul>
+											<ul class="tsd-descriptions">
+												<li class="tsd-description">
+													<h4 class="tsd-parameters-title">Parameters</h4>
+													<ul class="tsd-parameters">
+														<li>
+															<h5>status: <a href="../modules/_cordova_background_geolocation_.html#authorizationstatus" class="tsd-signature-type">AuthorizationStatus</a></h5>
+														</li>
+													</ul>
+													<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">void</span></h4>
+												</li>
+											</ul>
+										</li>
+									</ul>
+								</li>
+							</ul>
+							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">Promise</span><span class="tsd-signature-symbol">&lt;</span><a href="../modules/_cordova_background_geolocation_.html#authorizationstatus" class="tsd-signature-type">AuthorizationStatus</a><span class="tsd-signature-symbol">&gt;</span></h4>
 						</li>
 					</ul>
 				</section>
@@ -3945,6 +4085,9 @@ onSuspend() {
 								<a href="_cordova_background_geolocation_.backgroundgeolocation.html#getodometer" class="tsd-kind-icon">get<wbr>Odometer</a>
 							</li>
 							<li class=" tsd-kind-method tsd-parent-kind-class tsd-is-static">
+								<a href="_cordova_background_geolocation_.backgroundgeolocation.html#getproviderstate" class="tsd-kind-icon">get<wbr>Provider<wbr>State</a>
+							</li>
+							<li class=" tsd-kind-method tsd-parent-kind-class tsd-is-static">
 								<a href="_cordova_background_geolocation_.backgroundgeolocation.html#getsensors" class="tsd-kind-icon">get<wbr>Sensors</a>
 							</li>
 							<li class=" tsd-kind-method tsd-parent-kind-class tsd-is-static">
@@ -3979,6 +4122,9 @@ onSuspend() {
 							</li>
 							<li class=" tsd-kind-method tsd-parent-kind-class tsd-is-static">
 								<a href="_cordova_background_geolocation_.backgroundgeolocation.html#removelisteners" class="tsd-kind-icon">remove<wbr>Listeners</a>
+							</li>
+							<li class=" tsd-kind-method tsd-parent-kind-class tsd-is-static">
+								<a href="_cordova_background_geolocation_.backgroundgeolocation.html#requestpermission" class="tsd-kind-icon">request<wbr>Permission</a>
 							</li>
 							<li class=" tsd-kind-method tsd-parent-kind-class tsd-is-static">
 								<a href="_cordova_background_geolocation_.backgroundgeolocation.html#reset" class="tsd-kind-icon">reset</a>
