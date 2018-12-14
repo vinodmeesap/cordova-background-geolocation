@@ -282,6 +282,12 @@ public class CDVBackgroundGeolocation extends CordovaPlugin {
         } else if (ACTION_LOG.equalsIgnoreCase(action)) {
             result = true;
             log(data, callbackContext);
+        } else if (BackgroundGeolocation.ACTION_GET_PROVIDER_STATE.equalsIgnoreCase(action)) {
+            result = true;
+            getProviderState(callbackContext);
+        } else if (BackgroundGeolocation.ACTION_REQUEST_PERMISSION.equalsIgnoreCase(action)) {
+            result = true;
+            requestPermission(callbackContext);
         }
         return result;
     }
@@ -915,6 +921,22 @@ public class CDVBackgroundGeolocation extends CordovaPlugin {
     private void isPowerSaveMode(CallbackContext callbackContext) {
         PluginResult result = new PluginResult(PluginResult.Status.OK, getAdapter().isPowerSaveMode());
         callbackContext.sendPluginResult(result);
+    }
+
+    private void requestPermission(final CallbackContext callbackContext) {
+        getAdapter().requestPermission(new TSRequestPermissionCallback() {
+            @Override public void onSuccess(int status) {
+                callbackContext.success(status);
+            }
+            @Override public void onFailure(int status) {
+                PluginResult result = new PluginResult(PluginResult.Status.ERROR, status);
+                callbackContext.sendPluginResult(result);
+            }
+        });
+    }
+
+    private void getProviderState(CallbackContext callbackContext) {
+        callbackContext.success(getAdapter().getProviderState().toJson());
     }
 
     private void onError(String error) {

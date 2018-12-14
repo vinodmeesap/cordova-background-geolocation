@@ -3,6 +3,11 @@
 
 ## Unreleased
 
+## [2.14.4] 2018-12-13
+- [Fixed] Android NPE in `watchPosition`
+- [Added] Added method `getProviderState` for querying current state of location-services.
+- [Added] Added method `requestPermission` for manually requesting location-permission (`#start`, `#getCurrentPosition`, `#watchPosition` etc, will already automatically request permission.
+
 ## [2.14.3] 2018-12-06
 - [Changed] Upgrade Android logger dependency to latest version (`logback`).
 - [Fixed] Prevent Android foreground-service from auto-starting when location permission is revoked via Settings screen.

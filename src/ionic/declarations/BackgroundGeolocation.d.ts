@@ -385,6 +385,9 @@ declare module "cordova-background-geolocation" {
     * });
     * ```
     *
+    * ### ℹ️ See also:
+    * - You can explicitly request the current state of location-services using [[getProviderState]].
+    *
     * ### ⚠️ Note:
     * - The plugin always force-fires an [[onProviderChange]] event whenever the app is launched (right after the [[ready]] method is executed), regardless of current state, so you can learn the the current state of location-services with each boot of your application.
     *
@@ -1335,6 +1338,38 @@ declare module "cordova-background-geolocation" {
     */
     static getSensors(success?:(sensors:Sensors) => void, failure?:Function): Promise<Sensors>;
 
+    /**
+    * Retrieves the current state of location-provider authorization.
+    *
+    * ### ℹ️ See also:
+    * - You can also *listen* for changes in location-authoriztion using the event [[onProviderChange]].
+    *
+    * @example
+    * ```javascript
+    * let providerState = await BackgroundGeolocation.getProviderState();
+    * console.log('- Provider state: ', providerState);
+    * ```
+    */
+    static getProviderState(success?:(state:ProviderChangeEvent) => void, failure?:Function): Promise<ProviderChangeEvent>;
+
+    /**
+    * Initiates a location permission dialog with the user.
+    *
+    * If the user has already provided authorization for location-services, your `success` callback will be executed immediately.
+    *
+    * ### ⚠️ Note:
+    * - The SDK will **already request permission** from the user when you execute [[start]], [[startGeofences]], [[getCurrentPosition]], etc.  You **do not need to explicitly execute this method** with typical use-cases.
+    *
+    * @example
+    * ```javascript
+    * BackgroundGeolocation.requestPermission().then((status) => {
+    *   console.log('[requestPermission] SUCCESS');
+    * }).catch((status) => {
+    *   console.log('[requestPermission] REJECTED', status);
+    * });
+    * ```
+    */
+    static requestPermission(success?:(status:AuthorizationStatus) => void, failure?:(status:AuthorizationStatus) => void): Promise<AuthorizationStatus>;
     /**
     *
     */
