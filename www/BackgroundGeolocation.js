@@ -73,6 +73,20 @@ module.exports = {
             return API.reset(config);
         }
     },
+    requestPermission: function(success, failure) {
+        if (!arguments.length) {
+            return API.requestPermission();
+        } else {
+            API.requestPermission().then(success).catch(failure);
+        }
+    },
+    getProviderState: function(success, failure) {
+        if (!arguments.length) {
+            return API.getProviderState();
+        } else {
+            API.getProviderState().then(success).catch(failure);
+        }
+    },
     onLocation: function(success, failure) {
         this.on('location', success, failure);
     },
