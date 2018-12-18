@@ -3,6 +3,9 @@
 
 ## Unreleased
 
+## [2.14.5] 2018-12-18
+- [Fixed] Android `extras` provided to `watchPosition` were not being appended to location data.
+
 ## [2.14.4] 2018-12-13
 - [Fixed] Android NPE in `watchPosition`
 - [Added] Added method `getProviderState` for querying current state of location-services.
