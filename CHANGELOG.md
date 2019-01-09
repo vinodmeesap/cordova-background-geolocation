@@ -1,7 +1,9 @@
 
 # CHANGELOG
 
-## Unreleased
+## [2.14.6] 2019-01-11
+- [Changed] Android Service: Return `START_STICKY` instead of `START_REDELIVER_INTENT`.
+- [Changed] Android: `setShowBadge(false)` on Android `NotificationChannel`.  Some users reporting that Android shows a badge-count on app icon when service is started / stopped.
 
 ## [2.14.5] 2018-12-18
 - [Fixed] Android `extras` provided to `watchPosition` were not being appended to location data.
