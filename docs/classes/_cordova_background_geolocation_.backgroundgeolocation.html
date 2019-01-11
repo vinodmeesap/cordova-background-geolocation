@@ -23,7 +23,7 @@
 						<li class="state loading">Preparing search index...</li>
 						<li class="state failure">The search index is not available</li>
 					</ul>
-					<a href="../globals.html" class="title">[API Docs] Cordova Background Geolocation</a>&nbsp;<span class="tsd-flag ts-flagOptional ts-flagVersion">v 2.14.4</span>
+					<a href="../globals.html" class="title">[API Docs] Cordova Background Geolocation</a>&nbsp;<span class="tsd-flag ts-flagOptional ts-flagVersion">v 2.14.6</span>
 				</div>
 				<div class="" id="tsd-widgets">
 					<a class="github" href="https://github.com/transistorsoft/cordova-background-geolocation">Github</a>
@@ -118,7 +118,7 @@
 									</tr>
 									<tr>
 										<td><a href="_cordova_background_geolocation_.backgroundgeolocation.html#onpowersavechange">onPowerSaveChange</a></td>
-										<td>Fired when state of operating-system&#39;s &quot;power-saving&quot; feature is enabled / disabld.</td>
+										<td>Fired when state of operating-system&#39;s &quot;power-saving&quot; feature is enabled / disabled.</td>
 									</tr>
 									<tr>
 										<td><a href="_cordova_background_geolocation_.backgroundgeolocation.html#onenabledchange">onEnabledChange</a></td>
@@ -205,7 +205,7 @@ BackgroundGeolocation.ready({
 });
 </code></pre>
 							<h3 id="-note-">ℹ️ Note:</h3>
-							<p>The configuration <strong><code>{}</code></strong> provided to the <a href="_cordova_background_geolocation_.backgroundgeolocation.html#ready">ready</a> method is applied <strong>only</strong> when your app is <strong>first booted</strong> &mdash; for every launch thereafter, the plugin will automatically load the last known configuration from persistant storage.  If you wish to <strong>force</strong> the <code>#ready</code> method to <em>always</em> apply the supplied config <code>{}</code>, you can specify <strong><code>reset: true</code></strong></p>
+							<p>The configuration <strong><code>{}</code></strong> provided to the <a href="_cordova_background_geolocation_.backgroundgeolocation.html#ready">ready</a> method is applied <strong>only</strong> when your app is <strong>first booted</strong> &mdash; for every launch thereafter, the plugin will automatically load the last known configuration from persistent storage.  If you wish to <strong>force</strong> the <code>#ready</code> method to <em>always</em> apply the supplied config <code>{}</code>, you can specify <strong><code>reset: true</code></strong></p>
 						</dd>
 						<dt class="tsd-comment-tag-example">example</dt>
 						<dd><pre><code class="language-javascript">BackgroundGeolocation.ready({
@@ -412,7 +412,7 @@ BackgroundGeolocation.ready({<span class="hljs-attr">desiredAccuracy</span>: <sp
 								a <code>connectivitychange</code> event with the current state network-connectivity whenever the <a href="_cordova_background_geolocation_.backgroundgeolocation.html#start">start</a> method is executed.</p>
 								<dl class="tsd-comment-tags">
 									<dt class="tsd-comment-tag-example">example</dt>
-									<dd><pre><code class="language-javascript">BackgroundGeolocation.oConnectivityChange(<span class="hljs-function">(<span class="hljs-params">event</span>) =&gt;</span> {
+									<dd><pre><code class="language-javascript">BackgroundGeolocation.onConnectivityChange(<span class="hljs-function">(<span class="hljs-params">event</span>) =&gt;</span> {
   <span class="hljs-built_in">console</span>.log(<span class="hljs-string">'[onConnectivityChange] '</span>, event);
 });</code></pre>
 									</dd>
@@ -461,7 +461,7 @@ BackgroundGeolocation.ready({<span class="hljs-attr">desiredAccuracy</span>: <sp
 									<p>Subscribe to changes in plugin <a href="../interfaces/_cordova_background_geolocation_.state.html#enabled">State.enabled</a>.</p>
 								</div>
 								<p>Fired when the plugin&#39;s <a href="../interfaces/_cordova_background_geolocation_.state.html#enabled">State.enabled</a> changes.  For example, executing <a href="_cordova_background_geolocation_.backgroundgeolocation.html#start">start</a> and <a href="_cordova_background_geolocation_.backgroundgeolocation.html#stop">stop</a> will cause the <code>onEnabledChnage</code> event to fire.
-									This event is primarily desigend for use with the configuration option <a href="../interfaces/_cordova_background_geolocation_.config.html#stopafterelapsedminutes">stopAfterElapsedMinutes</a>, which automatically executes the plugin&#39;s
+									This event is primarily designed for use with the configuration option <a href="../interfaces/_cordova_background_geolocation_.config.html#stopafterelapsedminutes">stopAfterElapsedMinutes</a>, which automatically executes the plugin&#39;s
 								<a href="_cordova_background_geolocation_.backgroundgeolocation.html#stop">stop</a> method.</p>
 								<dl class="tsd-comment-tags">
 									<dt class="tsd-comment-tag-example">example</dt>
@@ -579,7 +579,7 @@ BackgroundGeolocation.ready({<span class="hljs-attr">desiredAccuracy</span>: <sp
 								<dl class="tsd-comment-tags">
 									<dt class="tsd-comment-tag-example">example</dt>
 									<dd><pre><code class="language-javascript">BackgroundGeolocation.onGeofencesChange(<span class="hljs-function">(<span class="hljs-params">event</span>) =&gt;</span> {
-  <span class="hljs-keyword">let</span> on = event.on;     <span class="hljs-comment">//&lt;-- new geofences activiated.</span>
+  <span class="hljs-keyword">let</span> on = event.on;     <span class="hljs-comment">//&lt;-- new geofences activated.</span>
   <span class="hljs-keyword">let</span> off = event.off; <span class="hljs-comment">//&lt;-- geofences that were just de-activated.</span>
 
   <span class="hljs-comment">// Create map circles</span>
@@ -902,7 +902,7 @@ BackgroundGeolocation.onHeartbeat(<span class="hljs-function">(<span class="hljs
 							</aside>
 							<div class="tsd-comment tsd-typography">
 								<div class="lead">
-									<p>Subsribe to state changes in OS power-saving system.</p>
+									<p>Subscribe to state changes in OS power-saving system.</p>
 								</div>
 								<p>Fired when the state of the operating-system&#39;s &quot;Power Saving&quot; mode changes.  Your <code>callback</code> will be provided with a <code>bool</code> showing whether
 								&quot;Power Saving&quot; is <strong>enabled</strong> or <strong>disabled</strong>.  Power Saving mode can throttle certain services in the background, such as HTTP requests or GPS.</p>
@@ -965,7 +965,7 @@ BackgroundGeolocation.onHeartbeat(<span class="hljs-function">(<span class="hljs
 								<div class="lead">
 									<p>Subscribe to changes in device&#39;s location-services configuration / authorization.</p>
 								</div>
-								<p>Your <code>callback</code> fill be executed whenever a change in the state of the device&#39;s <strong>Location Services</strong> has been detected.  eg: &quot;GPS ON&quot;, &quot;Wifi only&quot;.</p>
+								<p>Your <code>callback</code> fill be executed whenever a change in the state of the device&#39;s <strong>Location Services</strong> has been detected.  eg: &quot;GPS ON&quot;, &quot;WiFi only&quot;.</p>
 								<dl class="tsd-comment-tags">
 									<dt class="tsd-comment-tag-example">example</dt>
 									<dd><pre><code class="language-javascript">BackgroundGeolocation.onProviderChange(<span class="hljs-function">(<span class="hljs-params">event</span>) =&gt;</span> {
@@ -1618,7 +1618,7 @@ BackgroundGeolocation.changePace(<span class="hljs-literal">false</span>); <span
 								<div class="lead">
 									<p>Signal completion of <a href="_cordova_background_geolocation_.backgroundgeolocation.html#startbackgroundtask">startBackgroundTask</a></p>
 								</div>
-								<p>Sends a signal to the native OS that your long-running task, addressed by <code>taskId</code> privided by <a href="_cordova_background_geolocation_.backgroundgeolocation.html#startbackgroundtask">startBackgroundTask</a> is complete and the OS may proceed
+								<p>Sends a signal to the native OS that your long-running task, addressed by <code>taskId</code> provided by <a href="_cordova_background_geolocation_.backgroundgeolocation.html#startbackgroundtask">startBackgroundTask</a> is complete and the OS may proceed
 								to suspend your application if applicable.</p>
 								<dl class="tsd-comment-tags">
 									<dt class="tsd-comment-tag-example">example</dt>
@@ -1879,11 +1879,12 @@ BackgroundGeolocation.changePace(<span class="hljs-literal">false</span>); <span
 							</aside>
 							<div class="tsd-comment tsd-typography">
 								<div class="lead">
-									<p>Retrive a List of <a href="../interfaces/_cordova_background_geolocation_.location.html">Location</a> currently stored in the plugin&#39;s SQLite datbase.</p>
+									<p>Retrieve a List of <a href="../interfaces/_cordova_background_geolocation_.location.html">Location</a> currently stored in the plugin&#39;s SQLite database.</p>
 								</div>
 								<dl class="tsd-comment-tags">
 									<dt class="tsd-comment-tag-example">example</dt>
-									<dd><pre><code class="language-javascript"><span class="hljs-keyword">let</span> locations = <span class="hljs-keyword">await</span> BackgroundGeolocation.getLocations();</code></pre>
+									<dd><p><code>java script
+let locations = await BackgroundGeolocation.getLocations();</code></p>
 									</dd>
 								</dl>
 							</div>
@@ -2438,7 +2439,7 @@ BackgroundGeolocation.changePace(<span class="hljs-literal">false</span>); <span
 									<p>Signal to the plugin that your app is launched and ready, proving the default <a href="../interfaces/_cordova_background_geolocation_.config.html">Config</a>.</p>
 								</div>
 								<p>The supplied <a href="../interfaces/_cordova_background_geolocation_.config.html">Config</a> will be applied <strong>only at first install</strong> of your app — for every launch thereafter,
-									the plugin will automatically load its last-known configuration from persisent storage.
+									the plugin will automatically load its last-known configuration from persistent storage.
 								The plugin always remembers the configuration you apply to it.</p>
 								<dl class="tsd-comment-tags">
 									<dt class="tsd-comment-tag-example">example</dt>
@@ -2469,7 +2470,7 @@ bgGeo.reset({
   <span class="hljs-attr">distanceFilter</span>:  <span class="hljs-number">10</span>
 });</code></pre>
 										<h3 id="-a-href-_cordova_background_geolocation_-backgroundgeolocation-html-reset-reset-a-true"><a href="_cordova_background_geolocation_.backgroundgeolocation.html#reset">reset</a>: true</h3>
-										<p>Optionally, you can set <a href="_cordova_background_geolocation_.backgroundgeolocation.html#reset">reset</a> to <strong><code>true</code></strong>  This is helpful during development.  This will esentially <em>force</em> the supplied <a href="../interfaces/_cordova_background_geolocation_.config.html">Config</a> to
+										<p>Optionally, you can set <a href="_cordova_background_geolocation_.backgroundgeolocation.html#reset">reset</a> to <strong><code>true</code></strong>  This is helpful during development.  This will essentially <em>force</em> the supplied <a href="../interfaces/_cordova_background_geolocation_.config.html">Config</a> to
 										be applied with <em>each launch</em> of your application.</p>
 									</dd>
 									<dt class="tsd-comment-tag-example">example</dt>
@@ -3842,7 +3843,7 @@ onSuspend() {
 									just as any other location (If the SDK is currently <a href="../interfaces/_cordova_background_geolocation_.providerchangeevent.html#enabled">enabled</a>) in addition to POSTing to your configured <a href="../interfaces/_cordova_background_geolocation_.config.html#url">url</a> (if you&#39;ve enabled the HTTP features).</p>
 								</div>
 								<h3 id="-warning-">⚠️ Warning:</h3>
-								<p><code>watchPosition</code> is <strong>not</strong> reccommended for <strong>long term</strong> monitoring in the background &mdash; It&#39;s primarily designed for use in the foreground <strong>only</strong>.  You might use it for fast-updates of the user&#39;s current position on the map, for example.
+								<p><code>watchPosition</code> is <strong>not</strong> recommended for <strong>long term</strong> monitoring in the background &mdash; It&#39;s primarily designed for use in the foreground <strong>only</strong>.  You might use it for fast-updates of the user&#39;s current position on the map, for example.
 								The SDK&#39;s primary <a href="https://github.com/transistorsoft/cordova-background-geolocation/wiki/Philosophy-of-Operation">Philosophy of Operation</a> <strong>does not require</strong> <code>watchPosition</code>.</p>
 								<h4 id="ios">iOS</h4>
 								<p><code>watchPosition</code> will continue to run in the background, preventing iOS from suspending your application.  Take care to listen to <code>suspend</code> event and call <a href="_cordova_background_geolocation_.backgroundgeolocation.html#stopwatchposition">stopWatchPosition</a> if you don&#39;t want your app to keep running in the background, consuming battery.</p>
