@@ -980,7 +980,7 @@ declare module "cordova-background-geolocation" {
     static getLocations(success?:(locations:Array<Object>) => void, failure?:Function): Promise<Array<Object>>;
 
     /**
-    * Retrive the count of all locations current stored in the plugin's SQLite datbase.
+    * Retrieve the count of all locations current stored in the plugin's SQLite database.
     *
     * @example
       * ```javascript
@@ -1012,7 +1012,7 @@ declare module "cordova-background-geolocation" {
     * execute an HTTP post for **each** [[Location]] in the database (REST-style).  Your callback will be executed and provided with a `List` of all the
     * locations from the SQLite database.  If you configured the plugin for HTTP (by configuring a [[url]], your callback will be executed after all
     * the HTTP request(s) have completed.  If the plugin failed to sync to your server (possibly because of no network connection), the failure callback will
-    * be called with an error message.  If you are **not** using the HTTP features, [[sync]] will delete all records from its SQLite datbase.
+    * be called with an error message.  If you are **not** using the HTTP features, [[sync]] will delete all records from its SQLite database.
     *
     * @example
       * ```javascript
@@ -1028,9 +1028,9 @@ declare module "cordova-background-geolocation" {
     static sync(success?:(locations:Array<Object>) => void, failure?:Function): Promise<Array<Object>>;
 
     /**
-    * Retrieve the current distance-travelled ("odometer").
+    * Retrieve the current distance-traveled ("odometer").
     *
-    * The plugin constantly tracks distance travelled, computing the distance between the current location and last and maintaining the sum.  To fetch the
+    * The plugin constantly tracks distance traveled, computing the distance between the current location and last and maintaining the sum.  To fetch the
     * current **odometer** reading:
     *
     * @example
@@ -1043,7 +1043,7 @@ declare module "cordova-background-geolocation" {
     *  - [[resetOdometer]] / [[setOdometer]].
     *
     * ### ⚠️ Warning:
-    * - Odometer calculations are dependant upon the accuracy of received locations.  If location accuracy is poor, this will necessarily introduce error into odometer calculations.
+    * - Odometer calculations are dependent upon the accuracy of received locations.  If location accuracy is poor, this will necessarily introduce error into odometer calculations.
     */
     static getOdometer(success?:(odometer:number) => void, failure?:Function): Promise<number>;
 
@@ -1278,7 +1278,7 @@ declare module "cordova-background-geolocation" {
     static emailLog(email:string, success?:Function, failure?:(error:string) => void): Promise<void>;
 
     /**
-    * Destory the entire contents of plugin's log database.
+    * Destroy the entire contents of plugin's log database.
     *
     * @example
       * ```javascript
@@ -1321,7 +1321,7 @@ declare module "cordova-background-geolocation" {
     static isPowerSaveMode(success?:(enabled:boolean) => void, failure?:Function): Promise<boolean>;
 
     /**
-    * Returns the presense of device sensors *accelerometer*, *gyroscope*, *magnetometer*
+    * Returns the presence of device sensors *accelerometer*, *gyroscope*, *magnetometer*
     * @break
     *
     * These core [[Sensors]] are used by the motion activity-recognition system -- when any of these sensors are missing from a device (particularly on cheap
@@ -1342,7 +1342,7 @@ declare module "cordova-background-geolocation" {
     * Retrieves the current state of location-provider authorization.
     *
     * ### ℹ️ See also:
-    * - You can also *listen* for changes in location-authoriztion using the event [[onProviderChange]].
+    * - You can also *listen* for changes in location-authorization using the event [[onProviderChange]].
     *
     * @example
     * ```javascript
