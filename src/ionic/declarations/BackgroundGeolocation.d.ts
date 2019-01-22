@@ -260,7 +260,7 @@ declare module "cordova-background-geolocation" {
     * Every location recorded by the SDK is provided to your `callback`, including those from [[onMotionChange]], [[getCurrentPosition]] and [[watchPosition]].
     *
     * @example
-      * ```javascript
+    * ```javascript
     * BackgroundGeolocation.onLocation((location) => {
     *   console.log('[onLocation] success: ', location);
     * }, (error) => {
@@ -307,7 +307,7 @@ declare module "cordova-background-geolocation" {
     * Your `callback` will be executed each time the device has changed-state between **MOVING** or **STATIONARY**.
     *
     * @example
-      * ```javascript
+    * ```javascript
     * BackgroundGeolocation.onMotionChange((event) => {
     *   if (event.isMoving) {
     *      console.log('[onMotionChange] Device has just started MOVING ', event.location);
@@ -328,7 +328,7 @@ declare module "cordova-background-geolocation" {
     * Subscribe to HTTP responses from your server [[url]].
     *
     * @example
-      * ```javascript
+    * ```javascript
     * BackgroundGeolocation.onHttp((event) => {
     *   let status = response.status;
     *   let success = response.success;
@@ -349,7 +349,7 @@ declare module "cordova-background-geolocation" {
     * Your `callback` will be executed each time the activity-recognition system receives an event (`still, on_foot, in_vehicle, on_bicycle, running`).
     *
     * @example
-      * ```javascript
+    * ```javascript
     * BackgroundGeolocation.onActivityChange((event) => {
     *   console.log('[onActivityChange] ', event);
     * });
@@ -364,7 +364,7 @@ declare module "cordova-background-geolocation" {
     * Your `callback` fill be executed whenever a change in the state of the device's **Location Services** has been detected.  eg: "GPS ON", "WiFi only".
     *
     * @example
-      * ```javascript
+    * ```javascript
     * BackgroundGeolocation.onProviderChange((event) => {
     *   console.log('[onProviderChange: ', event);
     *
@@ -401,7 +401,7 @@ declare module "cordova-background-geolocation" {
     * Your `callback` will be executed for each [[heartbeatInterval]] while the device is in **stationary** state (**iOS** requires [[preventSuspend]]: true as well).
     *
     * @example
-      * ```javascript
+    * ```javascript
     * BackgroundGeolocation.ready({
     *   heartbeatInterval: 60
     * });
@@ -441,7 +441,7 @@ declare module "cordova-background-geolocation" {
     * It's when this list of monitored geofences *changes*, that the plugin will fire the `onGeofencesChange` event.
     *
     * @example
-      * ```javascript
+    * ```javascript
     * BackgroundGeolocation.onGeofencesChange((event) => {
     *   let on = event.on;     //<-- new geofences activated.
     *   let off = event.off; //<-- geofences that were just de-activated.
@@ -471,7 +471,7 @@ declare module "cordova-background-geolocation" {
     * will reflect the state according to your [[schedule]].
     *
     * @example
-      * ```javascript
+    * ```javascript
     * BackgroundGeolocation.onSchedule((state) => {
     *   if (state.enabled) {
     *     console.log('[onSchedule] scheduled start tracking');
@@ -491,7 +491,7 @@ declare module "cordova-background-geolocation" {
     * a `connectivitychange` event with the current state network-connectivity whenever the [[start]] method is executed.
     *
     * @example
-      * ```javascript
+    * ```javascript
     * BackgroundGeolocation.onConnectivityChange((event) => {
     *   console.log('[onConnectivityChange] ', event);
     * });
@@ -522,7 +522,7 @@ declare module "cordova-background-geolocation" {
     * ![](https://dl.dropboxusercontent.com/s/raz8lagrqayowia/Screenshot%202017-09-19%2010.33.49.png?dl=1)
     *
     * @example
-      * ```javascript
+    * ```javascript
     * BackgroundGeolocation.oPowerSaveChange((isPowerSaveMode) => {
     *   console.log('[onPowerSaveChange: ', isPowerSaveMode);
     * });
@@ -539,7 +539,7 @@ declare module "cordova-background-geolocation" {
     * [[stop]] method.
     *
     * @example
-      * ```javascript
+    * ```javascript
     * BackgroundGeolocation.onEnabledChange(isEnabled => {
     *   console.log('[onEnabledChanged] isEnabled? ', isEnabled);
     * });
@@ -659,7 +659,7 @@ declare module "cordova-background-geolocation" {
     * The supplied [[Config]] will be appended to the current configuration and applied in realtime.
     *
     * @example
-      * ```javascript
+    * ```javascript
     * BackgroundGeolocation.setConfig({
     *   desiredAccuracy: Config.DESIRED_ACCURACY_HIGH,
     *   distanceFilter: 100.0,
@@ -691,7 +691,7 @@ declare module "cordova-background-geolocation" {
     * If you've configured a [[schedule]], this method will override that schedule and engage tracking immediately.
     *
     * @example
-      * ```javascript
+    * ```javascript
     * BackgroundGeolocation.start().then((state) => {
     *   console.log('[start] success - ', state);
     * });
@@ -708,7 +708,7 @@ declare module "cordova-background-geolocation" {
     * Disable location and geofence monitoring.  This is the SDK's power **OFF** button.
     *
     * @example
-      * ```javascript
+    * ```javascript
     * BackgroundGeolocation.stop();
     * ```
     *
@@ -716,7 +716,7 @@ declare module "cordova-background-geolocation" {
     * If you've configured a [[schedule]], **`#stop`** will **not** halt the Scheduler.  You must explicitly [[stopSchedule]] as well:
     *
     * @example
-      * ```javascript
+    * ```javascript
     * // Later when you want to stop the Scheduler (eg: user logout)
     * BackgroundGeolocation.stopSchedule();
     * ```
@@ -733,7 +733,7 @@ declare module "cordova-background-geolocation" {
     * to turn **off** location-services and return the plugin to the **stationary** state.
     *
     * @example
-      * ```javascript
+    * ```javascript
     * BackgroundGeolocation.changePace(true);  // <-- Location-services ON ("moving" state)
     * BackgroundGeolocation.changePace(false); // <-- Location-services OFF ("stationary" state)
     * ```
@@ -747,7 +747,7 @@ declare module "cordova-background-geolocation" {
     * simply use the usual [[stop]] method.
     *
     * @example
-      * ```javascript
+    * ```javascript
     * // Add a geofence.
     * BackgroundGeolocation.addGeofence({
     *   notifyOnExit: true,
@@ -782,7 +782,7 @@ declare module "cordova-background-geolocation" {
     * Return the current [[State]] of the plugin, including all [[Config]] parameters.
     *
     * @example
-      * ```javascript
+    * ```javascript
     * let state = await BackgroundGeolocation.state();
     * console.log('[state] ', state.enabled, state.trackingMode);
     * ```
@@ -798,7 +798,7 @@ declare module "cordova-background-geolocation" {
     * To halt scheduled tracking, use [[stopSchedule]].
     *
     * @example
-      * ```javascript
+    * ```javascript
     * BackgroundGeolocation.startSchedule.then((state) => {
     *   console.log('[startSchedule] success: ', state);
     * })
@@ -813,7 +813,7 @@ declare module "cordova-background-geolocation" {
     * Halt scheduled tracking.
     *
     * @example
-      * ```javascript
+    * ```javascript
     * BackgroundGeolocation.stopSchedule.then((state) => {
     *   console.log('[stopSchedule] success: ', state);
     * })
@@ -822,7 +822,7 @@ declare module "cordova-background-geolocation" {
     * ⚠️ [[stopSchedule]] will **not** execute [[stop]] if the plugin is currently tracking.  You must explicitly execute [[stop]].
     *
     * @example
-      * ```javascript
+    * ```javascript
     * // Later when you want to stop the Scheduler (eg: user logout)
     * await BackgroundGeolocation.stopSchedule().then((state) => {
     *   if (state.enabled) {
@@ -843,7 +843,7 @@ declare module "cordova-background-geolocation" {
     * which you will send to the [[finish]] method.
     *
     * @example
-      * ```javascript
+    * ```javascript
     * BackgroundGeolocation.startBackgroundTask().then((taskId) => {
     *   // Perform some long-running task (eg: HTTP request)
     *   performLongRunningTask.then(() => {
@@ -894,7 +894,7 @@ declare module "cordova-background-geolocation" {
     * See [[LocationError]].
     *
     * @example
-      * ```javascript
+    * ```javascript
     * let location = await BackgroundGeolocation.getCurrentPosition({
     *   timeout: 30,          // 30 second timeout to fetch location
     *   maximumAge: 5000,     // Accept the last-known-location if not older than 5000 ms.
@@ -973,7 +973,7 @@ declare module "cordova-background-geolocation" {
     * Retrieve a List of [[Location]] currently stored in the plugin's SQLite database.
     *
     * @example
-      * ```java script
+    * ```javascript
     * let locations = await BackgroundGeolocation.getLocations();
     * ```
     */
@@ -983,7 +983,7 @@ declare module "cordova-background-geolocation" {
     * Retrieve the count of all locations current stored in the plugin's SQLite database.
     *
     * @example
-      * ```javascript
+    * ```javascript
     * let count = await BackgroundGeolocation.getCount();
     * ```
     */
@@ -993,7 +993,7 @@ declare module "cordova-background-geolocation" {
     * Remove all records in plugin's SQLite database.
     *
     * @example
-      * ```javascript
+    * ```javascript
     * let success = await BackgroundGeolocation.destroyLocations();
     * ```
     */
@@ -1015,7 +1015,7 @@ declare module "cordova-background-geolocation" {
     * be called with an error message.  If you are **not** using the HTTP features, [[sync]] will delete all records from its SQLite database.
     *
     * @example
-      * ```javascript
+    * ```javascript
     * BackgroundGeolocation.sync((records) => {
     *   console.log('[sync] success: ', records);
     * }).catch((error) => {
@@ -1034,7 +1034,7 @@ declare module "cordova-background-geolocation" {
     * current **odometer** reading:
     *
     * @example
-      * ```javascript
+    * ```javascript
     * let odometer = await BackgroundGeolocation.getOdometer();
     * ```
     *
@@ -1051,7 +1051,7 @@ declare module "cordova-background-geolocation" {
     * Initialize the `odometer` to *any* arbitrary value.
     *
     * @example
-      * ```javascript
+    * ```javascript
     * BackgroundGeolocation.setOdometer(1234.56).then((location) => {
     *   // This is the location where odometer was set at.
     *   console.log('[setOdometer] success: ', location);
@@ -1067,7 +1067,7 @@ declare module "cordova-background-geolocation" {
     * Initialize the `odometer` to `0`.
     *
     * @example
-      * ```javascript
+    * ```javascript
     * BackgroundGeolocation.resetOdometer().then((location) => {
     *   // This is the location where odometer was set at.
     *   console.log('[setOdometer] success: ', location);
@@ -1084,7 +1084,7 @@ declare module "cordova-background-geolocation" {
     * Adds a [[Geofence]] to be monitored by the native Geofencing API.
     *
     * @example
-      * ```javascript
+    * ```javascript
     * BackgroundGeolocation.addGeofence({
     *   identifier: "Home",
     *   radius: 150,
@@ -1115,7 +1115,7 @@ declare module "cordova-background-geolocation" {
     * Adds a list of [[Geofence]] to be monitored by the native Geofencing API.
     *
     * @example
-      * ```javascript
+    * ```javascript
     * let geofences = [{
     *   identifier: 'foo',
     *   radius: 200,
@@ -1145,7 +1145,7 @@ declare module "cordova-background-geolocation" {
     * Removes a [[Geofence]] having the given [[Geofence.identifier]].
     *
     * @example
-      * ```javascript
+    * ```javascript
     * BackgroundGeolocation.removeGeofence("Home").then((success) => {
     *   console.log('[removeGeofence] success');
     * }).catch((error) => {
@@ -1175,7 +1175,7 @@ declare module "cordova-background-geolocation" {
     * Fetch a list of all [[Geofence]] in the SDK's database.  If there are no geofences being monitored, you'll receive an empty `Array`.
     *
     * @example
-      * ```javascript
+    * ```javascript
     * let geofences = await BackgroundGeolocation.getGeofences();
     * console.log('[getGeofences: ', geofences);
     * ```
@@ -1263,7 +1263,7 @@ declare module "cordova-background-geolocation" {
     * Email the result of [[getLog]] using device's mail client.
     *
     * @example
-      * ```javascript
+    * ```javascript
     * BackgroundGeolocation.emailLog('foo@bar.com').then((success) => {
     *   console.log('[emailLog] success');
     * }).catch((error) => {
@@ -1281,7 +1281,7 @@ declare module "cordova-background-geolocation" {
     * Destroy the entire contents of plugin's log database.
     *
     * @example
-      * ```javascript
+    * ```javascript
     * BackgroundGeolocation.destroyLog();
     * ```
     * ### ℹ️ See also:
@@ -1314,7 +1314,7 @@ declare module "cordova-background-geolocation" {
     * ![](https://dl.dropboxusercontent.com/s/raz8lagrqayowia/Screenshot%202017-09-19%2010.33.49.png?dl=1)
     *
     * @example
-      * ```javascript
+    * ```javascript
     * let isPowerSaveMode = await BackgroundGeolocation.isPowerSaveMode;
     * ```
     */
@@ -1331,7 +1331,7 @@ declare module "cordova-background-geolocation" {
     * [[minimumActivityRecognitionConfidence]].
     *
     * @example
-      * ```javascript
+    * ```javascript
     * let sensors = await BackgroundGeolocation.sensors;
     * console.log(sensors);
     * ```
