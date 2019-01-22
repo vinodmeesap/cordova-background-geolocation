@@ -1512,7 +1512,7 @@ BackgroundGeolocation.changePace(<span class="hljs-literal">false</span>); <span
 							</aside>
 							<div class="tsd-comment tsd-typography">
 								<div class="lead">
-									<p>Destory the entire contents of plugin&#39;s log database.</p>
+									<p>Destroy the entire contents of plugin&#39;s log database.</p>
 								</div>
 								<dl class="tsd-comment-tags">
 									<dt class="tsd-comment-tag-example">example</dt>
@@ -1660,7 +1660,7 @@ BackgroundGeolocation.changePace(<span class="hljs-literal">false</span>); <span
 							</aside>
 							<div class="tsd-comment tsd-typography">
 								<div class="lead">
-									<p>Retrive the count of all locations current stored in the plugin&#39;s SQLite datbase.</p>
+									<p>Retrieve the count of all locations current stored in the plugin&#39;s SQLite database.</p>
 								</div>
 								<dl class="tsd-comment-tags">
 									<dt class="tsd-comment-tag-example">example</dt>
@@ -1883,8 +1883,7 @@ BackgroundGeolocation.changePace(<span class="hljs-literal">false</span>); <span
 								</div>
 								<dl class="tsd-comment-tags">
 									<dt class="tsd-comment-tag-example">example</dt>
-									<dd><p><code>java script
-let locations = await BackgroundGeolocation.getLocations();</code></p>
+									<dd><pre><code class="language-javascript"><span class="hljs-keyword">let</span> locations = <span class="hljs-keyword">await</span> BackgroundGeolocation.getLocations();</code></pre>
 									</dd>
 								</dl>
 							</div>
@@ -2058,9 +2057,9 @@ let locations = await BackgroundGeolocation.getLocations();</code></p>
 							</aside>
 							<div class="tsd-comment tsd-typography">
 								<div class="lead">
-									<p>Retrieve the current distance-travelled (&quot;odometer&quot;).</p>
+									<p>Retrieve the current distance-traveled (&quot;odometer&quot;).</p>
 								</div>
-								<p>The plugin constantly tracks distance travelled, computing the distance between the current location and last and maintaining the sum.  To fetch the
+								<p>The plugin constantly tracks distance traveled, computing the distance between the current location and last and maintaining the sum.  To fetch the
 								current <strong>odometer</strong> reading:</p>
 								<dl class="tsd-comment-tags">
 									<dt class="tsd-comment-tag-example">example</dt>
@@ -2072,7 +2071,7 @@ let locations = await BackgroundGeolocation.getLocations();</code></p>
 										</ul>
 										<h3 id="-warning-">⚠️ Warning:</h3>
 										<ul>
-											<li>Odometer calculations are dependant upon the accuracy of received locations.  If location accuracy is poor, this will necessarily introduce error into odometer calculations.</li>
+											<li>Odometer calculations are dependent upon the accuracy of received locations.  If location accuracy is poor, this will necessarily introduce error into odometer calculations.</li>
 										</ul>
 									</dd>
 								</dl>
@@ -2124,7 +2123,7 @@ let locations = await BackgroundGeolocation.getLocations();</code></p>
 								</div>
 								<h3 id="-see-also-">ℹ️ See also:</h3>
 								<ul>
-									<li>You can also <em>listen</em> for changes in location-authoriztion using the event <a href="_cordova_background_geolocation_.backgroundgeolocation.html#onproviderchange">onProviderChange</a>.</li>
+									<li>You can also <em>listen</em> for changes in location-authorization using the event <a href="_cordova_background_geolocation_.backgroundgeolocation.html#onproviderchange">onProviderChange</a>.</li>
 								</ul>
 								<dl class="tsd-comment-tags">
 									<dt class="tsd-comment-tag-example">example</dt>
@@ -2176,7 +2175,7 @@ let locations = await BackgroundGeolocation.getLocations();</code></p>
 							</aside>
 							<div class="tsd-comment tsd-typography">
 								<div class="lead">
-									<p>Returns the presense of device sensors <em>accelerometer</em>, <em>gyroscope</em>, <em>magnetometer</em></p>
+									<p>Returns the presence of device sensors <em>accelerometer</em>, <em>gyroscope</em>, <em>magnetometer</em></p>
 								</div>
 								<dl class="tsd-comment-tags">
 									<dt class="tsd-comment-tag-break">break</dt>
@@ -3736,7 +3735,7 @@ onSuspend() {
 									execute an HTTP post for <strong>each</strong> <a href="../interfaces/_cordova_background_geolocation_.location.html">Location</a> in the database (REST-style).  Your callback will be executed and provided with a <code>List</code> of all the
 									locations from the SQLite database.  If you configured the plugin for HTTP (by configuring a <a href="../interfaces/_cordova_background_geolocation_.config.html#url">url</a>, your callback will be executed after all
 									the HTTP request(s) have completed.  If the plugin failed to sync to your server (possibly because of no network connection), the failure callback will
-								be called with an error message.  If you are <strong>not</strong> using the HTTP features, <a href="_cordova_background_geolocation_.backgroundgeolocation.html#sync">sync</a> will delete all records from its SQLite datbase.</p>
+								be called with an error message.  If you are <strong>not</strong> using the HTTP features, <a href="_cordova_background_geolocation_.backgroundgeolocation.html#sync">sync</a> will delete all records from its SQLite database.</p>
 								<dl class="tsd-comment-tags">
 									<dt class="tsd-comment-tag-example">example</dt>
 									<dd><pre><code class="language-javascript">BackgroundGeolocation.sync(<span class="hljs-function">(<span class="hljs-params">records</span>) =&gt;</span> {
