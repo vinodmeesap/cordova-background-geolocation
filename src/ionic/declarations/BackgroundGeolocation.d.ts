@@ -16,6 +16,7 @@
 /// <reference path="interfaces/Sensors.d.ts" />
 /// <reference path="interfaces/State.d.ts" />
 /// <reference path="interfaces/WatchPositionRequest.d.ts" />
+/// <reference path="interfaces/DeviceSettings.d.ts" />
 
 declare module "cordova-background-geolocation" {
   /**
@@ -190,7 +191,20 @@ declare module "cordova-background-geolocation" {
     static ACTIVITY_TYPE_AUTOMOTIVE_NAVIGATION:ActivityType;
     static ACTIVITY_TYPE_FITNESS:ActivityType;
     static ACTIVITY_TYPE_OTHER_NAVIGATION:ActivityType;
-
+    /**
+    * [[DeviceSettings]] API
+    *
+    * Provides an API to show Android & vendor-specific Battery / Power Management settings screens that can affect performance of the Background Geolocation SDK on various devices.
+    *
+    * The site [Don't Kill My App](https://dontkillmyapp.com/) provides a comprehensive list of poor Android vendors which throttle background-services that this plugin relies upon.
+    *
+    * This [[DeviceSettings]] API is an attempt to provide resources to direct the user to the appropriate vendor-specific settings screen to resolve issues with background operation.
+    *
+    * ![](https://dl.dropboxusercontent.com/s/u7ljngfecxvibyh/huawei-settings-battery-launch.jpg?dl=1)
+    * ![](https://dl.dropboxusercontent.com/s/hd6yxw58hgc7ef4/android-settings-battery-optimization.jpg?dl=1)
+    *
+    */
+    static deviceSettings: DeviceSettings;
     /**
     * @hidden
     */

@@ -8,6 +8,7 @@
 */
 
 var API = require('./API');
+var DeviceSettings = require('./DeviceSettings');
 
 var emptyFn = function() {};
 
@@ -46,6 +47,8 @@ module.exports = {
     ACTIVITY_TYPE_AUTOMOTIVE_NAVIGATION: 2,
     ACTIVITY_TYPE_FITNESS: 3,
     ACTIVITY_TYPE_OTHER_NAVIGATION: 4,
+
+    deviceSettings: DeviceSettings,
 
     ready: function(defaultConfig, success, failure) {
         if (arguments.length <= 1) {
@@ -95,8 +98,8 @@ module.exports = {
         this.on('motionchange', callback);
     },
 
-    onHttp: function(success, failure) {
-        this.on('http', success, failure);
+    onHttp: function(callback) {
+        this.on('http', callback);
     },
 
     onHeartbeat: function(callback) {

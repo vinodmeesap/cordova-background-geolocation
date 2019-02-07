@@ -139,6 +139,11 @@ var BackgroundGeolocation = /** @class */ (function () {
         enumerable: true,
         configurable: true
     });
+    Object.defineProperty(BackgroundGeolocation, "deviceSettings", {
+        get: function () { return plugin().deviceSettings; },
+        enumerable: true,
+        configurable: true
+    });
     BackgroundGeolocation.ready = function (config, success, failure) {
         var bgGeo = plugin();
         return bgGeo.ready.apply(bgGeo, arguments);
@@ -151,39 +156,39 @@ var BackgroundGeolocation = /** @class */ (function () {
         var bgGeo = plugin();
         return bgGeo.reset.apply(bgGeo, arguments);
     };
-    BackgroundGeolocation.onLocation = function () {
+    BackgroundGeolocation.onLocation = function (success, failure) {
         var bgGeo = plugin();
         bgGeo.onLocation.apply(bgGeo, arguments);
     };
-    BackgroundGeolocation.onMotionChange = function () {
+    BackgroundGeolocation.onMotionChange = function (callback) {
         var bgGeo = plugin();
         bgGeo.onMotionChange.apply(bgGeo, arguments);
     };
-    BackgroundGeolocation.onHttp = function () {
+    BackgroundGeolocation.onHttp = function (callback) {
         var bgGeo = plugin();
         bgGeo.onHttp.apply(bgGeo, arguments);
     };
-    BackgroundGeolocation.onHeartbeat = function () {
+    BackgroundGeolocation.onHeartbeat = function (callback) {
         var bgGeo = plugin();
         bgGeo.onHeartbeat.apply(bgGeo, arguments);
     };
-    BackgroundGeolocation.onProviderChange = function () {
+    BackgroundGeolocation.onProviderChange = function (callback) {
         var bgGeo = plugin();
         bgGeo.onProviderChange.apply(bgGeo, arguments);
     };
-    BackgroundGeolocation.onActivityChange = function () {
+    BackgroundGeolocation.onActivityChange = function (callback) {
         var bgGeo = plugin();
         bgGeo.onActivityChange.apply(bgGeo, arguments);
     };
-    BackgroundGeolocation.onGeofence = function () {
+    BackgroundGeolocation.onGeofence = function (callback) {
         var bgGeo = plugin();
         bgGeo.onGeofence.apply(bgGeo, arguments);
     };
-    BackgroundGeolocation.onGeofencesChange = function () {
+    BackgroundGeolocation.onGeofencesChange = function (callback) {
         var bgGeo = plugin();
         bgGeo.onGeofencesChange.apply(bgGeo, arguments);
     };
-    BackgroundGeolocation.onSchedule = function () {
+    BackgroundGeolocation.onSchedule = function (callback) {
         var bgGeo = plugin();
         bgGeo.onSchedule.apply(bgGeo, arguments);
     };

@@ -23,7 +23,7 @@
 						<li class="state loading">Preparing search index...</li>
 						<li class="state failure">The search index is not available</li>
 					</ul>
-					<a href="../globals.html" class="title">[API Docs] Cordova Background Geolocation</a>&nbsp;<span class="tsd-flag ts-flagOptional ts-flagVersion">v 2.14.6</span>
+					<a href="../globals.html" class="title">[API Docs] Cordova Background Geolocation</a>&nbsp;<span class="tsd-flag ts-flagOptional ts-flagVersion">v 2.14.7</span>
 				</div>
 				<div class="" id="tsd-widgets">
 					<a class="github" href="https://github.com/transistorsoft/cordova-background-geolocation">Github</a>
@@ -2728,6 +2728,19 @@ BackgroundGeolocation.setConfig({
 schedule: [
     <span class="hljs-string">"2018-01-01-09:00 2019-01-01-17:00"</span>  <span class="hljs-comment">// &lt;-- track for 1 year</span>
   ]</code></pre>
+								<h2 id="scheduling-geofences-only-or-location-geofences-tracking">Scheduling Geofences-only or Location + Geofences Tracking</h2>
+								<p>You can choose to schedule either geofences-only (<a href="../classes/_cordova_background_geolocation_.backgroundgeolocation.html#startgeofences">BackgroundGeolocation.startGeofences</a>) or location + geofences (<a href="../classes/_cordova_background_geolocation_.backgroundgeolocation.html#start">BackgroundGeolocation.start</a>) tracking with each configured schedule by appending the text <code>geofence</code> or <code>location</code> (default):</p>
+								<p>In the following schedule, the SDK will engage <em>location + geofences</em> tracking between 9am to 5pm.  From 6pm to midnight, only <em>geofences</em> will be monitored.</p>
+								<pre><code class="language-javascript">schedule: [
+  <span class="hljs-string">"1-7 09:00-17:00 location"</span>,
+  <span class="hljs-string">"1-7 18:00-12:00 geofence"</span>
+]</code></pre>
+								<p>Since <code>location</code> is the default tracking-mode, it can be omitted:</p>
+								<pre><code class="language-javascript">schedule: [
+  <span class="hljs-string">"1-7 09:00-10:00"</span>,  <span class="hljs-comment">// &lt;-- location is default</span>
+  <span class="hljs-string">"1-7 10:00-11:00 geofence"</span>
+  <span class="hljs-string">"1-7 12:00-13:00"</span>,
+  <span class="hljs-string">"1-7 13:00-14:00 geofence"</span></code></pre>
 								<h3 id="ios">iOS</h3>
 								<ul>
 									<li>iOS <strong>cannot</strong> evaluate the Schedule at the <em>exact</em> time you configure &mdash; it can only evaluate the <strong><code>schedule</code></strong> <em>periodically</em>, whenever your app comes alive.</li>
@@ -3350,6 +3363,12 @@ BackgroundGeolocation.ready({
 					</li>
 					<li class=" tsd-kind-interface tsd-parent-kind-module tsd-is-not-exported">
 						<a href="_cordova_background_geolocation_.currentpositionrequest.html" class="tsd-kind-icon">Current<wbr>Position<wbr>Request</a>
+					</li>
+					<li class=" tsd-kind-interface tsd-parent-kind-module tsd-is-not-exported">
+						<a href="_cordova_background_geolocation_.devicesettings.html" class="tsd-kind-icon">Device<wbr>Settings</a>
+					</li>
+					<li class=" tsd-kind-interface tsd-parent-kind-module tsd-is-not-exported">
+						<a href="_cordova_background_geolocation_.devicesettingsrequest.html" class="tsd-kind-icon">Device<wbr>Settings<wbr>Request</a>
 					</li>
 					<li class=" tsd-kind-interface tsd-parent-kind-module tsd-is-not-exported">
 						<a href="_cordova_background_geolocation_.geofence.html" class="tsd-kind-icon">Geofence</a>
