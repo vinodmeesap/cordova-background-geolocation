@@ -23,7 +23,7 @@
 						<li class="state loading">Preparing search index...</li>
 						<li class="state failure">The search index is not available</li>
 					</ul>
-					<a href="../globals.html" class="title">[API Docs] Cordova Background Geolocation</a>&nbsp;<span class="tsd-flag ts-flagOptional ts-flagVersion">v 2.14.6</span>
+					<a href="../globals.html" class="title">[API Docs] Cordova Background Geolocation</a>&nbsp;<span class="tsd-flag ts-flagOptional ts-flagVersion">v 2.15.0</span>
 				</div>
 				<div class="" id="tsd-widgets">
 					<a class="github" href="https://github.com/transistorsoft/cordova-background-geolocation">Github</a>
@@ -288,6 +288,7 @@ BackgroundGeolocation.ready({<span class="hljs-attr">desiredAccuracy</span>: <sp
 								<li class="tsd-kind-property tsd-parent-kind-class tsd-is-static"><a href="_cordova_background_geolocation_.backgroundgeolocation.html#notification_priority_low" class="tsd-kind-icon">NOTIFICATION_<wbr>PRIORITY_<wbr>LOW</a></li>
 								<li class="tsd-kind-property tsd-parent-kind-class tsd-is-static"><a href="_cordova_background_geolocation_.backgroundgeolocation.html#notification_priority_max" class="tsd-kind-icon">NOTIFICATION_<wbr>PRIORITY_<wbr>MAX</a></li>
 								<li class="tsd-kind-property tsd-parent-kind-class tsd-is-static"><a href="_cordova_background_geolocation_.backgroundgeolocation.html#notification_priority_min" class="tsd-kind-icon">NOTIFICATION_<wbr>PRIORITY_<wbr>MIN</a></li>
+								<li class="tsd-kind-property tsd-parent-kind-class tsd-is-static"><a href="_cordova_background_geolocation_.backgroundgeolocation.html#devicesettings" class="tsd-kind-icon">device<wbr>Settings</a></li>
 								<li class="tsd-kind-property tsd-parent-kind-class tsd-is-static"><a href="_cordova_background_geolocation_.backgroundgeolocation.html#logger" class="tsd-kind-icon">logger</a></li>
 							</ul>
 						</section>
@@ -1265,6 +1266,23 @@ BackgroundGeolocation.onHeartbeat(<span class="hljs-function">(<span class="hljs
 					<div class="tsd-signature tsd-kind-icon">NOTIFICATION_<wbr>PRIORITY_<wbr>MIN<span class="tsd-signature-symbol">:</span> <a href="../modules/_cordova_background_geolocation_.html#notificationpriority" class="tsd-signature-type">NotificationPriority</a></div>
 					<aside class="tsd-sources">
 					</aside>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-class tsd-is-static">
+					<a name="devicesettings" class="tsd-anchor"></a>
+					<h3><span class="tsd-flag ts-flagStatic">Static</span> device<wbr>Settings</h3>
+					<div class="tsd-signature tsd-kind-icon">device<wbr>Settings<span class="tsd-signature-symbol">:</span> <a href="../interfaces/_cordova_background_geolocation_.devicesettings.html" class="tsd-signature-type">DeviceSettings</a></div>
+					<aside class="tsd-sources">
+					</aside>
+					<div class="tsd-comment tsd-typography">
+						<div class="lead">
+							<p><a href="../interfaces/_cordova_background_geolocation_.devicesettings.html">DeviceSettings</a> API</p>
+						</div>
+						<p>Provides an API to show Android &amp; vendor-specific Battery / Power Management settings screens that can affect performance of the Background Geolocation SDK on various devices.</p>
+						<p>The site <a href="https://dontkillmyapp.com/">Don&#39;t Kill My App</a> provides a comprehensive list of poor Android vendors which throttle background-services that this plugin relies upon.</p>
+						<p>This <a href="../interfaces/_cordova_background_geolocation_.devicesettings.html">DeviceSettings</a> API is an attempt to provide resources to direct the user to the appropriate vendor-specific settings screen to resolve issues with background operation.</p>
+						<p><img src="https://dl.dropboxusercontent.com/s/u7ljngfecxvibyh/huawei-settings-battery-launch.jpg?dl=1" alt="">
+						<img src="https://dl.dropboxusercontent.com/s/hd6yxw58hgc7ef4/android-settings-battery-optimization.jpg?dl=1" alt=""></p>
+					</div>
 				</section>
 				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-class tsd-is-static">
 					<a name="logger" class="tsd-anchor"></a>
@@ -4043,6 +4061,9 @@ onSuspend() {
 								<a href="_cordova_background_geolocation_.backgroundgeolocation.html#notification_priority_min" class="tsd-kind-icon">NOTIFICATION_<wbr>PRIORITY_<wbr>MIN</a>
 							</li>
 							<li class=" tsd-kind-property tsd-parent-kind-class tsd-is-static">
+								<a href="_cordova_background_geolocation_.backgroundgeolocation.html#devicesettings" class="tsd-kind-icon">device<wbr>Settings</a>
+							</li>
+							<li class=" tsd-kind-property tsd-parent-kind-class tsd-is-static">
 								<a href="_cordova_background_geolocation_.backgroundgeolocation.html#logger" class="tsd-kind-icon">logger</a>
 							</li>
 							<li class=" tsd-kind-method tsd-parent-kind-class tsd-is-static">
@@ -4189,6 +4210,12 @@ onSuspend() {
 					</li>
 					<li class=" tsd-kind-interface tsd-parent-kind-module tsd-is-not-exported">
 						<a href="../interfaces/_cordova_background_geolocation_.currentpositionrequest.html" class="tsd-kind-icon">Current<wbr>Position<wbr>Request</a>
+					</li>
+					<li class=" tsd-kind-interface tsd-parent-kind-module tsd-is-not-exported">
+						<a href="../interfaces/_cordova_background_geolocation_.devicesettings.html" class="tsd-kind-icon">Device<wbr>Settings</a>
+					</li>
+					<li class=" tsd-kind-interface tsd-parent-kind-module tsd-is-not-exported">
+						<a href="../interfaces/_cordova_background_geolocation_.devicesettingsrequest.html" class="tsd-kind-icon">Device<wbr>Settings<wbr>Request</a>
 					</li>
 					<li class=" tsd-kind-interface tsd-parent-kind-module tsd-is-not-exported">
 						<a href="../interfaces/_cordova_background_geolocation_.geofence.html" class="tsd-kind-icon">Geofence</a>

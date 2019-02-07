@@ -4,6 +4,7 @@ import com.transistorsoft.locationmanager.adapter.BackgroundGeolocation;
 import com.transistorsoft.locationmanager.adapter.TSConfig;
 import com.transistorsoft.locationmanager.adapter.callback.*;
 import com.transistorsoft.locationmanager.data.LocationModel;
+import com.transistorsoft.locationmanager.device.DeviceSettingsRequest;
 import com.transistorsoft.locationmanager.event.ActivityChangeEvent;
 import com.transistorsoft.locationmanager.event.ConnectivityChangeEvent;
 import com.transistorsoft.locationmanager.event.GeofenceEvent;
@@ -38,6 +39,7 @@ import android.content.DialogInterface;
 
 import android.app.Activity;
 import android.content.Intent;
+import android.os.Build;
 import android.util.Log;
 
 public class CDVBackgroundGeolocation extends CordovaPlugin {
@@ -81,6 +83,9 @@ public class CDVBackgroundGeolocation extends CordovaPlugin {
     public static final String ACTION_START_SCHEDULE    = "startSchedule";
     public static final String ACTION_STOP_SCHEDULE     = "stopSchedule";
     public static final String ACTION_LOG               = "log";
+
+    private static final String ACTION_REQUEST_SETTINGS  = "requestSettings";
+    private static final String ACTION_SHOW_SETTINGS     = "showSettings";
 
     private List<TSCallback> locationAuthorizationCallbacks = new ArrayList<TSCallback>();
     private List<CallbackContext> watchPositionCallbacks = new ArrayList<CallbackContext>();
@@ -279,6 +284,15 @@ public class CDVBackgroundGeolocation extends CordovaPlugin {
         } else if (BackgroundGeolocation.ACTION_IS_POWER_SAVE_MODE.equalsIgnoreCase(action)) {
             result = true;
             isPowerSaveMode(callbackContext);
+        } else if (BackgroundGeolocation.ACTION_IS_IGNORING_BATTERY_OPTIMIZATIONS.equalsIgnoreCase(action)) {
+            result = true;
+            isIgnoringBatteryOptimizations(callbackContext);
+        } else if (ACTION_REQUEST_SETTINGS.equalsIgnoreCase(action)) {
+            result = true;
+            requestSettings(data.getJSONObject(0), callbackContext);
+        } else if (ACTION_SHOW_SETTINGS.equalsIgnoreCase(action)) {
+            result = true;
+            showSettings(data.getJSONObject(0), callbackContext);
         } else if (ACTION_LOG.equalsIgnoreCase(action)) {
             result = true;
             log(data, callbackContext);
@@ -921,6 +935,31 @@ public class CDVBackgroundGeolocation extends CordovaPlugin {
     private void isPowerSaveMode(CallbackContext callbackContext) {
         PluginResult result = new PluginResult(PluginResult.Status.OK, getAdapter().isPowerSaveMode());
         callbackContext.sendPluginResult(result);
+    }
+
+    private void isIgnoringBatteryOptimizations(CallbackContext callbackContext) {
+        PluginResult result = new PluginResult(PluginResult.Status.OK, getAdapter().isIgnoringBatteryOptimizations());
+        callbackContext.sendPluginResult(result);
+    }
+
+    private void requestSettings(JSONObject args, CallbackContext callbackContext) throws JSONException {
+        String action = args.getString("action");
+        DeviceSettingsRequest request = getAdapter().requestSettings(action);
+        if (request != null) {
+            callbackContext.success(request.toJson());
+        } else {
+            callbackContext.error("Failed to find " + action + " screen for device " + Build.MANUFACTURER + " " + Build.MODEL + "@" + Build.VERSION.RELEASE);
+        }
+    }
+
+    private void showSettings(JSONObject args, CallbackContext callbackContext) throws JSONException {
+        String action = args.getString("action");
+        boolean didShow = getAdapter().showSettings(action);
+        if (didShow) {
+            callbackContext.success();
+        } else {
+            callbackContext.error("Failed to find " + action + " screen for device " + Build.MANUFACTURER + " " + Build.MODEL + "@" + Build.VERSION.RELEASE);
+        }
     }
 
     private void requestPermission(final CallbackContext callbackContext) {

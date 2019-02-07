@@ -37,6 +37,8 @@ export default class BackgroundGeolocation {
 
   static get logger() { return plugin().logger; }
 
+  static get deviceSettings() { return plugin().deviceSettings; }
+
   static ready(config:any, success?:Function, failure?:Function) {
     let bgGeo = plugin();
     return bgGeo.ready.apply(bgGeo, arguments);
@@ -50,39 +52,39 @@ export default class BackgroundGeolocation {
     return bgGeo.reset.apply(bgGeo, arguments);
   }
 
-  static onLocation() {
+  static onLocation(success: Function, failure: Function) {
     let bgGeo = plugin();
     bgGeo.onLocation.apply(bgGeo, arguments);
   }
-  static onMotionChange() {
+  static onMotionChange(callback: Function) {
     let bgGeo = plugin();
     bgGeo.onMotionChange.apply(bgGeo, arguments);
   }
-  static onHttp() {
+  static onHttp(callback: Function) {
     let bgGeo = plugin();
     bgGeo.onHttp.apply(bgGeo, arguments);
   }
-  static onHeartbeat() {
+  static onHeartbeat(callback: Function) {
     let bgGeo = plugin();
     bgGeo.onHeartbeat.apply(bgGeo, arguments);
   }
-  static onProviderChange() {
+  static onProviderChange(callback: Function) {
     let bgGeo = plugin();
     bgGeo.onProviderChange.apply(bgGeo, arguments);
   }
-  static onActivityChange() {
+  static onActivityChange(callback: Function) {
     let bgGeo = plugin();
     bgGeo.onActivityChange.apply(bgGeo, arguments);
   }
-  static onGeofence() {
+  static onGeofence(callback: Function) {
     let bgGeo = plugin();
     bgGeo.onGeofence.apply(bgGeo, arguments);
   }
-  static onGeofencesChange() {
+  static onGeofencesChange(callback: Function) {
     let bgGeo = plugin();
     bgGeo.onGeofencesChange.apply(bgGeo, arguments);
   }
-  static onSchedule() {
+  static onSchedule(callback: Function) {
     let bgGeo = plugin();
     bgGeo.onSchedule.apply(bgGeo, arguments);
   }
