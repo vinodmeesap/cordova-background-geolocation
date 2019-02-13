@@ -35,6 +35,11 @@ export default class BackgroundGeolocation {
   static get ACTIVITY_TYPE_FITNESS() { return plugin().ACTIVITY_TYPE_FITNESS; }
   static get ACTIVITY_TYPE_OTHER_NAVIGATION() { return plugin().ACTIVITY_TYPE_OTHER_NAVIGATION; }
 
+  static get PERSIST_MODE_ALL()       { return plugin().PERSIST_MODE_ALL; }
+  static get PERSIST_MODE_LOCATION()  { return plugin().PERSIST_MODE_LOCATION; }
+  static get PERSIST_MODE_GEOFENCE()  { return plugin().PERSIST_MODE_GEOFENCE; }
+  static get PERSIST_MODE_NONE()      { return plugin().PERSIST_MODE_NONE; }
+
   static get logger() { return plugin().logger; }
 
   static get deviceSettings() { return plugin().deviceSettings; }

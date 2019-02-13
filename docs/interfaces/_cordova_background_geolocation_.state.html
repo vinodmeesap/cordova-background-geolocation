@@ -23,7 +23,7 @@
 						<li class="state loading">Preparing search index...</li>
 						<li class="state failure">The search index is not available</li>
 					</ul>
-					<a href="../globals.html" class="title">[API Docs] Cordova Background Geolocation</a>&nbsp;<span class="tsd-flag ts-flagOptional ts-flagVersion">v 2.15.0</span>
+					<a href="../globals.html" class="title">[API Docs] Cordova Background Geolocation</a>&nbsp;<span class="tsd-flag ts-flagOptional ts-flagVersion">v 2.15.1</span>
 				</div>
 				<div class="" id="tsd-widgets">
 					<a class="github" href="https://github.com/transistorsoft/cordova-background-geolocation">Github</a>
@@ -144,6 +144,7 @@
 								<li class="tsd-kind-property tsd-parent-kind-interface tsd-is-not-exported"><a href="_cordova_background_geolocation_.state.html#odometer" class="tsd-kind-icon">odometer</a></li>
 								<li class="tsd-kind-property tsd-parent-kind-interface tsd-is-inherited tsd-is-not-exported"><a href="_cordova_background_geolocation_.state.html#params" class="tsd-kind-icon">params</a></li>
 								<li class="tsd-kind-property tsd-parent-kind-interface tsd-is-inherited tsd-is-not-exported"><a href="_cordova_background_geolocation_.state.html#pauseslocationupdatesautomatically" class="tsd-kind-icon">pauses<wbr>Location<wbr>Updates<wbr>Automatically</a></li>
+								<li class="tsd-kind-property tsd-parent-kind-interface tsd-is-inherited tsd-is-not-exported"><a href="_cordova_background_geolocation_.state.html#persistmode" class="tsd-kind-icon">persist<wbr>Mode</a></li>
 								<li class="tsd-kind-property tsd-parent-kind-interface tsd-is-inherited tsd-is-not-exported"><a href="_cordova_background_geolocation_.state.html#preventsuspend" class="tsd-kind-icon">prevent<wbr>Suspend</a></li>
 								<li class="tsd-kind-property tsd-parent-kind-interface tsd-is-inherited tsd-is-not-exported"><a href="_cordova_background_geolocation_.state.html#reset" class="tsd-kind-icon">reset</a></li>
 								<li class="tsd-kind-property tsd-parent-kind-interface tsd-is-inherited tsd-is-not-exported"><a href="_cordova_background_geolocation_.state.html#schedule" class="tsd-kind-icon">schedule</a></li>
@@ -2214,6 +2215,50 @@ BackgroundGeolocation.ready({
 					</div>
 				</section>
 				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-interface tsd-is-inherited tsd-is-not-exported">
+					<a name="persistmode" class="tsd-anchor"></a>
+					<h3><span class="tsd-flag ts-flagOptional">Optional</span> persist<wbr>Mode</h3>
+					<div class="tsd-signature tsd-kind-icon">persist<wbr>Mode<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">boolean</span></div>
+					<aside class="tsd-sources">
+						<p>Inherited from <a href="_cordova_background_geolocation_.config.html">Config</a>.<a href="_cordova_background_geolocation_.config.html#persistmode">persistMode</a></p>
+					</aside>
+					<div class="tsd-comment tsd-typography">
+						<div class="lead">
+							<p>Allows you to specify which events to persist to the SDK&#39;s internal database:  locations | geofences | all (default).</p>
+						</div>
+						<p>Note that all recorded location and geofence events will <em>always</em> be provided to your [BackgroundGeolocation.onLocation] and [BackgroundGeolocation.onGeofence] events, just that the
+							persistence of those events in the SDK&#39;s internal SQLite database can be limited.  Any event which has not been persisted to the SDK&#39;s internal database
+						will also <strong>not</strong> therefore be uploaded to your [url] (if configured).</p>
+						<table>
+							<thead>
+								<tr>
+									<th>Name</th>
+									<th>Description</th>
+								</tr>
+							</thead>
+							<tbody><tr>
+									<td><a href="../classes/_cordova_background_geolocation_.backgroundgeolocation.html#persist_mode_all">BackgroundGeolocation.PERSIST_MODE_ALL</a></td>
+									<td>(<strong>DEFAULT</strong>) Persist both geofence and location events</td>
+								</tr>
+								<tr>
+									<td><a href="../classes/_cordova_background_geolocation_.backgroundgeolocation.html#persist_mode_location">BackgroundGeolocation.PERSIST_MODE_LOCATION</a></td>
+									<td>Persist only location events (ignore geofence events)</td>
+								</tr>
+								<tr>
+									<td><a href="../classes/_cordova_background_geolocation_.backgroundgeolocation.html#persist_mode_geofence">BackgroundGeolocation.PERSIST_MODE_GEOFENCE</a></td>
+									<td>Persist only geofence events (ignore location events)</td>
+								</tr>
+								<tr>
+									<td><a href="../classes/_cordova_background_geolocation_.backgroundgeolocation.html#persist_mode_none">BackgroundGeolocation.PERSIST_MODE_NONE</a></td>
+									<td>Persist nothing (neither geofence nor location events)</td>
+								</tr>
+						</tbody></table>
+						<h3 id="-warning">⚠️ Warning</h3>
+						<p>This option is designed for specializd use-cases and should generally not be used.  For example, some might wish to
+							run the plugin in regular tracking mode with <a href="../classes/_cordova_background_geolocation_.backgroundgeolocation.html#start">BackgroundGeolocation.start</a> but only record geofence events.  In this case,
+						one would configure <code>persistMode: BackgroundGeolocation.PERSIST_MODE_GEOFENCE</code>.</p>
+					</div>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-interface tsd-is-inherited tsd-is-not-exported">
 					<a name="preventsuspend" class="tsd-anchor"></a>
 					<h3><span class="tsd-flag ts-flagOptional">Optional</span> prevent<wbr>Suspend</h3>
 					<div class="tsd-signature tsd-kind-icon">prevent<wbr>Suspend<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">boolean</span></div>
@@ -3053,6 +3098,9 @@ BackgroundGeolocation.ready({
 								<a href="_cordova_background_geolocation_.state.html#pauseslocationupdatesautomatically" class="tsd-kind-icon">pauses<wbr>Location<wbr>Updates<wbr>Automatically</a>
 							</li>
 							<li class=" tsd-kind-property tsd-parent-kind-interface tsd-is-inherited tsd-is-not-exported">
+								<a href="_cordova_background_geolocation_.state.html#persistmode" class="tsd-kind-icon">persist<wbr>Mode</a>
+							</li>
+							<li class=" tsd-kind-property tsd-parent-kind-interface tsd-is-inherited tsd-is-not-exported">
 								<a href="_cordova_background_geolocation_.state.html#preventsuspend" class="tsd-kind-icon">prevent<wbr>Suspend</a>
 							</li>
 							<li class=" tsd-kind-property tsd-parent-kind-interface tsd-is-inherited tsd-is-not-exported">
@@ -3127,6 +3175,9 @@ BackgroundGeolocation.ready({
 					</li>
 					<li class=" tsd-kind-type-alias tsd-parent-kind-module tsd-is-not-exported">
 						<a href="../modules/_cordova_background_geolocation_.html#notificationpriority" class="tsd-kind-icon">Notification<wbr>Priority</a>
+					</li>
+					<li class=" tsd-kind-type-alias tsd-parent-kind-module tsd-is-not-exported">
+						<a href="../modules/_cordova_background_geolocation_.html#persistmode" class="tsd-kind-icon">Persist<wbr>Mode</a>
 					</li>
 					<li class=" tsd-kind-type-alias tsd-parent-kind-module tsd-is-not-exported">
 						<a href="../modules/_cordova_background_geolocation_.html#trackingmode" class="tsd-kind-icon">Tracking<wbr>Mode</a>

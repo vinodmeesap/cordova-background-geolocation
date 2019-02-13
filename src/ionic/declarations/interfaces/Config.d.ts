@@ -1071,6 +1071,26 @@ declare module "cordova-background-geolocation" {
     maxRecordsToPersist?: number;
 
     /**
+    * Allows you to specify which events to persist to the SDK's internal database:  locations | geofences | all (default).
+    *
+    * Note that all recorded location and geofence events will *always* be provided to your [BackgroundGeolocation.onLocation] and [BackgroundGeolocation.onGeofence] events, just that the
+    * persistence of those events in the SDK's internal SQLite database can be limited.  Any event which has not been persisted to the SDK's internal database
+    * will also **not** therefore be uploaded to your [url] (if configured).
+    *
+    * | Name                                 | Description                                             |
+    * |--------------------------------------|---------------------------------------------------------|
+    * | [[BackgroundGeolocation.PERSIST_MODE_ALL]]                   | (__DEFAULT__) Persist both geofence and location events |
+    * | [[BackgroundGeolocation.PERSIST_MODE_LOCATION]]              | Persist only location events (ignore geofence events)   |
+    * | [[BackgroundGeolocation.PERSIST_MODE_GEOFENCE]]              | Persist only geofence events (ignore location events)   |
+    * | [[BackgroundGeolocation.PERSIST_MODE_NONE]]                  | Persist nothing (neither geofence nor location events)  |
+    *
+    * ### ⚠️ Warning
+    * This option is designed for specializd use-cases and should generally not be used.  For example, some might wish to
+    * run the plugin in regular tracking mode with [[BackgroundGeolocation.start]] but only record geofence events.  In this case,
+    * one would configure `persistMode: BackgroundGeolocation.PERSIST_MODE_GEOFENCE`.
+    */
+    persistMode?: boolean;
+    /**
     * Controls the order that locations are selected from the database (and uploaded to your server).
     *
     * Defaults to ascending (`ASC`), where oldest locations are synced first.  Descending (`DESC`) uploads latest locations first.

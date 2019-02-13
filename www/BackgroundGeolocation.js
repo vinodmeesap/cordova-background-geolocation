@@ -48,6 +48,12 @@ module.exports = {
     ACTIVITY_TYPE_FITNESS: 3,
     ACTIVITY_TYPE_OTHER_NAVIGATION: 4,
 
+    // For persistMode
+    PERSIST_MODE_ALL: 2,
+    PERSIST_MODE_LOCATION: 1,
+    PERSIST_MODE_GEOFENCE: -1,
+    PERSIST_MODE_NONE: 0,
+
     deviceSettings: DeviceSettings,
 
     ready: function(defaultConfig, success, failure) {
