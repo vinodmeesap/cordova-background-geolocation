@@ -610,6 +610,7 @@ BackgroundGeolocation.setConfig({
 								<li class="tsd-kind-property tsd-parent-kind-interface tsd-is-not-exported"><a href="_cordova_background_geolocation_.config.html#preventsuspend" class="tsd-kind-icon">prevent<wbr>Suspend</a></li>
 								<li class="tsd-kind-property tsd-parent-kind-interface tsd-is-not-exported"><a href="_cordova_background_geolocation_.config.html#reset" class="tsd-kind-icon">reset</a></li>
 								<li class="tsd-kind-property tsd-parent-kind-interface tsd-is-not-exported"><a href="_cordova_background_geolocation_.config.html#schedule" class="tsd-kind-icon">schedule</a></li>
+								<li class="tsd-kind-property tsd-parent-kind-interface tsd-is-not-exported"><a href="_cordova_background_geolocation_.config.html#speedjumpfilter" class="tsd-kind-icon">speed<wbr>Jump<wbr>Filter</a></li>
 								<li class="tsd-kind-property tsd-parent-kind-interface tsd-is-not-exported"><a href="_cordova_background_geolocation_.config.html#startonboot" class="tsd-kind-icon">start<wbr>OnBoot</a></li>
 								<li class="tsd-kind-property tsd-parent-kind-interface tsd-is-not-exported"><a href="_cordova_background_geolocation_.config.html#stationaryradius" class="tsd-kind-icon">stationary<wbr>Radius</a></li>
 								<li class="tsd-kind-property tsd-parent-kind-interface tsd-is-not-exported"><a href="_cordova_background_geolocation_.config.html#stopafterelapsedminutes" class="tsd-kind-icon">stop<wbr>After<wbr>Elapsed<wbr>Minutes</a></li>
@@ -2808,6 +2809,21 @@ schedule: [
 					</div>
 				</section>
 				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-interface tsd-is-not-exported">
+					<a name="speedjumpfilter" class="tsd-anchor"></a>
+					<h3><span class="tsd-flag ts-flagOptional">Optional</span> speed<wbr>Jump<wbr>Filter</h3>
+					<div class="tsd-signature tsd-kind-icon">speed<wbr>Jump<wbr>Filter<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">number</span></div>
+					<aside class="tsd-sources">
+					</aside>
+					<div class="tsd-comment tsd-typography">
+						<div class="lead">
+							<p><strong><code>Android-only</code></strong> Experimental filter to ignore anomalous locations that suddenly jump an unusual distance from last.
+								The SDK will calculate an apparent speed and distance relative to last known location.  If the location suddenly
+							teleports from last location, it will be ignored.</p>
+						</div>
+						<p>The measurement is in meters/second.  The default is to throw away any location which apparently moved at 300 meters/second from last known location.</p>
+					</div>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-interface tsd-is-not-exported">
 					<a name="startonboot" class="tsd-anchor"></a>
 					<h3><span class="tsd-flag ts-flagOptional">Optional</span> start<wbr>OnBoot</h3>
 					<div class="tsd-signature tsd-kind-icon">start<wbr>OnBoot<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">boolean</span></div>
@@ -3367,6 +3383,9 @@ BackgroundGeolocation.ready({
 							</li>
 							<li class=" tsd-kind-property tsd-parent-kind-interface tsd-is-not-exported">
 								<a href="_cordova_background_geolocation_.config.html#schedule" class="tsd-kind-icon">schedule</a>
+							</li>
+							<li class=" tsd-kind-property tsd-parent-kind-interface tsd-is-not-exported">
+								<a href="_cordova_background_geolocation_.config.html#speedjumpfilter" class="tsd-kind-icon">speed<wbr>Jump<wbr>Filter</a>
 							</li>
 							<li class=" tsd-kind-property tsd-parent-kind-interface tsd-is-not-exported">
 								<a href="_cordova_background_geolocation_.config.html#startonboot" class="tsd-kind-icon">start<wbr>OnBoot</a>

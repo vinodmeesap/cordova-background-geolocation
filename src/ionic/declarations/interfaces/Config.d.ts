@@ -1756,6 +1756,16 @@ declare module "cordova-background-geolocation" {
     enableTimestampMeta?: boolean;
 
     /**
+    * __`Android-only`__ Experimental filter to ignore anomalous locations that suddenly jump an unusual distance from last.
+    * The SDK will calculate an apparent speed and distance relative to last known location.  If the location suddenly
+    * teleports from last location, it will be ignored.
+    *
+    * The measurement is in meters/second.  The default is to throw away any location which apparently moved at 300 meters/second from last known location.
+    */
+    speedJumpFilter?: number;
+
+    /**
+
     * __`[Android-only]`__ Configures a comma-separated list of motion-activities which are allow to trigger location-tracking.
     * @break
     *
