@@ -134,6 +134,26 @@ var BackgroundGeolocation = /** @class */ (function () {
         enumerable: true,
         configurable: true
     });
+    Object.defineProperty(BackgroundGeolocation, "PERSIST_MODE_ALL", {
+        get: function () { return plugin().PERSIST_MODE_ALL; },
+        enumerable: true,
+        configurable: true
+    });
+    Object.defineProperty(BackgroundGeolocation, "PERSIST_MODE_LOCATION", {
+        get: function () { return plugin().PERSIST_MODE_LOCATION; },
+        enumerable: true,
+        configurable: true
+    });
+    Object.defineProperty(BackgroundGeolocation, "PERSIST_MODE_GEOFENCE", {
+        get: function () { return plugin().PERSIST_MODE_GEOFENCE; },
+        enumerable: true,
+        configurable: true
+    });
+    Object.defineProperty(BackgroundGeolocation, "PERSIST_MODE_NONE", {
+        get: function () { return plugin().PERSIST_MODE_NONE; },
+        enumerable: true,
+        configurable: true
+    });
     Object.defineProperty(BackgroundGeolocation, "logger", {
         get: function () { return plugin().logger; },
         enumerable: true,

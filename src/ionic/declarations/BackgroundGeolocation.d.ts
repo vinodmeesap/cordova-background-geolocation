@@ -191,6 +191,12 @@ declare module "cordova-background-geolocation" {
     static ACTIVITY_TYPE_AUTOMOTIVE_NAVIGATION:ActivityType;
     static ACTIVITY_TYPE_FITNESS:ActivityType;
     static ACTIVITY_TYPE_OTHER_NAVIGATION:ActivityType;
+
+    static PERSIST_MODE_ALL: PersistMode;
+    static PERSIST_MODE_LOCATION: PersistMode;
+    static PERSIST_MODE_GEOFENCE: PersistMode;
+    static PERSIST_MODE_NONE: PersistMode;
+
     /**
     * [[DeviceSettings]] API
     *
