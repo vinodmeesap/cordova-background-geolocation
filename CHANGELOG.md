@@ -1,6 +1,10 @@
 
 # CHANGELOG
 
+## [3.0.0-beta.1] - 2019-02-27
+- [Changed] Major refactor of Android Service architecture.  The SDK no longer requires a foreground-service active at all times.  The foreground-service (and cooresponding persistent notification) will only be active while the SDK is in the *moving* state.  No breaking dart api changes.
+- [Changed] Improved Android debug notifications.
+
 ## [2.15.1] 2019-02-20
 - [Added] Added new Config options `persistMode` for specifying exactly which events get persisted: location | geofence | all | none.
 - [Added] Experimental Android-only Config option `speedJumpFilter (default 300 meters/second)` for detecting location anomalies.  The plugin will measure the distance and apparent speed of the current location relative to last location.  If the apparent speed is > `speedJumpFilter`, the location will be ignored.  Some users, particularly in Australia, curiously, have had locations suddenly jump hundreds of kilometers away, into the ocean.
