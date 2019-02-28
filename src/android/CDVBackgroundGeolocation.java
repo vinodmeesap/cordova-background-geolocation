@@ -11,6 +11,7 @@ import com.transistorsoft.locationmanager.event.GeofenceEvent;
 import com.transistorsoft.locationmanager.event.GeofencesChangeEvent;
 import com.transistorsoft.locationmanager.event.HeartbeatEvent;
 import com.transistorsoft.locationmanager.event.LocationProviderChangeEvent;
+import com.transistorsoft.locationmanager.event.TerminateEvent;
 import com.transistorsoft.locationmanager.geofence.TSGeofence;
 import com.transistorsoft.locationmanager.http.HttpResponse;
 import com.transistorsoft.locationmanager.location.TSCurrentPositionRequest;
@@ -18,6 +19,7 @@ import com.transistorsoft.locationmanager.location.TSLocation;
 import com.transistorsoft.locationmanager.location.TSWatchPositionRequest;
 import com.transistorsoft.locationmanager.logger.TSLog;
 import com.transistorsoft.locationmanager.scheduler.ScheduleEvent;
+import com.transistorsoft.locationmanager.scheduler.TSScheduleManager;
 import com.transistorsoft.locationmanager.util.Sensors;
 
 import java.util.ArrayList;
@@ -230,7 +232,7 @@ public class CDVBackgroundGeolocation extends CordovaPlugin {
             getGeofences(callbackContext);
         } else if (ACTION_PLAY_SOUND.equalsIgnoreCase(action)) {
             result = true;
-            getAdapter().startTone(data.getInt(0));
+            getAdapter().startTone(data.getString(0));
             callbackContext.success();
         } else if (BackgroundGeolocation.ACTION_GET_CURRENT_POSITION.equalsIgnoreCase(action)) {
             result = true;
@@ -905,13 +907,6 @@ public class CDVBackgroundGeolocation extends CordovaPlugin {
         callbackContext.success();
     }
 
-    public void onPause(boolean multitasking) {
-        Log.i(TAG, "- onPause");
-    }
-    public void onResume(boolean multitasking) {
-        Log.i(TAG, "- onResume");
-    }
-
     private JSONObject getState() {
         return TSConfig.getInstance(cordova.getActivity().getApplicationContext()).toJson();
     }
@@ -984,7 +979,7 @@ public class CDVBackgroundGeolocation extends CordovaPlugin {
         TSConfig config = TSConfig.getInstance(cordova.getActivity().getApplicationContext());
         // Show alert popup with js error
         if (config.getDebug()) {
-            getAdapter().startTone(android.media.ToneGenerator.TONE_CDMA_HIGH_S_X4);
+            getAdapter().startTone("ERROR");
             AlertDialog.Builder builder = new AlertDialog.Builder(this.cordova.getActivity());
             builder.setMessage(message)
                     .setCancelable(false)
@@ -1016,6 +1011,22 @@ public class CDVBackgroundGeolocation extends CordovaPlugin {
      * Override method in CordovaPlugin.
      * Checks to see if it should turn off
      */
+    public void onPause(boolean multitasking) {
+
+    }
+
+    public void onStop() {
+        Context context = cordova.getActivity().getApplicationContext();
+        TSConfig config = TSConfig.getInstance(context);
+        if (config.getEnabled() && config.getEnableHeadless() && !config.getStopOnTerminate()) {
+            TSScheduleManager.getInstance(context).oneShot(TerminateEvent.ACTION, 10000);
+        }
+    }
+
+    public void onResume(boolean multitasking) {
+
+    }
+
     public void onDestroy() {
         Log.i(TAG, "CDVBackgroundGeolocation#onDestoy");
         getAdapter().onActivityDestroy();
