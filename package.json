@@ -1,6 +1,6 @@
 {
   "name": "cordova-background-geolocation",
-  "version": "3.0.0-beta.4",
+  "version": "3.0.0-rc.1",
   "description": "The most sophisticated cross-platform background location tracking & geofencing plugin with battery-conscious motion-detection",
   "cordova": {
     "id": "cordova-background-geolocation",
@@ -56,6 +56,7 @@
   "devDependencies": {
     "typedoc": "^0.12.0",
     "typedoc-plugin-gitlink": "^0.0.3",
+    "typedoc-plugin-mediaplayer": "^0.1.1",
     "typedoc-theme-transistor": "git+https://github.com/transistorsoft/typedoc-theme-transistor.git"
   },
   "author": "Chris Scott, Transistor Software",
