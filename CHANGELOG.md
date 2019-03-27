@@ -1,6 +1,9 @@
 
 # CHANGELOG
 
+## [3.0.0-rc.2] - 2019-03-27
+- [Fixed] An Android foreground-service is launched on first install and fails to stop.
+
 ## [3.0.0-rc.1] - 2019-03-26
 
 ------------------------------------------------------------------------------

@@ -205,19 +205,9 @@ BackgroundGeolocation.setConfig({
 									</tr>
 								</thead>
 								<tbody><tr>
-										<td><a href="_cordova_background_geolocation_.config.html#activityrecognitioninterval">activityRecognitionInterval</a></td>
-										<td><code>Integer</code></td>
-										<td><strong>Default: <code>10000</code></strong>.  The desired time between activity detections. Larger values will result in fewer activity detections while improving battery life. A value of <code>0</code> will result in activity detections at the fastest possible rate.</td>
-									</tr>
-									<tr>
 										<td><a href="_cordova_background_geolocation_.config.html#stoptimeout">stopTimeout</a></td>
 										<td><code>Integer</code></td>
 										<td><strong>Default: <code>5</code></strong>.  The number of <strong>minutes</strong> to wait before turning off location-services after the ActivityRecognition System (ARS) detects the device is <code>STILL</code></td>
-									</tr>
-									<tr>
-										<td><a href="_cordova_background_geolocation_.config.html#minimumactivityrecognitionconfidence">minimumActivityRecognitionConfidence</a></td>
-										<td><code>Integer</code></td>
-										<td><strong>Default: <code>75</code></strong>.  Each activity-recognition-result returned by the API is tagged with a &quot;confidence&quot; level expressed as a <code>%</code>.  You can set your desired confidence to trigger a state-change.</td>
 									</tr>
 									<tr>
 										<td><a href="_cordova_background_geolocation_.config.html#stopdetectiondelay">stopDetectionDelay</a></td>
@@ -651,15 +641,9 @@ BackgroundGeolocation.setConfig({
 					<aside class="tsd-sources">
 					</aside>
 					<div class="tsd-comment tsd-typography">
-						<div class="lead">
-							<p>Controls the sample-rate of the motion activity-recognition system.</p>
-						</div>
 						<dl class="tsd-comment-tags">
-							<dt class="tsd-comment-tag-break">break</dt>
-							<dd><p>Defaults to <code>10000</code> (10 seconds).  This is primarily an <strong>Android</strong> option, since only Android can constantly monitor the activity-detection API
-									in the background (iOS uses a &quot;stationary geofence&quot; to detect device-motion).  The desired time between activity detections. Larger values
-									will result in fewer activity detections while improving battery life. A value of 0 will result in activity detections at the fastest possible
-								rate.</p>
+							<dt class="tsd-comment-tag-deprecated">deprecated</dt>
+							<dd><p>No longer used.</p>
 							</dd>
 						</dl>
 					</div>
@@ -2458,20 +2442,9 @@ BackgroundGeolocation.ready({
 					<aside class="tsd-sources">
 					</aside>
 					<div class="tsd-comment tsd-typography">
-						<div class="lead">
-							<p>The minimum motion-activity confidence to conclude a device is moving.</p>
-						</div>
 						<dl class="tsd-comment-tags">
-							<dt class="tsd-comment-tag-break">break</dt>
-							<dd><p>Defaults to <strong><code>75</code>%</strong>.  Each activity-recognition-result returned by the API is tagged with a &quot;confidence&quot; level expressed as a %.
-								You can set your desired confidence to trigger a <a href="../classes/_cordova_background_geolocation_.backgroundgeolocation.html#onmotionchange">BackgroundGeolocation.onMotionChange</a> event.</p>
-								<p>This setting can be helpful for poor quality Android devices missing crucial motion sensors (accelerometer, gyroscope, magnetometer)
-								by adjusting the confidence lower.  You can determine missing sensors on a device using the method <a href="../classes/_cordova_background_geolocation_.backgroundgeolocation.html#getsensors">getSensors</a>.</p>
-							</dd>
-							<dt class="tsd-comment-tag-example">example</dt>
-							<dd><pre><code class="language-javascript">BackgroundGeolocation.ready({
-  <span class="hljs-attr">minimumActivityRecognitionConfidence</span>: <span class="hljs-number">50</span> <span class="hljs-comment">// &lt;-- trigger less confidently.</span>
-});</code></pre>
+							<dt class="tsd-comment-tag-deprecated">deprecated</dt>
+							<dd><p>No longer used.</p>
 							</dd>
 						</dl>
 					</div>
