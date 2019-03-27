@@ -635,7 +635,9 @@
 {
     UIBackgroundTaskIdentifier taskId = [[command.arguments objectAtIndex: 0] integerValue];
     [bgGeo stopBackgroundTask:taskId];
-    [self.commandDelegate sendPluginResult:[CDVPluginResult resultWithStatus:CDVCommandStatus_OK] callbackId:command.callbackId];
+
+    CDVPluginResult* result = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsInt: (int)taskId];
+    [self.commandDelegate sendPluginResult:result callbackId:command.callbackId];
 }
 
 /**
@@ -658,13 +660,6 @@
     BOOL moving = [[command.arguments objectAtIndex: 0] boolValue];
     [bgGeo changePace:moving];
     CDVPluginResult* result = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsBool: moving];
-    [self.commandDelegate sendPluginResult:result callbackId:command.callbackId];
-}
-
--(void) beginBackgroundTask:(CDVInvokedUrlCommand*)command
-{
-    UIBackgroundTaskIdentifier taskId = [bgGeo createBackgroundTask];
-    CDVPluginResult* result = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsInt: (int)taskId];
     [self.commandDelegate sendPluginResult:result callbackId:command.callbackId];
 }
 

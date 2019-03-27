@@ -946,12 +946,13 @@ declare module "cordova-background-geolocation" {
     * });
     * ```
     */
-    static stopBackgroundTask(taskId: number, success?: Function, failure?: Function): Promise<void>;
+    static stopBackgroundTask(taskId: number, success?: Function, failure?: Function): Promise<number>;
 
     /**
     * @alias [[stopBackgroundTask]]
+    * @deprecated
     */
-    static finish(taskId: number, success?: Function, failure?: Function): Promise<void>;
+    static finish(taskId: number, success?: Function, failure?: Function): Promise<number>;
 
     /**
     * Retrieves the current [[Location]].
