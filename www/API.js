@@ -340,7 +340,7 @@ module.exports = {
     },
     // @deprecated
     finish: function(taskId) {
-        return stopBackgroundTask(taskId);
+        return this.stopBackgroundTask(taskId);
     },
     changePace: function(isMoving) {
         return new Promise(function(resolve, reject) {
