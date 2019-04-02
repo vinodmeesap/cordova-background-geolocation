@@ -375,7 +375,7 @@ declare module "cordova-background-geolocation" {
     *   desiredAccuracy: BackgroundGeolocation.DESIRED_ACCURACY_MEDIUM,
     *   locationUpdateInterval: 5000,
     *   distanceFilter: 50
-    * }).then(state) {
+    * }).then((state) => {
     *   BackgroundGeolocation.startGeofences();
     * });
     * ```
@@ -1558,7 +1558,6 @@ declare module "cordova-background-geolocation" {
     *
     * @example **`useSignificantChanges: false` (Default)**
     * ![](https://dl.dropboxusercontent.com/s/hcxby3sujqanv9q/useSignificantChangesOnly-false.png?dl=1)
-
     */
     useSignificantChangesOnly?: boolean;
 
