@@ -53,18 +53,10 @@ $ ionic cordova plugin add https://github.com/transistorsoft/cordova-background-
 This plugin has tagged stable versions.  To install a particular version, append a version code to the github url prefixed by `#`.
 
 ```
-$ cordova plugin add <git.url>#2.13.2
+$ cordova plugin add <git.url>#3.0.0
 ```
 
 ![](https://dl.dropboxusercontent.com/s/5y59djjvxlnvkou/screenshot-github-tagged-branches.png?dl=1)
-
-## :large_blue_diamond: Android SDK
-
-If building from your local machine (as you should be), ensure you have the following items installed or updated in Android SDK Manager
-#### SDK Tools
-![](https://dl.dropboxusercontent.com/s/qdscbas4krc27c4/android-sdk-tools.png?dl=1)
-#### SDK Platforms
-![](https://dl.dropboxusercontent.com/s/qetghugog00puz2/android-sdk-platforms.png?dl=1)
 
 
 ## :large_blue_diamond: Configuring the plugin
