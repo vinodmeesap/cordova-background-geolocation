@@ -1197,7 +1197,7 @@ declare module "cordova-background-geolocation" {
     * ### Android
     *
     * Android will reboot the plugin's background-service *immediately* after device reboot.  However, just like [[stopOnTerminate]] __`false`__,
-    * the plugin will be running "headless" without your Application code.  If you wish for your Flutter Application to boot as well, you may
+    * the plugin will be running "headless" without your Application code.  If you wish for your Application to boot as well, you may
     * configure any of the following **`forceReloadOnXXX`** options:
     *
     * - [[forceReloadOnLocationChange]]
@@ -1903,7 +1903,7 @@ declare module "cordova-background-geolocation" {
     * Force launch your terminated App after a [[BackgroundGeolocation.onLocation]] event.
     * @break
     *
-    * When the user terminates your Android app with [[BackgroundGeolocation]] configured with [[stopOnTerminate]] __`false`__, the foreground `MainActivity` (where your Flutter app lives) *will* terminate &mdash; only the plugin's pure native background-service is running, **"headless"**, in this case.  The background service will continue tracking the location.  However, the background service *can* optionally **re-launch** your foreground application.
+    * When the user terminates your Android app with [[BackgroundGeolocation]] configured with [[stopOnTerminate]] __`false`__, the foreground `MainActivity` (where your Javascript app lives) *will* terminate &mdash; only the plugin's pure native background-service is running, **"headless"**, in this case.  The background service will continue tracking the location.  However, the background service *can* optionally **re-launch** your foreground application.
     *
     * ### ⚠️ Warning:
     * - When the background service re-launches your application, it will *briefly* appear in the foreground before *immediately* minimizing.  If the user has their phone on at the time, they will see a brief flash of your app appearing and minimizing.
@@ -1914,7 +1914,7 @@ declare module "cordova-background-geolocation" {
     * Force launch your terminated App after a [[BackgroundGeolocation.onMotionChange]] event.
     * @break
     *
-    * When the user terminates your Android app with [[BackgroundGeolocation]] configured with [[stopOnTerminate]] __`false`__, the foreground `MainActivity` (where your Flutter app lives) *will* terminate &mdash; only the plugin's pure native background-service is running, **"headless"**, in this case.  The background service will continue tracking the location.  However, the background service *can* optionally **re-launch** your foreground application.
+    * When the user terminates your Android app with [[BackgroundGeolocation]] configured with [[stopOnTerminate]] __`false`__, the foreground `MainActivity` (where your Javascript app lives) *will* terminate &mdash; only the plugin's pure native background-service is running, **"headless"**, in this case.  The background service will continue tracking the location.  However, the background service *can* optionally **re-launch** your foreground application.
     *
     * ### ⚠️ Warning:
     * - When the background service re-launches your application, it will *briefly* appear in the foreground before *immediately* minimizing.  If the user has their phone on at the time, they will see a brief flash of your app appearing and minimizing.
@@ -1925,7 +1925,7 @@ declare module "cordova-background-geolocation" {
     * Force launch your terminated App after a [[BackgroundGeolocation.onGeofence]] event.
     * @break
     *
-    * When the user terminates your Android app with [[BackgroundGeolocation]] configured with [[stopOnTerminate]] __`false`__, the foreground `MainActivity` (where your Flutter app lives) *will* terminate &mdash; only the plugin's pure native background-service is running, **"headless"**, in this case.  The background service will continue tracking the location.  However, the background service *can* optionally **re-launch** your foreground application.
+    * When the user terminates your Android app with [[BackgroundGeolocation]] configured with [[stopOnTerminate]] __`false`__, the foreground `MainActivity` (where your Javascript app lives) *will* terminate &mdash; only the plugin's pure native background-service is running, **"headless"**, in this case.  The background service will continue tracking the location.  However, the background service *can* optionally **re-launch** your foreground application.
     *
     * ### ⚠️ Warning:
     * - When the background service re-launches your application, it will *briefly* appear in the foreground before *immediately* minimizing.  If the user has their phone on at the time, they will see a brief flash of your app appearing and minimizing.
@@ -1958,7 +1958,7 @@ declare module "cordova-background-geolocation" {
     * Force launch your terminated App after a [[BackgroundGeolocation.onSchedule]] event.
     * @break
     *
-    * When the user terminates your Android app with [[BackgroundGeolocation]] configured with [[stopOnTerminate]] __`false`__, the foreground `MainActivity` (where your Flutter app lives) *will* terminate &mdash; only the plugin's pure native background-service is running, **"headless"**, in this case.  The background service will continue tracking the location.  However, the background service *can* optionally **re-launch** your foreground application.
+    * When the user terminates your Android app with [[BackgroundGeolocation]] configured with [[stopOnTerminate]] __`false`__, the foreground `MainActivity` (where your Javascript app lives) *will* terminate &mdash; only the plugin's pure native background-service is running, **"headless"**, in this case.  The background service will continue tracking the location.  However, the background service *can* optionally **re-launch** your foreground application.
     *
     * ### ⚠️ Warning:
     * - When the background service re-launches your application, it will *briefly* appear in the foreground before *immediately* minimizing.  If the user has their phone on at the time, they will see a brief flash of your app appearing and minimizing.
