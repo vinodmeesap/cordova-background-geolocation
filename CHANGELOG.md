@@ -1,6 +1,10 @@
 
 # CHANGELOG
 
+## [3.0.2] - 2019-04-25
+- [Fixed] Android bug where service repeatedly starts/stops after rebooting the device with plugin in *moving* state.
+- [Fixed] Android headless `heartbeat` events were failing (incorrect `Context` was supplied to the event).
+
 ## [3.0.1] - 2019-04-17
 - [Fixed] Typescript API missing methods `getProviderState`, `requestPermission`.
 - [Added] Expose plugin config `--variable` `OKHTTP_VERSION`.  People are reporting conflicts with `cordova-plugin-advanced-http`, which also imports `okhttp`.
