@@ -44,10 +44,14 @@
     NSDictionary *params = [command.arguments objectAtIndex:0];
     if (config.isFirstBoot) {
         [config updateWithDictionary:params];
-    } else if (params[@"reset"] && [[params objectForKey:@"reset"] boolValue]) {
-        [config reset];
-        [config updateWithDictionary:params];
+    } else {
+        BOOL reset = (params[@"reset"]) ? [params[@"reset"] boolValue] : YES;
+        if (reset) {
+            [config reset];
+            [config updateWithDictionary:params];
+        }
     }
+
     [bgGeo ready];
     CDVPluginResult *result = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsDictionary:[config toDictionary]];
     [self.commandDelegate sendPluginResult:result callbackId:command.callbackId];
@@ -415,6 +419,11 @@
     };
     [self registerCallback:command.callbackId callback:callback];
     [bgGeo onEnabledChange:callback];
+}
+
+- (void) addNotificationActionListener:(CDVInvokedUrlCommand*)command
+{
+    // No iOS implementation
 }
 
 - (void) addGeofence:(CDVInvokedUrlCommand*)command
