@@ -361,11 +361,11 @@ declare module "cordova-background-geolocation" {
     *
     * @example
     * ```javascript
-    * BackgroundGeolocation.onHttp((event) => {
+    * BackgroundGeolocation.onHttp((response) => {
     *   let status = response.status;
     *   let success = response.success;
     *   let responseText = response.responseText;
-    *   console.log('[onHttp] ', event);
+    *   console.log('[onHttp] ', response);
     * });
     * ```
     * ### ℹ️ See also:
