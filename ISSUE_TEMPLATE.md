@@ -12,7 +12,10 @@
 * Device manufacturer / model:
 * Cordova version (`cordova -v`):
 * Cordova platform version (`cordova platform ls`):
-* Plugin config
+* Plugin config provided to `#ready`:
+```javascript <!-- syntax-highlighting:  paste your code below -->
+INSERT_YOUR_CODE_HERE
+```
 
 ## Expected Behavior
 <!--- Tell us what should happen -->
@@ -32,7 +35,11 @@
 
 ## Debug logs
 <!-- include iOS / Android logs
-- ios XCode logs, 
+- ios XCode logs,
 - use #getLog #emailLog methods (@see docs)
 - Android: $ adb logcat
 -->
+<details>
+	<summary>Logs</summary>
+	PASTE_YOUR_LOGS_HERE
+</details>
