@@ -1386,6 +1386,11 @@ declare module "cordova-background-geolocation" {
     schedule?: Array<string>;
 
     /**
+    * Force scheduler to use AlarmManager, even where JobService is available.
+    */
+    scheduleUseAlarmManager?: boolean;
+
+    /**
     * Configure the plugin to emit sound effects and local-notifications during development.
     * @break
     *
