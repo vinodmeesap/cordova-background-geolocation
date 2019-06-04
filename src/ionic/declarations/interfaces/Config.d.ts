@@ -1386,7 +1386,14 @@ declare module "cordova-background-geolocation" {
     schedule?: Array<string>;
 
     /**
-    * Force scheduler to use AlarmManager, even where JobService is available.
+    * __Android only__ Force the Android scheduler to use `AlarmManager` (more precise) instead of `JobScheduler`.  Defaults to `false`.
+    *
+    * ```typescript
+    * BackgroundGeolocation.ready(bg.Config(
+    *   schedule: ['1-7 09:00-17:00'],
+    *   scheduleUseAlarmManager: true
+    * ));
+    * ```
     */
     scheduleUseAlarmManager?: boolean;
 
