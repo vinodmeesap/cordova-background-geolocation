@@ -1,6 +1,12 @@
 
 # CHANGELOG
 
+## [3.2.1] - 2019-08-22
+- [Added] Capacitor Support.  See README for Capacitor Setup Instructions.
+- [Fixed] Android Initial headless events can be missed when app booted due to motion transition event.
+- [Fixed] Android crash with EventBus `Subscriber already registered error`.
+- [Fixed] iOS `Crash: [TSHttpService postBatch:error:] + 6335064 (TSHttpService.m:253)`
+
 ## [3.2.0] - 2019-08-17
 - [Added] iOS 13 support.
 
