@@ -4,7 +4,7 @@
 npm install https://github.com/transistorsoft/cordova-background-geolocation.git
 npx cap sync
 ```
-:information_source: Append optional `#version` tag (eg: `#3.2.1`) to url above (See [Releases](/releases))
+:information_source: Append optional `#version` tag (eg: `#3.2.1`) to url above (See [Releases](../../../releases))
 
 # iOS
 
