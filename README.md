@@ -36,7 +36,7 @@ Also available for [React Native](https://github.com/transistorsoft/react-native
 
 ## :large_blue_diamond: Installing the plugin ##
 
-:information_source: Append optional `#version` tag (eg: `#3.2.1`) to url below (See [Releases](../../releases))
+:information_source: Append optional `#version` tag (eg: `#3.2.1`) to url below (See [Releases](../../../releases))
 
 - #### From master (latest, greatest.)
 
