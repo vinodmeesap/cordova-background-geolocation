@@ -36,6 +36,8 @@ Also available for [React Native](https://github.com/transistorsoft/react-native
 
 ## :large_blue_diamond: Installing the plugin ##
 
+:information_source: Append optional `#version` tag (eg: `#3.2.1`) to url below (See [Releases](/releases))
+
 - #### From master (latest, greatest.)
 
 ```bash
@@ -56,16 +58,6 @@ npm install https://github.com/transistorsoft/cordova-background-geolocation.git
 npx cap sync
 ```
 :information_source: See [Capacitor Setup](./help/INSTALL_CAPACITOR.md)
-
-#### Installing a tagged version.
-
-This plugin has tagged stable versions.  To install a particular version, append a version code to the github url prefixed by `#`.
-
-```
-$ cordova plugin add <git.url>#3.0.0
-```
-
-![](https://dl.dropboxusercontent.com/s/5y59djjvxlnvkou/screenshot-github-tagged-branches.png?dl=1)
 
 
 ## :large_blue_diamond: Configuring the plugin
