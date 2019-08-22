@@ -36,28 +36,28 @@ Also available for [React Native](https://github.com/transistorsoft/react-native
 
 ## :large_blue_diamond: Installing the plugin ##
 
-#### From master (latest, greatest.)
+:information_source: Append optional `#version` tag (eg: `#3.2.1`) to url below (See [Releases](/releases))
 
-```
-$ cordova plugin add https://github.com/transistorsoft/cordova-background-geolocation.git
+- #### From master (latest, greatest.)
+
+```bash
+cordova plugin add https://github.com/transistorsoft/cordova-background-geolocation.git
 ```
 
-#### Ionic
+- #### Ionic
 
 For Ionic, simply run the above command through the *Ionic CLI*:
-```
-$ ionic cordova plugin add https://github.com/transistorsoft/cordova-background-geolocation.git
-```
-
-#### Installing a tagged version.
-
-This plugin has tagged stable versions.  To install a particular version, append a version code to the github url prefixed by `#`.
-
-```
-$ cordova plugin add <git.url>#3.0.0
+```bash
+ionic cordova plugin add https://github.com/transistorsoft/cordova-background-geolocation.git
 ```
 
-![](https://dl.dropboxusercontent.com/s/5y59djjvxlnvkou/screenshot-github-tagged-branches.png?dl=1)
+- #### Capacitor
+
+```bash
+npm install https://github.com/transistorsoft/cordova-background-geolocation.git
+npx cap sync
+```
+:information_source: See [Capacitor Setup](./help/INSTALL_CAPACITOR.md)
 
 
 ## :large_blue_diamond: Configuring the plugin
