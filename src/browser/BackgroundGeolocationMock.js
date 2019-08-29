@@ -197,10 +197,12 @@ var BrowserInterface = {
     * @param {Object} defaultConfig
     */
     ready: function(success, failure, opts) {
+        var config = opts[0];
     	loadState();
-    	Object.assign(_state, opts[0]);
+    	Object.assign(_state, config);
     	success(_state);
-    	if (_state.enabled) {
+
+        if (_state.enabled) {
     		BrowserInterface.start(success, failure, opts);
     	} else {
     		saveState();
@@ -348,8 +350,9 @@ var BrowserInterface = {
         success();
     },
     changePace: function(success, failure, opts) {
+        var isMoving = opts[0];
     	setState({
-    		isMoving: opts[0]
+    		isMoving: isMoving
 		});
         success(opts);
 
@@ -362,7 +365,8 @@ var BrowserInterface = {
         });
     },
     setConfig: function(success, failure, opts) {
-    	setState(opts[0]);
+        var config = opts[0];
+    	setState(config);
         success(_state);
     },
     getLocations: function(success, failure, opts) {
@@ -379,7 +383,8 @@ var BrowserInterface = {
         success();
     },
     insertLocation: function(success, failure, opts) {
-        success(opts);
+        var params = opts[0];
+        success(params);
     },
     /**
     * Signal native plugin to sync locations queue to HTTP
@@ -394,8 +399,9 @@ var BrowserInterface = {
         success(0.0);
     },
     setOdometer: function(success, failure, opts) {
+        var odometer = opts[0];
     	setState({
-    		odometer: opts[0]
+    		odometer: odometer
 		});
         success(_state.odometer);
     },
@@ -404,13 +410,15 @@ var BrowserInterface = {
     * add geofence
     */
     addGeofence: function(success, failure, opts) {
-        success(opts[0]);
+        var params = opts[0];
+        success(params);
     },
     /**
     * add a list of geofences
     */
     addGeofences: function(success, failure, opts) {
-        success(opts[0]);
+        var params = opts[0];
+        success(params);
     },
     /**
     * Remove all geofences
