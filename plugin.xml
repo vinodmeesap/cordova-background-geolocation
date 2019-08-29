@@ -78,4 +78,15 @@
             </feature>
         </config-file>
      </platform>
+
+     <platform name="browser">
+        <config-file target="config.xml" parent="/*">
+            <feature name="BackgroundGeolocation"></feature>
+        </config-file>
+        <js-module src="src/browser/BackgroundGeolocationMock.js" name="BackgroundGeolocationMock">
+            <runs/>
+        </js-module>
+
+     </platform>
+
 </plugin>
