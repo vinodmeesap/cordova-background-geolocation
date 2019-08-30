@@ -2,6 +2,7 @@
 # CHANGELOG
 
 ## Unreleased
+- [Changed] Rebuild iOS `TSLocationManager.framework` with XCode 10.  Replace `@available` macro with `SYSTEM_VERSION_GREATER_THAN_OR_EQUAL_TO`.
 - [Fixed] iOS 13 preventSuspend was not working with iOS 13.  iOS has once again decreased the max time for UIApplication beginBackgroundTask from 180s down to 30s.
 - [Added] Implement Cordova "browser" platform with a Mock implementation of BackgroundGeolocation for use while developing in browser.
 - [Changed] Upgrade `android-logback` dependency to `2.0.0`
