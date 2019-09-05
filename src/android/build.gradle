@@ -35,3 +35,28 @@ dependencies {
   // Load tslocationmanager.aar
   implementation fileTree(include: ['*.aar'], dir: "${libDir}/tslocationmanager")
 }
+
+/**
+* Background Geolocation's aar includes about 1.5M of mp3 sound-files for its debugging sound FX.
+* This method strips those mp3s out in RELEASE builds.
+*/
+ext.postBuildExtras = {
+  android {
+    purgeBackgroundGeolocationDebugResources(applicationVariants)
+  }
+}
+
+def purgeBackgroundGeolocationDebugResources(applicationVariants) {
+    if ((ext.has("removeBackgroundGeolocationDebugSoundsInRelease")) && (ext.removeBackgroundGeolocationDebugSoundsInRelease == false)) return
+    applicationVariants.all { variant ->
+        if (variant.buildType.name == "release") {
+            println("[cordova-background-geolocation] Purging debug resources in release build")
+            variant.mergeResourcesProvider.configure {
+                doLast {
+                    delete(fileTree(dir: outputDir, includes: ["raw_tslocationmanager*"]))
+                }
+            }
+        }
+    }
+}
+
