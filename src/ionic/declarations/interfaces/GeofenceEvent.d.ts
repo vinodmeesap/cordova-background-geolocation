@@ -25,6 +25,6 @@ declare module "cordova-background-geolocation" {
     /**
     * Optional [[Geofence.extras]]
     */
-    extras?: Object;
+    extras?: Extras;
   }
 }

@@ -739,7 +739,7 @@ declare module "cordova-background-geolocation" {
     * }
     * ```
     */
-    extras?: Object;
+    extras?: Extras;
 
     /**
     * Immediately upload each recorded location to your configured [[url]].
