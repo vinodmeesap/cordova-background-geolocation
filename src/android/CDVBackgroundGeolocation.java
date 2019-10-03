@@ -1061,7 +1061,7 @@ public class CDVBackgroundGeolocation extends CordovaPlugin {
     public void onStop() {
         Context context = cordova.getActivity().getApplicationContext();
         TSConfig config = TSConfig.getInstance(context);
-        if (config.getEnabled() && config.getEnableHeadless() && !config.getStopOnTerminate()) {
+        if (config.getEnabled()) {
             TSScheduleManager.getInstance(context).oneShot(TerminateEvent.ACTION, 10000);
         }
     }

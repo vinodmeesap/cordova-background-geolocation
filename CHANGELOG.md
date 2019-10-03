@@ -1,6 +1,19 @@
 
 # CHANGELOG
 
+## Unreleased
+- [Added] Android now supports `disableMotionActivityUpdates` for Android 10 which now requires run-time permission for "Physical Activity".  Setting to `true` will not ask user for this permission.  The plugin will fallback to using the "stationary geofence" triggering, like iOS.
+- [Changed] Android:  Ensure all code that accesses the database is performed in background-threads, including all logging (addresses `Context.startForegroundService` ANR issue).
+- [Changed] Android:  Ensure all geofence event-handling is performed in background-threads (addresses `Context.startForegroundService` ANR issue).
+- [Added] Android: implement logic to handle operation without Motion API on Android 10.  v3 has always used a "stationary geofence" like iOS as a fail-safe, but this is now crucial for Android 10 which now requires run-time permission for "Physical Activity".  For those users who [Deny] this permission, Android will trigger tracking in a manner similar to iOS (ie: requiring movement of about 200 meters).  This also requires handling to detect when the device has become stationary.
+
+## [3.2.3] - 2019-09-30
+- [Added] Implement `disableMotionActivityUpdates` for Android where device SDK > `Q`.  Android Q now requires run-time permissions for "Physical Activity".  Configuring `disableMotionActivityUpdates: true` will disable asking the user for this permission.  However, the plugin performance will be *seriously* degraded; it will take movement of 200-1000 meters before tracking will initiate.
+- [Fixed] Android issue with `stopOnTerminate: true`.  Plugin mistakenly clears event-listeners on re-launch of app.
+- [Added] Implement an HTTP "back-off" mechanism for both iOS and Android.  If the device is **on a Cell connection** and the server returns an HTTP response of `0` (could not connect), the plugin will not re-attempt an HTTP upload until **another** `autoSyncThreshold` records are recorded.  If you have not configured an `autoSyncThreshold`, the plugin will automatically halt HTTP attempts until another `10` records are recorded.  The HTTP back-off mechnism does not apply for `motionchange` events or if the device is connected to a Wifi network.
+- [Fixed] Android NPE on `LocationRequest.getSmallestDisplacement` / `LocationRequest.setSmallestDisplacement`.  I suspect this was caused due to moving some code into background-thread while addressing ANR issues related to `Context.startForegroundService`.
+
+
 ## [3.2.2] - 2019-09-18
 - [Changed] Android:  move more location-handling code into background-threads to help mitigate against ANR referencing `Context.startForegroundService`
 - [Changed] Android:  If BackgroundGeolocation adapter is instantiated headless and is enabled, force ActivityRecognitionService to start.
