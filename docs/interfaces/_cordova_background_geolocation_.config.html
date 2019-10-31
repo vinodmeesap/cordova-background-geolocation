@@ -23,7 +23,7 @@
 						<li class="state loading">Preparing search index...</li>
 						<li class="state failure">The search index is not available</li>
 					</ul>
-					<a href="../globals.html" class="title">[API Docs] Cordova Background Geolocation</a>&nbsp;<span class="tsd-flag ts-flagOptional ts-flagVersion">v 3.3.1</span>
+					<a href="../globals.html" class="title">[API Docs] Cordova Background Geolocation</a>&nbsp;<span class="tsd-flag ts-flagOptional ts-flagVersion">v 3.3.2</span>
 				</div>
 				<div class="" id="tsd-widgets">
 					<a class="github" href="https://github.com/transistorsoft/cordova-background-geolocation">Github</a>
@@ -504,6 +504,7 @@ BackgroundGeolocation.setConfig({
 								<li class="tsd-kind-property tsd-parent-kind-interface tsd-is-not-exported"><a href="_cordova_background_geolocation_.config.html#defertime" class="tsd-kind-icon">defer<wbr>Time</a></li>
 								<li class="tsd-kind-property tsd-parent-kind-interface tsd-is-not-exported"><a href="_cordova_background_geolocation_.config.html#desiredaccuracy" class="tsd-kind-icon">desired<wbr>Accuracy</a></li>
 								<li class="tsd-kind-property tsd-parent-kind-interface tsd-is-not-exported"><a href="_cordova_background_geolocation_.config.html#desiredodometeraccuracy" class="tsd-kind-icon">desired<wbr>Odometer<wbr>Accuracy</a></li>
+								<li class="tsd-kind-property tsd-parent-kind-interface tsd-is-not-exported"><a href="_cordova_background_geolocation_.config.html#disableautosynconcellular" class="tsd-kind-icon">disable<wbr>Auto<wbr>Sync<wbr>OnCellular</a></li>
 								<li class="tsd-kind-property tsd-parent-kind-interface tsd-is-not-exported"><a href="_cordova_background_geolocation_.config.html#disableelasticity" class="tsd-kind-icon">disable<wbr>Elasticity</a></li>
 								<li class="tsd-kind-property tsd-parent-kind-interface tsd-is-not-exported"><a href="_cordova_background_geolocation_.config.html#disablelocationauthorizationalert" class="tsd-kind-icon">disable<wbr>Location<wbr>Authorization<wbr>Alert</a></li>
 								<li class="tsd-kind-property tsd-parent-kind-interface tsd-is-not-exported"><a href="_cordova_background_geolocation_.config.html#disablemotionactivityupdates" class="tsd-kind-icon">disable<wbr>Motion<wbr>Activity<wbr>Updates</a></li>
@@ -1012,6 +1013,20 @@ Locations: <span class="hljs-variable">__</span>|<span class="hljs-variable">__<
 						<p>Defaults to <code>100</code>.  If a location arrives having <strong><code>accuracy &gt; desiredOdometerAccuracy</code></strong>, that location will not be used to update the
 							odometer.  If you only want to calculate odometer from GPS locations, you could set <strong><code>desiredOdometerAccuracy: 10</code></strong>.
 						This will prevent odometer updates when a device is moving around indoors, in a shopping mall, for example.</p>
+					</div>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-interface tsd-is-not-exported">
+					<a name="disableautosynconcellular" class="tsd-anchor"></a>
+					<h3><span class="tsd-flag ts-flagOptional">Optional</span> disable<wbr>Auto<wbr>Sync<wbr>OnCellular</h3>
+					<div class="tsd-signature tsd-kind-icon">disable<wbr>Auto<wbr>Sync<wbr>OnCellular<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">boolean</span></div>
+					<aside class="tsd-sources">
+					</aside>
+					<div class="tsd-comment tsd-typography">
+						<div class="lead">
+							<p>Disable <a href="_cordova_background_geolocation_.config.html#autosync">autoSync</a> HTTP requests when device is connected to a Cellular connection.
+							Defaults to <code>false</code>.  Set <code>true</code> to allow <a href="_cordova_background_geolocation_.config.html#autosync">autoSync</a> only when device is connected to Wifi.</p>
+						</div>
+						<p><strong>WARNING</strong> This option is ignored when manually invoking <a href="../classes/_cordova_background_geolocation_.backgroundgeolocation.html#sync">BackgroundGeolocation.sync</a>.</p>
 					</div>
 				</section>
 				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-interface tsd-is-not-exported">
@@ -3313,6 +3328,9 @@ BackgroundGeolocation.ready({
 							</li>
 							<li class=" tsd-kind-property tsd-parent-kind-interface tsd-is-not-exported">
 								<a href="_cordova_background_geolocation_.config.html#desiredodometeraccuracy" class="tsd-kind-icon">desired<wbr>Odometer<wbr>Accuracy</a>
+							</li>
+							<li class=" tsd-kind-property tsd-parent-kind-interface tsd-is-not-exported">
+								<a href="_cordova_background_geolocation_.config.html#disableautosynconcellular" class="tsd-kind-icon">disable<wbr>Auto<wbr>Sync<wbr>OnCellular</a>
 							</li>
 							<li class=" tsd-kind-property tsd-parent-kind-interface tsd-is-not-exported">
 								<a href="_cordova_background_geolocation_.config.html#disableelasticity" class="tsd-kind-icon">disable<wbr>Elasticity</a>

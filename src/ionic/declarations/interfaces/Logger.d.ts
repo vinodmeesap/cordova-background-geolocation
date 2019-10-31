@@ -1,3 +1,6 @@
+/// <reference path="../types.d.ts" />
+/// <reference path="./SQLQuery.d.ts" />
+
 declare module "cordova-background-geolocation" {
   /**
   * # Logger API

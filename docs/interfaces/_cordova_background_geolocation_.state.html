@@ -23,7 +23,7 @@
 						<li class="state loading">Preparing search index...</li>
 						<li class="state failure">The search index is not available</li>
 					</ul>
-					<a href="../globals.html" class="title">[API Docs] Cordova Background Geolocation</a>&nbsp;<span class="tsd-flag ts-flagOptional ts-flagVersion">v 3.3.1</span>
+					<a href="../globals.html" class="title">[API Docs] Cordova Background Geolocation</a>&nbsp;<span class="tsd-flag ts-flagOptional ts-flagVersion">v 3.3.2</span>
 				</div>
 				<div class="" id="tsd-widgets">
 					<a class="github" href="https://github.com/transistorsoft/cordova-background-geolocation">Github</a>
@@ -96,6 +96,7 @@
 								<li class="tsd-kind-property tsd-parent-kind-interface tsd-is-inherited tsd-is-not-exported"><a href="_cordova_background_geolocation_.state.html#desiredaccuracy" class="tsd-kind-icon">desired<wbr>Accuracy</a></li>
 								<li class="tsd-kind-property tsd-parent-kind-interface tsd-is-inherited tsd-is-not-exported"><a href="_cordova_background_geolocation_.state.html#desiredodometeraccuracy" class="tsd-kind-icon">desired<wbr>Odometer<wbr>Accuracy</a></li>
 								<li class="tsd-kind-property tsd-parent-kind-interface tsd-is-not-exported"><a href="_cordova_background_geolocation_.state.html#didlaunchinbackground" class="tsd-kind-icon">did<wbr>Launch<wbr>InBackground</a></li>
+								<li class="tsd-kind-property tsd-parent-kind-interface tsd-is-inherited tsd-is-not-exported"><a href="_cordova_background_geolocation_.state.html#disableautosynconcellular" class="tsd-kind-icon">disable<wbr>Auto<wbr>Sync<wbr>OnCellular</a></li>
 								<li class="tsd-kind-property tsd-parent-kind-interface tsd-is-inherited tsd-is-not-exported"><a href="_cordova_background_geolocation_.state.html#disableelasticity" class="tsd-kind-icon">disable<wbr>Elasticity</a></li>
 								<li class="tsd-kind-property tsd-parent-kind-interface tsd-is-inherited tsd-is-not-exported"><a href="_cordova_background_geolocation_.state.html#disablelocationauthorizationalert" class="tsd-kind-icon">disable<wbr>Location<wbr>Authorization<wbr>Alert</a></li>
 								<li class="tsd-kind-property tsd-parent-kind-interface tsd-is-inherited tsd-is-not-exported"><a href="_cordova_background_geolocation_.state.html#disablemotionactivityupdates" class="tsd-kind-icon">disable<wbr>Motion<wbr>Activity<wbr>Updates</a></li>
@@ -632,6 +633,21 @@ Locations: <span class="hljs-variable">__</span>|<span class="hljs-variable">__<
 							iOS apps can be launched in the background due to a background-fetch event, geofence events or exiting the <a href="_cordova_background_geolocation_.config.html#stationaryradius">Config.stationaryRadius</a>.</p>
 						</div>
 						<p>One might use this flag to choose to load only minimal resources until the iOS app is determined to have launched into the foreground.</p>
+					</div>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-interface tsd-is-inherited tsd-is-not-exported">
+					<a name="disableautosynconcellular" class="tsd-anchor"></a>
+					<h3><span class="tsd-flag ts-flagOptional">Optional</span> disable<wbr>Auto<wbr>Sync<wbr>OnCellular</h3>
+					<div class="tsd-signature tsd-kind-icon">disable<wbr>Auto<wbr>Sync<wbr>OnCellular<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">boolean</span></div>
+					<aside class="tsd-sources">
+						<p>Inherited from <a href="_cordova_background_geolocation_.config.html">Config</a>.<a href="_cordova_background_geolocation_.config.html#disableautosynconcellular">disableAutoSyncOnCellular</a></p>
+					</aside>
+					<div class="tsd-comment tsd-typography">
+						<div class="lead">
+							<p>Disable <a href="_cordova_background_geolocation_.state.html#autosync">autoSync</a> HTTP requests when device is connected to a Cellular connection.
+							Defaults to <code>false</code>.  Set <code>true</code> to allow <a href="_cordova_background_geolocation_.state.html#autosync">autoSync</a> only when device is connected to Wifi.</p>
+						</div>
+						<p><strong>WARNING</strong> This option is ignored when manually invoking <a href="../classes/_cordova_background_geolocation_.backgroundgeolocation.html#sync">BackgroundGeolocation.sync</a>.</p>
 					</div>
 				</section>
 				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-interface tsd-is-inherited tsd-is-not-exported">
@@ -3131,6 +3147,9 @@ BackgroundGeolocation.ready({
 							</li>
 							<li class=" tsd-kind-property tsd-parent-kind-interface tsd-is-not-exported">
 								<a href="_cordova_background_geolocation_.state.html#didlaunchinbackground" class="tsd-kind-icon">did<wbr>Launch<wbr>InBackground</a>
+							</li>
+							<li class=" tsd-kind-property tsd-parent-kind-interface tsd-is-inherited tsd-is-not-exported">
+								<a href="_cordova_background_geolocation_.state.html#disableautosynconcellular" class="tsd-kind-icon">disable<wbr>Auto<wbr>Sync<wbr>OnCellular</a>
 							</li>
 							<li class=" tsd-kind-property tsd-parent-kind-interface tsd-is-inherited tsd-is-not-exported">
 								<a href="_cordova_background_geolocation_.state.html#disableelasticity" class="tsd-kind-icon">disable<wbr>Elasticity</a>

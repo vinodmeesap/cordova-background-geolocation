@@ -1121,6 +1121,15 @@ declare module "cordova-background-geolocation" {
     */
     persistMode?: PersistMode;
     /**
+    * Disable [[autoSync]] HTTP requests when device is connected to a Cellular connection.
+    * Defaults to `false`.  Set `true` to allow [[autoSync]] only when device is connected to Wifi.
+    *
+    * __WARNING__ This option is ignored when manually invoking [[BackgroundGeolocation.sync]].
+    *
+    */
+    disableAutoSyncOnCellular?: boolean;
+
+    /**
     * Controls the order that locations are selected from the database (and uploaded to your server).
     *
     * Defaults to ascending (`ASC`), where oldest locations are synced first.  Descending (`DESC`) uploads latest locations first.

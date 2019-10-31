@@ -23,7 +23,7 @@
 						<li class="state loading">Preparing search index...</li>
 						<li class="state failure">The search index is not available</li>
 					</ul>
-					<a href="../globals.html" class="title">[API Docs] Cordova Background Geolocation</a>&nbsp;<span class="tsd-flag ts-flagOptional ts-flagVersion">v 3.3.1</span>
+					<a href="../globals.html" class="title">[API Docs] Cordova Background Geolocation</a>&nbsp;<span class="tsd-flag ts-flagOptional ts-flagVersion">v 3.3.2</span>
 				</div>
 				<div class="" id="tsd-widgets">
 					<a class="github" href="https://github.com/transistorsoft/cordova-background-geolocation">Github</a>
@@ -66,7 +66,7 @@
 					<pre><code class="language-javascript"><span class="hljs-comment">// Constrain results between optionl start/end dates using a SQLQuery</span>
 <span class="hljs-keyword">let</span> log = <span class="hljs-keyword">await</span> BackgroundGeolocation.logger.getLog({
   <span class="hljs-attr">start</span>: <span class="hljs-built_in">Date</span>.parse(<span class="hljs-string">'2019-10-21 13:00'</span>),  <span class="hljs-comment">// &lt;-- optional HH:mm:ss</span>
-  end: DateTime.parse(<span class="hljs-string">'2019-10-22'</span>)
+  end: <span class="hljs-built_in">Date</span>.parse(<span class="hljs-string">'2019-10-22'</span>)
 });
 
 <span class="hljs-comment">// Or just a start date</span>
@@ -75,20 +75,20 @@
 });
 
 <span class="hljs-comment">// Or just an end date</span>
-<span class="hljs-keyword">let</span> log = <span class="hljs-keyword">await</span> BackgroundGeolocation.logger.uploadLog(<span class="hljs-string">"http://my.server.com/users/123/logs"</span>, {
+BackgroundGeolocation.logger.uploadLog(<span class="hljs-string">"http://my.server.com/users/123/logs"</span>, {
   <span class="hljs-attr">end</span>: <span class="hljs-built_in">Date</span>.parse(<span class="hljs-string">'2019-10-21'</span>)
 ));
 
 <span class="hljs-comment">// Select first 100 records from log</span>
 <span class="hljs-keyword">let</span> Logger = BackgroundGeolocation.logger;
-<span class="hljs-keyword">let</span> log = <span class="hljs-keyword">await</span> Logger.emailLog(<span class="hljs-string">"foo@bar.com"</span>, {
+Logger.emailLog(<span class="hljs-string">"foo@bar.com"</span>, {
   <span class="hljs-attr">order</span>: Logger.ORDER_ASC,
   <span class="hljs-attr">limit</span>: <span class="hljs-number">100</span>
 ));
 
 <span class="hljs-comment">// Select most recent 100 records from log</span>
 <span class="hljs-keyword">let</span> Logger = BackgroundGeolocation.logger;
-<span class="hljs-keyword">let</span> log = <span class="hljs-keyword">await</span> Logger.emailLog(<span class="hljs-string">"foo@bar.com"</span>, {
+Logger.emailLog(<span class="hljs-string">"foo@bar.com"</span>, {
   <span class="hljs-attr">order</span>: Logger.ORDER_DESC,
   <span class="hljs-attr">limit</span>: <span class="hljs-number">100</span>
 ));</code></pre>
