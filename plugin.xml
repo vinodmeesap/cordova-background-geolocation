@@ -3,7 +3,7 @@
 <plugin xmlns="http://www.phonegap.com/ns/plugins/1.0"
     xmlns:android="http://schemas.android.com/apk/res/android"
     id="cordova-background-geolocation"
-    version="3.3.2">
+    version="3.4.0">
 
     <name>BackgroundGeolocation</name>
     <description>The most sophisticated, battery-efficient background-geolocation and geofencing plugin for Cordova</description>
@@ -24,12 +24,11 @@
     <js-module src="www/API.js" name="API"></js-module>
     <js-module src="www/DeviceSettings.js" name="DeviceSettings"></js-module>
     <js-module src="www/Logger.js" name="Logger"></js-module>
+    <js-module src="www/TransistorAuthorizationToken.js" name="TransistorAuthorizationToken"></js-module>
 
      <platform name="ios">
-
         <preference name="BACKGROUND_MODE_LOCATION" default="&lt;string&gt;location&lt;/string&gt;" />
 
-        <!-- <dependency id="cordova-plugin-cocoalumberjack" version="~0.0.4" /> -->
         <!-- required background modes:  App registers for location updates -->
         <config-file target="*-Info.plist" parent="UIBackgroundModes">
             <array>
@@ -42,6 +41,7 @@
                 <param name="ios-package" value="CDVBackgroundGeolocation"/>
             </feature>
         </config-file>
+
         <framework src="CocoaLumberjack" type="podspec" spec="~> 3.5.0" />
         <framework src="AudioToolbox.framework" weak="true" />
         <framework src="SystemConfiguration.framework" weak="true" />
@@ -67,6 +67,7 @@
         <framework src="com.intentfilter:android-permissions:0.1.8"/>
         <framework src="org.slf4j:slf4j-api:1.7.25"/>
         <framework src="com.github.tony19:logback-android:2.0.0"/>
+
         <framework src="src/android/build.gradle" custom="true" type="gradleReference" />
 
         <resource-file src="src/android/libs/tslocationmanager" target="../../libs/tslocationmanager" />
