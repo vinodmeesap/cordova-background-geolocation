@@ -1,6 +1,6 @@
 {
   "name": "cordova-background-geolocation",
-  "version": "3.4.0",
+  "version": "3.4.1",
   "description": "The most sophisticated cross-platform background location tracking & geofencing plugin with battery-conscious motion-detection",
   "cordova": {
     "id": "cordova-background-geolocation",
