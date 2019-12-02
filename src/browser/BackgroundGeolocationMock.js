@@ -100,6 +100,14 @@ var DEVICE_SENSORS = {
 	significant_motion: false
 };
 
+var DEVICE_INFO = {
+    platform: 'browser',
+    model: 'Unknown',
+    manufacturer: 'Unknown',
+    version: '-1',
+    framework: 'cordova'
+};
+
 var PROVIDER_STATE = {
 	gps: false,
 	network: true,
@@ -485,6 +493,11 @@ var BrowserInterface = {
     */
     getSensors: function(success, failure, opts) {
         success(DEVICE_SENSORS);
+    },
+    getDeviceInfo: function() {
+        return new Promise(function(resolve, reject) {
+            resolve(DEVICE_INFO);
+        });
     }
 };
 

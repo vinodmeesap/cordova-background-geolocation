@@ -5,7 +5,7 @@ declare module "cordova-background-geolocation" {
   * @example
   * ```typescript
   * BackgroundGeolocation.onHeartbeat(heartbeatEvent => {
-  *   console.log('[heartbeat] ', heartbeatEvent);
+  *   console.log("[heartbeat] ", heartbeatEvent);
   * });
   * ```
   */
