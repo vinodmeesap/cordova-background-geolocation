@@ -23,7 +23,7 @@
 						<li class="state loading">Preparing search index...</li>
 						<li class="state failure">The search index is not available</li>
 					</ul>
-					<a href="../globals.html" class="title">[API Docs] Cordova Background Geolocation</a>&nbsp;<span class="tsd-flag ts-flagOptional ts-flagVersion">v 3.5.0</span>
+					<a href="../globals.html" class="title">[API Docs] Cordova Background Geolocation</a>&nbsp;<span class="tsd-flag ts-flagOptional ts-flagVersion">v 3.5.1</span>
 				</div>
 				<div class="" id="tsd-widgets">
 					<a class="github" href="https://github.com/transistorsoft/cordova-background-geolocation">Github</a>
@@ -228,6 +228,71 @@ BackgroundGeolocation.ready({
   ]
 }</code></pre>
 							<p>The SDK will run each of these commands synchronously upon itself.</p>
+							<h3 id="supported-rpc-commands">Supported RPC Commands</h3>
+							<table>
+								<thead>
+									<tr>
+										<th>Command</th>
+										<th>Arguments</th>
+										<th>Description</th>
+									</tr>
+								</thead>
+								<tbody><tr>
+										<td><code>start</code></td>
+										<td>None.</td>
+										<td><code>BackgroundGeolocation.start()</code></td>
+									</tr>
+									<tr>
+										<td><code>stop</code></td>
+										<td>None.</td>
+										<td><code>BackgroundGeolocation.stop()</code></td>
+									</tr>
+									<tr>
+										<td><code>startGeofences</code></td>
+										<td>None.</td>
+										<td><code>BackgroundGeolocation.startGeofences()</code></td>
+									</tr>
+									<tr>
+										<td><code>changePace</code></td>
+										<td><code>Boolean</code></td>
+										<td><code>BackgroundGeolocation.changePace(argument)</code></td>
+									</tr>
+									<tr>
+										<td><code>setConfig</code></td>
+										<td><code>{Config}</code></td>
+										<td><code>BackgroundGeolocation.setConfig(argument)</code></td>
+									</tr>
+									<tr>
+										<td><code>addGeofence</code></td>
+										<td><code>{Geofence}</code></td>
+										<td><code>BackgroundGeolocation.addGeofence(argument)</code></td>
+									</tr>
+									<tr>
+										<td><code>addGeofences</code></td>
+										<td><code>[{Geofence}, ...]</code></td>
+										<td><code>BackgroundGeolocation.addGeofences(argument)</code></td>
+									</tr>
+									<tr>
+										<td><code>removeGeofence</code></td>
+										<td><code>identifier:String</code></td>
+										<td><code>BackgroundGeolocation.removeGeofence(argument)</code></td>
+									</tr>
+									<tr>
+										<td><code>removeGeofences</code></td>
+										<td>None or <code>[identifier:String,...]</code></td>
+										<td><code>BackgroundGeolocation.removeGeofences(argument)</code> If provided no argument, remove all; otherwise remove provided list of identifiers</td>
+									</tr>
+									<tr>
+										<td><code>uploadLog</code></td>
+										<td><code>url:String</code></td>
+										<td>The url to upload log to.</td>
+									</tr>
+									<tr>
+										<td><code>destroyLog</code></td>
+										<td>None</td>
+										<td><code>BackgroundGeolocation.destroyLog</code></td>
+									</tr>
+							</tbody></table>
 							<h3 id="simple-example-stop">Simple Example: <code>#stop</code></h3>
 							<p>Your server could return a response telling the SDK to <a href="../classes/_cordova_background_geolocation_.backgroundgeolocation.html#stop">BackgroundGeolocation.stop</a>:</p>
 						</dd>
