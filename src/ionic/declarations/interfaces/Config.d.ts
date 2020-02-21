@@ -1822,7 +1822,7 @@ declare module "cordova-background-geolocation" {
     *   locationAuthorizationAlert: {
     *     titleWhenNotEnabled: "Yo, location-services not enabled",
     *     titleWhenOff: "Yo, location-services OFF",
-    *     instructions: "You must enable "Always" in location-services, buddy",
+    *     instructions: "You must enable 'Always' in location-services, buddy",
     *     cancelButton: "Cancel",
     *     settingsButton: "Settings"
     *   }

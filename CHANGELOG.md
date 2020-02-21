@@ -1,5 +1,13 @@
 # CHANGELOG
 
+## 3.6.0 - 2020-02-22
+- [Changed] `react-native-background-fetch` dependency updated to `3.x` with new iOS 13 `BGTaskScheduler` API.
+- [Fixed] iOS bug related to significant-location-changes (SLC) API.  In a previous version, the plugin's geofence manager would stop monitoring SLC if the number of added geofences was < the maximum (20) (in order to not show the new iOS 13 dialog reporting background location usage when infinite-geofencing is not required).  The background-geolocation SDK uses several `CLLocationManager` instances and its `GeofenceManager` maintains its own instance.  However, it turns out that when *any* `CLLocationManager` instance stops monitoring the SLC API, then **ALL** instances stop monitoring SLC, which is highly unexpected and undocumented.  As a result, the plugin would lose its safety mechanism should the stationary geofence fail to trigger and iOS tracking could fail to start in some circumstances.
+- [Fixed] `synchronize` methods in `TSLocationManager` to address Android NPE related to `buildTSLocation`.
+- [Fixed] Typescript declaration for `Location.isMoving` should be `Location.is_moving`.
+- [Fixed] iOS:  Bug in `accessToken` RegExp in Authorization token-refresh handler.
+- [Fixed] Part of the raw Javascript API contained typescript, which would cause an error on older mobile browser versions.
+
 ## 3.5.1 - 2020-01-17
 - [Added] Implement four new RPC commands `addGeofence`, `removeGeofence`, `addGeofences`, `removeGeofences`.  Document available RPC commands in "HttpGuide".
 

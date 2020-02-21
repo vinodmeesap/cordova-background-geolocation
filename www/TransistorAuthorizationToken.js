@@ -11,13 +11,13 @@ var exec = require("cordova/exec");
 
 module.exports = {
 	findOrCreate: function(orgname, username, url=DEFAULT_URL) {
-		return new Promise((resolve, reject) => {
-			let success = (token) => {
+		return new Promise(function(resolve, reject) {
+			var success = function(token) {
 				// Configure Transistor url and refreshPayload.  Flutter is so much nice for this stuff.
 				token.url = url;
 				resolve(token)
-			}
-			let failure = (error) => {
+			};
+			var failure = function(error) {
 				console.warn('[TransistorAuthorizationToken findOrCreate] ERROR: ', error);
 				// Return a dummy token on error.  this is a weird thing to do but it probably failed due to no network connection to demo server.
 				// Once app will request the token once again after restarting one's app.
@@ -33,9 +33,9 @@ module.exports = {
 	},
 
 	destroy: function(url=DEFAULT_URL) {
-  	return new Promise((resolve, reject) => {
-			let success = (token) => { resolve(token) }
-			let failure = (error) => { reject(error) }
+	return new Promise(function(resolve, reject) {
+			var success = function(token) { resolve(token) }
+			var failure = function(error) { reject(error) }
 			exec(success, failure, MODULE_NAME, 'destroyTransistorToken', [url]);
 		});
   },
@@ -43,7 +43,7 @@ module.exports = {
   applyIf: function(config) {
   	if (!config.transistorAuthorizationToken) return config;
 
-  	let token = config.transistorAuthorizationToken;
+  	var token = config.transistorAuthorizationToken;
   	delete config.transistorAuthorizationToken;
 
   	config.url = token.url + LOCATIONS_PATH;
