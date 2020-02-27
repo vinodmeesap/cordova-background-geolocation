@@ -10,7 +10,8 @@ var REFRESH_PAYLOAD = {
 var exec = require("cordova/exec");
 
 module.exports = {
-	findOrCreate: function(orgname, username, url=DEFAULT_URL) {
+	findOrCreate: function(orgname, username, url) {
+		url = url || DEFAULT_URL;
 		return new Promise(function(resolve, reject) {
 			var success = function(token) {
 				// Configure Transistor url and refreshPayload.  Flutter is so much nice for this stuff.
@@ -32,29 +33,30 @@ module.exports = {
 		});
 	},
 
-	destroy: function(url=DEFAULT_URL) {
-	return new Promise(function(resolve, reject) {
+	destroy: function(url) {
+		url = url || DEFAULT_URL;
+		return new Promise(function(resolve, reject) {
 			var success = function(token) { resolve(token) }
 			var failure = function(error) { reject(error) }
 			exec(success, failure, MODULE_NAME, 'destroyTransistorToken', [url]);
 		});
-  },
+  	},
 
-  applyIf: function(config) {
-  	if (!config.transistorAuthorizationToken) return config;
+  	applyIf: function(config) {
+  		if (!config.transistorAuthorizationToken) return config;
 
-  	var token = config.transistorAuthorizationToken;
-  	delete config.transistorAuthorizationToken;
+	  	var token = config.transistorAuthorizationToken;
+	  	delete config.transistorAuthorizationToken;
 
-  	config.url = token.url + LOCATIONS_PATH;
-  	config.authorization = {
-  		strategy: 'JWT',
-  		accessToken: token.accessToken,
-  		refreshToken: token.refreshToken,
-  		refreshUrl: token.url + REFRESH_TOKEN_PATH,
-  		refreshPayload: REFRESH_PAYLOAD,
-  		expires: token.expires
+	  	config.url = token.url + LOCATIONS_PATH;
+	  	config.authorization = {
+	  		strategy: 'JWT',
+	  		accessToken: token.accessToken,
+	  		refreshToken: token.refreshToken,
+	  		refreshUrl: token.url + REFRESH_TOKEN_PATH,
+	  		refreshPayload: REFRESH_PAYLOAD,
+	  		expires: token.expires
+	  	}
+  		return config;
   	}
-  	return config;
-  }
 }
