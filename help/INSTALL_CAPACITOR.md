@@ -63,11 +63,11 @@ android {
 
 ## AndroidManifest.xml (License Configuration)
 
-If you've **not** [purchased a license](https://www.transistorsoft.com/shop/products/react-native-background-geolocation#plans), **ignore this step** &mdash; the plugin is fully functional in *DEBUG* builds so you can try before you [buy](https://www.transistorsoft.com/shop/products/react-native-background-geolocation#plans).
+If you've **not** [purchased a license](https://www.transistorsoft.com/shop/products/cordova-background-geolocation#plans), **ignore this step** &mdash; the plugin is fully functional in *DEBUG* builds so you can try before you [buy](https://www.transistorsoft.com/shop/products/cordova-background-geolocation#plans).
 
 ```diff
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.transistorsoft.backgroundgeolocation.react">
+    package="com.your.app">
 
   <application
     android:name=".MainApplication"
