@@ -1,5 +1,8 @@
 # CHANGELOG
 
+## Unreleased
+- [Fixed] Allow firebase-adapter to validate license flavors on same key (eg: .development, .staging).
+
 ## 3.6.3 - 2020-04-15
 - [Fixed][Android] Fix breaking gradle configuration change for Capacitor 2.0.  See new [Capacitor Setup](./help/INSTALL_CAPACITOR.md#android).
 
