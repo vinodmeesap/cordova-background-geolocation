@@ -1,5 +1,7 @@
 def TAG = "[cordova-background-geolocation] "
 
+def useAndroidX = (project.hasProperty("android.useAndroidX")) ? project.property("android.useAndroidX") : false
+
 def userDir = System.getProperty("user.dir")
 def libDir = "${projectDir}/libs"
 
@@ -41,7 +43,11 @@ println("${TAG} libDir: ${libDir}")
 
 dependencies {
   // Load tslocationmanager.aar
-  implementation fileTree(include: ['*.aar'], dir: "${libDir}/tslocationmanager")
+  if (useAndroidX) {
+    implementation fileTree(include: ['*.aar'], dir: "${libDir}/tslocationmanager")
+  } else {
+    implementation fileTree(include: ['*.aar'], dir: "${libDir}/tslocationmanager/reverse")
+  }
 }
 
 /**
