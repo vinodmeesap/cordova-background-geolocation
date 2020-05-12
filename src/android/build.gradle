@@ -44,9 +44,9 @@ println("${TAG} libDir: ${libDir}")
 dependencies {
   // Load tslocationmanager.aar
   if (useAndroidX) {
-    implementation fileTree(include: ['*.aar'], dir: "${libDir}/tslocationmanager")
+    api fileTree(include: ['*.aar'], dir: "${libDir}/tslocationmanager")
   } else {
-    implementation fileTree(include: ['*.aar'], dir: "${libDir}/tslocationmanager/reverse")
+    api fileTree(include: ['*.aar'], dir: "${libDir}/tslocationmanager/reverse")
   }
 }
 
