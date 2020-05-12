@@ -1,6 +1,8 @@
 # CHANGELOG
 
 ## Unreleased
+- [Changed][Android] Gradle import `tslocationmanager.aar` using `api` rather than `implementation` in order to allow overrides in `AndroidManifest.xml`.
+- [Fixed][iOS] When upgrading from a version previous to `3.4.0`, if any records exist within plugin's SQLite database, those records could fail to be properly migrated to new schema.
 - [Added] Implement `BackgroundGeolocation.destroyLocation(uuid)` for destroying single location by uuid.
 - [Added] New method `BackgroundGeolocation.destroyLocation(uuid)` for destroying a single location by `Location.uuid`.
 - [Fixed] Allow firebase-adapter to validate license flavors on same key (eg: .development, .staging).
