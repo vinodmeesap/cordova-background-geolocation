@@ -1,8 +1,10 @@
 # CHANGELOG
 
 ## Unreleased
+- [Fixed][Android] Capacitor `build.gradle` issue.  When building with 3rd-party build-service, the gradle file could fail to detect Capacitor apps due to unexpected result of `$userDir` variable.  Fixed by detecting Capacitor relative to `$projectDir` instead (Thanks to @soleary1222).  Fixes [issue](https://github.com/transistorsoft/cordova-background-geolocation-lt/issues/1123).
+- [Fixed][Android] Fix `@UIThread` issue executing location error handler on background-thread.
 - [Changed][Android] Gradle import `tslocationmanager.aar` using `api` rather than `implementation` in order to allow overrides in `AndroidManifest.xml`.
-- [Fixed][iOS] When upgrading from a version previous to `3.4.0`, if any records exist within plugin's SQLite database, those records could fail to be properly migrated to new schema.
+- [Fixed][iOS] When upgrading from a version previous `<3.4.0`, if any records exist within plugin's SQLite database, those records could fail to be properly migrated to new schema.
 - [Added] Implement `BackgroundGeolocation.destroyLocation(uuid)` for destroying single location by uuid.
 - [Added] New method `BackgroundGeolocation.destroyLocation(uuid)` for destroying a single location by `Location.uuid`.
 - [Fixed] Allow firebase-adapter to validate license flavors on same key (eg: .development, .staging).
