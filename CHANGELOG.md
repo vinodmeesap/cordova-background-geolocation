@@ -1,6 +1,7 @@
 # CHANGELOG
 
 ## Unreleased
+- [Fixed][iOS] When using `disableStopDetection: true` with `pausesLocationUpdatesAutomatically: true`, the `CLLocationManagerDelegate didPauseLocationUpdates` fired a `motionchange` with `isMoving: true` (should be `false`).
 - [Fixed][Android] Capacitor `build.gradle` issue.  When building with 3rd-party build-service, the gradle file could fail to detect Capacitor apps due to unexpected result of `$userDir` variable.  Fixed by detecting Capacitor relative to `$projectDir` instead (Thanks to @soleary1222).  Fixes [issue](https://github.com/transistorsoft/cordova-background-geolocation-lt/issues/1123).
 - [Fixed][Android] Fix `@UIThread` issue executing location error handler on background-thread.
 - [Changed][Android] Gradle import `tslocationmanager.aar` using `api` rather than `implementation` in order to allow overrides in `AndroidManifest.xml`.
