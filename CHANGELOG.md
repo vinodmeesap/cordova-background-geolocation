@@ -1,6 +1,7 @@
 # CHANGELOG
 
 ## Unreleased
+- [Fixed][Android] `onGeofence` event-handler fails to be fired when `maxRecordsToPersist: 0`.
 - [Fixed][Android] `requestPermission` method was always returning `AUTHORIZATION_STATUS_ALWAYS` even when *When in Use* was selected.
 - [Fixed][iOS] When using `disableStopDetection: true` with `pausesLocationUpdatesAutomatically: true`, the `CLLocationManagerDelegate didPauseLocationUpdates` fired a `motionchange` with `isMoving: true` (should be `false`).
 - [Fixed][Android] Capacitor `build.gradle` issue.  When building with 3rd-party build-service, the gradle file could fail to detect Capacitor apps due to unexpected result of `$userDir` variable.  Fixed by detecting Capacitor relative to `$projectDir` instead (Thanks to @soleary1222).  Fixes [issue](https://github.com/transistorsoft/cordova-background-geolocation-lt/issues/1123).
