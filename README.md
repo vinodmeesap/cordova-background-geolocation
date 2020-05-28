@@ -1,4 +1,4 @@
-cordova-background-geolocation &middot; [Premium Version]
+Cordova / Capacitor Background Geolocation &middot; [Premium Version]
 ===========================================================================
 
 [![](https://dl.dropboxusercontent.com/s/nm4s5ltlug63vv8/logo-150-print.png?dl=1)](https://www.transistorsoft.com)
