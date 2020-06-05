@@ -1,6 +1,7 @@
 def TAG = "[cordova-background-geolocation] "
 
 def useAndroidX = (project.hasProperty("android.useAndroidX")) ? project.property("android.useAndroidX") : false
+def nodeModulesDir = (project.hasProperty("nodeModulesDirectory")) ? project.property("nodeModulesDirectory") : "../../node_modules"
 
 def libDir = "${projectDir}/libs"
 
@@ -12,7 +13,7 @@ if (capacitorConfig.exists()) {
   def CORDOVA_BACKGROUND_GEOLOCATION    = "cordova-background-geolocation"
 
   // Capacitor app
-  libDir = "${projectDir}/../../node_modules"
+  libDir = "${projectDir}/${nodeModulesDir}"
 
   File folder = new File("${libDir}/${CORDOVA_BACKGROUND_GEOLOCATION}")
 
