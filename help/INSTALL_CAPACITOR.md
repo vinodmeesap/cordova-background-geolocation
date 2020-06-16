@@ -30,7 +30,7 @@ Edit **`Info.plist`**.  Add the following items (Set **Value** as desired):
 
 ![](https://dl.dropbox.com/s/9non3j83jj0rimu/ios-setup-plist-strings.png?dl=1)
 
-## [Configure `cordova-plugin-background-fetch`](https://github.com/transistorsoft/cordova-plugin-background-fetch/blob/master/docs/INSTALL_CAPACITOR.md#ios-setup)
+## [Configure `cordova-plugin-background-fetch`](https://github.com/transistorsoft/cordova-plugin-background-fetch/blob/master/docs/INSTALL_CAPACITOR.md)
 
 The BackgroundGeolocation SDK makes use internally on __`cordova-plugin-background-fetch`__.  Regardless of whether you instend to implement the BackgroundFetch Javascript API in your app, you **must** perform the [Background Fetch iOS Setup](https://github.com/transistorsoft/cordova-plugin-background-fetch/blob/master/docs/INSTALL_CAPACITOR.md#ios-setup) at __`cordova-plugin-background-fetch`__.
 

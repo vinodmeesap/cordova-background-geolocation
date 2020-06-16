@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## 3.8.0 - 2020-05-15
+- [Fixed][Android] `com.android.tools.build:gradle:4.0.0` no longer allows "*direct local aar dependencies*".  The Android Setup now requires a custom __`maven url`__.
+- [Fixed][Android] `onConnectivityChange` can report incorrect value for `enabled` when toggling between Wifi Off / Airplane mode.
+
 ## 3.7.0 - 2020-05-28
 - [Fixed][Android] `onGeofence` event-handler fails to be fired when `maxRecordsToPersist: 0`.
 - [Fixed][Android] `requestPermission` method was always returning `AUTHORIZATION_STATUS_ALWAYS` even when *When in Use* was selected.
