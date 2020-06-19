@@ -75,7 +75,7 @@ def purgeBackgroundGeolocationDebugResources(applicationVariants) {
         if (!variant.hasProperty('mergeResourcesProvider')) return
 
         if (variant.buildType.name == "release") {
-            println("[$pluginName] Purging debug resources in release build")
+            println("[cordova-background-geolocation] Purging debug resources in release build")
             variant.mergeResourcesProvider.configure {
                 doLast {
                     delete(fileTree(dir: outputDir, includes: ["raw_tslocationmanager*"]))
