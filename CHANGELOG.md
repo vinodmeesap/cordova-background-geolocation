@@ -1,5 +1,11 @@
 # CHANGELOG
 
+## Unreleased
+- [Fixed][iOS] Geofence `EXIT` sometimes not firing when using `notifyOnDwell`.
+- [Fixed][Javascript] @kbrownlees found typescript in `TransistorAuthorizationToken` causing old browsers to crash, defining a function as `foo()` vs `foo: function()`.
+- [Changed][Android] Refactor geofencing-only mode to not initiate "Infinite Geofencing" when the total number of added geofences is `< 99` (the maximum number of simultaneous geofences that can be monitored on Android).  This prevents the SDK from periodically requesting location to query "geofences within `geofenceProximityRadius`".  iOS already has this behaviour (where its maximum simultaneous geofences is `19`).
+- [Fixed][iOS] When using `#ready` with `reset: true` (the default), and `autoSync: false`, the SDK could initiate HTTP service if any records exist within plugin's SQLite database, since `reset: true` causes `autoSync: true` for a fraction of a millisecond, initiating the HTTP Service.
+
 ## 3.8.0 - 2020-05-15
 - [Fixed][Android] `com.android.tools.build:gradle:4.0.0` no longer allows "*direct local aar dependencies*".  The Android Setup now requires a custom __`maven url`__.
 - [Fixed][Android] `onConnectivityChange` can report incorrect value for `enabled` when toggling between Wifi Off / Airplane mode.
