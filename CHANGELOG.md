@@ -1,6 +1,7 @@
 # CHANGELOG
 
-## Unreleased
+## 3.8.1 - 2020-07-08
+- [Added][Android] New Config option `Notification.sticky` (default `false`) for allowing the Android foreground-service notification to be always shown.  The default behavior is the only show the notification when the SDK is in the *moving* state, but Some developers have expressed the need to provide full disclosure to their users when the SDK is enabled, regardless if the device is stationary with location-services OFF.
 - [Fixed][iOS] Geofence `EXIT` sometimes not firing when using `notifyOnDwell`.
 - [Fixed][Javascript] @kbrownlees found typescript in `TransistorAuthorizationToken` causing old browsers to crash, defining a function as `foo()` vs `foo: function()`.
 - [Changed][Android] Refactor geofencing-only mode to not initiate "Infinite Geofencing" when the total number of added geofences is `< 99` (the maximum number of simultaneous geofences that can be monitored on Android).  This prevents the SDK from periodically requesting location to query "geofences within `geofenceProximityRadius`".  iOS already has this behaviour (where its maximum simultaneous geofences is `19`).
