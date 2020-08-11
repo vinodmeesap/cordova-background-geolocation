@@ -1,5 +1,37 @@
 # CHANGELOG
 
+## Unreleased
+
+- [Added][Android] Add `onChange` listener for `config.locationAuthorizationRequest` to request location-authorization.
+- [Changed][iOS] If `locationAuthorizationRequest == 'WhenInUse'` and the user has granted the higher level of `Always` authorization, do not show `locationAuthorizationAlert`.
+- [Added][iOS] Apple has changed the behaviour of location authorization &mdash; if an app initially requests `When In Use` location authorization then later requests `Always` authorization, iOS will *immediately* show the authorization upgrade dialog (`[Keep using When in Use`] / `[Change to Always allow]`).
+
+__Example__
+```javascript
+onDeviceReady() {
+  BackgroundGeolocation.ready({
+    locationAuthorizationRequest: 'WhenInUse',
+    .
+    .
+    .
+  });
+}
+
+async onClickStartTracking() {
+  await BackgroundGeolocation.start();
+
+  //
+  // some time later -- could be immediately after, hours later, days later, etc.
+  //
+  // Simply update `locationAuthorizationRequest` to "Always" -- the SDK will cause iOS to automatically show the authorization upgrade dialog.
+  BackgroundGeolocation.setConfig({
+    locationAuthorizationRequest: 'Always'
+  });
+}
+```
+
+![](https://dl.dropbox.com/s/0alq10i4pcm2o9q/ios-when-in-use-to-always-CHANGELOG.gif?dl=1)
+
 ## 3.8.2 - 2020-07-23
 [Fixed] Modify `plugin.xml` to copy android `libs` to `platforms/android/libs` rather than referencing from `/plugins/src/android/libs` -- this was not possible with *PhoneGap Build*.
 [Fixed][iOS] when `getCurrentPosition` is provided with `extras`, those `extras` overwrite any configured `Config.extras` rather than merging.
