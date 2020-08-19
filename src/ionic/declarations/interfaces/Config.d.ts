@@ -1804,9 +1804,12 @@ declare module "cordova-background-geolocation" {
     * For apps with When In Use authorization, the system changes the appearance of the status bar when the app uses location services in the background.
     */
     showsBackgroundLocationIndicator?: boolean;
-
     /**
-    * Defines the *desired* location-authorization request you *wish* for the user to authorize: "Always" or "When In Use".
+    * Defines the *desired* location-authorization request you *wish* for the user to authorize:
+    * - __`Always`__
+    * - __`WhenInUse`__
+    * - __`Any`__
+    *
     * @break
     *
     * **`locationAuthorizationRequest`** tells the plugin the mode it *expects* to have been authorized with *by the user*.  Defaults to __`Always`__.  If you _don't care_ what the user authorizes, you may configure __`locationAuthorizationRequest: "Any"`__.
@@ -1815,19 +1818,40 @@ declare module "cordova-background-geolocation" {
     *
     * ## iOS
     *
-    * iOS 13 introduced a significant change to *location authorization* (See this [blog entry](https://medium.com/@transistorsoft/ios-13-and-android-q-support-beb7595d2c24)).  No longer will the __`[Always allow]`__ option appear on the initial authorization dialog.  Instead, the OS will automatically show an "authorization upgrade" dialog to the user at some time in the future, asking the user if they'd like to grant __`[Keep Only While Using ]`__ or __`[Change to Always Allow]`__.
+    * iOS 13 introduced a significant modification to *location authorization* (See this [blog entry](https://medium.com/@transistorsoft/ios-13-and-android-q-support-beb7595d2c24)).  No longer will the __`[Always allow]`__ option appear on the initial authorization dialog.  Instead, iOS will prompt the user with a second "authorization upgrade" dialog, asking the user if they'd like to grant __`[Keep Only While Using ]`__ or __`[Change to Always Allow]`__.
     *
-    * If your app requests __`locationAuthorizationRequest: "Always"`__, the user must first authorize __`[Alow While Using App]`__:
+    * ### 1.  __`locationAuthorizationRequest: 'Always'`__:
+    *
+    * If your app requests __`locationAuthorizationRequest: 'Always'`__, the user must first authorize __`[Alow While Using App]`__, followed *immediately* by a second dialog prompting the user to upgrade location authorization with __`[Change to Always Allow]`__:
+    *
+    * ![](https://dl.dropbox.com/s/0alq10i4pcm2o9q/ios-when-in-use-to-always-CHANGELOG.gif?dl=1)
+    *
+    * If the user __denies__ __`Always`__ authorization, the [[locationAuthorizationAlert]] will be shown (see [[disableLocationAuthorizationAlert]] to disable this behaviour).
+    *
+    * ![](https://dl.dropbox.com/s/wk66ave2mzq6m6a/ios-locationAuthorizationAlert.jpg?dl=1)
+    *
+    * ### 2.  __`locationAuthorizationRequest: 'WhenInUse'`__:
+    *
+    * Only the initial dialog will be shown:
     *
     * ![](https://dl.dropbox.com/s/n38qehw3cjhzngy/ios13-location-authorization.png?dl=1)
     *
-    * At some time in the future, iOS will show a dialog offering to allow the user to upgrade location-authorization with __`[Change to Always Allow]`__:
+    * *However*, if your app *later* uses __`setConfig`__ to change __`locationAuthorizationRequest: 'Always'`__, iOS will *immediately* show the "authorization upgrade" dialog:
     *
     * ![](https://dl.dropbox.com/s/5syokc8rtrc9q35/ios13-location-authorization-upgrade-always.png?dl=1)
     *
-    * *However*, if your app *initially* requests __`WhenInUse`__ then *later* requests __`Always`__, iOS will *immediately* show the "authorization upgrade" dialog:
+    * ### 3.  __`locationAuthorizationRequest: 'Any'`__:
+    *
+    * The SDK will request `Always` authorization.  The initial location authorization dialog will be shown:
+    *
+    * ![](https://dl.dropbox.com/s/n38qehw3cjhzngy/ios13-location-authorization.png?dl=1)
+    *
+    * However, at some *unknown time* in the future, iOS will prompt the user with the location authorization upgrade dialog:
+    *
+    * ![](https://dl.dropbox.com/s/5syokc8rtrc9q35/ios13-location-authorization-upgrade-always.png?dl=1)
     *
     * @example
+    *
     * ```javascript
     * onAppLaunch() {
     *   // Initially configure for 'WhenInUse'.
@@ -1840,24 +1864,23 @@ declare module "cordova-background-geolocation" {
     * }
     *
     * async onClickStartTracking() {
-    *   // Initial location authorization dialog for "When in Use" authotization will be shown here.
+    *   // Initial location authorization dialog for "When in Use" authotization
+    *   // will be shown here.
     *   await BackgroundGeolocation.start();
+    *   // some time later -- could be immediately after, hours later, days later, etc.,
+    *   // you can upgrade the config to 'Always' whenever you wish:
+    *   upgradeToAlwaysAllow();
+    * }
     *
-    *   //
-    *   // some time later -- could be immediately after, hours later, days later, etc.
-    *   //
-    *   // Simply update `locationAuthorizationRequest` to "Always" -- the SDK will cause iOS to automatically
-    *   // show the authorization upgrade dialog for "Change to Always Allow":
+    * upgradeToAlwaysAllow() {
+    *   // Simply update `locationAuthorizationRequest` to "Always" -- the SDK
+    *   // will cause iOS to immediately show the authorization upgrade dialog
+    *   // for "Change to Always Allow":
     *   BackgroundGeolocation.setConfig({
     *     locationAuthorizationRequest: 'Always'
     *   });
     * }
     * ```
-    *
-    * The following animation demonstrates the example above &mdash; at first install, the app initially requests __`WhenInUse`__ authorization then _immediately_ requests __`Always`__:
-    *
-    * ![](https://dl.dropbox.com/s/0alq10i4pcm2o9q/ios-when-in-use-to-always-CHANGELOG.gif?dl=1)
-    *
     *
     * ## Android
     *
@@ -1915,6 +1938,8 @@ declare module "cordova-background-geolocation" {
     * ## iOS
     *
     * The iOS alert dialog text elements can be configured via [[locationAuthorizationAlert]] and [[locationAuthorizationRequest]].
+    *
+    * ![](https://dl.dropbox.com/s/wk66ave2mzq6m6a/ios-locationAuthorizationAlert.jpg?dl=1)
     *
     * ## Android
     *
