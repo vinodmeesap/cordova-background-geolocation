@@ -58,7 +58,9 @@
     "typedoc": "^0.12.0",
     "typedoc-plugin-gitlink": "^0.0.3",
     "typedoc-plugin-mediaplayer": "^0.1.1",
-    "typedoc-theme-transistor": "git+https://github.com/transistorsoft/typedoc-theme-transistor.git"
+    "typedoc-theme-transistor": "git+https://github.com/transistorsoft/typedoc-theme-transistor.git",
+    "chalk": "^4.1.0",
+    "rimraf": "^3.0.2"
   },
   "author": "Chris Scott, Transistor Software",
   "license": "Commercial (http://www.binpress.com/license/view/l/7bbff78c0e0f33e865b4f83333a54bdf)",
