@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## 3.9.2 &mdash; 2020-10-02
+
+- [Added][Android] Added special mechanism for *Capacitor* apps to allow for *Android Headless Mode*.  See the updated Setup instructions in the Wiki.
+
 ## 3.9.1 &mdash; 2020-09-30
 
 - [Fixed][Android] `isMainActivityActive` reported incorrect results for Android apps configured with "product flavors".  This would cause the SDK to fail to recognize app is in "headless" state and fail to transmit headless events.
