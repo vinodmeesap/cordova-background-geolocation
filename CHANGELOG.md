@@ -1,5 +1,10 @@
 # CHANGELOG
 
+## Unreleased
+
+- [Fixed][iOS] fix bug providing wrong Array of records to `sync` method when no HTTP service is configured.
+- [Fixed][Android] Add extra logic for `isMainActivityActive` to detect when `TSLocationManagerActivity` is active.
+
 ## 3.9.2 &mdash; 2020-10-02
 
 - [Added][Android] Added special mechanism for *Capacitor* apps to allow for *Android Headless Mode*.  See the updated Setup instructions in the Wiki.
